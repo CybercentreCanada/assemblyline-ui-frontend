@@ -102,8 +102,8 @@ export const ManageHeuristicsRoute = createAppRoute({
   }),
 
   ancestor: '/manage',
-  shortname: () => ({ i18nKey: 'drawer.manage.heuristics', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'drawer.manage.heuristics', ns: 'app' }),
+  shortname: () => ['app_route.manage_heuristics.shortname', { ns: 'manageHeuristics' }],
+  fullname: () => ['app_route.manage_heuristics.fullname', { ns: 'manageHeuristics' }],
   shorticon: () => <SimCardOutlinedIcon />,
   fullicon: () => <SimCardOutlinedIcon />,
 

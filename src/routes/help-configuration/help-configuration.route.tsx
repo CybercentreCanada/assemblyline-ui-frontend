@@ -240,8 +240,8 @@ export const HelpConfigurationRoute = createAppRoute({
   path: '/help/configuration',
 
   ancestor: '/help',
-  shortname: () => ({ i18nKey: 'drawer.help.configuration', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'drawer.help.configuration', ns: 'app' }),
+  shortname: () => ['app_route.help_configuration.shortname', { ns: 'helpConfiguration' }],
+  fullname: () => ['app_route.help_configuration.fullname', { ns: 'helpConfiguration' }],
   shorticon: () => <SettingsApplicationsOutlinedIcon />,
   fullicon: () => <SettingsApplicationsOutlinedIcon />,
 

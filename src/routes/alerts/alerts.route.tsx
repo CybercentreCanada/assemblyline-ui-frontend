@@ -304,8 +304,8 @@ export const AlertsRoute = createAppRoute({
   }),
 
   ancestor: null,
-  shortname: () => ({ i18nKey: 'drawer.alerts', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'drawer.alerts', ns: 'app' }),
+  shortname: () => ['app_route.alerts.shortname', { ns: 'alerts' }],
+  fullname: () => ['app_route.alerts.fullname', { ns: 'alerts' }],
   shorticon: () => <NotificationImportantOutlinedIcon />,
   fullicon: () => <NotificationImportantOutlinedIcon />,
 

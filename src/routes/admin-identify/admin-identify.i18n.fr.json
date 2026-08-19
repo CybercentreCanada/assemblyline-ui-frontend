@@ -1,4 +1,6 @@
 {
+  "app_route.admin_identify.fullname": "Administration des Identifications de fichier",
+  "app_route.admin_identify.shortname": "Identification des fichiers",
   "loading.magic": "Chargement de l'éditeur LibMagic personnalisé...",
   "loading.mimes": "Chargement de l'éditeur de types MIME de confiance...",
   "loading.patterns": "Chargement de l'éditeur de modèles d'expressions régulières magic...",

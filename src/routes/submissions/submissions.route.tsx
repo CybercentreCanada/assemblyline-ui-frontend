@@ -179,8 +179,8 @@ export const SubmissionsRoute = createAppRoute({
   }),
 
   ancestor: null,
-  shortname: () => ({ i18nKey: 'drawer.submissions', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'drawer.submissions', ns: 'app' }),
+  shortname: () => ['app_route.submissions.shortname', { ns: 'submissions' }],
+  fullname: () => ['app_route.submissions.fullname', { ns: 'submissions' }],
   shorticon: () => <ViewCarouselOutlinedIcon />,
   fullicon: () => <ViewCarouselOutlinedIcon />,
 

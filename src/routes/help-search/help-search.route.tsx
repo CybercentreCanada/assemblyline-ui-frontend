@@ -522,8 +522,8 @@ export const HelpSearchRoute = createAppRoute({
   hash: s => s.string(null),
 
   ancestor: '/help',
-  shortname: () => ({ i18nKey: 'drawer.help.search', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'drawer.help.search', ns: 'app' }),
+  shortname: () => ['app_route.help_search.shortname', { ns: 'helpSearch' }],
+  fullname: () => ['app_route.help_search.fullname', { ns: 'helpSearch' }],
   shorticon: () => <SearchIcon />,
   fullicon: () => <SearchIcon />,
 

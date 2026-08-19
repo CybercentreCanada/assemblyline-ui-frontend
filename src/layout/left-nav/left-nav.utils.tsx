@@ -42,13 +42,16 @@ export const getLeftNavMenuItem = (
   const id = `${route?.path} - ${index}`;
   const name = route?.shortname?.(link as never, configState);
   const icon = route?.shorticon?.(link as never, configState) ?? null;
+  const label = name ? t(name[0], name[1]) : null;
 
   if (items.length) {
     const nextItems = items
       .map((child, childIndex) => getLeftNavMenuItem(child, childIndex, store, configState, t))
       .filter((child): child is LeftNavMenuItem => child !== null);
 
-    return nextItems.length ? { id, type: 'menu', i18nKey: name?.i18nKey, icon, items: nextItems } : null;
+    return nextItems.length
+      ? { id, type: 'menu', i18nKey: typeof label === 'string' ? label : undefined, icon, items: nextItems }
+      : null;
   }
 
   if (isRouteHidden(route, configState)) return null;
@@ -59,8 +62,7 @@ export const getLeftNavMenuItem = (
     withProps: true,
     render: (navOpen, navProps) => (
       <LeftNavRoute
-        i18nKey={name?.i18nKey}
-        ns={name?.ns}
+        name={name}
         icon={icon}
         nav={link ? navigate => navigate.to().only(link as never) : undefined}
         navOpen={navOpen}

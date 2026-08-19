@@ -21,8 +21,8 @@ export const CrashRoute = createAppRoute({
   path: '/crash',
 
   ancestor: null,
-  shortname: () => ({ i18nKey: 'error.crash', ns: 'error' }),
-  fullname: () => ({ i18nKey: 'error.crash', ns: 'error' }),
+  shortname: () => ['app_route.error.shortname', { ns: 'error' }],
+  fullname: () => ['app_route.error.fullname', { ns: 'error' }],
   shorticon: () => <BugReportOutlinedIcon />,
   fullicon: () => <BugReportOutlinedIcon />,
 

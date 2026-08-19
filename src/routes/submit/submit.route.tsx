@@ -421,8 +421,8 @@ export const SubmitRoute = createAppRoute({
   }),
 
   ancestor: null,
-  shortname: () => ({ i18nKey: 'drawer.submit', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'drawer.submit', ns: 'app' }),
+  shortname: () => ['app_route.submit.shortname', { ns: 'submit' }],
+  fullname: () => ['app_route.submit.fullname', { ns: 'submit' }],
   shorticon: () => <PublishOutlinedIcon />,
   fullicon: () => <PublishOutlinedIcon />,
 
@@ -447,8 +447,8 @@ export const SubmitRootRoute = createAppRoute({
   }),
 
   ancestor: null,
-  shortname: () => ({ i18nKey: 'drawer.submit', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'drawer.submit', ns: 'app' }),
+  shortname: () => ['app_route.submit.shortname', { ns: 'submit' }],
+  fullname: () => ['app_route.submit.fullname', { ns: 'submit' }],
   shorticon: () => <PublishOutlinedIcon />,
   fullicon: () => <PublishOutlinedIcon />,
 

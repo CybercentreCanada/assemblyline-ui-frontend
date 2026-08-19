@@ -337,8 +337,8 @@ export const SubmissionReportRoute = createAppRoute({
   }),
 
   ancestor: '/submissions',
-  shortname: location => ({ i18nKey: location?.path?.id ?? 'breadcrumb.submission.report', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'breadcrumb.submission.report', ns: 'app' }),
+  shortname: location => ['app_route.submission_report.shortname', { ns: 'submissionReport', id: location.path.id }],
+  fullname: location => ['app_route.submission_report.fullname', { ns: 'submissionReport', id: location.path.id }],
   shorticon: () => <ChromeReaderModeOutlinedIcon />,
   fullicon: () => <ChromeReaderModeOutlinedIcon />,
 

@@ -319,8 +319,8 @@ export const ManageWorkflowCreateRoute = createAppRoute({
   }),
 
   ancestor: '/manage/workflows',
-  shortname: location => ({ i18nKey: location?.path?.id ?? 'breadcrumb.workflow.create', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'breadcrumb.workflow.create', ns: 'app' }),
+  shortname: location => ['app_route.manage_workflow_create_id.shortname', { ns: 'manageWorkflowDetail', id: location.path.id }],
+  fullname: location => ['app_route.manage_workflow_create_id.fullname', { ns: 'manageWorkflowDetail', id: location.path.id }],
   shorticon: () => <CreateOutlinedIcon />,
   fullicon: () => <CreateOutlinedIcon />,
 
@@ -343,8 +343,8 @@ export const ManageWorkflowCreateRootRoute = createAppRoute({
   }),
 
   ancestor: '/manage/workflows',
-  shortname: () => ({ i18nKey: 'breadcrumb.workflow.create', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'breadcrumb.workflow.create', ns: 'app' }),
+  shortname: () => ['app_route.manage_workflow_create_root.shortname', { ns: 'manageWorkflowDetail' }],
+  fullname: () => ['app_route.manage_workflow_create_root.fullname', { ns: 'manageWorkflowDetail' }],
   shorticon: () => <CreateOutlinedIcon />,
   fullicon: () => <CreateOutlinedIcon />,
 

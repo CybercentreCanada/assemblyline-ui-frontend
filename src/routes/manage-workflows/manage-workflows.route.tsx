@@ -181,8 +181,8 @@ export const ManageWorkflowsRoute = createAppRoute({
   }),
 
   ancestor: '/manage',
-  shortname: () => ({ i18nKey: 'drawer.manage.workflow', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'drawer.manage.workflow', ns: 'app' }),
+  shortname: () => ['app_route.manage_workflows.shortname', { ns: 'manageWorkflows' }],
+  fullname: () => ['app_route.manage_workflows.fullname', { ns: 'manageWorkflows' }],
   shorticon: () => <BiNetworkChart />,
   fullicon: () => <BiNetworkChart />,
 

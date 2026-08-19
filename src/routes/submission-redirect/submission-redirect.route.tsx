@@ -35,8 +35,8 @@ export const SubmissionRedirectRoute = createAppRoute({
   }),
 
   ancestor: '/submissions',
-  shortname: location => ({ i18nKey: location?.path?.id ?? 'breadcrumb.submission.detail', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'breadcrumb.submission.detail', ns: 'app' }),
+  shortname: location => ['app_route.submission_redirect.shortname', { ns: 'submissionDetail', id: location.path.id }],
+  fullname: location => ['app_route.submission_redirect.fullname', { ns: 'submissionDetail', id: location.path.id }],
   shorticon: () => <ListAltOutlinedIcon />,
   fullicon: () => <ListAltOutlinedIcon />,
 

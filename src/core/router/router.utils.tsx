@@ -1828,7 +1828,7 @@ export const getTitlesFromNavigation = function (
       const name = route.fullname(location as never, config);
       if (!name) return null;
 
-      const title = t(name.i18nKey, { ns: name.ns });
+      const title = t(name?.[0], name?.[1]);
       if (typeof title !== 'string') return null;
 
       const trimmedTitle = title.trim();

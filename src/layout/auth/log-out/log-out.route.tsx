@@ -48,8 +48,8 @@ export const LogoutRoute = createAppRoute({
   path: '/logout',
 
   ancestor: null,
-  shortname: () => ({ i18nKey: 'logout', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'logout', ns: 'app' }),
+  shortname: () => ['app_route.log_out.shortname', { ns: 'logout' }],
+  fullname: () => ['app_route.log_out.fullname', { ns: 'logout' }],
   shorticon: () => <LogoutOutlinedIcon />,
   fullicon: () => <LogoutOutlinedIcon />,
 

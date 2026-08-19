@@ -1,6 +1,8 @@
 {
   "alerter": "Métriques d'alertes",
   "alerter.error": "Le générateur d'alertes produit des erreurs",
+  "app_route.dashboard.fullname": "Tableau de bord",
+  "app_route.dashboard.shortname": "Tableau de bord",
   "archive.error.exception": "L'archiveur génère des exceptions non interceptées",
   "archive.error.invalid": "L'archiveur reçoit des messages non valides",
   "archive.error.not_found": "L'archiveur essaie d'archiver les documents manquants",

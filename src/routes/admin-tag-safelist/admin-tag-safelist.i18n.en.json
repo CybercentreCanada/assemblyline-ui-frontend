@@ -1,4 +1,6 @@
 {
+  "app_route.admin_tag_safelist.fullname": "Admin System Safelist",
+  "app_route.admin_tag_safelist.shortname": "System Safelist",
   "loading": "Loading safelist editor...",
   "reset": "Reset",
   "save": "Save changes",

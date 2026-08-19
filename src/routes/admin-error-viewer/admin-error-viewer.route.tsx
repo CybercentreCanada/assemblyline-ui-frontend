@@ -304,8 +304,8 @@ export const AdminErrorViewerRoute = createAppRoute({
   }),
 
   ancestor: '/admin',
-  shortname: () => ({ i18nKey: 'adminmenu.errors', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'adminmenu.errors', ns: 'app' }),
+  shortname: () => ['app_route.admin_error_viewer.shortname', { ns: 'adminErrorViewer' }],
+  fullname: () => ['app_route.admin_error_viewer.fullname', { ns: 'adminErrorViewer' }],
   shorticon: () => <ErrorOutlineOutlinedIcon />,
   fullicon: () => <ErrorOutlineOutlinedIcon />,
 

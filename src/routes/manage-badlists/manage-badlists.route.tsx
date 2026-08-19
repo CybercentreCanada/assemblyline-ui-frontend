@@ -150,8 +150,8 @@ export const ManageBadlistsRoute = createAppRoute({
   }),
 
   ancestor: '/manage',
-  shortname: () => ({ i18nKey: 'drawer.manage.badlist', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'drawer.manage.badlist', ns: 'app' }),
+  shortname: () => ['app_route.manage_badlists.shortname', { ns: 'manageBadlists' }],
+  fullname: () => ['app_route.manage_badlists.fullname', { ns: 'manageBadlists' }],
   shorticon: () => <BugReportOutlinedIcon />,
   fullicon: () => <BugReportOutlinedIcon />,
 

@@ -1,6 +1,10 @@
 {
   "ai_summary": "Executive Summary",
   "analysing_report": "Asking the robots to summarize the report...",
+  "app_route.submission_detail.fullname": "Submission Detail {{id}}",
+  "app_route.submission_detail.shortname": "{{id}}",
+  "app_route.submission_redirect.fullname": "Submission Redirect {{id}}",
+  "app_route.submission_redirect.shortname": "{{id}}",
   "archive": "Copy the submission into the Malware Archive",
   "archive.acceptText": "Yes, archive it!",
   "archive.alternate_expiry": "When should this submission be delete from the Malware Archive?",

@@ -435,8 +435,8 @@ export const ArchivesRoute = createAppRoute({
   }),
 
   ancestor: null,
-  shortname: () => ({ i18nKey: 'drawer.archive', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'drawer.archive', ns: 'app' }),
+  shortname: () => ['app_route.archives.shortname', { ns: 'archive' }],
+  fullname: () => ['app_route.archives.fullname', { ns: 'archive' }],
   shorticon: () => <ArchiveOutlinedIcon />,
   fullicon: () => <ArchiveOutlinedIcon />,
 

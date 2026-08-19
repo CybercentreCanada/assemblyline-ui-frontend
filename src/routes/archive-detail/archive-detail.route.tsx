@@ -304,8 +304,8 @@ export const ArchiveDetailRoute = createAppRoute({
   }),
 
   ancestor: '/archives',
-  shortname: () => ({ i18nKey: 'breadcrumb.archive.detail', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'breadcrumb.archive.detail', ns: 'app' }),
+  shortname: () => ['app_route.archive_detail_id_tab.shortname', { ns: 'archive' }],
+  fullname: location => ['app_route.archive_detail_id_tab.fullname', { ns: 'archive', id: location.path.id, tab: location.path.tab }],
   shorticon: () => <DescriptionOutlinedIcon />,
   fullicon: () => <DescriptionOutlinedIcon />,
 
@@ -325,8 +325,8 @@ export const ArchiveDetailRootRoute = createAppRoute({
   }),
 
   ancestor: '/archives',
-  shortname: () => ({ i18nKey: 'breadcrumb.archive.detail', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'breadcrumb.archive.detail', ns: 'app' }),
+  shortname: () => ['app_route.archive_detail_id.shortname', { ns: 'archive' }],
+  fullname: location => ['app_route.archive_detail_id.fullname', { ns: 'archive', id: location.path.id }],
   shorticon: () => <DescriptionOutlinedIcon />,
   fullicon: () => <DescriptionOutlinedIcon />,
 

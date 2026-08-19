@@ -637,8 +637,8 @@ export const ManageBadlistDetailRoute = createAppRoute({
   }),
 
   ancestor: '/manage/badlists',
-  shortname: location => ({ i18nKey: location?.path?.id ?? 'breadcrumb.badlist.detail', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'breadcrumb.badlist.detail', ns: 'app' }),
+  shortname: location => ['app_route.manage_badlist_detail.shortname', { ns: 'manageBadlistDetail', id: location.path.id }],
+  fullname: location => ['app_route.manage_badlist_detail.fullname', { ns: 'manageBadlistDetail', id: location.path.id }],
   shorticon: () => <BugReportOutlinedIcon />,
   fullicon: () => <BugReportOutlinedIcon />,
 

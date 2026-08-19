@@ -134,8 +134,8 @@ export const HelpServicesRoute = createAppRoute({
   path: '/help/services',
 
   ancestor: '/help',
-  shortname: () => ({ i18nKey: 'drawer.help.services', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'drawer.help.services', ns: 'app' }),
+  shortname: () => ['app_route.help_services.shortname', { ns: 'helpServices' }],
+  fullname: () => ['app_route.help_services.fullname', { ns: 'helpServices' }],
   shorticon: () => <AccountTreeOutlinedIcon />,
   fullicon: () => <AccountTreeOutlinedIcon />,
 

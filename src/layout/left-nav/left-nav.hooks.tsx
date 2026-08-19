@@ -15,7 +15,7 @@ import { useTranslation } from 'react-i18next';
 export const useParseTemplateLeftNavMenu = (
   leftNavs: AppLeftNavItem[] = []
 ): AppPreferenceConfigs['leftnav']['menus'] => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const configStoreApi = useAppConfigStoreApi();
   const locationParamStoreApi = useAppLocationParamStoreApi();
@@ -43,6 +43,10 @@ export const useParseTemplateLeftNavMenu = (
       unsubscribeLocationParam?.();
     };
   }, [buildMenu, configStoreApi, locationParamStoreApi]);
+
+  useEffect(() => {
+    setMenu(buildMenu());
+  }, [buildMenu, i18n.language]);
 
   return menu;
 };

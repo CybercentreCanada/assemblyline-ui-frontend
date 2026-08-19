@@ -42,8 +42,8 @@ export const MissingNodeRoute = createAppRoute({
   path: '/missing-node',
 
   ancestor: null,
-  shortname: () => ({ i18nKey: 'title', ns: 'missingNode' }),
-  fullname: () => ({ i18nKey: 'title', ns: 'missingNode' }),
+  shortname: () => ['app_route.missing_node.shortname', { ns: 'missingNode' }],
+  fullname: () => ['app_route.missing_node.fullname', { ns: 'missingNode' }],
   shorticon: () => <LinkOffIcon />,
   fullicon: () => <LinkOffIcon />,
 

@@ -105,8 +105,8 @@ export const SettingsRoute = createAppRoute({
   }),
 
   ancestor: null,
-  shortname: () => ({ i18nKey: 'usermenu.settings', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'usermenu.settings', ns: 'app' }),
+  shortname: () => ['app_route.settings_tab.shortname', { ns: 'settings' }],
+  fullname: location => ['app_route.settings_tab.fullname', { ns: 'settings', tab: location.path.tab }],
   shorticon: () => <SettingsOutlinedIcon />,
   fullicon: () => <SettingsOutlinedIcon />,
 
@@ -120,8 +120,8 @@ export const SettingsRootRoute = createAppRoute({
   path: '/settings',
 
   ancestor: null,
-  shortname: () => ({ i18nKey: 'usermenu.settings', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'usermenu.settings', ns: 'app' }),
+  shortname: () => ['app_route.settings_root.shortname', { ns: 'settings' }],
+  fullname: () => ['app_route.settings_root.fullname', { ns: 'settings' }],
   shorticon: () => <SettingsOutlinedIcon />,
   fullicon: () => <SettingsOutlinedIcon />,
 

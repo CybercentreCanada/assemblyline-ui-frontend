@@ -231,8 +231,8 @@ export const AdminErrorDetailRoute = createAppRoute({
   params: s => ({ id: s.string() }),
 
   ancestor: '/admin/errors',
-  shortname: location => ({ i18nKey: location?.path?.id ?? 'breadcrumb.error.detail', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'breadcrumb.error.detail', ns: 'app' }),
+  shortname: location => ['app_route.admin_error_detail.shortname', { ns: 'adminErrorViewer', id: location.path.id }],
+  fullname: location => ['app_route.admin_error_detail.fullname', { ns: 'adminErrorViewer', id: location.path.id }],
   shorticon: () => <ListOutlinedIcon />,
   fullicon: () => <ListOutlinedIcon />,
 

@@ -119,8 +119,8 @@ export const DevelopmentLibraryRoute = createAppRoute({
   }),
 
   ancestor: '/development',
-  shortname: () => ({ i18nKey: 'drawer.development.library', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'drawer.development.library', ns: 'app' }),
+  shortname: () => ['app_route.development_library.shortname', { ns: 'developmentAPI' }],
+  fullname: () => ['app_route.development_library.fullname', { ns: 'developmentAPI' }],
   shorticon: () => <LibraryBooksIcon />,
   fullicon: () => <LibraryBooksIcon />,
 

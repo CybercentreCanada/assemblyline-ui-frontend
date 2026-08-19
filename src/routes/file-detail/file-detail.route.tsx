@@ -531,8 +531,8 @@ export const FileDetailRoute = createAppRoute({
   }),
 
   ancestor: null,
-  shortname: () => ({ i18nKey: 'breadcrumb.file.detail', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'breadcrumb.file.detail', ns: 'app' }),
+  shortname: () => ['app_route.file_detail.shortname', { ns: 'fileDetail' }],
+  fullname: location => ['app_route.file_detail.fullname', { ns: 'fileDetail', id: location.path.id }],
   shorticon: () => <DescriptionOutlinedIcon />,
   fullicon: () => <DescriptionOutlinedIcon />,
 

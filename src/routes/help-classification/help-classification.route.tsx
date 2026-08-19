@@ -293,8 +293,8 @@ export const HelpClassificationRoute = createAppRoute({
   path: '/help/classification',
 
   ancestor: '/help',
-  shortname: () => ({ i18nKey: 'drawer.help.classification', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'drawer.help.classification', ns: 'app' }),
+  shortname: () => ['app_route.help_classification.shortname', { ns: 'helpClassification' }],
+  fullname: () => ['app_route.help_classification.fullname', { ns: 'helpClassification' }],
   shorticon: () => <LabelOutlinedIcon />,
   fullicon: () => <LabelOutlinedIcon />,
 

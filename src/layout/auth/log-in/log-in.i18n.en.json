@@ -1,4 +1,6 @@
 {
+  "app_route.log_in.fullname": "Login",
+  "app_route.log_in.shortname": "Login",
   "button": "Sign in",
   "button_oauth": "Sign in with",
   "button_saml": "Sign in with SAML",

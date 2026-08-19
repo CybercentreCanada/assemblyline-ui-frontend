@@ -1,4 +1,8 @@
 {
+  "app_route.manage.fullname": "Manage",
+  "app_route.manage.shortname": "Manage",
+  "app_route.manage_signatures.fullname": "Manage Signatures",
+  "app_route.manage_signatures.shortname": "Signatures",
   "download_desc": "Download current set of signatures",
   "filter": "Filter signatures...",
   "filter.disabled.add": "Add filter query to show disabled signatures",

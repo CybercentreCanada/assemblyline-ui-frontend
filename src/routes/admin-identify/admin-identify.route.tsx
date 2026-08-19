@@ -193,8 +193,8 @@ export const AdminIdentifyRoute = createAppRoute({
   path: '/admin/identify',
 
   ancestor: '/admin',
-  shortname: () => ({ i18nKey: 'adminmenu.identify', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'adminmenu.identify', ns: 'app' }),
+  shortname: () => ['app_route.admin_identify.shortname', { ns: 'adminIdentify' }],
+  fullname: () => ['app_route.admin_identify.fullname', { ns: 'adminIdentify' }],
   shorticon: () => <FindInPageOutlinedIcon />,
   fullicon: () => <FindInPageOutlinedIcon />,
 

@@ -1,4 +1,5 @@
 import { useAppConfig } from 'core/config';
+import type { RouteName } from 'core/routes';
 import { getRouteParamFromKey, useAppLocationParamStore, useAppPageKey } from 'core/routes';
 import type { ComponentType, MemoExoticComponent, ReactNode } from 'react';
 import { memo } from 'react';
@@ -9,19 +10,19 @@ import { ForbiddenPage } from 'routes/forbidden/forbidden';
 // RouteName
 //*****************************************************************************************
 
-export type RouteNameProps = {
+export type AppRouteNameProps = {
   /** Route path fallback, shown when no name is resolved. */
   fallback?: ReactNode;
   /** Result of a route's `shortname`/`fullname` resolver. */
-  name?: { i18nKey: string; ns: string };
+  name?: RouteName;
 };
 
-export const RouteName = memo(({ fallback = null, name }: RouteNameProps) => {
-  const { t } = useTranslation(name.ns);
-  return !name ? <>{fallback}</> : <>{t(name.i18nKey)}</>;
+export const AppRouteName = memo(({ fallback = null, name }: AppRouteNameProps) => {
+  const { t } = useTranslation();
+  return !name ? <>{fallback}</> : <>{t(name?.[0], name?.[1])}</>;
 });
 
-RouteName.displayName = 'RouteName';
+AppRouteName.displayName = 'AppRouteName';
 
 //*****************************************************************************************
 // DisabledBoundary

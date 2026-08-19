@@ -181,8 +181,8 @@ export const ManageSafelistsRoute = createAppRoute({
   }),
 
   ancestor: '/manage',
-  shortname: () => ({ i18nKey: 'drawer.manage.safelist', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'drawer.manage.safelist', ns: 'app' }),
+  shortname: () => ['app_route.manage_safelists.shortname', { ns: 'manageSafelists' }],
+  fullname: () => ['app_route.manage_safelists.fullname', { ns: 'manageSafelists' }],
   shorticon: () => <VerifiedUserOutlinedIcon />,
   fullicon: () => <VerifiedUserOutlinedIcon />,
 

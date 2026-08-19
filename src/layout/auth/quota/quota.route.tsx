@@ -56,8 +56,8 @@ export const QuotaRoute = createAppRoute({
   path: '/quota',
 
   ancestor: null,
-  shortname: () => ({ i18nKey: 'quota', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'quota', ns: 'app' }),
+  shortname: () => ['app_route.quota.shortname', { ns: 'quota' }],
+  fullname: () => ['app_route.quota.fullname', { ns: 'quota' }],
   shorticon: () => <SpeedOutlinedIcon />,
   fullicon: () => <SpeedOutlinedIcon />,
 

@@ -478,8 +478,8 @@ export const ManageSignatureSourcesRoute = createAppRoute({
   path: '/manage/sources',
 
   ancestor: '/manage',
-  shortname: () => ({ i18nKey: 'drawer.manage.source', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'drawer.manage.source', ns: 'app' }),
+  shortname: () => ['app_route.manage_signature_sources.shortname', { ns: 'manageSignatureSources' }],
+  fullname: () => ['app_route.manage_signature_sources.fullname', { ns: 'manageSignatureSources' }],
   shorticon: () => <CodeOutlinedIcon />,
   fullicon: () => <CodeOutlinedIcon />,
 

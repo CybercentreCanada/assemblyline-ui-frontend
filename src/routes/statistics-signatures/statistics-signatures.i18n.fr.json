@@ -1,4 +1,6 @@
 {
+  "app_route.statistics_signatures.fullname": "Statistiques des signatures",
+  "app_route.statistics_signatures.shortname": "Statistiques des signatures",
   "avg": "Score Moy",
   "classification": "Classification",
   "count": "Nombre",

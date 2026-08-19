@@ -388,8 +388,8 @@ export const DevelopmentAPIRoute = createAppRoute({
   path: '/development/api',
 
   ancestor: '/development',
-  shortname: () => ({ i18nKey: 'drawer.development.api', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'drawer.development.api', ns: 'app' }),
+  shortname: () => ['app_route.development_api.shortname', { ns: 'developmentAPI' }],
+  fullname: () => ['app_route.development_api.fullname', { ns: 'developmentAPI' }],
   shorticon: () => <ApiIcon />,
   fullicon: () => <ApiIcon />,
 

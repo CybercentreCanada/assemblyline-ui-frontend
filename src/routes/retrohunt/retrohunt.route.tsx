@@ -271,8 +271,8 @@ export const RetrohuntRoute = createAppRoute({
   }),
 
   ancestor: null,
-  shortname: () => ({ i18nKey: 'drawer.retrohunt', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'drawer.retrohunt', ns: 'app' }),
+  shortname: () => ['app_route.retrohunt.shortname', { ns: 'retrohunt' }],
+  fullname: () => ['app_route.retrohunt.fullname', { ns: 'retrohunt' }],
   shorticon: () => <DataObjectOutlinedIcon />,
   fullicon: () => <DataObjectOutlinedIcon />,
 

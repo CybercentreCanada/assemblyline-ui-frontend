@@ -369,8 +369,8 @@ export const AdminServiceReviewRoute = createAppRoute({
   }),
 
   ancestor: '/admin',
-  shortname: () => ({ i18nKey: 'adminmenu.service_review', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'adminmenu.service_review', ns: 'app' }),
+  shortname: () => ['app_route.admin_service_review.shortname', { ns: 'adminServiceReview' }],
+  fullname: () => ['app_route.admin_service_review.fullname', { ns: 'adminServiceReview' }],
   shorticon: () => <CompareArrowsOutlinedIcon />,
   fullicon: () => <CompareArrowsOutlinedIcon />,
 

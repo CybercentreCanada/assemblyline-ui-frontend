@@ -103,7 +103,7 @@ export const useAppTemplateLeftNav = () =>
       { link: { route: '/archives' } },
       { link: { route: '/retrohunt' } },
       {
-        link: { route: '/search' },
+        link: { route: '/search/:index', path: { index: null } } as never,
         items: [
           { link: { route: '/search' } },
           { link: { route: '/search/:index', path: { index: 'alert' } } },

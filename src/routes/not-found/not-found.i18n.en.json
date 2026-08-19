@@ -1,4 +1,6 @@
 {
+  "app_route.not_found.fullname": "Not Found",
+  "app_route.not_found.shortname": "Not Found",
   "description": "The route you requested could not be found. Share the navigation details below with the system administrators if this is unexpected.",
   "diagnostics.attemptedHref": "Requested destination",
   "diagnostics.attemptedInput": "Navigation payload",

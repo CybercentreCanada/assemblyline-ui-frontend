@@ -638,8 +638,8 @@ export const RetrohuntDetailRoute = createAppRoute({
   }),
 
   ancestor: '/retrohunt',
-  shortname: location => ({ i18nKey: location?.path?.id ?? 'breadcrumb.retrohunt.detail', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'breadcrumb.retrohunt.detail', ns: 'app' }),
+  shortname: location => ['app_route.retrohunt_detail.shortname', { ns: 'retrohunt', id: location.path.id }],
+  fullname: location => ['app_route.retrohunt_detail.fullname', { ns: 'retrohunt', id: location.path.id }],
   shorticon: () => <ListOutlinedIcon />,
   fullicon: () => <ListOutlinedIcon />,
 

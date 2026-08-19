@@ -1,4 +1,6 @@
 {
+  "app_route.manage_heuristic_detail.fullname": "Manage Heuristic Detail {{id}}",
+  "app_route.manage_heuristic_detail.shortname": "{{id}}",
   "attack_id": "Associated Att&ck IDs",
   "chart.title": "Number of hits in the last 30 days",
   "contribution": "Score contribution",

@@ -15,8 +15,8 @@ export const NotFoundRoute = createAppRoute({
   }),
 
   ancestor: null,
-  shortname: () => ({ i18nKey: 'notfound', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'notfound', ns: 'app' }),
+  shortname: () => ['app_route.not_found.shortname', { ns: 'error404' }],
+  fullname: () => ['app_route.not_found.fullname', { ns: 'error404' }],
   shorticon: () => <LinkOffIcon />,
   fullicon: () => <LinkOffIcon />,
 

@@ -662,8 +662,14 @@ export const ManageSignatureDetailRoute = createAppRoute({
   }),
 
   ancestor: '/manage/signatures',
-  shortname: location => ({ i18nKey: location?.path?.id ?? 'breadcrumb.signature.detail', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'breadcrumb.signature.detail', ns: 'app' }),
+  shortname: location => [
+    'app_route.manage_signature_detail_id.shortname',
+    { ns: 'manageSignatureDetail', id: location.path.id }
+  ],
+  fullname: location => [
+    'app_route.manage_signature_detail_id.fullname',
+    { ns: 'manageSignatureDetail', id: location.path.id }
+  ],
   shorticon: () => <ListOutlinedIcon />,
   fullicon: () => <ListOutlinedIcon />,
 
@@ -682,8 +688,14 @@ export const ManageSignatureDetailRoute2 = createAppRoute({
   }),
 
   ancestor: '/manage/signatures',
-  shortname: location => ({ i18nKey: location?.path?.name ?? 'breadcrumb.signature.detail', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'breadcrumb.signature.detail', ns: 'app' }),
+  shortname: location => [
+    'app_route.manage_signature_detail_type_source_name.shortname',
+    { ns: 'manageSignatureDetail', name: location.path.name }
+  ],
+  fullname: location => [
+    'app_route.manage_signature_detail_type_source_name.fullname',
+    { ns: 'manageSignatureDetail', type: location.path.type, source: location.path.source, name: location.path.name }
+  ],
   shorticon: () => <ListOutlinedIcon />,
   fullicon: () => <ListOutlinedIcon />,
 

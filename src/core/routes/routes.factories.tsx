@@ -1,5 +1,5 @@
 import { AppErrorProvider } from 'core/error';
-import type { InferAppLocationFromParams } from 'core/routes';
+import type { InferAppLocationFromParams, RouteName } from 'core/routes';
 import { DisabledBoundary, ForbiddenBoundary } from 'core/routes';
 import type { HASH_PARAM_BLUEPRINTS, HashParamValue, InferHashParamBlueprintFromValue } from 'features/hash-params';
 import { createHashParamCodec } from 'features/hash-params';
@@ -30,14 +30,8 @@ export type CreateAppRouteProps<
 
   // Presentation
   ancestor?: RoutePath | null;
-  shortname: (
-    location: InferAppLocationFromParams<Path, Params, Search, Hash>,
-    config: AppConfigStore
-  ) => { i18nKey: string; ns: string };
-  fullname: (
-    location: InferAppLocationFromParams<Path, Params, Search, Hash>,
-    config: AppConfigStore
-  ) => { i18nKey: string; ns: string };
+  shortname: (location: InferAppLocationFromParams<Path, Params, Search, Hash>, config: AppConfigStore) => RouteName;
+  fullname: (location: InferAppLocationFromParams<Path, Params, Search, Hash>, config: AppConfigStore) => RouteName;
   shorticon: (location: InferAppLocationFromParams<Path, Params, Search, Hash>, config: AppConfigStore) => ReactElement;
   fullicon: (location: InferAppLocationFromParams<Path, Params, Search, Hash>, config: AppConfigStore) => ReactElement;
 

@@ -180,8 +180,8 @@ export const ManageSignaturesRoute = createAppRoute({
   }),
 
   ancestor: '/manage',
-  shortname: () => ({ i18nKey: 'drawer.manage.signatures', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'drawer.manage.signatures', ns: 'app' }),
+  shortname: () => ['app_route.manage_signatures.shortname', { ns: 'manageSignatures' }],
+  fullname: () => ['app_route.manage_signatures.fullname', { ns: 'manageSignatures' }],
   shorticon: () => <FingerprintOutlinedIcon />,
   fullicon: () => <FingerprintOutlinedIcon />,
 

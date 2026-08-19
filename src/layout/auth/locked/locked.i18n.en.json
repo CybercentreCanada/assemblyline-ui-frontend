@@ -1,4 +1,6 @@
 {
+  "app_route.locked.fullname": "Locked",
+  "app_route.locked.shortname": "Locked",
   "auto_notify": "System administrators have been notified. You will receive an email once your account is active.",
   "contact_admin": "Contact the system administrators to activate your account.",
   "title": "Hang tight, your access is on hold"

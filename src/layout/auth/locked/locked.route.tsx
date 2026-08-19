@@ -56,8 +56,8 @@ export const LockedRoute = createAppRoute({
   path: '/locked',
 
   ancestor: null,
-  shortname: () => ({ i18nKey: 'locked', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'locked', ns: 'app' }),
+  shortname: () => ['app_route.locked.shortname', { ns: 'locked' }],
+  fullname: () => ['app_route.locked.fullname', { ns: 'locked' }],
   shorticon: () => <HourglassEmptyOutlinedIcon />,
   fullicon: () => <HourglassEmptyOutlinedIcon />,
 

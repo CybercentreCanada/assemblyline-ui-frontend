@@ -1,4 +1,6 @@
 {
+  "app_route.help_configuration.fullname": "Aide sur la configuration courante",
+  "app_route.help_configuration.shortname": "Configuration courante",
   "config": "Variables de configuration",
   "config.desc": "Chaque instance d'assemblyline a une configuration unique. Certains paramètres de configuration sont particulièrement utiles pour comprendre le fonctionnement du système:",
   "file_types": "Types de fichier",

@@ -177,8 +177,8 @@ export const AdminSitemapRoute = createAppRoute({
   path: '/admin/sitemap',
 
   ancestor: '/admin',
-  shortname: () => ({ i18nKey: 'adminmenu.sitemap', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'adminmenu.sitemap', ns: 'app' }),
+  shortname: () => ['app_route.admin_sitemap.shortname', { ns: 'adminSiteMap' }],
+  fullname: () => ['app_route.admin_sitemap.fullname', { ns: 'adminSiteMap' }],
   shorticon: () => <MapOutlinedIcon />,
   fullicon: () => <MapOutlinedIcon />,
 

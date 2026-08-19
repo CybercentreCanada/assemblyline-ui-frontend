@@ -127,7 +127,7 @@ export const AppNavigationBlocker = memo(() => {
         const routeParam = getRouteParamFromKey(locationState, pageKey);
         const configState = getAppConfigStateFromApi(configStoreApi);
         const name = route.fullname(routeParam as never, configState);
-        const title = name && t(name.i18nKey, { ns: name.ns });
+        const title = name && t(name?.[0], name?.[1]);
 
         switch (reason) {
           case 'unsaved_changes':

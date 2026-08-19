@@ -5,10 +5,10 @@ import { useAppTemplateLeftNav } from 'app/core.template';
 import { getAppConfigStateFromApi, useAppConfigStoreApi } from 'core/config';
 import { AppLink } from 'core/router';
 import {
+  AppRouteName,
   createAppRoute,
   findAppRouteFromPath,
   getAppLocationParamStateFromApi,
-  RouteName,
   useAppLocationParamStoreApi
 } from 'core/routes';
 import { AppPageCenter } from 'core/template';
@@ -31,7 +31,7 @@ export const DevelopmentPage = memo(() => {
       return {
         nav: nav => nav.to().only(item.link),
         icon: route?.shorticon?.(item?.link, configState),
-        label: <RouteName name={route?.shortname?.(item?.link, configState)} />
+        label: <AppRouteName name={route?.shortname?.(item?.link, configState)} />
       };
     });
   }, [configStoreApi, locationParamStoreApi, leftNav]);
@@ -80,8 +80,8 @@ export const DevelopmentRoute = createAppRoute({
   path: '/development',
 
   ancestor: null,
-  shortname: () => ({ i18nKey: 'drawer.development', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'drawer.development', ns: 'app' }),
+  shortname: () => ['app_route.development.shortname', { ns: 'developmentAPI' }],
+  fullname: () => ['app_route.development.fullname', { ns: 'developmentAPI' }],
   shorticon: () => <Code />,
   fullicon: () => <Code />,
 

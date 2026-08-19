@@ -1081,8 +1081,8 @@ export const AdminUserDetailRoute = createAppRoute({
   }),
 
   ancestor: '/admin/users',
-  shortname: location => ({ i18nKey: location?.path?.id ?? 'breadcrumb.user.detail', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'breadcrumb.user.detail', ns: 'app' }),
+  shortname: location => ['app_route.user_id.shortname', { ns: 'user', id: location.path.id }],
+  fullname: location => ['app_route.user_id.fullname', { ns: 'user', id: location.path.id }],
   shorticon: () => <AccountCircleOutlinedIcon />,
   fullicon: () => <AccountCircleOutlinedIcon />,
 
@@ -1107,8 +1107,8 @@ export const AccountRoute = createAppRoute({
   path: '/account',
 
   ancestor: null,
-  shortname: () => ({ i18nKey: 'usermenu.account', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'usermenu.account', ns: 'app' }),
+  shortname: () => ['app_route.account.shortname', { ns: 'user' }],
+  fullname: () => ['app_route.account.fullname', { ns: 'user' }],
   shorticon: () => <AccountCircleOutlinedIcon />,
   fullicon: () => <AccountCircleOutlinedIcon />,
 

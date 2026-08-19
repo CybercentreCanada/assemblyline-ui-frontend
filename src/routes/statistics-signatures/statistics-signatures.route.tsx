@@ -86,8 +86,8 @@ export const StatisticsSignaturesRoute = createAppRoute({
   path: '/manage/statistics/signatures',
 
   ancestor: '/manage/signatures',
-  shortname: () => ({ i18nKey: 'title', ns: 'statisticsSignatures' }),
-  fullname: () => ({ i18nKey: 'title', ns: 'statisticsSignatures' }),
+  shortname: () => ['app_route.statistics_signatures.shortname', { ns: 'statisticsSignatures' }],
+  fullname: () => ['app_route.statistics_signatures.fullname', { ns: 'statisticsSignatures' }],
   shorticon: () => <BarChartOutlinedIcon />,
   fullicon: () => <BarChartOutlinedIcon />,
 

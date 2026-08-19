@@ -1,4 +1,6 @@
 {
+  "app_route.not_found.fullname": "Introuvable",
+  "app_route.not_found.shortname": "Introuvable",
   "description": "La route demandée est introuvable. Partagez les détails de la navigation ci-dessous avec les administrateurs système si cela vous semble inattendu.",
   "diagnostics.attemptedHref": "Destination demandée",
   "diagnostics.attemptedInput": "Charge utile de navigation",

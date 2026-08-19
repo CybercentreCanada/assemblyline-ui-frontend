@@ -1028,8 +1028,8 @@ export const AlertDetailRoute = createAppRoute({
   }),
 
   ancestor: '/alerts',
-  shortname: location => ({ i18nKey: location?.path?.id ?? 'breadcrumb.alert.detail', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'breadcrumb.alert.detail', ns: 'app' }),
+  shortname: location => ['app_route.alert_detail.shortname', { ns: 'alerts', id: location.path.id }],
+  fullname: location => ['app_route.alert_detail.fullname', { ns: 'alerts', id: location.path.id }],
   shorticon: () => <BallotOutlinedIcon />,
   fullicon: () => <BallotOutlinedIcon />,
 

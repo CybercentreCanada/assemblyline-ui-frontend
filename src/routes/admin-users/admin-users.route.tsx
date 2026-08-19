@@ -167,8 +167,8 @@ export const AdminUsersRoute = createAppRoute({
   }),
 
   ancestor: '/admin',
-  shortname: () => ({ i18nKey: 'adminmenu.users', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'adminmenu.users', ns: 'app' }),
+  shortname: () => ['app_route.admin_users.shortname', { ns: 'adminUsers' }],
+  fullname: () => ['app_route.admin_users.fullname', { ns: 'adminUsers' }],
   shorticon: () => <SupervisorAccountOutlinedIcon />,
   fullicon: () => <SupervisorAccountOutlinedIcon />,
 

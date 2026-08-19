@@ -5,10 +5,10 @@ import { useAppTemplateLeftNav } from 'app/core.template';
 import { getAppConfigStateFromApi, useAppConfigStoreApi } from 'core/config';
 import { AppLink } from 'core/router';
 import {
+  AppRouteName,
   createAppRoute,
   findAppRouteFromPath,
   getAppLocationParamStateFromApi,
-  RouteName,
   useAppLocationParamStoreApi
 } from 'core/routes';
 import { AppPageCenter } from 'core/template';
@@ -31,7 +31,7 @@ export const AdminPage = memo(() => {
       return {
         nav: nav => nav.to().only(item.link),
         icon: route?.shorticon?.(item?.link, configState),
-        label: <RouteName name={route?.shortname?.(item?.link, configState)} />
+        label: <AppRouteName name={route?.shortname?.(item?.link, configState)} />
       };
     });
   }, [configStoreApi, locationParamStoreApi, leftNav]);
@@ -80,8 +80,8 @@ export const AdminRoute = createAppRoute({
   path: '/admin',
 
   ancestor: null,
-  shortname: () => ({ i18nKey: 'adminmenu', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'adminmenu', ns: 'app' }),
+  shortname: () => ['app_route.admin.shortname', { ns: 'adminActions' }],
+  fullname: () => ['app_route.admin.fullname', { ns: 'adminActions' }],
   shorticon: () => <BusinessOutlinedIcon />,
   fullicon: () => <BusinessOutlinedIcon />,
 

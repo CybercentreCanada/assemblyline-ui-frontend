@@ -1766,8 +1766,8 @@ export const DashboardRoute = createAppRoute({
   path: '/dashboard',
 
   ancestor: null,
-  shortname: () => ({ i18nKey: 'drawer.dashboard', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'drawer.dashboard', ns: 'app' }),
+  shortname: () => ['app_route.dashboard.shortname', { ns: 'dashboard' }],
+  fullname: () => ['app_route.dashboard.fullname', { ns: 'dashboard' }],
   shorticon: () => <DashboardOutlinedIcon />,
   fullicon: () => <DashboardOutlinedIcon />,
 

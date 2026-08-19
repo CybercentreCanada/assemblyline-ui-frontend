@@ -447,22 +447,22 @@ export const SearchRoute = createAppRoute({
   shortname: location => {
     switch (location?.path?.index) {
       case 'alert':
-        return { i18nKey: 'drawer.search.alert', ns: 'app' };
+        return ['app_route.search_index.alert.shortname', { ns: 'search' }];
       case 'file':
-        return { i18nKey: 'drawer.search.file', ns: 'app' };
+        return ['app_route.search_index.file.shortname', { ns: 'search' }];
       case 'result':
-        return { i18nKey: 'drawer.search.result', ns: 'app' };
+        return ['app_route.search_index.result.shortname', { ns: 'search' }];
       case 'retrohunt':
-        return { i18nKey: 'drawer.search.retrohunt', ns: 'app' };
+        return ['app_route.search_index.retrohunt.shortname', { ns: 'search' }];
       case 'signature':
-        return { i18nKey: 'drawer.search.signature', ns: 'app' };
+        return ['app_route.search_index.signature.shortname', { ns: 'search' }];
       case 'submission':
-        return { i18nKey: 'drawer.search.submission', ns: 'app' };
+        return ['app_route.search_index.submission.shortname', { ns: 'search' }];
       default:
-        return { i18nKey: 'drawer.search', ns: 'app' };
+        return ['app_route.search_index.shortname', { ns: 'search' }];
     }
   },
-  fullname: () => ({ i18nKey: 'drawer.search', ns: 'app' }),
+  fullname: location => ['app_route.search_index.fullname', { ns: 'search', index: location.path.index }],
   shorticon: location => {
     switch (location?.path?.index) {
       case 'alert':
@@ -501,8 +501,8 @@ export const SearchRootRoute = createAppRoute({
   }),
 
   ancestor: null,
-  shortname: () => ({ i18nKey: 'drawer.search', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'drawer.search', ns: 'app' }),
+  shortname: () => ['app_route.search_root.shortname', { ns: 'search' }],
+  fullname: () => ['app_route.search_root.fullname', { ns: 'search' }],
   shorticon: () => <SearchIcon />,
   fullicon: () => <SearchIcon />,
 

@@ -33,10 +33,10 @@ export const Tooltip = memo(({ children = null, noDiv = false, title = null, ...
       slotProps={{
         ...tooltipProps?.slotProps,
         popper: {
-          ...tooltipProps?.slotProps?.popper,
-          disablePortal: true,
+          disablePortal: false,
           // modifiers: [{ name: 'offset', options: { offset: [0, 0] } }],
-          onMouseOver: () => setOpen(false)
+          onMouseOver: () => setOpen(false),
+          ...tooltipProps?.slotProps?.popper
         },
         tooltip: {
           ...tooltipProps?.slotProps?.tooltip,

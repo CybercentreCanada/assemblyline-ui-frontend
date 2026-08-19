@@ -467,8 +467,8 @@ export const HelpAPIRoute = createAppRoute({
   path: '/help/api',
 
   ancestor: '/help',
-  shortname: () => ({ i18nKey: 'drawer.help.api', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'drawer.help.api', ns: 'app' }),
+  shortname: () => ['app_route.help_api.shortname', { ns: 'helpAPI' }],
+  fullname: () => ['app_route.help_api.fullname', { ns: 'helpAPI' }],
   shorticon: () => <AssignmentOutlinedIcon />,
   fullicon: () => <AssignmentOutlinedIcon />,
 

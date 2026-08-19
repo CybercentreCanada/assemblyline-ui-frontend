@@ -35,8 +35,8 @@ export const AlertRedirectRoute = createAppRoute({
   path: '/alerts-redirect',
 
   ancestor: null,
-  shortname: () => ({ i18nKey: 'drawer.alerts', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'drawer.alerts', ns: 'app' }),
+  shortname: () => ['app_route.alert_redirect.shortname', { ns: 'alerts' }],
+  fullname: () => ['app_route.alert_redirect.fullname', { ns: 'alerts' }],
   shorticon: () => <NotificationImportantOutlinedIcon />,
   fullicon: () => <NotificationImportantOutlinedIcon />,
 

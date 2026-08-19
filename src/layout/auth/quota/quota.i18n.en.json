@@ -1,4 +1,6 @@
 {
+  "app_route.quota.fullname": "Quota",
+  "app_route.quota.shortname": "Quota",
   "description": "You have reached your daily quota. Contact the system administrators if you believe this is a mistake.",
   "logout": "Logout",
   "title": "Whoa, your quota meter is maxed out"

@@ -1,5 +1,5 @@
-export { DisabledBoundary, ForbiddenBoundary, RouteName } from './routes.components';
-export type { DisabledBoundaryProps, ForbiddenBoundaryProps, RouteNameProps } from './routes.components';
+export { AppRouteName, DisabledBoundary, ForbiddenBoundary } from './routes.components';
+export type { AppRouteNameProps, DisabledBoundaryProps, ForbiddenBoundaryProps } from './routes.components';
 export { createAppRoute } from './routes.factories';
 export type { CreateAppRouteProps } from './routes.factories';
 export {
@@ -21,7 +21,8 @@ export type {
   InferAppLocationFromPath,
   InferAppRouteFromPath,
   InferAppRouteParamFromPath,
-  InferAppRouteSearchValuesFromPath
+  InferAppRouteSearchValuesFromPath,
+  RouteName
 } from './routes.models';
 export {
   AppLocationParamProvider,

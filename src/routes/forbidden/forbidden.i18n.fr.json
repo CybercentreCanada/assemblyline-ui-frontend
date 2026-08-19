@@ -1,4 +1,8 @@
 {
+  "app_route.disabled.fullname": "Désactivé",
+  "app_route.disabled.shortname": "Désactivé",
+  "app_route.forbidden.fullname": "Interdit",
+  "app_route.forbidden.shortname": "Interdit",
   "description": "Vous n'êtes pas autorisé à afficher cette page. Contactez les administrateurs système si vous avez besoin d'accéder à cette route.",
   "disabled.description": "Cette fonctionnalité est actuellement désactivée par politique ou configuration. Contactez les administrateurs système si cela vous semble inattendu.",
   "disabled.title": "Cette fonctionnalité fait la sieste",

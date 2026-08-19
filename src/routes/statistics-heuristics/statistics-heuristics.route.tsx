@@ -83,8 +83,8 @@ export const StatisticsHeuristicsRoute = createAppRoute({
   path: '/manage/statistics/heuristics',
 
   ancestor: '/manage/heuristics',
-  shortname: () => ({ i18nKey: 'title', ns: 'statisticsHeuristics' }),
-  fullname: () => ({ i18nKey: 'title', ns: 'statisticsHeuristics' }),
+  shortname: () => ['app_route.statistics_heuristics.shortname', { ns: 'statisticsHeuristics' }],
+  fullname: () => ['app_route.statistics_heuristics.fullname', { ns: 'statisticsHeuristics' }],
   shorticon: () => <BarChartOutlinedIcon />,
   fullicon: () => <BarChartOutlinedIcon />,
 

@@ -1,4 +1,6 @@
 {
+  "app_route.admin_service_review.fullname": "Admin Service Review",
+  "app_route.admin_service_review.shortname": "Service Review",
   "error": "Error distribution",
   "errors": "View errors in Error Viewer",
   "file.extracted.avg": "Average number of extracted file",

@@ -128,8 +128,8 @@ export const ToSRoute = createAppRoute({
   path: '/tos',
 
   ancestor: null,
-  shortname: () => ({ i18nKey: 'breadcrumb.tos', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'breadcrumb.tos', ns: 'app' }),
+  shortname: () => ['app_route.terms_of_service.shortname', { ns: 'tos' }],
+  fullname: () => ['app_route.terms_of_service.fullname', { ns: 'tos' }],
   shorticon: () => <ReceiptOutlinedIcon />,
   fullicon: () => <ReceiptOutlinedIcon />,
 

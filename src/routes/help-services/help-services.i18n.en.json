@@ -1,5 +1,9 @@
 {
   "accepts": "Accepts",
+  "app_route.help_services.fullname": "Help Service Listing",
+  "app_route.help_services.shortname": "Service Listing",
+  "app_route.help.fullname": "Help",
+  "app_route.help.shortname": "Help",
   "category": "Category",
   "count": "services loaded in the system",
   "disabled": "Disabled",

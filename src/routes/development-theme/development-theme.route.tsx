@@ -321,8 +321,8 @@ export const DevelopmentThemeRoute = createAppRoute({
   path: '/development/theme',
 
   ancestor: '/development',
-  shortname: () => ({ i18nKey: 'drawer.development.theme', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'drawer.development.theme', ns: 'app' }),
+  shortname: () => ['app_route.development_theme.shortname', { ns: 'developmentAPI' }],
+  fullname: () => ['app_route.development_theme.fullname', { ns: 'developmentAPI' }],
   shorticon: () => <PaletteIcon />,
   fullicon: () => <PaletteIcon />,
 

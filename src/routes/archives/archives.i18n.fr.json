@@ -1,4 +1,10 @@
 {
+  "app_route.archive_detail_id.fullname": "Détails du fichier archivé {{id}}",
+  "app_route.archive_detail_id.shortname": "{{id}}",
+  "app_route.archive_detail_id_tab.fullname": "Détails du fichier archivé {{id}} {{tab}}",
+  "app_route.archive_detail_id_tab.shortname": "{{id}}",
+  "app_route.archives.fullname": "Archive de maliciels",
+  "app_route.archives.shortname": "Archive",
   "ascii": "ASCII",
   "attribution": "Attribution",
   "beta.description": "L'Archive de maliciels est une fonctionnalité en cours de développement qui peut changer à l'avenir. À utiliser à vos risques et périls !",

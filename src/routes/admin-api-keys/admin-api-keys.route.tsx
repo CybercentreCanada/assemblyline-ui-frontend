@@ -169,8 +169,8 @@ export const AdminAPIKeysRoute = createAppRoute({
   }),
 
   ancestor: '/admin',
-  shortname: () => ({ i18nKey: 'adminmenu.apikeys', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'adminmenu.apikeys', ns: 'app' }),
+  shortname: () => ['app_route.admin_api_keys.shortname', { ns: 'adminAPIkeys' }],
+  fullname: () => ['app_route.admin_api_keys.fullname', { ns: 'adminAPIkeys' }],
   shorticon: () => <KeyOutlinedIcon />,
   fullicon: () => <KeyOutlinedIcon />,
 

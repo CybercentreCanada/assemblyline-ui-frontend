@@ -175,8 +175,8 @@ export const DevelopmentCustomizeRoute = createAppRoute({
   path: '/development/customize',
 
   ancestor: '/development',
-  shortname: () => ({ i18nKey: 'drawer.development.customize', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'drawer.development.customize', ns: 'app' }),
+  shortname: () => ['app_route.development_customize.shortname', { ns: 'developmentAPI' }],
+  fullname: () => ['app_route.development_customize.fullname', { ns: 'developmentAPI' }],
   shorticon: () => <DataObjectOutlinedIcon />,
   fullicon: () => <DataObjectOutlinedIcon />,
 

@@ -361,8 +361,8 @@ export const AdminServiceDetailRoute = createAppRoute({
   }),
 
   ancestor: '/admin/services',
-  shortname: location => ({ i18nKey: location?.path?.svc ?? 'breadcrumb.service.detail', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'breadcrumb.service.detail', ns: 'app' }),
+  shortname: location => ['app_route.admin_service_detail.shortname', { ns: 'adminServices', svc: location.path.svc }],
+  fullname: location => ['app_route.admin_service_detail.fullname', { ns: 'adminServices', svc: location.path.svc }],
   shorticon: () => <WebAssetIcon />,
   fullicon: () => <WebAssetIcon />,
 

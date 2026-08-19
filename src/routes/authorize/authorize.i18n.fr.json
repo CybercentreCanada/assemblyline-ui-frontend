@@ -1,5 +1,7 @@
 {
   "access": "demande l'accès à votre compte.",
+  "app_route.authorize.fullname": "Autoriser",
+  "app_route.authorize.shortname": "Autoriser",
   "button.allow": "Permettre",
   "button.back": "Retourner",
   "button.cancel": "Annuler",

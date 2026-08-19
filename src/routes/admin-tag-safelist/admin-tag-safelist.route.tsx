@@ -193,8 +193,8 @@ export const AdminTagSafelistRoute = createAppRoute({
   path: '/admin/tag_safelist',
 
   ancestor: '/admin',
-  shortname: () => ({ i18nKey: 'adminmenu.tag_safelist', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'adminmenu.tag_safelist', ns: 'app' }),
+  shortname: () => ['app_route.admin_tag_safelist.shortname', { ns: 'adminTagSafelist' }],
+  fullname: () => ['app_route.admin_tag_safelist.fullname', { ns: 'adminTagSafelist' }],
   shorticon: () => <VerifiedUserOutlinedIcon />,
   fullicon: () => <VerifiedUserOutlinedIcon />,
 

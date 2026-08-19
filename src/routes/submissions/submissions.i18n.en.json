@@ -1,4 +1,6 @@
 {
+  "app_route.submissions.fullname": "Submissions",
+  "app_route.submissions.shortname": "Submissions",
   "detail": "Detail",
   "filter": "Filter submissions...",
   "filter.completed.add": "Add filter to show completed submissions",

@@ -504,8 +504,8 @@ export const AdminServicesRoute = createAppRoute({
   path: '/admin/services',
 
   ancestor: '/admin',
-  shortname: () => ({ i18nKey: 'adminmenu.services', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'adminmenu.services', ns: 'app' }),
+  shortname: () => ['app_route.admin_services.shortname', { ns: 'adminServices' }],
+  fullname: () => ['app_route.admin_services.fullname', { ns: 'adminServices' }],
   shorticon: () => <AccountTreeOutlinedIcon />,
   fullicon: () => <AccountTreeOutlinedIcon />,
 

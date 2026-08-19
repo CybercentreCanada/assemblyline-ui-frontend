@@ -1,5 +1,7 @@
 {
   "actor": "Utilisé par",
+  "app_route.submission_report.fullname": "Rapport de soumission {{id}}",
+  "app_route.submission_report.shortname": "{{id}}",
   "attack": "Matrice d'Att&ck",
   "detail_view": "Afficher la vue détaillée",
   "error.notfound": "La soumission n'a pas été trouvée",

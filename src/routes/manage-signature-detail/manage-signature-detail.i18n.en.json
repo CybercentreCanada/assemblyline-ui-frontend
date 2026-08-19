@@ -1,4 +1,8 @@
 {
+  "app_route.manage_signature_detail_id.fullname": "Manage Signature Detail {{id}}",
+  "app_route.manage_signature_detail_id.shortname": "{{id}}",
+  "app_route.manage_signature_detail_type_source_name.fullname": "Manage Signature Detail {{type}} {{source}} {{name}}",
+  "app_route.manage_signature_detail_type_source_name.shortname": "{{name}}",
   "cancel": "Cancel",
   "change.close": "Cancel",
   "change.save": "Save changes",

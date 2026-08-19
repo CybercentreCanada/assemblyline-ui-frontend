@@ -190,8 +190,8 @@ export const AdminActionsRoute = createAppRoute({
   path: '/admin/actions',
 
   ancestor: '/admin',
-  shortname: () => ({ i18nKey: 'adminmenu.actions', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'adminmenu.actions', ns: 'app' }),
+  shortname: () => ['app_route.admin_actions.shortname', { ns: 'adminActions' }],
+  fullname: () => ['app_route.admin_actions.fullname', { ns: 'adminActions' }],
   shorticon: () => <PlaylistPlayOutlinedIcon />,
   fullicon: () => <PlaylistPlayOutlinedIcon />,
 

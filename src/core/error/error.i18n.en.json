@@ -1,4 +1,6 @@
 {
+  "app_route.error.fullname": "Crash",
+  "app_route.error.shortname": "Crash",
   "error": "error",
   "error.button": "Try again",
   "error.chunk": "Reloading the application to fix a loading error...",

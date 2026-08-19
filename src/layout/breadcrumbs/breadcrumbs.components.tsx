@@ -5,10 +5,10 @@ import { useAppPreferenceStore } from 'core/preference';
 import type { InferAppNavigationPropsFromPath } from 'core/router';
 import { AppLink, getPageFromPanelKey, useAppRouterStore } from 'core/router';
 import {
+  AppRouteName,
   findAppRouteFromPage,
   getAppLocationParamStateFromApi,
   getRouteParamFromPage,
-  RouteName,
   useAppLocationParamStore,
   useAppLocationParamStoreApi
 } from 'core/routes';
@@ -64,7 +64,7 @@ export const BreadcrumbLastItem = memo(({ location, route }: BreadcrumbLastItemP
       <BreadcrumbIcon location={location} route={route} />
       <Tooltip title={route.path}>
         <span style={{ maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-          <RouteName name={name} fallback={route.path} />
+          <AppRouteName name={name} fallback={route.path} />
         </span>
       </Tooltip>
     </Typography>
@@ -96,7 +96,7 @@ export const BreadcrumbLinkItem = memo(({ route }: BreadcrumbLinkItemProps) => {
       <BreadcrumbIcon route={route} />
       <Tooltip title={route.path}>
         <span style={{ maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-          <RouteName name={name} fallback={route.path} />
+          <AppRouteName name={name} fallback={route.path} />
         </span>
       </Tooltip>
     </Link>

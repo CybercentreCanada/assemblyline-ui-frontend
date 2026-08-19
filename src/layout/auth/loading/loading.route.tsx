@@ -40,8 +40,8 @@ export const LoadingRoute = createAppRoute({
   path: '/loading',
 
   ancestor: null,
-  shortname: () => ({ i18nKey: 'loading', ns: 'alerts' }),
-  fullname: () => ({ i18nKey: 'loading', ns: 'alerts' }),
+  shortname: () => ['app_route.loading.shortname', { ns: 'alerts' }],
+  fullname: () => ['app_route.loading.fullname', { ns: 'alerts' }],
   shorticon: () => <PendingOutlinedIcon />,
   fullicon: () => <PendingOutlinedIcon />,
 

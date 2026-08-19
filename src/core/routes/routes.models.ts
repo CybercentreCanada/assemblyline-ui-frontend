@@ -11,6 +11,15 @@ import type {
   InferSearchParamValueMapFromEngine,
   SearchParamBlueprintMap
 } from 'features/search-params';
+import type { TOptions } from 'i18next';
+
+/** Arguments accepted by i18next's `t` function when resolving a route label. */
+export type RouteName = readonly [
+  /** Translation key or fallback keys. */
+  key: string | string[],
+  /** Optional i18next interpolation, namespace, and display options. */
+  options?: TOptions
+];
 
 //*****************************************************************************************
 // Create Route Types

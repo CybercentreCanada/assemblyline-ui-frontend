@@ -1,4 +1,6 @@
 {
+  "app_route.help_configuration.fullname": "Help Current Configuration",
+  "app_route.help_configuration.shortname": "Current Configuration",
   "config": "Configuration variables",
   "config.desc": "Every Assemblyline instance has a unique configuration. Some configuration parameters are particularly useful to understand how the system works:",
   "file_types": "File Types",

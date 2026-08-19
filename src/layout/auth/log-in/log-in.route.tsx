@@ -112,8 +112,8 @@ export const LoginRoute = createAppRoute({
   path: '/login',
 
   ancestor: null,
-  shortname: () => ({ i18nKey: 'login', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'login', ns: 'app' }),
+  shortname: () => ['app_route.log_in.shortname', { ns: 'login' }],
+  fullname: () => ['app_route.log_in.fullname', { ns: 'login' }],
   shorticon: () => <LoginOutlinedIcon />,
   fullicon: () => <LoginOutlinedIcon />,
 

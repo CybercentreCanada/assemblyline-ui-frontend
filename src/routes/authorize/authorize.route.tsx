@@ -126,8 +126,8 @@ export const AuthorizeRoute = createAppRoute({
   path: '/authorize',
 
   ancestor: null,
-  shortname: () => ({ i18nKey: 'access', ns: 'authorize' }),
-  fullname: () => ({ i18nKey: 'access', ns: 'authorize' }),
+  shortname: () => ['app_route.authorize.shortname', { ns: 'authorize' }],
+  fullname: () => ['app_route.authorize.fullname', { ns: 'authorize' }],
   shorticon: () => <KeyOutlinedIcon />,
   fullicon: () => <KeyOutlinedIcon />,
 

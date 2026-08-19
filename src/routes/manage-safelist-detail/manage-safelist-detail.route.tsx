@@ -543,8 +543,8 @@ export const ManageSafelistDetailRoute = createAppRoute({
   }),
 
   ancestor: '/manage/safelists',
-  shortname: location => ({ i18nKey: location?.path?.id ?? 'drawer.manage.safelist.detail', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'drawer.manage.safelist.detail', ns: 'app' }),
+  shortname: location => ['app_route.manage_safelist_detail.shortname', { ns: 'manageSafelistDetail', id: location.path.id }],
+  fullname: location => ['app_route.manage_safelist_detail.fullname', { ns: 'manageSafelistDetail', id: location.path.id }],
   shorticon: () => <ListOutlinedIcon />,
   fullicon: () => <ListOutlinedIcon />,
 

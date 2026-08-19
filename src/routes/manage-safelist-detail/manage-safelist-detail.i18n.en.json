@@ -1,4 +1,6 @@
 {
+  "app_route.manage_safelist_detail.fullname": "Manage Safelist Detail {{id}}",
+  "app_route.manage_safelist_detail.shortname": "{{id}}",
   "chart.title": "Number of times seen in the past 30 days",
   "classification.update.success": "The source classification was successfully updated",
   "delete.acceptText": "Yes, remove it!",

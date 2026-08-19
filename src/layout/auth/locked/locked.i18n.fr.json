@@ -1,4 +1,6 @@
 {
+  "app_route.locked.fullname": "Verrouillé",
+  "app_route.locked.shortname": "Verrouillé",
   "auto_notify": "Les administrateurs système ont été informés. Vous recevrez un e-mail dès que votre compte sera actif.",
   "contact_admin": "Contactez les administrateurs système pour activer votre compte.",
   "title": "Patience, votre accès est en attente"
