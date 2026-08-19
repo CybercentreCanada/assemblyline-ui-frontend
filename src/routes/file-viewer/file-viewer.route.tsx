@@ -484,8 +484,11 @@ export const FileViewerRoute = createAppRoute({
   }),
 
   ancestor: null,
-  shortname: () => ['app_route.file_viewer_id_tab.shortname', { ns: 'fileViewer' }],
-  fullname: location => ['app_route.file_viewer_id_tab.fullname', { ns: 'fileViewer', id: location.path.id, tab: location.path.tab }],
+  shortname: location => ['app_route.file_viewer_id_tab.shortname', { ns: 'fileViewer', id: location.path.id }],
+  fullname: location => [
+    'app_route.file_viewer_id_tab.fullname',
+    { ns: 'fileViewer', id: location.path.id, tab: location.path.tab }
+  ],
   shorticon: () => <PageviewOutlinedIcon />,
   fullicon: () => <PageviewOutlinedIcon />,
 
@@ -512,7 +515,7 @@ export const FileViewerRootRoute = createAppRoute({
   }),
 
   ancestor: null,
-  shortname: () => ['app_route.file_viewer_id.shortname', { ns: 'fileViewer' }],
+  shortname: location => ['app_route.file_viewer_id.shortname', { ns: 'fileViewer', id: location.path.id }],
   fullname: location => ['app_route.file_viewer_id.fullname', { ns: 'fileViewer', id: location.path.id }],
   shorticon: () => <PageviewOutlinedIcon />,
   fullicon: () => <PageviewOutlinedIcon />,

@@ -105,7 +105,7 @@ export const SettingsRoute = createAppRoute({
   }),
 
   ancestor: null,
-  shortname: () => ['app_route.settings_tab.shortname', { ns: 'settings' }],
+  shortname: location => ['app_route.settings_tab.shortname', { ns: 'settings', tab: location.path.tab }],
   fullname: location => ['app_route.settings_tab.fullname', { ns: 'settings', tab: location.path.tab }],
   shorticon: () => <SettingsOutlinedIcon />,
   fullicon: () => <SettingsOutlinedIcon />,

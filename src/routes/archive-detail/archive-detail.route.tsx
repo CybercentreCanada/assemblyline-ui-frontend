@@ -304,8 +304,11 @@ export const ArchiveDetailRoute = createAppRoute({
   }),
 
   ancestor: '/archives',
-  shortname: () => ['app_route.archive_detail_id_tab.shortname', { ns: 'archive' }],
-  fullname: location => ['app_route.archive_detail_id_tab.fullname', { ns: 'archive', id: location.path.id, tab: location.path.tab }],
+  shortname: location => ['app_route.archive_detail_id_tab.shortname', { ns: 'archive', id: location.path.id }],
+  fullname: location => [
+    'app_route.archive_detail_id_tab.fullname',
+    { ns: 'archive', id: location.path.id, tab: location.path.tab }
+  ],
   shorticon: () => <DescriptionOutlinedIcon />,
   fullicon: () => <DescriptionOutlinedIcon />,
 
@@ -325,7 +328,7 @@ export const ArchiveDetailRootRoute = createAppRoute({
   }),
 
   ancestor: '/archives',
-  shortname: () => ['app_route.archive_detail_id.shortname', { ns: 'archive' }],
+  shortname: location => ['app_route.archive_detail_id.shortname', { ns: 'archive', id: location.path.id }],
   fullname: location => ['app_route.archive_detail_id.fullname', { ns: 'archive', id: location.path.id }],
   shorticon: () => <DescriptionOutlinedIcon />,
   fullicon: () => <DescriptionOutlinedIcon />,
