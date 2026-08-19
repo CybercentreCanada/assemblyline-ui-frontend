@@ -243,7 +243,8 @@ export const useAppTemplatePreferences = () => {
       },
       leftnav: {
         menus: menu,
-        width: 240
+        // TODO: maybe revert to 240 if the icons are removed
+        width: 260
       }
     }),
     [menu]

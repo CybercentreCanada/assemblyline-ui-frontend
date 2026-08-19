@@ -887,6 +887,7 @@ const SubmissionDetail = memo(() => {
         navigate.to<'/file/detail/:id'>({ replace: true }).update(s => ({
           ...s,
           search: {
+            name: s?.search?.name ?? null,
             metadata: submission?.metadata,
             liveResultKeys: liveResultKeys,
             liveErrors: curFileLiveErrors,
@@ -898,6 +899,7 @@ const SubmissionDetail = memo(() => {
         navigate.to<'/file/detail/:id'>({ replace: true }).update(s => ({
           ...s,
           search: {
+            name: s?.search?.name ?? null,
             metadata: submission?.metadata,
             force: submission && submission.max_score < 0,
             filetypeOverride: submission?.files?.[0]?.sha256 !== fid ? null : submission?.params?.filetype_override

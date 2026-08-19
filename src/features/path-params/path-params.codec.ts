@@ -116,12 +116,12 @@ export function createPathParamsCodec<const Path extends RoutePath>(basePath: Pa
         const key = part.slice(1);
         const parser = blueprintMap[key];
         const value = safeParams[key as keyof typeof safeParams];
-        if (value === undefined || value === null || !parser) continue;
+        if (!parser) continue;
 
         try {
           parts[index] = encodeURIComponent(parser.stringify(value as never));
         } catch {
-          parts[index] = String(value);
+          parts[index] = String(value ?? '');
         }
       }
 

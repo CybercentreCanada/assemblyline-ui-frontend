@@ -150,6 +150,15 @@ describe('createPathParamsCodec', () => {
     expect(codec.stringify({ itemID: 'a b' })).toBe('/item/a%20b');
   });
 
+  it('stringifies null enum values to the configured default', () => {
+    const codec = createPathParamsCodec('/file/viewer/:id/:tab')(b => ({
+      id: b.string(),
+      tab: b.enum(['ascii', 'code', 'strings', 'hex', 'image'] as const, 'ascii')
+    }));
+
+    expect(codec.stringify({ id: 'abc', tab: null as never })).toBe('/file/viewer/abc/ascii');
+  });
+
   it('handles a path with no dynamic segments', () => {
     const codec = createPathParamsCodec('/simple')(() => ({}) as never);
     expect(codec.parse(makeLocation('/simple'))).toEqual({});

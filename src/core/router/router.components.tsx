@@ -42,7 +42,18 @@ export function WrappedAppLink<const Origin extends AppRoute['path']>(
   const handleClick = useCallback(
     (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
       onClick?.(event);
-      if (!nav) return;
+      if (
+        !nav ||
+        event.defaultPrevented ||
+        event.button !== 0 ||
+        event.metaKey ||
+        event.ctrlKey ||
+        event.shiftKey ||
+        event.altKey ||
+        props.target != null ||
+        props.download !== undefined
+      )
+        return;
 
       event.preventDefault();
       event.stopPropagation();

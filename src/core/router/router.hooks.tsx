@@ -605,16 +605,17 @@ export function useAppSyncRouterStoreFromNavigation() {
       if (navigation.id === routerState.id) return;
       if (hasBlockedPages(navigation, routerState) && !navigation.options?.ignoreBlocker) return;
 
-      const titles = getTitlesFromNavigation(navigation, locationState, configState, t);
-      const nextTitle = navigation?.options?.nextTitle?.trim();
-      document.title = nextTitle ? nextTitle : titles?.length > 0 ? titles.join(' | ') : 'Assemblyline 4';
-
       const fragments = getHashFragmentsFromRouter(navigation);
 
       void navigate(!fragments?.length ? '/v1' : `/v1#${fragments.join('#')}`, {
         state: getLocationStateFromRouter(navigation),
         replace: navigation?.options?.replace || false
       });
+
+      const titles = getTitlesFromNavigation(navigation, locationState, configState, t);
+      const nextTitle = navigation?.options?.nextTitle?.trim();
+      document.title = nextTitle ? nextTitle : titles?.length > 0 ? titles.join(' | ') : 'Assemblyline 4';
+
       setRouterStore(router => reconcileRouterFromNavigation(router, navigation));
     },
     [configStoreApi, locationParamStoreApi, navigate, routerStoreApi, setRouterStore, t]

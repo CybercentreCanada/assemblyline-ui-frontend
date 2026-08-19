@@ -700,7 +700,7 @@ const WrappedAlertActions = ({ alert, inDrawer = false }: Props) => {
               ...(permanent && { marginRight: '-6px' })
             },
             '.MuiSpeedDial-actions': {
-              backgroundColor: theme.palette.background.paper
+              backgroundColor: 'inherit'
             },
             '.MuiSpeedDial-actionsClosed': {
               backgroundColor: 'rgba(0, 0, 0, 0) !important',
