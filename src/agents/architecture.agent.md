@@ -44,8 +44,8 @@ These patterns are NOT allowed in this codebase:
 1. **All exported components must be wrapped in `memo()`** — including `styled()` components
 2. **Every component sets `.displayName`** — for React DevTools
 3. **All component-internal functions use `useCallback`**
-4. **Components read state via `useAppConfig(selector)`** — not props for shared state
-5. **Components write state via `useAppSetConfig()`** — callback form with manual nested spreading
+4. **Components read state via `useAppConfigStore(selector)`** — not props for shared state
+5. **Components write state via `useAppSetConfigStore()`** — callback form with manual nested spreading
 6. **API mutations use `useAPIMutation()`** — not raw fetch or axios
 7. **API queries use `useAPIQuery()`** — not raw useQuery
 8. **Translation keys come from per-module i18n files** — no inline strings for user-visible text

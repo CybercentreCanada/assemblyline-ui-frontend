@@ -1,5 +1,5 @@
 import { List, useTheme } from '@mui/material';
-import { useAppConfig } from 'core/config';
+import { useAppConfigStore } from 'core/config';
 import { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { PageSection } from 'ui/layouts/PageSection';
@@ -10,7 +10,7 @@ export const ExternalSourcesSection = memo(() => {
   const { t } = useTranslation(['settings']);
   const theme = useTheme();
   const form = useForm();
-  const configuration = useAppConfig(s => s.configuration);
+  const configuration = useAppConfigStore(s => s.configuration);
 
   const fileSources = useMemo<string[]>(() => {
     if (!configuration?.submission?.file_sources) return [];

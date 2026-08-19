@@ -63,8 +63,8 @@ const MyComponent = memo(({ onClose }: MyComponentProps) => {
   const theme = useTheme();
 
   // 2. App/core hooks (store, API, snackbar, etc.)
-  const isOpen = useAppConfig(c => c.layout.notifications.open);
-  const setConfig = useAppSetConfig();
+  const isOpen = useAppConfigStore(c => c.layout.notifications.open);
+  const setConfigStore = useAppSetConfigStore();
 
   // 3. useState (rare — only for truly local ephemeral state)
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
@@ -221,8 +221,8 @@ Components read state directly from stores via selectors. This ensures only the 
 ```typescript
 const MyComponent = memo(() => {
   // ✅ Direct store access — focused re-render
-  const isOpen = useAppConfig(c => c.layout.notifications.open);
-  const count = useAppConfig(c => c.layout.notifications.items.length);
+  const isOpen = useAppConfigStore(c => c.layout.notifications.open);
+  const count = useAppConfigStore(c => c.layout.notifications.items.length);
 
   // ✅ Feature-scoped store
   const selectedId = useStore(s => s.selectedId);

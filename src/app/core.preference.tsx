@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+export const APP_PREFERENCE_STORAGE_KEY = 'al.settings';
+
 /** React Query cache timing settings. */
 const API_PREFERENCE_SCHEMA = z.object({
   /** How long cached data is retained after all subscribers unmount (ms). */
@@ -71,17 +73,17 @@ const TEMPLATE_PREFERENCE_SCHEMA = z.object({
 /** Root schema combining all preference slices. */
 export const APP_PREFERENCE_SCHEMA = z.object({
   /** React Query cache timing configuration. */
-  api: API_PREFERENCE_SCHEMA.catch(API_PREFERENCE_SCHEMA.parse({})),
+  api: API_PREFERENCE_SCHEMA.catch(() => API_PREFERENCE_SCHEMA.parse({})),
   /** Login provider and redirect preferences. */
-  auth: AUTH_PREFERENCE_SCHEMA.catch(AUTH_PREFERENCE_SCHEMA.parse({})),
+  auth: AUTH_PREFERENCE_SCHEMA.catch(() => AUTH_PREFERENCE_SCHEMA.parse({})),
   /** Panel layout and navigation behaviour. */
-  router: ROUTER_PREFERENCE_SCHEMA.catch(ROUTER_PREFERENCE_SCHEMA.parse({})),
+  router: ROUTER_PREFERENCE_SCHEMA.catch(() => ROUTER_PREFERENCE_SCHEMA.parse({})),
   /** Safe/benign result visibility. */
-  safeResults: SAFE_RESULTS_PREFERENCE_SCHEMA.catch(SAFE_RESULTS_PREFERENCE_SCHEMA.parse({})),
+  safeResults: SAFE_RESULTS_PREFERENCE_SCHEMA.catch(() => SAFE_RESULTS_PREFERENCE_SCHEMA.parse({})),
   /** Toast notification display settings. */
-  snackbar: SNACKBAR_PREFERENCE_SCHEMA.catch(SNACKBAR_PREFERENCE_SCHEMA.parse({})),
+  snackbar: SNACKBAR_PREFERENCE_SCHEMA.catch(() => SNACKBAR_PREFERENCE_SCHEMA.parse({})),
   /** Global UI template and appearance settings. */
-  template: TEMPLATE_PREFERENCE_SCHEMA.catch(TEMPLATE_PREFERENCE_SCHEMA.parse({}))
+  template: TEMPLATE_PREFERENCE_SCHEMA.catch(() => TEMPLATE_PREFERENCE_SCHEMA.parse({}))
 });
 
 export const DEFAULT_APP_PREFERENCE_STORE = APP_PREFERENCE_SCHEMA.parse({});

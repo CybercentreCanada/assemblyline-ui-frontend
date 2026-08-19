@@ -1,10 +1,7 @@
-import { DEFAULT_APP_PREFERENCE_STORE } from 'app/core.preference';
-import {
-  getAppPreferenceStateFromApi,
-  loadPreferenceFromLocalStorage,
-  savePreferenceToLocalStorage
-} from 'core/preference/preference.utils';
-import { describe, expect, it, vi } from 'vitest';
+import { APP_PREFERENCE_SCHEMA, DEFAULT_APP_PREFERENCE_STORE } from 'app/core.preference';
+import { getAppPreferenceStateFromApi } from 'core/preference/preference.providers';
+import { loadPreferenceFromLocalStorage, savePreferenceToLocalStorage } from 'core/preference/preference.utils';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { z } from 'zod';
 import type { StoreApi } from 'zustand';
 
@@ -22,8 +19,12 @@ const TestSchema = z.object({
     })
     .catch({ lang: 'en', mode: 'system' })
 });
-
 const STORAGE_KEY = 'test.preference';
+const createTestPreference = () => TestSchema.parse({});
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 //*****************************************************************************************
 // getAppPreferenceStateFromApi
@@ -47,6 +48,15 @@ describe('getAppPreferenceStateFromApi', () => {
   });
 });
 
+describe('APP_PREFERENCE_SCHEMA defaults', () => {
+  it('creates fresh nested defaults for each parse', () => {
+    const first = APP_PREFERENCE_SCHEMA.parse({});
+    first.router.maxPanels = 99;
+
+    expect(APP_PREFERENCE_SCHEMA.parse({}).router.maxPanels).toBe(DEFAULT_APP_PREFERENCE_STORE.router.maxPanels);
+  });
+});
+
 //*****************************************************************************************
 // savePreferenceToLocalStorage
 //*****************************************************************************************
@@ -61,24 +71,20 @@ describe('savePreferenceToLocalStorage', () => {
     });
 
     const preference = { api: { gcTime: 2_000, staleTime: 500 }, layout: { lang: 'en', mode: 'system' } };
-    savePreferenceToLocalStorage(TestSchema, preference as any, STORAGE_KEY);
+    savePreferenceToLocalStorage(TestSchema, preference, STORAGE_KEY);
 
-    const stored = JSON.parse(storage[STORAGE_KEY]);
+    const stored: unknown = JSON.parse(storage[STORAGE_KEY]);
     expect(stored).toEqual({ api: { gcTime: 2_000 } });
-
-    vi.restoreAllMocks();
   });
 
   it('removes the key when preference match defaults exactly', () => {
-    const removeSpy = vi.spyOn(Storage.prototype, 'removeItem').mockImplementation(() => {});
-    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {});
+    const removeSpy = vi.spyOn(Storage.prototype, 'removeItem').mockImplementation(vi.fn());
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(vi.fn());
 
     const defaults = TestSchema.parse({});
-    savePreferenceToLocalStorage(TestSchema, defaults as any, STORAGE_KEY);
+    savePreferenceToLocalStorage(TestSchema, defaults, STORAGE_KEY);
 
     expect(removeSpy).toHaveBeenCalledWith(STORAGE_KEY);
-
-    vi.restoreAllMocks();
   });
 
   it('stores multiple nested diffs across different keys', () => {
@@ -86,15 +92,13 @@ describe('savePreferenceToLocalStorage', () => {
     vi.spyOn(Storage.prototype, 'setItem').mockImplementation((k, v) => {
       storage[k] = v;
     });
-    vi.spyOn(Storage.prototype, 'removeItem').mockImplementation(() => {});
+    vi.spyOn(Storage.prototype, 'removeItem').mockImplementation(vi.fn());
 
     const preference = { api: { gcTime: 5_000, staleTime: 999 }, layout: { lang: 'fr', mode: 'dark' } };
-    savePreferenceToLocalStorage(TestSchema, preference as any, STORAGE_KEY);
+    savePreferenceToLocalStorage(TestSchema, preference, STORAGE_KEY);
 
-    const stored = JSON.parse(storage[STORAGE_KEY]);
+    const stored: unknown = JSON.parse(storage[STORAGE_KEY]);
     expect(stored).toEqual({ api: { gcTime: 5_000, staleTime: 999 }, layout: { lang: 'fr', mode: 'dark' } });
-
-    vi.restoreAllMocks();
   });
 });
 
@@ -105,54 +109,52 @@ describe('loadPreferenceFromLocalStorage', () => {
   it('returns full defaults when localStorage is empty', () => {
     vi.spyOn(Storage.prototype, 'getItem').mockReturnValue(null);
 
-    const result = loadPreferenceFromLocalStorage(TestSchema, STORAGE_KEY);
-    expect(result).toEqual(TestSchema.parse({}));
-
-    vi.restoreAllMocks();
+    const result = loadPreferenceFromLocalStorage(TestSchema, createTestPreference(), STORAGE_KEY);
+    expect(result).toEqual(createTestPreference());
   });
 
-  it('merges stored overrides with defaults', () => {
+  it('merges stored overrides with the current store values', () => {
     vi.spyOn(Storage.prototype, 'getItem').mockReturnValue(JSON.stringify({ api: { gcTime: 3_000 } }));
 
-    const result = loadPreferenceFromLocalStorage(TestSchema, STORAGE_KEY);
+    const result = loadPreferenceFromLocalStorage(
+      TestSchema,
+      {
+        api: { gcTime: 1_000, staleTime: 9_999 },
+        layout: { lang: 'fr', mode: 'light' }
+      } as unknown as AppPreferenceStore,
+      STORAGE_KEY
+    );
     expect(result).toEqual({
-      api: { gcTime: 3_000, staleTime: 500 },
-      layout: { lang: 'en', mode: 'system' }
+      api: { gcTime: 3_000, staleTime: 9_999 },
+      layout: { lang: 'fr', mode: 'light' }
     });
-
-    vi.restoreAllMocks();
   });
 
-  it('returns defaults when stored data is invalid JSON', () => {
+  it('returns current store values when stored data is invalid JSON', () => {
     vi.spyOn(Storage.prototype, 'getItem').mockReturnValue('not-json{{{');
 
-    const result = loadPreferenceFromLocalStorage(TestSchema, STORAGE_KEY);
-    expect(result).toEqual(TestSchema.parse({}));
-
-    vi.restoreAllMocks();
+    const current = { api: { gcTime: 2_500, staleTime: 500 }, layout: { lang: 'en', mode: 'dark' } };
+    const result = loadPreferenceFromLocalStorage(TestSchema, current as unknown as AppPreferenceStore, STORAGE_KEY);
+    expect(result).toEqual(current);
   });
 
   it('falls back to defaults for invalid field values', () => {
     vi.spyOn(Storage.prototype, 'getItem').mockReturnValue(JSON.stringify({ layout: { mode: 'banana', lang: 123 } }));
 
-    const result = loadPreferenceFromLocalStorage(TestSchema, STORAGE_KEY);
+    const result = loadPreferenceFromLocalStorage(TestSchema, createTestPreference(), STORAGE_KEY);
     expect(result).toEqual({
       api: { gcTime: 1_000, staleTime: 500 },
       layout: { lang: 'en', mode: 'system' }
     });
-
-    vi.restoreAllMocks();
   });
 
   it('preserves valid fields alongside invalid ones', () => {
     vi.spyOn(Storage.prototype, 'getItem').mockReturnValue(JSON.stringify({ layout: { mode: 'dark', lang: 999 } }));
 
-    const result = loadPreferenceFromLocalStorage(TestSchema, STORAGE_KEY);
+    const result = loadPreferenceFromLocalStorage(TestSchema, createTestPreference(), STORAGE_KEY);
     expect(result).toEqual({
       api: { gcTime: 1_000, staleTime: 500 },
       layout: { lang: 'en', mode: 'dark' }
     });
-
-    vi.restoreAllMocks();
   });
 });

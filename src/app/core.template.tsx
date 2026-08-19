@@ -2,7 +2,7 @@ import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import MenuBookOutlinedIcon from '@mui/icons-material/MenuBookOutlined';
 import { AppSwitcher } from '@tui/apps';
 import type { AppPreferenceConfigs, AppRouterAdapter, AppUserService } from '@tui/core';
-import { useAppConfig } from 'core/config';
+import { useAppConfigStore } from 'core/config';
 import { AppBreadcrumbs } from 'layout/breadcrumbs';
 import type { AppLeftNavItem } from 'layout/left-nav';
 import { useParseTemplateLeftNavMenu } from 'layout/left-nav';
@@ -21,7 +21,7 @@ import { IconButton } from 'ui/buttons/IconButton';
 export const EmailButton = memo(() => {
   const { t } = useTranslation();
 
-  const email = useAppConfig(s => s?.configuration?.system?.support?.email);
+  const email = useAppConfigStore(s => s?.configuration?.system?.support?.email);
 
   return !email ? null : (
     <IconButton color="inherit" size="large" tooltip={t('support.email')} onClick={() => window.open(email, '_blank')}>
@@ -39,7 +39,7 @@ EmailButton.displayName = 'EmailButton';
 export const DocumentationButton = memo(() => {
   const { t } = useTranslation();
 
-  const documentation = useAppConfig(s => s?.configuration?.system?.support?.documentation);
+  const documentation = useAppConfigStore(s => s?.configuration?.system?.support?.documentation);
 
   return !documentation ? null : (
     <IconButton

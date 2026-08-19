@@ -1,4 +1,4 @@
-import { useAppConfig } from 'core/config';
+import { useAppConfigStore } from 'core/config';
 import { useTableOfContent } from 'features/table-of-content/TableOfContent';
 import { memo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -8,7 +8,7 @@ import { PageNavigation, PageNavigationItem } from 'ui/layouts/PageNavigation';
 export const RightNav = memo(() => {
   const { t } = useTranslation(['settings']);
   const form = useForm();
-  const settings = useAppConfig(s => s.settings);
+  const settings = useAppConfigStore(s => s.settings);
   const { ActiveAnchor, scrollTo } = useTableOfContent();
 
   const handleCategoryChange = useCallback(

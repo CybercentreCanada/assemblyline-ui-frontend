@@ -2,7 +2,7 @@ import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
 import { AlertTitle, Skeleton, Tooltip } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
-import { useAppConfig } from 'core/config';
+import { useAppConfigStore } from 'core/config';
 import { useAppNavigate } from 'core/router';
 import useALContext from 'deprecated/hooks/useALContext';
 import type { SearchResult } from 'models/api/search';
@@ -39,7 +39,7 @@ export const SubmissionsTable = memo(
     const { c12nDef } = useALContext();
 
     const navigate = useAppNavigate<'/submissions'>();
-    const submissionView = useAppConfig(s => s.settings.submission_view);
+    const submissionView = useAppConfigStore(s => s.settings.submission_view);
 
     return !submissionResults ? (
       <Skeleton variant="rectangular" sx={{ height: '6rem', borderRadius: '4px' }} />

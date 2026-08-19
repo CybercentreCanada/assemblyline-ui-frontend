@@ -1,4 +1,4 @@
-import { useAppConfig } from 'core/config';
+import { useAppConfigStore } from 'core/config';
 import { useAppInterfaceStore, useAppSetInterfaceStore } from 'core/interface';
 import { useAppSnackbar } from 'core/snackbar';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
@@ -28,8 +28,8 @@ export const useAppExternalLookup = (): UseAppExternalLookup => {
   const { apiCall } = useMyAPI();
   const { showSuccessMessage, showWarningMessage, showErrorMessage } = useAppSnackbar();
 
-  const currentUser = useAppConfig(s => s.user);
-  const currentUserConfig = useAppConfig(s => s.configuration);
+  const currentUser = useAppConfigStore(s => s.user);
+  const configuration = useAppConfigStore(s => s.configuration);
 
   const enrichmentState = useAppInterfaceStore(s => s.externalLookup.enrichment);
 
@@ -40,13 +40,13 @@ export const useAppExternalLookup = (): UseAppExternalLookup => {
       const hasExternalQuery =
         !!currentUser &&
         !!currentUser.roles.includes('external_query') &&
-        !!currentUserConfig.ui.external_sources?.length &&
-        !!currentUserConfig.ui.external_source_tags?.hasOwnProperty(type);
+        !!configuration.ui.external_sources?.length &&
+        !!configuration.ui.external_source_tags?.hasOwnProperty(type);
 
       const hasExternalLinks =
-        !!currentUserConfig &&
-        !!currentUserConfig.ui.external_links?.hasOwnProperty(category) &&
-        !!currentUserConfig.ui.external_links[category].hasOwnProperty(type);
+        !!configuration &&
+        !!configuration.ui.external_links?.hasOwnProperty(category) &&
+        !!configuration.ui.external_links[category].hasOwnProperty(type);
 
       return (
         category !== null &&
@@ -56,14 +56,14 @@ export const useAppExternalLookup = (): UseAppExternalLookup => {
       );
     },
 
-    [currentUser, currentUserConfig]
+    [currentUser, configuration]
   );
 
   const getKey = (tagName: string, tagValue: string): string => `${tagName}_${tagValue}`;
 
   const enrichTagExternal = useCallback(
     (source: string, tagName: string, tagValue: string, classification: string) => {
-      const tagSrcMap = currentUserConfig.ui.external_source_tags;
+      const tagSrcMap = configuration.ui.external_source_tags;
       if (!tagSrcMap?.hasOwnProperty(tagName)) {
         showErrorMessage(t('related_external.error.invalidTagName'));
         return;
@@ -79,7 +79,7 @@ export const useAppExternalLookup = (): UseAppExternalLookup => {
       } else {
         // only send query to sources that support the tag name and the classification
         const s = [];
-        for (const src of currentUserConfig.ui.external_sources) {
+        for (const src of configuration.ui.external_sources) {
           if (tagSrcMap[tagName].includes(src.name)) {
             // uncomment when classification updates are merged in
             // if (!isAccessible(src.max_classification, classification, c12nDef, c12nDef.enforce)) {
@@ -178,7 +178,7 @@ export const useAppExternalLookup = (): UseAppExternalLookup => {
         }
       });
     },
-    [currentUserConfig, apiCall, showErrorMessage, t, showWarningMessage, showSuccessMessage]
+    [configuration, apiCall, showErrorMessage, t, showWarningMessage, showSuccessMessage]
   );
 
   return {

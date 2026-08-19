@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/prefer-for-of */
-import { useAppConfig } from 'core/config';
+import { useAppConfigStore } from 'core/config';
 import type { CustomUser } from 'models/api/user';
 import type { Configuration, Submission } from 'models/base/config';
 import type { ServiceSpecification } from 'models/base/service';
@@ -504,7 +504,7 @@ export const parseSubmitProfile = (profile: ProfileSettings): UserSettings | nul
  * selections when conditions stop matching.
  */
 export const useAutoURLServicesSelection = () => {
-  const configuration = useAppConfig(s => s.configuration);
+  const configuration = useAppConfigStore(s => s.configuration);
   const form = useForm();
 
   const autoNames = configuration.ui.url_submission_auto_service_selection;

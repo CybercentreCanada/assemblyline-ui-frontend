@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { DEFAULT_APP_PREFERENCE_STORE } from 'app/core.preference';
 import type { ApiQueryKey, ApiResponse, BlobResponse } from 'core/api/api.models';
 import { getBlobResponse, isApiData, stableStringify } from 'core/api/api.utils';
-import { useAppConfig } from 'core/config';
+import { useAppConfigStore } from 'core/config';
 import { useAppSetInterfaceStore } from 'core/interface';
 import { useAppSnackbar } from 'core/snackbar';
 import { useMemo } from 'react';
@@ -34,7 +34,7 @@ export const useDownloadBlob = ({
   const queryClient = useQueryClient();
   const { t } = useTranslation(['api']);
   const { showErrorMessage, closeSnackbar } = useAppSnackbar();
-  const systemConfig = useAppConfig(s => s?.configuration);
+  const configuration = useAppConfigStore(s => s?.configuration);
   const setInterfaceStore = useAppSetInterfaceStore();
 
   const query = useQuery<BlobResponse, ApiResponse<Error>, BlobResponse, ApiQueryKey>(
@@ -79,7 +79,7 @@ export const useDownloadBlob = ({
           return Promise.reject({
             api_error_message: t('unreachable'),
             api_response: '',
-            api_server_version: systemConfig?.system?.version,
+            api_server_version: configuration?.system?.version,
             api_status_code: 502
           });
         }
@@ -92,7 +92,7 @@ export const useDownloadBlob = ({
           return Promise.reject({
             api_error_message: t('invalid'),
             api_response: '',
-            api_server_version: systemConfig?.system?.version,
+            api_server_version: configuration?.system?.version,
             api_status_code: 400
           });
         }
@@ -140,7 +140,7 @@ export const useDownloadBlob = ({
         return Promise.resolve({
           api_error_message: '',
           api_response: res.body,
-          api_server_version: systemConfig?.system?.version,
+          api_server_version: configuration?.system?.version,
           api_status_code: res.status,
           filename: getFileName(res.headers.get('Content-Disposition')),
           size: parseInt(res.headers.get('Content-Length')),

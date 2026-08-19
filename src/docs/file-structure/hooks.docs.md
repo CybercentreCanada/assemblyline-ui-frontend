@@ -33,7 +33,7 @@ Hooks use `const` arrow functions with JSDoc, same as utility functions:
  * @returns Current unread count
  */
 export const useNotificationCount = (): number => {
-  const notifications = useAppConfig(c => c.notifications.items);
+  const notifications = useAppConfigStore(c => c.notifications.items);
   return useMemo(
     () => notifications.filter(n => !n.read).length,
     [notifications]
@@ -68,7 +68,7 @@ export const useNotificationCount = (): number => { ... };
 ```typescript
 // ✅ Named store access — semantic wrapper over selector
 export const usePanelOpen = (): boolean => {
-  return useAppConfig(c => c.layout.panel.open);
+  return useAppConfigStore(c => c.layout.panel.open);
 };
 
 // ✅ Utility-style — reusable computation
@@ -92,7 +92,7 @@ const useMyComponentLogic = () => { ... };
 export const useSaveNotification = () => useAPIMutation(() => ({ ... }));
 
 // ❌ Re-exports a selector with no added logic
-export const useIsOpen = () => useAppConfig(c => c.layout.panel.open);
+export const useIsOpen = () => useAppConfigStore(c => c.layout.panel.open);
 // (valid only if used by 3+ components as a named access hook)
 ```
 

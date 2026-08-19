@@ -1,7 +1,7 @@
 import ReceiptOutlinedIcon from '@mui/icons-material/ReceiptOutlined';
 import { Link, Skeleton, Typography, styled, useTheme } from '@mui/material';
 import { useApiMutation, useApiQuery } from 'core/api';
-import { useAppConfig } from 'core/config';
+import { useAppConfigStore } from 'core/config';
 import { useAppSetInterfaceStore } from 'core/interface';
 import { createAppRoute } from 'core/routes';
 import { AppBanner, AppPageCenter } from 'core/template';
@@ -34,8 +34,8 @@ export const ToSPage = memo(() => {
   const { t } = useTranslation(['tos']);
   const theme = useTheme();
 
-  const currentUser = useAppConfig(s => s.user);
-  const configuration = useAppConfig(s => s.configuration);
+  const currentUser = useAppConfigStore(s => s.user);
+  const configuration = useAppConfigStore(s => s.configuration);
   const setInterfaceStore = useAppSetInterfaceStore();
 
   const handleAccept = useApiMutation(() => ({

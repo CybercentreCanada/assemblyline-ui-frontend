@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { DEFAULT_APP_PREFERENCE_STORE } from 'app/core.preference';
 import type { ApiQueryKey, ApiResponse } from 'core/api/api.models';
 import { getApiResponse, isApiData, stableStringify } from 'core/api/api.utils';
-import { useAppConfig } from 'core/config';
+import { useAppConfigStore } from 'core/config';
 import { useAppSetInterfaceStore } from 'core/interface';
 import { useAppSnackbar } from 'core/snackbar';
 import type { LoginParamsProps } from 'layout/auth/auth.models';
@@ -46,7 +46,7 @@ export const useBootstrapQuery = ({
   const queryClient = useQueryClient();
   const { t } = useTranslation(['api']);
   const { showErrorMessage, closeSnackbar } = useAppSnackbar();
-  const systemConfig = useAppConfig(s => s.configuration);
+  const configuration = useAppConfigStore(s => s.configuration);
   const setInterfaceStore = useAppSetInterfaceStore();
 
   const query = useQuery<
@@ -99,7 +99,7 @@ export const useBootstrapQuery = ({
           return Promise.reject({
             api_error_message: t('unreachable'),
             api_response: '',
-            api_server_version: systemConfig?.system?.version,
+            api_server_version: configuration?.system?.version,
             api_status_code: 502
           });
         }
@@ -113,7 +113,7 @@ export const useBootstrapQuery = ({
           return Promise.reject({
             api_error_message: t('invalid'),
             api_response: '',
-            api_server_version: systemConfig?.system?.version,
+            api_server_version: configuration?.system?.version,
             api_status_code: 400
           });
         }

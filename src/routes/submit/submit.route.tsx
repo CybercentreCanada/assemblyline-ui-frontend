@@ -1,6 +1,6 @@
 import PublishOutlinedIcon from '@mui/icons-material/PublishOutlined';
 import { Alert, Collapse, styled, useMediaQuery, useTheme } from '@mui/material';
-import { useAppConfig } from 'core/config';
+import { useAppConfigStore } from 'core/config';
 import { createAppRoute, useAppSearchSnapshot } from 'core/routes';
 import { useAppSnackbar } from 'core/snackbar';
 import { AppBanner, AppPageCenter } from 'core/template';
@@ -115,9 +115,9 @@ const WrappedSubmitRoute = memo(() => {
 
   const form = useForm();
 
-  const configuration = useAppConfig(s => s.configuration);
-  const currentUser = useAppConfig(s => s.user);
-  const settings = useAppConfig(s => s.settings);
+  const configuration = useAppConfigStore(s => s.configuration);
+  const currentUser = useAppConfigStore(s => s.user);
+  const settings = useAppConfigStore(s => s.settings);
 
   const search = useAppSearchSnapshot<'/submit'>();
 

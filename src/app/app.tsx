@@ -2,14 +2,14 @@ import { AppSwitcherProvider } from '@tui/apps';
 import { DEFAULT_APP_CONFIG_STORE } from 'app/core.config';
 import { i18n } from 'app/core.i18n';
 import { DEFAULT_APP_INTERFACE_STORE } from 'app/core.interface';
-import { DEFAULT_APP_PREFERENCE_STORE } from 'app/core.preference';
+import { APP_PREFERENCE_SCHEMA, APP_PREFERENCE_STORAGE_KEY } from 'app/core.preference';
 import { useAppRoutes } from 'app/core.routes';
 import { useAppTemplatePreferences, useAppTemplateRouter, useAppTemplateUser } from 'app/core.template';
 import { AppApiProvider } from 'core/api';
-import { AppConfigStoreProvider, useAppConfig } from 'core/config';
+import { AppConfigStoreProvider, useAppConfigStore } from 'core/config';
 import { AppErrorProvider } from 'core/error';
 import { AppInterfaceStoreProvider } from 'core/interface';
-import { AppPreferenceStoreProvider } from 'core/preference';
+import { AppPreferenceProvider, AppPreferenceStoreProvider } from 'core/preference';
 import {
   AppNavigationProvider,
   AppNavigationStoreProvider,
@@ -152,33 +152,35 @@ AppLayout.displayName = 'AppLayout';
 //*****************************************************************************************
 
 const AppProviders = memo(({ children }: PropsWithChildren) => {
-  const apps = useAppConfig(s => s?.configuration?.ui?.apps || []);
+  const apps = useAppConfigStore(s => s?.configuration?.ui?.apps || []);
   const routes = useAppRoutes();
 
   return (
-    <AppSwitcherProvider apps={apps}>
-      <AppTemplateProvider i18n={i18n}>
-        <AppErrorProvider>
-          <AppSnackbarProvider>
-            <AppApiProvider>
-              <AppAssistantProvider>
-                <AppRouterProvider>
-                  <AppNavigationProvider>
-                    <AppLocationParamProvider routes={routes}>
-                      <AppClueProvider>
-                        <AppCarouselProvider>
-                          <>{children}</>
-                        </AppCarouselProvider>
-                      </AppClueProvider>
-                    </AppLocationParamProvider>
-                  </AppNavigationProvider>
-                </AppRouterProvider>
-              </AppAssistantProvider>
-            </AppApiProvider>
-          </AppSnackbarProvider>
-        </AppErrorProvider>
-      </AppTemplateProvider>
-    </AppSwitcherProvider>
+    <AppPreferenceProvider schema={APP_PREFERENCE_SCHEMA} storageKey={APP_PREFERENCE_STORAGE_KEY}>
+      <AppSwitcherProvider apps={apps}>
+        <AppTemplateProvider i18n={i18n}>
+          <AppErrorProvider>
+            <AppSnackbarProvider>
+              <AppApiProvider>
+                <AppAssistantProvider>
+                  <AppRouterProvider>
+                    <AppNavigationProvider>
+                      <AppLocationParamProvider routes={routes}>
+                        <AppClueProvider>
+                          <AppCarouselProvider>
+                            <>{children}</>
+                          </AppCarouselProvider>
+                        </AppClueProvider>
+                      </AppLocationParamProvider>
+                    </AppNavigationProvider>
+                  </AppRouterProvider>
+                </AppAssistantProvider>
+              </AppApiProvider>
+            </AppSnackbarProvider>
+          </AppErrorProvider>
+        </AppTemplateProvider>
+      </AppSwitcherProvider>
+    </AppPreferenceProvider>
   );
 });
 
@@ -191,7 +193,7 @@ AppProviders.displayName = 'AppProviders';
 const AppStores = memo(({ children }: PropsWithChildren) => (
   <AppConfigStoreProvider data={DEFAULT_APP_CONFIG_STORE}>
     <AppInterfaceStoreProvider data={DEFAULT_APP_INTERFACE_STORE}>
-      <AppPreferenceStoreProvider data={DEFAULT_APP_PREFERENCE_STORE}>
+      <AppPreferenceStoreProvider>
         <AppRouterStoreProvider>
           <AppNavigationStoreProvider>
             <AppLocationParamStoreProvider>

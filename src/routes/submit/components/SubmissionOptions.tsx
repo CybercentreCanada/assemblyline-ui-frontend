@@ -1,6 +1,6 @@
 import { Typography, useTheme } from '@mui/material';
 import { useApiQuery } from 'core/api';
-import { useAppConfig } from 'core/config';
+import { useAppConfigStore } from 'core/config';
 import { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'routes/submit/submit.form';
@@ -12,7 +12,7 @@ import { TextInput } from 'ui/inputs/TextInput';
 export const SubmissionOptions = memo(() => {
   const { t } = useTranslation(['submit']);
   const theme = useTheme();
-  const configuration = useAppConfig(s => s.configuration);
+  const configuration = useAppConfigStore(s => s.configuration);
   const form = useForm();
 
   const priorityOptions = useMemo(

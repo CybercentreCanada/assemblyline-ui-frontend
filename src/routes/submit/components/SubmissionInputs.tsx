@@ -15,7 +15,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import { useApiCallFn } from 'core/api';
 import type { ApiResponse } from 'core/api/api.models';
-import { useAppConfig } from 'core/config';
+import { useAppConfigStore } from 'core/config';
 import { useAppSetInterfaceStore } from 'core/interface';
 import { AppLink, useAppNavigate } from 'core/router';
 import { useAppSnackbar } from 'core/snackbar';
@@ -52,7 +52,7 @@ import { TextInput } from 'ui/inputs/TextInput';
 export const ClassificationInput = memo(() => {
   const { t } = useTranslation(['submit']);
   const theme = useTheme();
-  const c12nDef = useAppConfig(s => s.c12nDef);
+  const c12nDef = useAppConfigStore(s => s.c12nDef);
   const form = useForm();
 
   return !c12nDef?.enforce ? null : (
@@ -125,7 +125,7 @@ FileInput.displayName = 'FileInput';
 
 export const HashInput = memo(() => {
   const { t } = useTranslation(['submit']);
-  const configuration = useAppConfig(s => s.configuration);
+  const configuration = useAppConfigStore(s => s.configuration);
   const { closeSnackbar } = useAppSnackbar();
   const form = useForm();
 
@@ -177,9 +177,9 @@ HashInput.displayName = 'HashInput';
 
 export const SubmissionProfileInput = memo(() => {
   const { t } = useTranslation(['submit']);
-  const user = useAppConfig(s => s.user);
-  const configuration = useAppConfig(s => s.configuration);
-  const settings = useAppConfig(s => s.settings);
+  const user = useAppConfigStore(s => s.user);
+  const configuration = useAppConfigStore(s => s.configuration);
+  const settings = useAppConfigStore(s => s.settings);
   const form = useForm();
 
   const applyAutoURLServicesSelection = useAutoURLServicesSelection();
@@ -339,7 +339,7 @@ MaliciousInput.displayName = 'MaliciousInput';
 
 export const ExternalSources = memo(() => {
   const { t } = useTranslation(['submit']);
-  const configuration = useAppConfig(s => s.configuration);
+  const configuration = useAppConfigStore(s => s.configuration);
   const form = useForm();
 
   return (
@@ -733,7 +733,7 @@ export const FileSubmit = memo(({ onClick = () => null, ...props }: ButtonProps)
   const navigate = useAppNavigate();
   const apiCall = useApiCallFn();
   const { closeSnackbar, showErrorMessage, showSuccessMessage } = useAppSnackbar();
-  const settings = useAppConfig(s => s.settings);
+  const settings = useAppConfigStore(s => s.settings);
   const setInterfaceStore = useAppSetInterfaceStore();
 
   const warnOnUnload = useCallback((warn: boolean) => {
@@ -976,7 +976,7 @@ HashSubmit.displayName = 'HashSubmit';
 
 const ExternalServicesDialog = memo(() => {
   const { t } = useTranslation(['submit']);
-  const configuration = useAppConfig(s => s.configuration);
+  const configuration = useAppConfigStore(s => s.configuration);
   const form = useForm();
 
   const handleDeselectExternalServices = useCallback(() => {
@@ -1052,7 +1052,7 @@ const ExternalServicesDialog = memo(() => {
 ExternalServicesDialog.displayName = 'ExternalServicesDialog';
 
 export const AnalyzeSubmission = memo(() => {
-  const configuration = useAppConfig(s => s.configuration);
+  const configuration = useAppConfigStore(s => s.configuration);
   const form = useForm();
 
   return (
@@ -1087,7 +1087,7 @@ AnalyzeSubmission.displayName = 'AnalyzeSubmission';
 export const ToS = memo(() => {
   const { t } = useTranslation(['submit']);
   const theme = useTheme();
-  const configuration = useAppConfig(s => s.configuration);
+  const configuration = useAppConfigStore(s => s.configuration);
 
   return !configuration.ui.tos ? null : (
     <div style={{ textAlign: 'center' }}>

@@ -30,7 +30,7 @@ import {
   useTheme
 } from '@mui/material';
 import { useApiMutation } from 'core/api';
-import { useAppConfig } from 'core/config';
+import { useAppConfigStore } from 'core/config';
 import { useAppInterfaceStore, useAppSetInterfaceStore } from 'core/interface';
 import { useAppSnackbar } from 'core/snackbar';
 import DOMPurify from 'dompurify';
@@ -265,8 +265,8 @@ NotificationItem.displayName = 'NotificationItem';
 
 const AnnouncementActions = memo(() => {
   const { t } = useTranslation(['notifications']);
-  const isAdmin = useAppConfig(s => Boolean(s?.user?.is_admin));
-  const systemMessage = useAppConfig(s => s?.systemMessage ?? null);
+  const isAdmin = useAppConfigStore(s => Boolean(s?.user?.is_admin));
+  const systemMessage = useAppConfigStore(s => s?.systemMessage ?? null);
   const setInterface = useAppSetInterfaceStore();
 
   const handleOpenCreateDialog = useCallback(() => {
@@ -321,7 +321,7 @@ AnnouncementActions.displayName = 'AnnouncementActions';
 const AnnouncementContent = memo(() => {
   const { t } = useTranslation(['notifications']);
   const theme = useTheme();
-  const systemMessage = useAppConfig(s => (s?.systemMessage ?? null) as SystemMessage | null);
+  const systemMessage = useAppConfigStore(s => (s?.systemMessage ?? null) as SystemMessage | null);
 
   return systemMessage ? (
     <>
@@ -420,7 +420,7 @@ const AnnouncementEditDialog = memo(() => {
   const title = useAppInterfaceStore(s => s.notifications.announcementDraft.title);
   const message = useAppInterfaceStore(s => s.notifications.announcementDraft.message);
   const severity = useAppInterfaceStore(s => s.notifications.announcementDraft.severity);
-  const systemMessage = useAppConfig(s => (s?.systemMessage ?? null) as SystemMessage | null);
+  const systemMessage = useAppConfigStore(s => (s?.systemMessage ?? null) as SystemMessage | null);
   const setInterface = useAppSetInterfaceStore();
 
   const handleSeverityChange = useCallback(
@@ -632,7 +632,7 @@ NotificationContent.displayName = 'NotificationContent';
 export const AnnouncementSection = memo(() => {
   const { t } = useTranslation(['notifications']);
   const theme = useTheme();
-  const systemMessage = useAppConfig(s => s?.systemMessage);
+  const systemMessage = useAppConfigStore(s => s?.systemMessage);
 
   return (
     <>
@@ -690,7 +690,7 @@ AnnouncementSection.displayName = 'AnnouncementSection';
 const NotificationIconButton = memo(() => {
   const { t } = useTranslation(['notifications']);
   const theme = useTheme();
-  const systemMessage = useAppConfig(s => s?.systemMessage);
+  const systemMessage = useAppConfigStore(s => s?.systemMessage);
   const isSystemMessageRead = useAppInterfaceStore(s => s.notifications.read);
   const newNotificationsCount = useNotificationNewCount();
   const handleOpen = useNotificationOpen();

@@ -1,5 +1,5 @@
 import { Paper, useTheme } from '@mui/material';
-import { useAppConfig } from 'core/config';
+import { useAppConfigStore } from 'core/config';
 import { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'routes/settings/settings.form';
@@ -14,7 +14,7 @@ export const SubmissionProfileDescription = memo(() => {
   const { t } = useTranslation(['settings']);
   const theme = useTheme();
   const form = useForm();
-  const configuration = useAppConfig(s => s.configuration);
+  const configuration = useAppConfigStore(s => s.configuration);
 
   return (
     <form.Subscribe selector={state => [state.values.state.tab] as const}>
@@ -40,8 +40,8 @@ export const SubmissionOptionsSection = memo(() => {
   const { t } = useTranslation(['settings']);
   const theme = useTheme();
   const form = useForm();
-  const configuration = useAppConfig(s => s.configuration);
-  const c12nDef = useAppConfig(s => s.c12nDef);
+  const configuration = useAppConfigStore(s => s.configuration);
+  const c12nDef = useAppConfigStore(s => s.c12nDef);
 
   const maxTTL = useMemo<number>(() => {
     if (!configuration?.submission) return 365;

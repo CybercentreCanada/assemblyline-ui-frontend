@@ -1,4 +1,4 @@
-import { useAppConfig } from 'core/config';
+import { useAppConfigStore } from 'core/config';
 import { useAppInterfaceStore, useAppSetInterfaceStore } from 'core/interface';
 import type { MinimalService } from 'layout/notifications/notifications.models';
 import {
@@ -22,8 +22,8 @@ const EMPTY_SERVICES: MinimalService[] = [];
  * @description Fetches notification feeds and applies filtering rules. Stores results in interface store.
  */
 export const useNotificationFeed = (): void => {
-  const isAdmin = useAppConfig(s => Boolean(s?.user?.is_admin));
-  const configuration = useAppConfig(s => s?.configuration || null);
+  const isAdmin = useAppConfigStore(s => Boolean(s?.user?.is_admin));
+  const configuration = useAppConfigStore(s => s?.configuration || null);
   const feedUrls = useMemo(() => configuration?.ui?.rss_feeds ?? EMPTY_FEED_URLS, [configuration]);
 
   const setInterface = useAppSetInterfaceStore();

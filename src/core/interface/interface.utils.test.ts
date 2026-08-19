@@ -1,5 +1,5 @@
 import { DEFAULT_APP_INTERFACE_STORE } from 'app/core.interface';
-import { getAppInterfaceStateFromApi } from 'core/interface/interface.utils';
+import { getAppInterfaceStateFromApi } from 'core/interface';
 import { describe, expect, it } from 'vitest';
 import type { StoreApi } from 'zustand';
 

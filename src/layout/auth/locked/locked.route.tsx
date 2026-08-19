@@ -1,6 +1,6 @@
 import HourglassEmptyOutlinedIcon from '@mui/icons-material/HourglassEmptyOutlined';
 import { Typography, useMediaQuery, useTheme } from '@mui/material';
-import { useAppConfig } from 'core/config';
+import { useAppConfigStore } from 'core/config';
 import { createAppRoute } from 'core/routes';
 import { AppPageCenter } from 'core/template';
 import { memo } from 'react';
@@ -16,8 +16,8 @@ export const LockedPage = memo(() => {
   const theme = useTheme();
   const downSM = useMediaQuery(theme.breakpoints.down('md'));
 
-  const tos = useAppConfig(s => s.configuration?.ui?.tos);
-  const tosLockoutNotify = useAppConfig(s => s.configuration?.ui?.tos_lockout_notify);
+  const tos = useAppConfigStore(s => s.configuration?.ui?.tos);
+  const tosLockoutNotify = useAppConfigStore(s => s.configuration?.ui?.tos_lockout_notify);
 
   return (
     <>

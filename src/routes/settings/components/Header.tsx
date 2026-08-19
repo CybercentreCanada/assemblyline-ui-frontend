@@ -1,6 +1,6 @@
 import { Alert, Tooltip, Typography, useTheme } from '@mui/material';
 import { invalidateApiQuery, useApiMutation } from 'core/api';
-import { useAppConfig } from 'core/config';
+import { useAppConfigStore } from 'core/config';
 import { useAppSnackbar } from 'core/snackbar';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -20,9 +20,9 @@ export const HeaderSection = memo(() => {
   const { t } = useTranslation(['settings', 'submit']);
   const theme = useTheme();
   const form = useForm();
-  const currentUser = useAppConfig(s => s.user);
-  const configuration = useAppConfig(s => s.configuration);
-  const settings = useAppConfig(s => s.settings);
+  const currentUser = useAppConfigStore(s => s.user);
+  const configuration = useAppConfigStore(s => s.configuration);
+  const settings = useAppConfigStore(s => s.settings);
   const { showErrorMessage, showSuccessMessage } = useAppSnackbar();
 
   const handleSubmit = useApiMutation(() => {

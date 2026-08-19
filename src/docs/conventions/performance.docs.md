@@ -22,10 +22,10 @@ Read only the exact slice of state needed — never subscribe to an entire store
 
 ```typescript
 // ✅ Only re-renders when this specific boolean changes
-const isOpen = useAppConfig(c => c.layout.notifications.open);
+const isOpen = useAppConfigStore(c => c.layout.notifications.open);
 
 // ❌ Re-renders on ANY config change
-const config = useAppConfig(c => c);
+const config = useAppConfigStore(c => c);
 ```
 
 ### Store selectors — access leaf values

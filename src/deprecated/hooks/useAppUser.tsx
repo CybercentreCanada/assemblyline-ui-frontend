@@ -1,7 +1,7 @@
-import { useAppConfig } from 'core/config';
+import { useAppConfigStore } from 'core/config';
 
 export const useAppUser = () => {
-  return useAppConfig(s => s.user);
+  return useAppConfigStore(s => s.user);
 };
 
 export default useAppUser;

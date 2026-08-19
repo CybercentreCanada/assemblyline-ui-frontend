@@ -1,4 +1,4 @@
-import { useAppConfig } from 'core/config';
+import { useAppConfigStore } from 'core/config';
 import type { RouteName } from 'core/routes';
 import { getRouteParamFromKey, useAppLocationParamStore, useAppPageKey } from 'core/routes';
 import type { ComponentType, MemoExoticComponent, ReactNode } from 'react';
@@ -41,7 +41,7 @@ export const DisabledBoundary = memo(
   ({ disabled = () => false, FallbackComponent = <ForbiddenPage disabled />, children }: DisabledBoundaryProps) => {
     const pageKey = useAppPageKey();
     const params = useAppLocationParamStore(s => getRouteParamFromKey(s, pageKey));
-    const isDisabled = useAppConfig(s => disabled(params, s));
+    const isDisabled = useAppConfigStore(s => disabled(params, s));
     return isDisabled ? <>{FallbackComponent}</> : <>{children}</>;
   }
 );
@@ -65,7 +65,7 @@ export const ForbiddenBoundary = memo(
   ({ forbidden = () => false, FallbackComponent = <ForbiddenPage />, children }: ForbiddenBoundaryProps) => {
     const pageKey = useAppPageKey();
     const params = useAppLocationParamStore(s => getRouteParamFromKey(s, pageKey));
-    const isForbidden = useAppConfig(s => forbidden(params, s));
+    const isForbidden = useAppConfigStore(s => forbidden(params, s));
     return isForbidden ? <>{FallbackComponent}</> : <>{children}</>;
   }
 );

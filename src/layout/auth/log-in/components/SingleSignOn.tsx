@@ -1,7 +1,7 @@
 import { Avatar, Link, Typography, useTheme } from '@mui/material';
-import { useSaveAppConfig } from 'core/config/config.hooks';
 import { useAppInterfaceStore } from 'core/interface';
 import { useAppSetPreferenceStore } from 'core/preference';
+import { useAppSavePreference } from 'core/preference/preference.hooks';
 import { useLoginRequest, useLoginReset, useQuickLogin } from 'layout/auth/log-in/log-in.hooks';
 import { useLoginForm } from 'layout/auth/log-in/log-in.providers';
 import { memo, useCallback, useEffect } from 'react';
@@ -78,7 +78,7 @@ export const OAuthLogin = memo(() => {
   const oAuthProviders = useAppInterfaceStore(s => s.auth.login.oauth_providers);
 
   const setPreferenceStore = useAppSetPreferenceStore();
-  const save = useSaveAppConfig();
+  const save = useAppSavePreference();
 
   const handleClick = useCallback(() => {
     const { pathname, search, hash } = location;
@@ -115,7 +115,7 @@ export const SAMLLogin = memo(() => {
   const allowSAML = useAppInterfaceStore(s => s.auth.login.allow_saml_login);
 
   const setPreferenceStore = useAppSetPreferenceStore();
-  const save = useSaveAppConfig();
+  const save = useAppSavePreference();
 
   const handleClick = useCallback(() => {
     const { pathname, search, hash } = location;

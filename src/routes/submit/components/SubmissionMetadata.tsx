@@ -6,18 +6,17 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import { useApiCallFn } from 'core/api';
-import { useAppConfig } from 'core/config';
+import { useAppConfigStore } from 'core/config';
 import lodashOmit from 'lodash/omit';
 import type { Metadata, MetadataFieldTypeMap } from 'models/base/config';
 import { Fragment, memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { isURL } from 'shared/utils/utils';
-import { Button } from 'ui/buttons/Button';
-import { IconButton } from 'ui/buttons/IconButton';
-// import { MonacoEditor } from 'ui/editors/MonacoEditor';
 import type { SubmitMetadata } from 'routes/submit/submit.form';
 import { useForm } from 'routes/submit/submit.form';
 import { isValidMetadata } from 'routes/submit/submit.utils';
+import { isURL } from 'shared/utils/utils';
+import { Button } from 'ui/buttons/Button';
+import { IconButton } from 'ui/buttons/IconButton';
 import type { DateInputProps } from 'ui/inputs/DateInput';
 import { DateInput } from 'ui/inputs/DateInput';
 import type { NumberInputProps } from 'ui/inputs/NumberInput';
@@ -29,6 +28,7 @@ import { SwitchInput } from 'ui/inputs/SwitchInput';
 import type { TextInputProps } from 'ui/inputs/TextInput';
 import { TextInput } from 'ui/inputs/TextInput';
 import type { Validator } from 'ui/inputs/utils/inputs.util.validation';
+import { MonacoEditor } from 'ui/MonacoEditor';
 
 const STATIC_VALIDATOR_TYPES_SET = new Set<MetadataFieldTypeMap>(['enum', 'boolean', 'integer', 'date']);
 
@@ -204,7 +204,7 @@ export const MetadataParam = memo(({ name, metadata, loading, disabled, editing 
 const ExtraMetadata = memo(() => {
   const { t } = useTranslation(['submit']);
   const theme = useTheme();
-  const configuration = useAppConfig(s => s.configuration);
+  const configuration = useAppConfigStore(s => s.configuration);
   const form = useForm();
 
   const submitKeys = useMemo(
@@ -251,13 +251,13 @@ const ExtraMetadata = memo(() => {
                 <ListItemText primary={t('metadata.editor.title')} />
               </DialogTitle>
               <DialogContent sx={{ display: 'flex', flexDirection: 'column', height: 'min(600px, 80vh)' }}>
-                {/* <MonacoEditor
+                <MonacoEditor
                   language="json"
                   value={edit ?? ''}
                   error={Boolean(error)}
                   options={{ wordWrap: 'on' }}
                   onChange={v => form.setFieldValue('metadata.edit', v)}
-                /> */}
+                />
                 {error && <FormHelperText sx={{ color: theme.palette.error.main }}>{error}</FormHelperText>}
               </DialogContent>
               <DialogActions>
@@ -347,7 +347,7 @@ ExtraMetadata.displayName = 'ExtraMetadata';
 
 export const SubmissionMetadata = memo(() => {
   const { t } = useTranslation(['submit']);
-  const configuration = useAppConfig(s => s.configuration);
+  const configuration = useAppConfigStore(s => s.configuration);
   const form = useForm();
 
   const entries = useMemo(

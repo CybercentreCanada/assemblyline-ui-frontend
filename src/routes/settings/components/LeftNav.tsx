@@ -1,4 +1,4 @@
-import { useAppConfig } from 'core/config';
+import { useAppConfigStore } from 'core/config';
 import { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'routes/settings/settings.form';
@@ -8,8 +8,8 @@ import { PageNavigation } from 'ui/layouts/PageNavigation';
 export const LeftNav = memo(() => {
   const { t } = useTranslation(['settings']);
   const form = useForm();
-  const configuration = useAppConfig(s => s.configuration);
-  const settings = useAppConfig(s => s.settings);
+  const configuration = useAppConfigStore(s => s.configuration);
+  const settings = useAppConfigStore(s => s.settings);
 
   const profileOptions = useMemo(() => {
     if (!settings || !configuration?.submission) return [];

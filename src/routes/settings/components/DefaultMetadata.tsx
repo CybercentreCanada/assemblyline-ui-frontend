@@ -1,5 +1,5 @@
 import { List, useTheme } from '@mui/material';
-import { useAppConfig } from 'core/config';
+import { useAppConfigStore } from 'core/config';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { PageSection } from 'ui/layouts/PageSection';
@@ -8,7 +8,7 @@ import { TextListInput } from 'ui/list-inputs/TextListInput';
 export const DefaultMetadataSection = memo(() => {
   const { t } = useTranslation(['settings']);
   const theme = useTheme();
-  const settings = useAppConfig(s => s.settings);
+  const settings = useAppConfigStore(s => s.settings);
 
   const metadata = settings?.default_metadata;
 

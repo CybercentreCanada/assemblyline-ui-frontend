@@ -21,7 +21,7 @@ import {
 } from '@mui/material';
 import type { SelectChangeEvent } from '@mui/material/Select';
 import { AppAvatar, AppUserAvatar, useAppTheme } from '@tui/core';
-import { useAppConfig } from 'core/config';
+import { useAppConfigStore } from 'core/config';
 import { useAppInterfaceStore, useAppSetInterfaceStore } from 'core/interface';
 import { useAppPreferenceStore, useAppSetPreferenceStore } from 'core/preference';
 import { useAppSafeResults } from 'layout/safe-results';
@@ -37,9 +37,9 @@ const UserAvatar = memo(
     const { t } = useTranslation();
     const theme = useTheme();
 
-    const name = useAppConfig(s => s?.user?.name);
-    const avatar = useAppConfig(s => s?.user?.avatar);
-    const email = useAppConfig(s => s?.user?.email);
+    const name = useAppConfigStore(s => s?.user?.name);
+    const avatar = useAppConfigStore(s => s?.user?.avatar);
+    const email = useAppConfigStore(s => s?.user?.email);
     const setTemplateStore = useAppSetInterfaceStore();
 
     const displayName = useMemo<string>(
@@ -131,9 +131,9 @@ QuotaBar.displayName = 'QuotaBar';
 export const UserQuota = memo(() => {
   const { t } = useTranslation();
 
-  const enforceQuota = useAppConfig(s => s.configuration.ui.enforce_quota);
-  const apiDailyQuota = useAppConfig(s => s.user.api_daily_quota);
-  const submissionDailyQuota = useAppConfig(s => s.user.submission_daily_quota);
+  const enforceQuota = useAppConfigStore(s => s.configuration.ui.enforce_quota);
+  const apiDailyQuota = useAppConfigStore(s => s.user.api_daily_quota);
+  const submissionDailyQuota = useAppConfigStore(s => s.user.submission_daily_quota);
   const apiQuotaRemaining = useAppInterfaceStore(s => s.quota.api);
   const submissionQuotaRemaining = useAppInterfaceStore(s => s.quota.submission);
 
@@ -378,9 +378,9 @@ const UserMenuHeader = memo(() => {
   const { t } = useTranslation();
   const theme = useTheme();
 
-  const name = useAppConfig(s => s?.user?.name);
-  const avatar = useAppConfig(s => s?.user?.avatar);
-  const email = useAppConfig(s => s?.user?.email);
+  const name = useAppConfigStore(s => s?.user?.name);
+  const avatar = useAppConfigStore(s => s?.user?.avatar);
+  const email = useAppConfigStore(s => s?.user?.email);
 
   const displayName = useMemo<string>(
     () =>

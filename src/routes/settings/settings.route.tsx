@@ -1,5 +1,5 @@
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
-import { useAppConfig } from 'core/config';
+import { useAppConfigStore } from 'core/config';
 import { createAppRoute, useAppPathParams } from 'core/routes';
 import { TableOfContentProvider, useTableOfContent } from 'features/table-of-content/TableOfContent';
 import { memo, useCallback, useEffect } from 'react';
@@ -20,9 +20,9 @@ const WrappedSettingsPage = memo(() => {
   const form = useForm();
   const { rootRef, headerRef } = useTableOfContent();
   const { tab: tabParam } = useAppPathParams<'/settings/:tab'>();
-  const currentUser = useAppConfig(s => s.user);
-  const configuration = useAppConfig(s => s.configuration);
-  const settings = useAppConfig(s => s.settings);
+  const currentUser = useAppConfigStore(s => s.user);
+  const configuration = useAppConfigStore(s => s.configuration);
+  const settings = useAppConfigStore(s => s.settings);
 
   const handleProfileChange = useCallback(() => {
     let s = form.getFieldValue('settings');

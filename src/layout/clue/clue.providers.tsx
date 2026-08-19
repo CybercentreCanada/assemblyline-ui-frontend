@@ -1,6 +1,6 @@
 import type { SnackbarEvents } from '@cccsaurora/clue-ui';
 import { ClueDatabaseContext, ClueProvider, SNACKBAR_EVENT_ID } from '@cccsaurora/clue-ui';
-import { useAppConfig } from 'core/config';
+import { useAppConfigStore } from 'core/config';
 import { useAppSnackbar } from 'core/snackbar';
 import type { PropsWithChildren } from 'react';
 import { memo, useContext, useEffect } from 'react';
@@ -21,7 +21,7 @@ export const AppClueProvider = memo(({ children }: PropsWithChildren) => {
 
   const database = useContext(ClueDatabaseContext);
 
-  const clueConfig = useAppConfig(s => s?.configuration?.ui?.api_proxies?.clue as CluePublicConfig);
+  const clueConfig = useAppConfigStore(s => s?.configuration?.ui?.api_proxies?.clue as CluePublicConfig);
 
   useEffect(() => {
     const handleMessage = (event: CustomEvent<SnackbarEvents>) => {

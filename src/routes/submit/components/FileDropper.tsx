@@ -1,7 +1,7 @@
 import BlockIcon from '@mui/icons-material/Block';
 import { styled } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
-import { useAppConfig } from 'core/config';
+import { useAppConfigStore } from 'core/config';
 import { memo, useCallback, useMemo } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useTranslation } from 'react-i18next';
@@ -52,8 +52,8 @@ type FileDropperProps = {
 
 const FileDropperComponent = ({ file, setFile, disabled }: FileDropperProps) => {
   const { t } = useTranslation(['submit']);
-  const user = useAppConfig(s => s.user);
-  const configuration = useAppConfig(s => s.configuration);
+  const user = useAppConfigStore(s => s.user);
+  const configuration = useAppConfigStore(s => s.configuration);
 
   const canSubmit = useMemo(() => user.roles.includes('submission_create'), [user.roles]);
 

@@ -1,7 +1,7 @@
 import { DEFAULT_APP_PREFERENCE_STORE } from 'app/core.preference';
 import type { ApiRequest, ApiResponse } from 'core/api/api.models';
 import { isApiData } from 'core/api/api.utils';
-import { useAppConfig } from 'core/config';
+import { useAppConfigStore } from 'core/config';
 import { useAppSetInterfaceStore } from 'core/interface';
 import { useAppSnackbar } from 'core/snackbar/snackbar.hooks';
 import { useCallback } from 'react';
@@ -32,7 +32,7 @@ export const useApiCallFn = <
 >() => {
   const { t } = useTranslation(['api']);
   const { showErrorMessage, closeSnackbar } = useAppSnackbar();
-  const systemConfig = useAppConfig(s => s.configuration);
+  const configuration = useAppConfigStore(s => s.configuration);
   const setInterfaceStore = useAppSetInterfaceStore();
 
   return useCallback(
@@ -101,7 +101,7 @@ export const useApiCallFn = <
             {
               api_error_message: t('unreachable'),
               api_response: '',
-              api_server_version: systemConfig?.system?.version,
+              api_server_version: configuration?.system?.version,
               api_status_code: 502
             },
             t('unreachable')
@@ -114,7 +114,7 @@ export const useApiCallFn = <
             {
               api_error_message: t('invalid'),
               api_response: '',
-              api_server_version: systemConfig?.system?.version,
+              api_server_version: configuration?.system?.version,
               api_status_code: 400
             },
             t('invalid')
@@ -158,6 +158,6 @@ export const useApiCallFn = <
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [systemConfig?.system?.version, t]
+    [configuration?.system?.version, t]
   );
 };

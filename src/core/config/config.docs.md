@@ -13,7 +13,7 @@ Application configuration store — **read-only after bootstrap**. Holds the `Ap
 
 ### App Config (`core/config/`)
 
-The main application data from the `/api/v4/user/whoami/` response. Set by the auth process after successful authentication. Components subscribe with `useAppConfig(s => s.field)`.
+The main application data from the `/api/v4/user/whoami/` response. Set by the auth process after successful authentication. Components subscribe with `useAppConfigStore(s => s.field)`.
 
 Shape (`AppConfig`): `c12nDef`, `classificationAliases`, `configuration`, `flattenedProps`, `indexes`, `systemMessage`, `user`, `settings`.
 
@@ -36,8 +36,6 @@ Examples: auth mode, current user, drawer open/closed, usermenu visibility, noti
 ## Key Files
 
 - `config.providers.tsx` — `useAppConfig`, `useAppSetConfig`, `useSystemConfig`, `useSetSystemConfig`, `AppConfigProvider`
-- `config.hooks.tsx` — Legacy hooks for saving/loading config to localStorage
-- `config.utils.ts` — LocalStorage persistence utilities (save/load with Zod validation)
 - `index.ts` — Public API barrel
 
 ## Data Flow
@@ -45,9 +43,9 @@ Examples: auth mode, current user, drawer open/closed, usermenu visibility, noti
 ```
 /api/v4/user/whoami/ (200)
   → auth normalizes response (normalizeWhoAmI)
-  → auth calls useAppSetConfig({ ...normalizedData })
+  → auth calls useAppSetConfigStore({ ...normalizedData })
   → config store updates
-  → consumers re-render via useAppConfig(selector)
+  → consumers re-render via useAppConfigStore(selector)
 ```
 
 ## Store API
@@ -58,9 +56,9 @@ Examples: auth mode, current user, drawer open/closed, usermenu visibility, noti
 import { useAppConfig } from 'core/config';
 
 // Subscribe to a specific field
-const configuration = useAppConfig(s => s.configuration);
-const user = useAppConfig(s => s.user);
-const c12nDef = useAppConfig(s => s.c12nDef);
+const configuration = useAppConfigStore(s => s.configuration);
+const user = useAppConfigStore(s => s.user);
+const c12nDef = useAppConfigStore(s => s.c12nDef);
 ```
 
 ### Writing (auth only)
@@ -68,7 +66,7 @@ const c12nDef = useAppConfig(s => s.c12nDef);
 ```typescript
 import { useAppSetConfig } from 'core/config';
 
-const setConfig = useAppSetConfig();
+const setConfigStore = useAppSetConfigStore();
 
 // Set after successful whoami
 setConfig(normalizedWhoAmI);
@@ -85,17 +83,9 @@ import { getAppConfigState } from 'core/config';
 const current = getAppConfigState();
 ```
 
-## Legacy Hooks
-
-These still exist for backward compatibility during migration:
-
-- `useSaveAppConfig` — saves current store to localStorage
-- `useLoadAppConfig` — loads from localStorage into store
-- `useSaveSettings` / `useLoadSettings` — same with pending state
-
 ## What NOT to Do
 
 - **Fetch data in the config module** — Auth owns the fetch. Config just stores.
 - **Mutate config from feature modules** — Only auth sets config. Everyone else reads.
 - **Use React Context for shared state** — Use Zustand stores. Context causes full-subtree re-renders.
-- **Prop drill config beyond 2 levels** — Use `useAppConfig(selector)` directly.
+- **Prop drill config beyond 2 levels** — Use `useAppConfigStore(selector)` directly.

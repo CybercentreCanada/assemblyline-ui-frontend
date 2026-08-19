@@ -1,8 +1,7 @@
-export { useLoadAppConfig, useLoadSettings, useSaveAppConfig, useSaveSettings } from './config.hooks';
-export { AppConfigStoreProvider, useAppConfig, useAppConfigStoreApi, useAppSetConfig } from './config.providers';
 export {
-  APP_CONFIG_LOCAL_STORAGE_KEY,
+  AppConfigStoreProvider,
   getAppConfigStateFromApi,
-  loadSettingsFromLocalStorage,
-  saveSettingsFromLocalStorage
-} from './config.utils';
+  useAppConfigStore,
+  useAppConfigStoreApi,
+  useAppSetConfigStore
+} from './config.providers';

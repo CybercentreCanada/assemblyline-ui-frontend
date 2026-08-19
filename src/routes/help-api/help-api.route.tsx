@@ -18,7 +18,7 @@ import {
 } from '@mui/material';
 import type { SelectChangeEvent } from '@mui/material/Select';
 import { useApiQuery } from 'core/api';
-import { useAppConfig } from 'core/config';
+import { useAppConfigStore } from 'core/config';
 import { createAppRoute } from 'core/routes';
 import { AppPageFullWidth } from 'core/template';
 import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
@@ -112,7 +112,7 @@ export const HelpAPIPage = React.memo(() => {
   const [apiSelected, setApiSelected] = useState<string>('');
   const [expandMap, setExpandMap] = useState<Record<string, boolean>>({});
 
-  const configuration = useAppConfig(s => s?.configuration);
+  const configuration = useAppConfigStore(s => s?.configuration);
 
   const sp1 = useMemo(() => theme.spacing(1), [theme]);
   const sp2 = useMemo(() => theme.spacing(2), [theme]);

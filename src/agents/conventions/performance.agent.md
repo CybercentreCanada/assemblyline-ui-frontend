@@ -41,11 +41,11 @@ const activeItems = useMemo(() => items.filter(i => i.active), [items]);
 const EMPTY_SERVICES: MinimalService[] = [];
 
 export const MyComponent = memo(() => {
-  const services = useAppConfig(s => s?.services ?? EMPTY_SERVICES);
+  const services = useAppConfigStore(s => s?.services ?? EMPTY_SERVICES);
 });
 
 // ❌ Inline default — new array every render
-const services = useAppConfig(s => s?.services ?? []);
+const services = useAppConfigStore(s => s?.services ?? []);
 ```
 
 ## Store Selectors — Access Leaf Values
@@ -74,7 +74,10 @@ Never spread/replace a parent object in the store. Mutate the individual fields 
 setStore(s => ({ ...s, routes: { ...s.routes, [key]: { ...s.routes[key], href: newHref } } }));
 
 // ✅ Mutate in place — only selectors for `href` will re-render
-setStore(s => { s.routes[key].href = newHref; return s; });
+setStore(s => {
+  s.routes[key].href = newHref;
+  return s;
+});
 ```
 
 ## Derived State

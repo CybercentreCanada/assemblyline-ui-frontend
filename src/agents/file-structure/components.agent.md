@@ -23,8 +23,8 @@ export type MyComponentProps = {
 
 export const MyComponent = memo(({ open, onClose }: MyComponentProps) => {
   const { t } = useTranslation(['myModule']);
-  const someValue = useAppConfig(c => c.layout.someValue);
-  const setConfig = useAppSetConfig();
+  const someValue = useAppConfigStore(c => c.layout.someValue);
+  const setConfigStore = useAppSetConfigStore();
 
   const handleAction = useCallback(() => {
     setConfig(prev => ({
@@ -98,22 +98,22 @@ if (isLoading) return <Spinner />;
 
 ## State Access
 
-| Solution | When |
-|----------|------|
-| `useAppConfig(c => c.path)` | App-wide state (layout, auth, config) |
-| `createAppStore` | Feature-scoped shared state |
-| TanStack Form stores | Form state with validation |
+| Solution                         | When                                  |
+| -------------------------------- | ------------------------------------- |
+| `useAppConfigStore(c => c.path)` | App-wide state (layout, auth, config) |
+| `createAppStore`                 | Feature-scoped shared state           |
+| TanStack Form stores             | Form state with validation            |
 
 - Always use focused selectors — never subscribe to entire store
 - Write via callback: `setConfig(prev => ({ ...prev.layout, ... }))`
 
 ## Decision Table
 
-| Scenario | Style |
-|----------|-------|
-| Standard component | `export const X = memo((...) => { ... })` |
-| Generic component | `function` keyword + `memo(forwardRef(...))` + type cast |
-| Hooks, handlers, utilities | `const` arrow function |
+| Scenario                   | Style                                                    |
+| -------------------------- | -------------------------------------------------------- |
+| Standard component         | `export const X = memo((...) => { ... })`                |
+| Generic component          | `function` keyword + `memo(forwardRef(...))` + type cast |
+| Hooks, handlers, utilities | `const` arrow function                                   |
 
 ## Generic Component Pattern
 

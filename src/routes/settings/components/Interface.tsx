@@ -1,5 +1,5 @@
 import { useTheme } from '@mui/material';
-import { useAppConfig } from 'core/config';
+import { useAppConfigStore } from 'core/config';
 import { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'routes/settings/settings.form';
@@ -14,8 +14,8 @@ export const InterfaceSection = memo(() => {
   const { t } = useTranslation(['settings']);
   const theme = useTheme();
   const form = useForm();
-  const configuration = useAppConfig(s => s.configuration);
-  const settings = useAppConfig(s => s.settings);
+  const configuration = useAppConfigStore(s => s.configuration);
+  const settings = useAppConfigStore(s => s.settings);
 
   const profileOptions = useMemo<{ value: string; primary: string }[]>(() => {
     if (!configuration || !settings) return [];

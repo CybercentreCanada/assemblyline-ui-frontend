@@ -32,11 +32,8 @@
  * @returns Current unread count
  */
 export const useNotificationCount = (): number => {
-  const notifications = useAppConfig(c => c.notifications.items);
-  return useMemo(
-    () => notifications.filter(n => !n.read).length,
-    [notifications]
-  );
+  const notifications = useAppConfigStore(c => c.notifications.items);
+  return useMemo(() => notifications.filter(n => !n.read).length, [notifications]);
 };
 ```
 
@@ -50,5 +47,5 @@ const useMyComponentLogic = () => { ... };
 export const useSaveNotification = () => useAPIMutation(() => ({ ... }));
 
 // ❌ Re-exports selector with no added logic
-export const useIsOpen = () => useAppConfig(c => c.layout.panel.open);
+export const useIsOpen = () => useAppConfigStore(c => c.layout.panel.open);
 ```
