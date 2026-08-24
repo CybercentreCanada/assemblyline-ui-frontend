@@ -1,0 +1,189 @@
+import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
+import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
+import PersonIcon from '@mui/icons-material/Person';
+import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
+import { useTheme } from '@mui/material';
+import Typography from '@mui/material/Typography';
+import { useAppNavigate } from 'core/router';
+import { createAppRoute, useAppSearchSnapshot } from 'core/routes';
+import { AppPageContainer, AppPageFullWidth } from 'core/template';
+import useALContext from 'deprecated/hooks/useALContext';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
+import type { IndexDefinition } from 'models/api/user';
+import type { SubmissionIndexed } from 'models/base/submission';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { ForbiddenPage } from 'routes/forbidden/forbidden';
+import { SubmissionsTable } from 'routes/search/components/submissions';
+import { safeFieldValue } from 'shared/utils/utils';
+import { DEFAULT_SUGGESTION } from 'ui/SearchBar/search-textfield';
+import SearchHeader from 'ui/SearchBar/SearchHeader';
+
+type SearchResults = {
+  items: SubmissionIndexed[];
+  offset: number;
+  rows: number;
+  total: number;
+};
+
+const Submissions = memo(() => {
+  const { t } = useTranslation(['submissions']);
+  const theme = useTheme();
+  const { apiCall } = useMyAPI();
+  const { user: currentUser, indexes } = useALContext();
+
+  const search = useAppSearchSnapshot<'/submissions'>();
+  const navigate = useAppNavigate<'/submissions'>();
+
+  const [submissionResults, setSubmissionResults] = useState<SearchResults>(null);
+  const [searching, setSearching] = useState<boolean>(false);
+
+  const suggestions = useMemo<IndexDefinition>(
+    () => ({ ...indexes.submission, ...DEFAULT_SUGGESTION }),
+    [indexes.submission]
+  );
+
+  const handleToggleFilter = useCallback(
+    (filter: string) =>
+      navigate.here().update(s => ({
+        ...s,
+        search: {
+          ...s?.search,
+          offset: 0,
+          filters: s.search.filters.includes(filter)
+            ? s.search.filters.filter(f => f !== filter)
+            : [...s.search.filters, filter]
+        }
+      })),
+
+    [navigate]
+  );
+
+  useEffect(() => {
+    if (!search || !currentUser.roles.includes('submission_view')) return;
+
+    apiCall({
+      url: '/api/v4/search/submission/',
+      method: 'POST',
+      body: search
+        .set(o => ({ ...o, query: o.query || '*', filters: [...o.filters, 'NOT(to_be_deleted:true)'] }))
+        .toObject(),
+      onSuccess: ({ api_response }) => setSubmissionResults(api_response as SearchResults),
+      onEnter: () => setSearching(true),
+      onExit: () => setSearching(false)
+    });
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentUser.roles, search?.toString()]);
+
+  return currentUser.roles.includes('submission_view') ? (
+    <AppPageFullWidth>
+      <div style={{ paddingBottom: theme.spacing(2) }}>
+        <Typography variant="h4">{t('title')}</Typography>
+      </div>
+
+      <AppPageContainer isSticky>
+        <div style={{ paddingTop: theme.spacing(1) }}>
+          <SearchHeader
+            params={search.toParams()}
+            loading={searching}
+            results={submissionResults}
+            resultLabel={
+              search.get('query')
+                ? t(`filtered${submissionResults?.total === 1 ? '' : 's'}`)
+                : t(`total${submissionResults?.total === 1 ? '' : 's'}`)
+            }
+            onChange={v =>
+              navigate
+                .here()
+                .update(s => ({ ...s, search: { ...s.search, ...SubmissionsRoute.search.delta(v).toObject() } }))
+            }
+            paramDefaults={search.defaults().toObject()}
+            searchInputProps={{ placeholder: t('filter'), options: suggestions }}
+            actionProps={[
+              {
+                tooltip: {
+                  title: search.has('filters', `params.submitter:${safeFieldValue(currentUser.username)}`)
+                    ? t('filter.personal.remove')
+                    : t('filter.personal.add')
+                },
+                icon: { children: <PersonIcon /> },
+                button: {
+                  color: search.has('filters', `params.submitter:${safeFieldValue(currentUser.username)}`)
+                    ? 'primary'
+                    : 'default',
+                  onClick: () => handleToggleFilter(`params.submitter:${safeFieldValue(currentUser.username)}`)
+                }
+              },
+              {
+                tooltip: {
+                  title: search.has('filters', 'state:completed')
+                    ? t('filter.completed.remove')
+                    : t('filter.completed.add')
+                },
+                icon: { children: <AssignmentTurnedInIcon /> },
+                button: {
+                  sx: {
+                    color: !search.has('filters', 'state:completed')
+                      ? 'default'
+                      : theme.palette.mode === 'dark'
+                        ? theme.palette.success.light
+                        : theme.palette.success.dark
+                  },
+                  onClick: () => handleToggleFilter('state:completed')
+                }
+              },
+              {
+                tooltip: {
+                  title: search.has('filters', 'max_score:>=1000')
+                    ? t('filter.malicious.remove')
+                    : t('filter.malicious.add')
+                },
+                icon: { children: <BugReportOutlinedIcon /> },
+                button: {
+                  sx: {
+                    color: !search.has('filters', 'max_score:>=1000')
+                      ? 'default'
+                      : theme.palette.mode === 'dark'
+                        ? theme.palette.error.light
+                        : theme.palette.error.dark
+                  },
+                  onClick: () => handleToggleFilter('max_score:>=1000')
+                }
+              }
+            ]}
+          />
+        </div>
+      </AppPageContainer>
+
+      <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
+        <SubmissionsTable submissionResults={submissionResults} />
+      </div>
+    </AppPageFullWidth>
+  ) : (
+    <ForbiddenPage />
+  );
+});
+
+export const SubmissionsRoute = createAppRoute({
+  component: Submissions,
+
+  path: '/submissions',
+  search: s => ({
+    query: s.string(''),
+    offset: s.number(0).min(0).source('transient').ephemeral(),
+    rows: s.number(25).locked().source('transient').ephemeral(),
+    sort: s.string('times.submitted desc').ephemeral(),
+    filters: s.filters([]),
+    track_total_hits: s.number(null).source('transient').nullable().ephemeral()
+  }),
+
+  ancestor: null,
+  shortname: () => ['app_route.submissions.shortname', { ns: 'submissions' }],
+  fullname: () => ['app_route.submissions.fullname', { ns: 'submissions' }],
+  shorticon: () => <ViewCarouselOutlinedIcon />,
+  fullicon: () => <ViewCarouselOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.roles.includes('submission_view')
+});

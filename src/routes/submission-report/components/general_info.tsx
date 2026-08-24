@@ -1,0 +1,401 @@
+import { Divider, Grid, Skeleton, Typography, useMediaQuery, useTheme } from '@mui/material';
+import type { SubmissionReport } from 'models/api/submission_report';
+import type { BodyFormat, SectionBody } from 'models/base/result_body';
+import type { ReactNode } from 'react';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { bytesToSize } from 'shared/utils/utils';
+import { ImageInlineBody } from 'ui/image_inline';
+import Moment from 'ui/Moment';
+import { GraphBody } from 'ui/ResultCard/graph_body';
+
+const parseValue = (value: any): ReactNode => {
+  if (value instanceof Array) {
+    return value.join(' | ');
+  } else if (value === true) {
+    return 'true';
+  } else if (value === false) {
+    return 'false';
+  } else if (typeof value === 'object') {
+    return JSON.stringify(value);
+  }
+  return value;
+};
+
+type KVItemProps = {
+  name: BodyFormat | string;
+  value: SectionBody['body'];
+};
+
+const WrappedKVItem = ({ name, value }: KVItemProps) => (
+  <>
+    <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
+      <span style={{ fontWeight: 500, marginRight: '4px', display: 'flex', textTransform: 'capitalize' }}>{name}</span>
+    </Grid>
+    <Grid size={{ xs: 8, sm: 9, lg: 10 }} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
+      {parseValue(value)}
+    </Grid>
+  </>
+);
+
+const KVItem = React.memo(WrappedKVItem);
+
+type OrderedKVExtraProps = {
+  body: SectionBody['body'];
+};
+
+const WrappedOrderedKVExtra = ({ body }: OrderedKVExtraProps) => (
+  <>
+    {Object.keys(body).map(id => {
+      const item = body[id];
+      return <KVItem key={id} name={item[0]} value={item[1]} />;
+    })}
+  </>
+);
+
+const OrderedKVExtra = React.memo(WrappedOrderedKVExtra);
+
+type KVExtraProps = {
+  body: SectionBody['body'];
+};
+
+const WrappedKVExtra = ({ body }: KVExtraProps) => (
+  <>
+    {Object.keys(body).map((key, id) => {
+      return <KVItem key={id} name={key} value={body[key]} />;
+    })}
+  </>
+);
+
+const KVExtra = React.memo(WrappedKVExtra);
+
+type Props = {
+  report: SubmissionReport;
+};
+
+function WrappedGeneralInformation({ report }: Props) {
+  const { t } = useTranslation(['submissionReport']);
+  const theme = useTheme();
+
+  const sp2 = theme.spacing(2);
+  const upSM = useMediaQuery(theme.breakpoints.up('sm'));
+
+  return (
+    <div style={{ pageBreakInside: 'avoid' }}>
+      <div style={{ marginTop: theme.spacing(4), pageBreakAfter: 'avoid', pageBreakInside: 'avoid' }}>
+        <Typography variant="h6">{t('general')}</Typography>
+        <Divider
+          sx={{
+            '@media print': {
+              backgroundColor: '#0000001f !important'
+            }
+          }}
+        />
+      </div>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: upSM ? 'start' : 'center',
+          flexDirection: upSM ? 'row' : 'column',
+          rowGap: sp2,
+          marginTop: theme.spacing(2),
+          marginBottom: theme.spacing(2),
+          pageBreakBefore: 'avoid',
+          pageBreakInside: 'avoid'
+        }}
+      >
+        <Grid container spacing={1}>
+          <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
+            <span style={{ fontWeight: 500 }}>{t('file.name')}</span>
+          </Grid>
+          <Grid size={{ xs: 8, sm: 9, lg: 10 }} style={{ wordBreak: 'break-word' }}>
+            {report ? report?.files[0]?.name : <Skeleton />}
+          </Grid>
+
+          <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
+            <span style={{ fontWeight: 500 }}>{t('file.description')}</span>
+          </Grid>
+          <Grid size={{ xs: 8, sm: 9, lg: 10 }} style={{ wordBreak: 'break-word' }}>
+            {report ? report?.params?.description : <Skeleton />}
+          </Grid>
+
+          <Grid size={{ xs: 12 }}>
+            <div style={{ height: theme.spacing(2) }} />
+          </Grid>
+
+          <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
+            <span style={{ fontWeight: 500 }}>{t('submission.date')}</span>
+          </Grid>
+          <Grid size={{ xs: 8, sm: 9, lg: 10 }}>
+            {report ? <Moment>{report?.times?.submitted}</Moment> : <Skeleton />}
+          </Grid>
+
+          <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
+            <span style={{ fontWeight: 500 }}>{t('submission.user')}</span>
+          </Grid>
+          <Grid size={{ xs: 8, sm: 9, lg: 10 }}>{report ? report?.params?.submitter : <Skeleton />}</Grid>
+
+          <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
+            <span style={{ fontWeight: 500 }}>{t('submission.services')}</span>
+          </Grid>
+          <Grid size={{ xs: 8, sm: 9, lg: 10 }}>
+            {report ? (
+              report?.params?.services?.rescan ? (
+                [
+                  ...report?.params?.services?.selected,
+                  ...report?.params?.services?.rescan?.filter(
+                    word => report?.params?.services?.selected?.indexOf(word) === -1
+                  )
+                ]
+                  .sort((a: string, b: string) => a.localeCompare(b))
+                  .join(' | ')
+              ) : (
+                report?.params?.services?.selected?.sort((a: string, b: string) => a.localeCompare(b)).join(' | ')
+              )
+            ) : (
+              <Skeleton />
+            )}
+          </Grid>
+
+          {report && report?.params?.services?.errors?.length !== 0 && (
+            <>
+              <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
+                <span style={{ fontWeight: 500 }}>{t('submission.services.errors')}</span>
+              </Grid>
+              <Grid size={{ xs: 8, sm: 9, lg: 10 }}>
+                <span
+                  style={{
+                    color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+                  }}
+                >
+                  {report.params.services.errors.join(' | ')}
+                </span>
+              </Grid>
+            </>
+          )}
+
+          {(!report || report?.file_info) && report?.file_info?.type?.startsWith('uri/') ? (
+            <>
+              <Grid size={{ xs: 12 }}>
+                <div style={{ height: theme.spacing(2) }} />
+              </Grid>
+
+              <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
+                <span style={{ fontWeight: 500 }}>{t('file.scheme')}</span>
+              </Grid>
+              <Grid size={{ xs: 8, sm: 9, lg: 10 }}>
+                {report.file_info?.uri_info ? report?.file_info?.uri_info.scheme : <Skeleton />}
+              </Grid>
+
+              {report.file_info?.uri_info?.username && (
+                <>
+                  <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
+                    <span style={{ fontWeight: 500 }}>{t('file.username')}</span>
+                  </Grid>
+                  <Grid size={{ xs: 8, sm: 9, lg: 10 }}>{report?.file_info?.uri_info.username}</Grid>
+                </>
+              )}
+
+              {report.file_info?.uri_info?.password && (
+                <>
+                  <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
+                    <span style={{ fontWeight: 500 }}>{t('file.password')}</span>
+                  </Grid>
+                  <Grid size={{ xs: 8, sm: 9, lg: 10 }}>{report?.file_info?.uri_info.password}</Grid>
+                </>
+              )}
+
+              <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
+                <span style={{ fontWeight: 500 }}>{t('file.hostname')}</span>
+              </Grid>
+              <Grid size={{ xs: 8, sm: 9, lg: 10 }}>{report?.file_info?.uri_info?.hostname}</Grid>
+
+              {report.file_info?.uri_info?.port && (
+                <>
+                  <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
+                    <span style={{ fontWeight: 500 }}>{t('file.port')}</span>
+                  </Grid>
+                  <Grid size={{ xs: 8, sm: 9, lg: 10 }}>{report?.file_info?.uri_info?.port}</Grid>
+                </>
+              )}
+
+              {report.file_info?.uri_info?.path && (
+                <>
+                  <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
+                    <span style={{ fontWeight: 500 }}>{t('file.path')}</span>
+                  </Grid>
+                  <Grid size={{ xs: 8, sm: 9, lg: 10 }}>{report?.file_info?.uri_info?.path}</Grid>
+                </>
+              )}
+
+              {report.file_info?.uri_info?.params && (
+                <>
+                  <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
+                    <span style={{ fontWeight: 500 }}>{t('file.params')}</span>
+                  </Grid>
+                  <Grid size={{ xs: 8, sm: 9, lg: 10 }}>{report?.file_info?.uri_info?.params}</Grid>
+                </>
+              )}
+
+              {report.file_info?.uri_info?.query && (
+                <>
+                  <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
+                    <span style={{ fontWeight: 500 }}>{t('file.query')}</span>
+                  </Grid>
+                  <Grid size={{ xs: 8, sm: 9, lg: 10 }}>{report?.file_info?.uri_info?.query}</Grid>
+                </>
+              )}
+
+              {report.file_info?.uri_info?.fragment && (
+                <>
+                  <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
+                    <span style={{ fontWeight: 500 }}>{t('file.fragment')}</span>
+                  </Grid>
+                  <Grid size={{ xs: 8, sm: 9, lg: 10 }}>{report?.file_info?.uri_info?.fragment}</Grid>
+                </>
+              )}
+            </>
+          ) : (
+            <>
+              <Grid size={{ xs: 12 }}>
+                <div style={{ height: theme.spacing(2) }} />
+              </Grid>
+
+              <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
+                <span style={{ fontWeight: 500 }}>{t('file.type')}</span>
+              </Grid>
+              <Grid size={{ xs: 8, sm: 9, lg: 10 }}>
+                {report ? (
+                  report?.params?.filetype_override ? (
+                    <>
+                      <span style={{ paddingRight: theme.spacing(0.5) }}>{`${report.params.filetype_override}`}</span>
+                      <span
+                        style={{
+                          textDecoration: 'line-through',
+                          color: theme.palette.text.disabled
+                        }}
+                      >{`${report.file_info.type}`}</span>
+                    </>
+                  ) : (
+                    report?.file_info?.type
+                  )
+                ) : (
+                  <Skeleton />
+                )}
+              </Grid>
+
+              <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
+                <span style={{ fontWeight: 500 }}>{t('file.mime')}</span>
+              </Grid>
+              <Grid size={{ xs: 8, sm: 9, lg: 10 }}>{report ? report?.file_info?.mime : <Skeleton />}</Grid>
+
+              <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
+                <span style={{ fontWeight: 500 }}>{t('file.magic')}</span>
+              </Grid>
+              <Grid size={{ xs: 8, sm: 9, lg: 10 }}>{report ? report?.file_info?.magic : <Skeleton />}</Grid>
+
+              <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
+                <span style={{ fontWeight: 500 }}>{t('file.size')}</span>
+              </Grid>
+              <Grid size={{ xs: 8, sm: 9, lg: 10 }}>
+                {!report ? (
+                  <Skeleton />
+                ) : !report?.file_info?.size ? null : (
+                  <span>
+                    {report?.file_info?.size}
+                    <span>{` (${bytesToSize(report?.file_info?.size)})`}</span>
+                  </span>
+                )}
+              </Grid>
+
+              <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
+                <span style={{ fontWeight: 500 }}>{t('file.md5')}</span>
+              </Grid>
+              <Grid size={{ xs: 8, sm: 9, lg: 10 }} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
+                {report ? report?.file_info?.md5 : <Skeleton />}
+              </Grid>
+
+              <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
+                <span style={{ fontWeight: 500 }}>{t('file.sha1')}</span>
+              </Grid>
+              <Grid size={{ xs: 8, sm: 9, lg: 10 }} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
+                {report ? report?.file_info?.sha1 : <Skeleton />}
+              </Grid>
+
+              <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
+                <span style={{ fontWeight: 500 }}>{t('file.sha256')}</span>
+              </Grid>
+              <Grid size={{ xs: 8, sm: 9, lg: 10 }} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
+                {report ? report?.file_info?.sha256 : <Skeleton />}
+              </Grid>
+
+              <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
+                <span style={{ fontWeight: 500 }}>{t('file.ssdeep')}</span>
+              </Grid>
+              <Grid size={{ xs: 8, sm: 9, lg: 10 }} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
+                {report ? report?.file_info?.ssdeep : <Skeleton />}
+              </Grid>
+
+              {report && report?.file_info?.tlsh && (
+                <>
+                  <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
+                    <span style={{ fontWeight: 500 }}>{t('file.tlsh')}</span>
+                  </Grid>
+                  <Grid size={{ xs: 8, sm: 9, lg: 10 }} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
+                    {report?.file_info?.tlsh}
+                  </Grid>
+                </>
+              )}
+            </>
+          )}
+
+          {report && report?.promoted_sections
+            ? report.promoted_sections
+                .filter(section => section.promote_to === 'URI_PARAMS')
+                .map((section, idx) =>
+                  section.body_format === 'KEY_VALUE' ? (
+                    <KVExtra key={idx} body={section.body} />
+                  ) : (
+                    <OrderedKVExtra key={idx} body={section.body} />
+                  )
+                )
+            : null}
+
+          <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
+            <span style={{ fontWeight: 500 }}>{t('file.entropy')}</span>
+          </Grid>
+          <Grid size={{ xs: 8, sm: 9, lg: 10 }} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
+            {report ? report?.file_info?.entropy : <Skeleton />}
+          </Grid>
+
+          {report && report?.file_info?.entropy && report?.promoted_sections ? (
+            <>
+              <Grid size={{ xs: 4, sm: 3, lg: 2 }} />
+              <Grid size={{ xs: 8, sm: 9, lg: 10 }}>
+                {report?.promoted_sections
+                  .filter(section => section?.promote_to === 'ENTROPY')
+                  .map((section, idx) =>
+                    section.body_format === 'GRAPH_DATA' ? <GraphBody key={idx} body={section.body} /> : null
+                  )}
+              </Grid>
+            </>
+          ) : null}
+        </Grid>
+        <div>
+          {report && report?.promoted_sections
+            ? report.promoted_sections
+                .filter(section => section?.promote_to === 'SCREENSHOT')
+                .map((section, idx) =>
+                  section.body_format === 'IMAGE' ? (
+                    <ImageInlineBody key={idx} body={section.body} size="large" />
+                  ) : null
+                )
+            : null}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const GeneralInformation = React.memo(WrappedGeneralInformation);
+export default GeneralInformation;

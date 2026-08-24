@@ -1,0 +1,12 @@
+{
+  "app_route.statistics_heuristics.fullname": "Statistiques des heuristiques",
+  "app_route.statistics_heuristics.shortname": "Statistiques des heuristiques",
+  "avg": "Score Moy",
+  "classification": "Classification",
+  "count": "Nombre",
+  "heur_id": "ID",
+  "max": "Score Max",
+  "min": "Score Min",
+  "name": "Nom",
+  "title": "Statistiques d'heuristiques"
+}

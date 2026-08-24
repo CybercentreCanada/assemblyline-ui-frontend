@@ -1,0 +1,11 @@
+.development-customize-div-class {
+  color: var(--mui-palette-text-secondary);
+  border: 1px solid var(--mui-palette-text-secondary);
+  border-radius: 4px;
+  margin: 4px;
+  padding: 4px;
+}
+
+.development-customize-div-class:hover {
+  background-color: var(--mui-palette-primary-main);
+}

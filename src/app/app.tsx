@@ -1,0 +1,225 @@
+import { AppSwitcherProvider } from '@tui/apps';
+import { DEFAULT_APP_CONFIG_STORE } from 'app/core.config';
+import { i18n } from 'app/core.i18n';
+import { DEFAULT_APP_INTERFACE_STORE } from 'app/core.interface';
+import { APP_PREFERENCE_SCHEMA, APP_PREFERENCE_STORAGE_KEY } from 'app/core.preference';
+import { useAppRoutes } from 'app/core.routes';
+import { useAppTemplatePreferences, useAppTemplateRouter, useAppTemplateUser } from 'app/core.template';
+import { AppApiProvider } from 'core/api';
+import { AppConfigStoreProvider, useAppConfigStore } from 'core/config';
+import { AppErrorProvider } from 'core/error';
+import { AppInterfaceStoreProvider } from 'core/interface';
+import { AppPreferenceProvider, AppPreferenceStoreProvider } from 'core/preference';
+import {
+  AppNavigationProvider,
+  AppNavigationStoreProvider,
+  AppRouterLayout,
+  AppRouterPanelLayout,
+  AppRouterProvider,
+  AppRouterStoreProvider
+} from 'core/router';
+import { AppLocationParamProvider, AppLocationParamStoreProvider } from 'core/routes';
+import { AppSnackbarProvider } from 'core/snackbar';
+import { AppTemplateLayout, AppTemplateProvider } from 'core/template';
+import { AppAssistantLayout, AppAssistantProvider } from 'layout/assistant';
+import { AppAuthLayout } from 'layout/auth';
+import { AppCarouselProvider } from 'layout/carousel';
+import { AppClueProvider } from 'layout/clue';
+import { AppDrawerLayout } from 'layout/drawer';
+import type { PropsWithChildren } from 'react';
+import { memo, StrictMode } from 'react';
+
+// TODO: remove dead dependencies like: node-forge, md5, history, fontsource-roboto, styled-components, @mui/styled-engine-sc
+
+/**
+ * MyAPP:
+ * BrowserRouter
+ * APIProvider
+ * SafeResultsProvider
+ * QuotaProvider
+ *
+ * TemplateUI
+ * AppThemesProvider
+ * MUI's Style engine
+ * ErrorBoundary
+ * UserProvider
+ * SnackbarProvider
+ * BorealisProvider
+ * UserProvider
+ * AssistantProvider
+ * HighlightProvider
+ * ExternalLookupProvider
+ * CarouselProvider
+ * AppDrawerProvider
+ *
+ * Layout:
+ * AppBarProvider
+ * AppBreadcrumbsProvider
+ * AppLeftNavProvider
+ * AppDrawerContainer
+ * AppLayoutProvider
+ */
+
+// export const Layout = () => <AppAuthLayout></AppAuthLayout>;
+
+// export const App2 = () => (
+//   <StrictMode>
+//     <AppConfigProvider>
+//       <AppThemeProvider>
+//         <AppErrorLayout>
+//           <AppApiProvider>
+//             app
+//             {/* <AppLayoutRoot>
+//               <AppSnackbarProvider>
+//                 <AppRouterProvider>
+//                   <AppAuthProvider>
+//                     <AppLayoutProvider>
+//                       <AppRouter />
+//                     </AppLayoutProvider>
+//                   </AppAuthProvider>
+//                 </AppRouterProvider>
+//               </AppSnackbarProvider>
+//             </AppLayoutRoot> */}
+//           </AppApiProvider>
+//         </AppErrorLayout>
+//       </AppThemeProvider>
+//     </AppConfigProvider>
+//   </StrictMode>
+// );
+
+// export const AppLayout2 = () => (
+//   <AppAuthLayout>
+//     <AppRouterLayout routes={APP_ROUTES}>
+//       <AppDrawerLayout content={<AppRouterPanel panelKey={1} />}>
+//         <AppAppsLayout>
+//           <AppTemplateLayout>
+//             <AppRouterPanel panelKey={0} />
+//           </AppTemplateLayout>
+//         </AppAppsLayout>
+//       </AppDrawerLayout>
+//     </AppRouterLayout>
+//   </AppAuthLayout>
+// );
+
+// export const App2 = () => (
+//   <StrictMode>
+//     {/* <AppConfigProviderStore> */}
+//     <AppThemeProvider>
+//       <AppErrorProvider>
+//         <AppApiProvider>
+//           <AppSnackbarProvider>
+//             <AppRouterProvider>
+//               <AppLayoutProvider i18n={i18n}>
+//                 <AppLayout2 />
+//               </AppLayoutProvider>
+//             </AppRouterProvider>
+//           </AppSnackbarProvider>
+//         </AppApiProvider>
+//       </AppErrorProvider>
+//     </AppThemeProvider>
+//     {/* </AppConfigProviderStore> */}
+//   </StrictMode>
+// );
+
+//*****************************************************************************************
+// App Layouts
+//*****************************************************************************************
+
+export const AppLayout = memo(() => {
+  const preferences = useAppTemplatePreferences();
+  const router = useAppTemplateRouter();
+  const user = useAppTemplateUser();
+
+  return (
+    <AppAuthLayout>
+      <AppAssistantLayout>
+        <AppRouterLayout>
+          <AppDrawerLayout content={<AppRouterPanelLayout panelKey={1} />}>
+            <AppTemplateLayout preferences={preferences} router={router} user={user}>
+              <AppRouterPanelLayout panelKey={0} />
+            </AppTemplateLayout>
+          </AppDrawerLayout>
+        </AppRouterLayout>
+      </AppAssistantLayout>
+    </AppAuthLayout>
+  );
+});
+
+AppLayout.displayName = 'AppLayout';
+
+//*****************************************************************************************
+// App Providers
+//*****************************************************************************************
+
+const AppProviders = memo(({ children }: PropsWithChildren) => {
+  const apps = useAppConfigStore(s => s?.configuration?.ui?.apps || []);
+  const routes = useAppRoutes();
+
+  return (
+    <AppPreferenceProvider schema={APP_PREFERENCE_SCHEMA} storageKey={APP_PREFERENCE_STORAGE_KEY}>
+      <AppSwitcherProvider apps={apps}>
+        <AppTemplateProvider i18n={i18n}>
+          <AppErrorProvider>
+            <AppSnackbarProvider>
+              <AppApiProvider>
+                <AppAssistantProvider>
+                  <AppRouterProvider>
+                    <AppNavigationProvider>
+                      <AppLocationParamProvider routes={routes}>
+                        <AppClueProvider>
+                          <AppCarouselProvider>
+                            <>{children}</>
+                          </AppCarouselProvider>
+                        </AppClueProvider>
+                      </AppLocationParamProvider>
+                    </AppNavigationProvider>
+                  </AppRouterProvider>
+                </AppAssistantProvider>
+              </AppApiProvider>
+            </AppSnackbarProvider>
+          </AppErrorProvider>
+        </AppTemplateProvider>
+      </AppSwitcherProvider>
+    </AppPreferenceProvider>
+  );
+});
+
+AppProviders.displayName = 'AppProviders';
+
+//*****************************************************************************************
+// App Stores
+//*****************************************************************************************
+
+const AppStores = memo(({ children }: PropsWithChildren) => (
+  <AppConfigStoreProvider data={DEFAULT_APP_CONFIG_STORE}>
+    <AppInterfaceStoreProvider data={DEFAULT_APP_INTERFACE_STORE}>
+      <AppPreferenceStoreProvider>
+        <AppRouterStoreProvider>
+          <AppNavigationStoreProvider>
+            <AppLocationParamStoreProvider>
+              <>{children}</>
+            </AppLocationParamStoreProvider>
+          </AppNavigationStoreProvider>
+        </AppRouterStoreProvider>
+      </AppPreferenceStoreProvider>
+    </AppInterfaceStoreProvider>
+  </AppConfigStoreProvider>
+));
+
+AppStores.displayName = 'AppStores';
+
+//*****************************************************************************************
+// App
+//*****************************************************************************************
+
+export const App = memo(() => (
+  <StrictMode>
+    <AppStores>
+      <AppProviders>
+        <AppLayout />
+      </AppProviders>
+    </AppStores>
+  </StrictMode>
+));
+
+App.displayName = 'App';
