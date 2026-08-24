@@ -128,7 +128,7 @@ const WrappedSubmitRoute = memo(() => {
   const setClassificationFromURL = useCallback(
     (s: typeof search) => {
       const c12n = s.get('classification');
-      if (c12n == null) return;
+      if (!c12n) return;
       form.setFieldValue('settings.classification.value', c12n);
     },
     [form]
@@ -137,7 +137,7 @@ const WrappedSubmitRoute = memo(() => {
   const setHashFromURL = useCallback(
     (s: typeof search) => {
       const raw = s.get('hash');
-      if (raw == null) return;
+      if (!raw) return;
 
       const [type, value] = getSubmitType(raw, configuration);
       form.setFieldValue('state.tab', 'hash');
@@ -150,7 +150,7 @@ const WrappedSubmitRoute = memo(() => {
   const setMetadataFromURL = useCallback(
     (s: typeof search) => {
       const raw = s.get('metadata') as Metadata;
-      if (raw == null) return;
+      if (!raw) return;
       form.setFieldValue('metadata.data', raw);
     },
     [form]
@@ -159,7 +159,7 @@ const WrappedSubmitRoute = memo(() => {
   const setProfileFromURL = useCallback(
     (s: typeof search) => {
       const name = s.get('profile');
-      if (name == null || !(name in settings.submission_profiles)) return;
+      if (!name || !(name in settings.submission_profiles)) return;
 
       form.setFieldValue('state.profile', name);
       form.setFieldValue('settings', s => switchProfile(s, configuration, settings, currentUser, name));
@@ -170,7 +170,7 @@ const WrappedSubmitRoute = memo(() => {
   const setRawFromURL = useCallback(
     (s: typeof search) => {
       const raw = s.get('raw');
-      if (raw == null) return;
+      if (!raw) return;
 
       const encoder = new TextEncoder();
       const tempFile = new File([encoder.encode(raw)], 'file.txt', { type: 'text/plain;charset=utf-8' });
@@ -188,7 +188,7 @@ const WrappedSubmitRoute = memo(() => {
   const setDescriptionFromURL = useCallback(
     (s: typeof search) => {
       const desc = s.get('description');
-      if (desc == null) return;
+      if (!desc) return;
       form.setFieldValue('settings.description.value', desc);
     },
     [form]
@@ -197,7 +197,7 @@ const WrappedSubmitRoute = memo(() => {
   const setPriorityFromURL = useCallback(
     (s: typeof search) => {
       const priority = s.get('priority');
-      if (priority == null) return;
+      if (!priority) return;
       form.setFieldValue('settings.priority.value', priority);
     },
     [form]
