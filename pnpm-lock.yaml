@@ -71,6 +71,9 @@ importers:
       '@tanstack/react-query':
         specifier: ^5.69.0
         version: 5.74.3(react@19.2.3)
+      '@tanstack/react-query-devtools':
+        specifier: ^5.74.3
+        version: 5.74.3(@tanstack/react-query@5.74.3(react@19.2.3))(react@19.2.3)
       '@tanstack/react-query-persist-client':
         specifier: ^5.69.0
         version: 5.74.3(@tanstack/react-query@5.74.3(react@19.2.3))(react@19.2.3)
@@ -285,9 +288,6 @@ importers:
       '@tanstack/eslint-plugin-query':
         specifier: ^5.72.0
         version: 5.73.3(eslint@9.24.0(jiti@2.6.1))(typescript@5.8.3)
-      '@tanstack/react-query-devtools':
-        specifier: ^5.74.3
-        version: 5.74.3(@tanstack/react-query@5.74.3(react@19.2.3))(react@19.2.3)
       '@testing-library/dom':
         specifier: ^10.4.0
         version: 10.4.0

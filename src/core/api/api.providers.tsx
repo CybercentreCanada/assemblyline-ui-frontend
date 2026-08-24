@@ -1,6 +1,5 @@
 import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
 import { keepPreviousData, QueryClient } from '@tanstack/react-query';
-import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools';
 import type { PersistedClient } from '@tanstack/react-query-persist-client';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import type { ApiQueryKey } from 'core/api/api.models';
@@ -8,7 +7,12 @@ import { useAppInterfaceStore } from 'core/interface';
 import { useAppPreferenceStore } from 'core/preference';
 import { compress, decompress } from 'lz-string';
 import type { PropsWithChildren } from 'react';
-import { Activity, memo, useEffect, useMemo } from 'react';
+import { Activity, lazy, memo, Suspense, useEffect, useMemo } from 'react';
+
+const ReactQueryDevtoolsPanel = lazy(async () => {
+  const module = await import('@tanstack/react-query-devtools');
+  return { default: module.ReactQueryDevtoolsPanel };
+});
 
 //*****************************************************************************************
 // App API Debugger Layout
@@ -38,7 +42,11 @@ export const AppApiLayout = memo(({ children }: AppApiLayoutProps) => {
             background: '#fff'
           }}
         >
-          <ReactQueryDevtoolsPanel client={queryClient} />
+          {showDevtools ? (
+            <Suspense fallback={null}>
+              <ReactQueryDevtoolsPanel client={queryClient} />
+            </Suspense>
+          ) : null}
         </div>
       </Activity>
     </>
