@@ -89,23 +89,26 @@ export const createStoreContext = <Store extends object>(initialState: Store) =>
     isEqual: EqualityFn<SelectorOutput> = Object.is
   ): [SelectorOutput, (dispatch: StorePatch) => void] => {
     const store = useContext(StoreContext);
-    if (!store) {
-      return [null, () => null];
-    }
+    const fallbackStoreRef = useRef<UseStoreDataReturn>({
+      get: () => initialState,
+      set: () => undefined,
+      subscribe: () => () => undefined
+    });
+    const storeApi = store ?? fallbackStoreRef.current;
 
-    const lastSelectionRef = useRef<SelectorOutput>(selector(store.get()) ?? selector(initialState));
+    const lastSelectionRef = useRef<SelectorOutput>(selector(storeApi.get()) ?? selector(initialState));
 
     const getSnapshot = useCallback(() => {
-      const nextSelection = selector(store.get()) ?? selector(initialState);
+      const nextSelection = selector(storeApi.get()) ?? selector(initialState);
       if (!isEqual(lastSelectionRef.current, nextSelection)) {
         lastSelectionRef.current = nextSelection;
       }
       return lastSelectionRef.current;
-    }, [initialState, isEqual, selector, store]);
+    }, [initialState, isEqual, selector, storeApi]);
 
-    const state = useSyncExternalStore(store.subscribe, getSnapshot, () => selector(initialState));
+    const state = useSyncExternalStore(storeApi.subscribe, getSnapshot, () => selector(initialState));
 
-    return [state, store.set];
+    return [state, storeApi.set];
   };
 
   return {

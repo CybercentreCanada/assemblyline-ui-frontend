@@ -1,9 +1,9 @@
 {
   "accepts": "Accepte",
-  "app_route.help_services.fullname": "Aide sur la Liste des Services",
-  "app_route.help_services.shortname": "Liste des Services",
   "app_route.help.fullname": "Aide",
   "app_route.help.shortname": "Aide",
+  "app_route.help_services.fullname": "Aide sur la Liste des Services",
+  "app_route.help_services.shortname": "Liste des Services",
   "category": "Catégorie",
   "count": "services chargés dans le système",
   "disabled": "Désactivé",

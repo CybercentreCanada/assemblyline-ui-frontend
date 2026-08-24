@@ -1,8 +1,8 @@
 {
-  "app_route.manage_signatures.fullname": "Gestion des Signatures",
-  "app_route.manage_signatures.shortname": "Signatures",
   "app_route.manage.fullname": "Gestion",
   "app_route.manage.shortname": "Gestion",
+  "app_route.manage_signatures.fullname": "Gestion des Signatures",
+  "app_route.manage_signatures.shortname": "Signatures",
   "download_desc": "Télécharger la liste de signatures actuelle",
   "filter": "Filtrer les signatures ...",
   "filter.disabled.add": "Ajouter un filtre pour afficher les signatures désactivées",
