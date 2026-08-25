@@ -2,7 +2,7 @@ import Flow from '@flowjs/flow.js';
 import { createFormContext } from 'features/form/createFormContext';
 import type { HashPatternMap } from 'models/base/config';
 import type { ProfileSettings } from 'routes/settings/settings.utils';
-import { generateRandomUUID } from 'shared/utils/app.utils';
+import { generateSubmitUUID } from 'routes/submit/submit.utils';
 
 /**
  * Metadata collected from the user on the Submit page.
@@ -142,7 +142,7 @@ export const DEFAULT_SUBMIT_FORM: SubmitStore = {
     profile: null,
     tab: 'file',
     progress: 0,
-    uuid: generateRandomUUID()
+    uuid: generateSubmitUUID()
   },
   autoURLServiceSelection: {
     open: false,

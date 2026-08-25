@@ -30,14 +30,14 @@ import { SubmissionMetadata } from 'routes/submit/components/SubmissionMetadata'
 import { SubmissionOptions } from 'routes/submit/components/SubmissionOptions';
 import type { SubmitStore } from 'routes/submit/submit.form';
 import { FLOW, FormProvider, useForm } from 'routes/submit/submit.form';
+import { useAutoURLServicesSelection } from 'routes/submit/submit.hooks';
 import {
   calculateFileHash,
+  generateSubmitUUID,
   getDefaultExternalSources,
   getPreferredSubmissionProfile,
-  switchProfile,
-  useAutoURLServicesSelection
+  switchProfile
 } from 'routes/submit/submit.utils';
-import { generateRandomUUID } from 'shared/utils/app.utils';
 import { getSubmitType } from 'shared/utils/utils';
 import { TabContainer } from 'ui/TabContainer';
 
@@ -232,7 +232,7 @@ const WrappedSubmitRoute = memo(() => {
     closeSnackbar();
 
     form.reset();
-    form.setFieldValue('state.uuid', generateRandomUUID());
+    form.setFieldValue('state.uuid', generateSubmitUUID());
 
     FLOW.cancel();
     FLOW.off('complete');
