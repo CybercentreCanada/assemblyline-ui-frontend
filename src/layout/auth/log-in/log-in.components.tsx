@@ -15,7 +15,7 @@ import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 //*****************************************************************************************
-// Divider
+// Text Divider
 //*****************************************************************************************
 
 export const TextDivider = memo(() => {
@@ -34,7 +34,7 @@ export const TextDivider = memo(() => {
 TextDivider.displayName = 'TextDivider';
 
 //*****************************************************************************************
-// LoginDivider
+// Login Divider
 //*****************************************************************************************
 
 export const LoginDivider = memo(() => {
@@ -117,7 +117,7 @@ export const PasswordInput = memo((props: TextFieldProps) => {
 PasswordInput.displayName = 'PasswordInput';
 
 //*****************************************************************************************
-// Password Input
+// Password Confirm Input
 //*****************************************************************************************
 export const PasswordConfirmInput = memo((props: TextFieldProps) => {
   const { t } = useTranslation(['login']);

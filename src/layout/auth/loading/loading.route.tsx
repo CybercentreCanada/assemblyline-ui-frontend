@@ -8,6 +8,7 @@ import { memo } from 'react';
 // Loading Page
 //*****************************************************************************************
 export type LoadingPageProps = {
+  /** Whether the vertical banner is hidden, leaving only the spinner. */
   hideBanner?: boolean;
 };
 

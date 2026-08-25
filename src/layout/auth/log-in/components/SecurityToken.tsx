@@ -9,6 +9,10 @@ import { useTranslation } from 'react-i18next';
 import { decode, encode } from 'shared/utils/cbor';
 import { toArrayBuffer } from 'shared/utils/toArrayBuffer';
 
+//*****************************************************************************************
+// Security Token Login
+//*****************************************************************************************
+
 export const SecurityTokenLogin = memo(() => {
   const { t } = useTranslation(['login']);
   const form = useLoginForm();
