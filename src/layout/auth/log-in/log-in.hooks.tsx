@@ -13,7 +13,13 @@ import { useLocation, useNavigate } from 'react-router';
  * @returns A function that clears any in-progress login state (OTP, reset password, SSO tokens, etc.).
  */
 export const useLoginReset = () => {
+  const navigate = useNavigate();
+
+  const redirectTo = useAppPreferenceStore(s => s?.auth?.redirectTo);
+
   const setInterfaceStore = useAppSetInterfaceStore();
+  const setPreferenceStore = useAppSetPreferenceStore();
+
   const form = useLoginForm();
 
   return useCallback(() => {
@@ -39,7 +45,15 @@ export const useLoginReset = () => {
       s.auth.disableWhoAmI = false;
       return s;
     });
-  }, [form, setInterfaceStore]);
+
+    if (redirectTo) void navigate(redirectTo);
+
+    setPreferenceStore(s => {
+      s.auth.redirectTo = null;
+      return s;
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form, navigate, setInterfaceStore, setPreferenceStore]);
 };
 
 /**
@@ -154,7 +168,7 @@ export const useOAuthLogin = () => {
         return s;
       });
 
-      navigate(redirectTo || '/');
+      if (redirectTo) void navigate(redirectTo);
     }
   });
 };
@@ -169,26 +183,45 @@ export const useSAMLLogin = () => {
   const { pathname, search } = useLocation();
   const { showErrorMessage } = useAppSnackbar();
 
+  const redirectTo = useAppPreferenceStore(s => s.auth.redirectTo);
+  const setInterfaceStore = useAppSetInterfaceStore();
+  const setPreferenceStore = useAppSetPreferenceStore();
+
   const form = useLoginForm();
   const resetLogin = useLoginReset();
 
-  const setInterfaceStore = useAppSetInterfaceStore();
-  const setPreferenceStore = useAppSetPreferenceStore();
-  const redirectTo = useAppPreferenceStore(s => s.auth.redirectTo);
+  type SAMLData = {
+    username: string | null;
+    email: string | null;
+    saml_token_id: string | null;
+    error: boolean;
+  };
 
-  const samlData = useMemo<{ username: string; email: string; saml_token_id: string; error: string }>(() => {
+  const samlData = useMemo<SAMLData>(() => {
     try {
       if (pathname.includes(`/saml/`)) {
         const params = new URLSearchParams(search);
         const data = params.get('data');
         if (data != null && data !== '') {
-          return JSON.parse(atob(data));
+          const parsed: unknown = JSON.parse(atob(data));
+          if (parsed === null || typeof parsed !== 'object') throw new Error('Invalid SAML response');
+
+          const response = parsed as Record<string, unknown>;
+          if (typeof response.saml_token_id !== 'string' || response.saml_token_id === '')
+            throw new Error('Invalid SAML response');
+
+          return {
+            username: typeof response.username === 'string' ? response.username : null,
+            email: typeof response.email === 'string' ? response.email : null,
+            saml_token_id: response.saml_token_id,
+            error: false
+          };
         }
       }
-    } catch (e) {
-      console.debug(e);
+    } catch {
+      return { username: null, email: null, saml_token_id: null, error: true };
     }
-    return { username: null, email: null, saml_token_id: null, error: null };
+    return { username: null, email: null, saml_token_id: null, error: false };
   }, [pathname, search]);
 
   useEffect(() => {
@@ -211,9 +244,10 @@ export const useSAMLLogin = () => {
         return s;
       });
 
-      navigate(redirectTo || '/');
+      if (redirectTo) void navigate(redirectTo);
     }
-  }, [form, navigate, resetLogin, samlData, showErrorMessage]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form, navigate, resetLogin, samlData, setInterfaceStore, setPreferenceStore, showErrorMessage]);
 };
 
 /**
@@ -237,10 +271,14 @@ export const useQuickLogin = () => {
  */
 export const useLoginRequest = () => {
   const { t } = useTranslation(['login']);
-  const { showErrorMessage } = useAppSnackbar();
-  const form = useLoginForm();
+  const navigate = useNavigate();
 
+  const redirectTo = useAppPreferenceStore(s => s.auth.redirectTo);
+  const { showErrorMessage } = useAppSnackbar();
   const setInterfaceStore = useAppSetInterfaceStore();
+  const setPreferenceStore = useAppSetPreferenceStore();
+
+  const form = useLoginForm();
   const resetLogin = useLoginReset();
 
   return useApiMutation(() => ({
@@ -281,6 +319,13 @@ export const useLoginRequest = () => {
         s.auth.disableWhoAmI = false;
         return s;
       });
+
+      setPreferenceStore(s => {
+        s.auth.redirectTo = null;
+        return s;
+      });
+
+      if (redirectTo) void navigate(redirectTo);
 
       invalidateApiQuery(({ url }) => '/api/v4/user/whoami/' === url, 100);
     }

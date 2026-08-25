@@ -4,13 +4,12 @@ import type { ApiQueryKey, ApiResponse } from 'core/api';
 import { isApiData, stableStringify } from 'core/api';
 import { useAppConfigStore, useAppSetConfigStore } from 'core/config';
 import { useAppInterfaceStore, useAppSetInterfaceStore } from 'core/interface';
-import { useAppSavePreference } from 'core/preference';
 import { useAppSnackbar } from 'core/snackbar';
 import type { LoginParamsProps } from 'layout/auth/auth.models';
 import { normalizeWhoAmI } from 'layout/auth/auth.utils';
 import type { WhoAmI, WhoAmIProps } from 'models/api/user';
 import type { Configuration } from 'models/base/config';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router';
 import { getXSRFCookie } from 'shared/utils/xsrf.utils';
@@ -69,6 +68,21 @@ export const useIsAuthenticating = () => {
   );
 };
 
+export const useAuthenticating = () => {
+  const setInterfaceStore = useAppSetInterfaceStore();
+
+  const isAuthenticating = useIsAuthenticating();
+
+  useEffect(() => {
+    if (isAuthenticating) {
+      setInterfaceStore(s => {
+        s.auth.mode = 'login';
+        return s;
+      });
+    }
+  }, [isAuthenticating, setInterfaceStore]);
+};
+
 /**
  * @name useAuthQuery
  * @description Main auth hook that fetches whoami and sets up the auth store state.
@@ -81,15 +95,13 @@ export const useAuthQuery = () => {
   const { setReady: setClueReady, setCustomIconify } = useClue();
 
   const configuration = useAppConfigStore(s => s?.configuration);
-
-  const setInterfaceStore = useAppSetInterfaceStore();
-  const setConfigStore = useAppSetConfigStore();
-
   const isAuthenticating = useIsAuthenticating();
-  const savePreference = useAppSavePreference();
+
+  const setConfigStore = useAppSetConfigStore();
+  const setInterfaceStore = useAppSetInterfaceStore();
 
   const disabled = false;
-  const retryAfter = 10 * 1000;
+  const retryAfter = 10_000;
   const allowCache = false;
 
   return useQuery<
@@ -101,7 +113,7 @@ export const useAuthQuery = () => {
     {
       queryKey: ['/api/v4/user/whoami/', 'GET', stableStringify(null), allowCache],
       enabled: !isAuthenticating,
-      retry: (failureCount, error) => failureCount < 3 || error?.api_status_code === 502,
+      retry: (failureCount, error) => error?.api_status_code === 502,
       retryDelay: failureCount => Math.min(retryAfter * (failureCount + 1), 10000),
       queryFn: async ({ signal }) => {
         // Reject if the query is not enabled
@@ -170,9 +182,7 @@ export const useAuthQuery = () => {
             s.auth.mode = 'login';
             return s;
           });
-          sessionStorage.clear();
-          savePreference();
-          return Promise.reject(json);
+          return Promise.reject({ ...json, api_status_code: res.status });
         }
 
         // Check for an invalid json format
@@ -220,7 +230,7 @@ export const useAuthQuery = () => {
         // Handle all non-successful request
         if (res.status !== 200) {
           showErrorMessage(json.api_error_message);
-          return Promise.reject(json);
+          return Promise.reject({ ...json, api_status_code: res.status });
         }
 
         if (res.status === 200) {

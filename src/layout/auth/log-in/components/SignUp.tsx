@@ -128,7 +128,13 @@ export const SignUpLink = memo(() => {
     <>
       <Typography align="center" variant="caption">
         {t('signup')}&nbsp;&nbsp;
-        <Link href="#" onClick={handleClick}>
+        <Link
+          href="#"
+          onClick={event => {
+            event.preventDefault();
+            handleClick();
+          }}
+        >
           {t('signup.link')}
         </Link>
       </Typography>

@@ -56,7 +56,14 @@ export const SingleSignOn = memo(() => {
               {t('button')}
             </Button>
 
-            <Link variant="body2" href="#" onClick={() => resetLogin()}>
+            <Link
+              variant="body2"
+              href="#"
+              onClick={event => {
+                event.preventDefault();
+                resetLogin();
+              }}
+            >
               {t('other')}
             </Link>
           </div>

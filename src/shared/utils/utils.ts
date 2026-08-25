@@ -285,7 +285,7 @@ export function getSAMLData() {
   if (window.location.pathname.indexOf('/saml/') !== -1) {
     const params = new URLSearchParams(window.location.search);
     const data = params.get('data');
-    if (data !== null || data !== undefined) {
+    if (data == null) {
       return JSON.parse(atob(data).toString());
     }
   }
