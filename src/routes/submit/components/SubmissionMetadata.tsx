@@ -6,6 +6,7 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import { useAppConfigStore } from 'core/config';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
 import lodashOmit from 'lodash/omit';
 import type { Metadata, MetadataFieldTypeMap } from 'models/base/config';
 import { Fragment, memo, useCallback, useEffect, useMemo, useState } from 'react';
