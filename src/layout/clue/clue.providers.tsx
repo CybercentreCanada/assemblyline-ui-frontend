@@ -1,9 +1,9 @@
 import type { SnackbarEvents } from '@cccsaurora/clue-ui';
-import { ClueDatabaseContext, ClueProvider, SNACKBAR_EVENT_ID } from '@cccsaurora/clue-ui';
+import { buildDatabase, ClueProvider, SNACKBAR_EVENT_ID } from '@cccsaurora/clue-ui';
 import { useAppConfigStore } from 'core/config';
 import { useAppSnackbar } from 'core/snackbar';
 import type { PropsWithChildren } from 'react';
-import { memo, useContext, useEffect } from 'react';
+import { memo, Suspense, use, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { JSONEditor } from 'ui/JSONEditor';
 
@@ -15,11 +15,22 @@ export type CluePublicConfig = {
   max_request_count?: number;
 };
 
-export const AppClueProvider = memo(({ children }: PropsWithChildren) => {
+// Built once at module scope: the provider otherwise creates a new database on every mount.
+const CLUE_DATABASE = buildDatabase().catch((error: unknown) => {
+  // eslint-disable-next-line no-console
+  console.error('Failed to initialize the Clue database:', error);
+  return undefined;
+});
+
+//*****************************************************************************************
+// App Clue Layout
+//*****************************************************************************************
+
+const AppClueLayout = memo(({ children }: PropsWithChildren) => {
   const i18next = useTranslation('clue');
   const { showSuccessMessage, showErrorMessage, showInfoMessage, showWarningMessage } = useAppSnackbar();
 
-  const database = useContext(ClueDatabaseContext);
+  const database = use(CLUE_DATABASE);
 
   const clueConfig = useAppConfigStore(s => s?.configuration?.ui?.api_proxies?.clue as CluePublicConfig);
 
@@ -67,3 +78,17 @@ export const AppClueProvider = memo(({ children }: PropsWithChildren) => {
     </ClueProvider>
   );
 });
+
+AppClueLayout.displayName = 'AppClueLayout';
+
+//*****************************************************************************************
+// App Clue Provider
+//*****************************************************************************************
+
+export const AppClueProvider = memo(({ children }: PropsWithChildren) => (
+  <Suspense fallback={null}>
+    <AppClueLayout>{children}</AppClueLayout>
+  </Suspense>
+));
+
+AppClueProvider.displayName = 'AppClueProvider';

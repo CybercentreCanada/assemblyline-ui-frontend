@@ -1,15 +1,26 @@
 /* eslint-disable @typescript-eslint/prefer-for-of */
-import { useAppConfigStore } from 'core/config';
 import type { CustomUser } from 'models/api/user';
 import type { Configuration, Submission } from 'models/base/config';
 import type { ServiceSpecification } from 'models/base/service';
 import type { UserSettings } from 'models/base/user_settings';
-import { useCallback, useRef } from 'react';
 import type { InterfaceKey, ProfileKey, ProfileSettings } from 'routes/settings/settings.utils';
 import { getValidValue, INTERFACE_KEYS, PROFILE_KEYS } from 'routes/settings/settings.utils';
-import type { AutoURLServiceIndices, SubmitStore } from 'routes/submit/submit.form';
-import { useForm } from 'routes/submit/submit.form';
+import type { SubmitStore } from 'routes/submit/submit.form';
 import { isURL } from 'shared/utils/utils';
+
+/**
+ * @name generateSubmitUUID
+ * @description Generates an RFC 4122 version 4 UUID identifying a submission upload.
+ * @returns A 36-character hyphenated UUID
+ */
+export const generateSubmitUUID = (): string => {
+  let d = new Date().getTime();
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+    const r = (d + Math.random() * 16) % 16 | 0;
+    d = Math.floor(d / 16);
+    return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16);
+  });
+};
 
 /**
  * @param settings - User settings.
@@ -491,122 +502,4 @@ export const parseSubmitProfile = (profile: ProfileSettings): UserSettings | nul
   out.initial_data = JSON.stringify(profile.initial_data.value, undefined, 2);
 
   return out;
-};
-
-/**
- * Automatically selects or deselects a predefined list of "auto URL services"
- * whenever:
- *   - the active submission tab is "hash",
- *   - the hash type is "url",
- *   - and the selected profile changes.
- *
- * It keeps track of what it auto-selected so it can cleanly revert those
- * selections when conditions stop matching.
- */
-export const useAutoURLServicesSelection = () => {
-  const configuration = useAppConfigStore(s => s.configuration);
-  const form = useForm();
-
-  const autoNames = configuration.ui.url_submission_auto_service_selection;
-
-  const prevTuple = useRef<readonly [string | null, boolean]>([null, false]);
-
-  const computeHasURLservices = useCallback(
-    (state: SubmitStore) => {
-      if (state.state.tab !== 'hash') return false;
-      if (state.hash.type !== 'url') return false;
-
-      return state.settings.services.some(cat => {
-        if (!state.state.customize && cat.restricted) return false;
-
-        return cat.services.some(svc => {
-          if (!state.state.customize && svc.restricted) return false;
-          return autoNames.includes(svc.name);
-        });
-      });
-    },
-    [autoNames]
-  );
-
-  const buildTuple = useCallback(
-    (state: SubmitStore) => [state.state.profile, computeHasURLservices(state)] as const,
-    [computeHasURLservices]
-  );
-
-  const addSelection = useCallback(() => {
-    const added: AutoURLServiceIndices = [];
-
-    const profile = form.getFieldValue('state.profile');
-
-    form.setFieldValue('settings.services', categories =>
-      categories.map((cat, ci) => {
-        const services = cat.services.map((svc, si) => {
-          if (autoNames.includes(svc.name)) {
-            added.push([ci, si]);
-            return { ...svc, selected: profile === 'default' ? true : svc.selected };
-          }
-          return svc;
-        });
-
-        return {
-          ...cat,
-          services,
-          selected: services.every(s => s.selected)
-        };
-      })
-    );
-
-    form.setFieldValue('autoURLServiceSelection.prev', prev => {
-      const next = prev ? [...prev] : [];
-      for (const a of added) {
-        if (!next.some(([ci, si]) => ci === a[0] && si === a[1])) {
-          next.push(a);
-        }
-      }
-      return next;
-    });
-  }, [form, autoNames]);
-
-  const removeSelection = useCallback(() => {
-    const urlServices = form.getFieldValue('autoURLServiceSelection.prev') ?? [];
-    if (!urlServices.length) return;
-
-    form.setFieldValue('settings.services', categories =>
-      categories.map((cat, ci) => {
-        const services = cat.services.map((svc, si) => {
-          const matched = urlServices.some(([x, y]) => x === ci && y === si);
-          return matched ? { ...svc, selected: svc.default } : svc;
-        });
-
-        return {
-          ...cat,
-          services,
-          selected: services.every(s => s.selected)
-        };
-      })
-    );
-
-    form.setFieldValue('autoURLServiceSelection.prev', []);
-  }, [form]);
-
-  return useCallback(() => {
-    const state = form.store.state.values;
-    const currTuple = buildTuple(state);
-
-    const prev = prevTuple.current;
-    const prevHasURL = prev[1];
-    const currHasURL = currTuple[1];
-
-    if (prev[0] === currTuple[0] && prevHasURL === currHasURL) {
-      return;
-    }
-
-    if (currHasURL) {
-      addSelection();
-    } else if (prevHasURL && !currHasURL) {
-      removeSelection();
-    }
-
-    prevTuple.current = currTuple;
-  }, [form.store.state.values, buildTuple, addSelection, removeSelection]);
 };

@@ -28,15 +28,15 @@ import { getProfileNames } from 'routes/settings/settings.utils';
 import { FileDropper } from 'routes/submit/components/FileDropper';
 import type { SubmitStore } from 'routes/submit/submit.form';
 import { FLOW, useForm } from 'routes/submit/submit.form';
+import { useAutoURLServicesSelection, useSubmitCancel } from 'routes/submit/submit.hooks';
 import {
   calculateFileHash,
+  generateSubmitUUID,
   getHashQuery,
   isUsingExternalServices,
   parseSubmitProfile,
-  switchProfile,
-  useAutoURLServicesSelection
+  switchProfile
 } from 'routes/submit/submit.utils';
-import { generateRandomUUID } from 'shared/utils/app.utils';
 import { getSubmitType } from 'shared/utils/utils';
 import type { ButtonProps } from 'ui/buttons/Button';
 import { Button } from 'ui/buttons/Button';
@@ -481,6 +481,8 @@ export const CancelButton = memo(() => {
   const { t } = useTranslation(['submit']);
   const form = useForm();
 
+  const cancelSubmit = useSubmitCancel();
+
   return (
     <form.Subscribe
       selector={state =>
@@ -502,20 +504,7 @@ export const CancelButton = memo(() => {
           loading={loading}
           disabled={disabled || (tab === 'file' ? file : tab === 'hash' ? hash : tab === 'raw' ? raw : false)}
           variant="outlined"
-          onClick={() => {
-            form.setFieldValue('file', null);
-            form.setFieldValue('hash.type', null);
-            form.setFieldValue('hash.value', '');
-            form.setFieldValue('raw.hash', null);
-            form.setFieldValue('raw.value', null);
-            form.setFieldValue('state.phase', 'editing');
-            form.setFieldValue('state.progress', null);
-            form.setFieldValue('state.uuid', generateRandomUUID());
-            FLOW.cancel();
-            FLOW.off('complete');
-            FLOW.off('fileError');
-            FLOW.off('progress');
-          }}
+          onClick={cancelSubmit}
         >
           {t('cancel.button.label')}
         </Button>
@@ -736,6 +725,8 @@ export const FileSubmit = memo(({ onClick = () => null, ...props }: ButtonProps)
   const settings = useAppConfigStore(s => s.settings);
   const setInterfaceStore = useAppSetInterfaceStore();
 
+  const cancelSubmit = useSubmitCancel();
+
   const warnOnUnload = useCallback((warn: boolean) => {
     window.onbeforeunload = warn ? () => true : null;
   }, []);
@@ -743,7 +734,7 @@ export const FileSubmit = memo(({ onClick = () => null, ...props }: ButtonProps)
   const handleCancel = useCallback(() => {
     form.setFieldValue('state.phase', 'editing');
     form.setFieldValue('state.progress', null);
-    form.setFieldValue('state.uuid', generateRandomUUID());
+    form.setFieldValue('state.uuid', generateSubmitUUID());
 
     FLOW.cancel();
     FLOW.off('complete');
@@ -823,10 +814,10 @@ export const FileSubmit = memo(({ onClick = () => null, ...props }: ButtonProps)
           onSuccess: ({ api_response }: ApiResponse<{ started: boolean; sid: string }>) => {
             showSuccessMessage(`${t('upload.snackbar.success')} ${api_response.sid}`);
             form.setFieldValue('state.phase', 'redirecting');
-            setTimeout(
-              () => navigate.to().create({ route: '/submission/detail/:id', path: { id: api_response.sid } }),
-              1000
-            );
+            setTimeout(() => {
+              navigate.here().create({ route: '/submission/detail/:id', path: { id: api_response.sid } });
+              cancelSubmit();
+            }, 1000);
           },
           onFailure: ({ api_status_code, api_error_message }) => {
             if ([400, 403, 404, 503].includes(api_status_code)) showErrorMessage(api_error_message);
@@ -840,7 +831,7 @@ export const FileSubmit = memo(({ onClick = () => null, ...props }: ButtonProps)
       FLOW.upload();
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [form, handleCancel, navigate, settings, showErrorMessage, showSuccessMessage, t]
+    [cancelSubmit, form, handleCancel, navigate, settings, showErrorMessage, showSuccessMessage, t]
   );
 
   return (
@@ -861,6 +852,8 @@ const RawSubmit = memo(({ onClick = () => null, ...props }: ButtonProps) => {
   const navigate = useAppNavigate();
   const { apiCall } = useMyAPI();
   const { closeSnackbar, showErrorMessage, showSuccessMessage } = useAppSnackbar();
+
+  const cancelSubmit = useSubmitCancel();
 
   const handleSubmit = useCallback(
     () => {
@@ -888,10 +881,10 @@ const RawSubmit = memo(({ onClick = () => null, ...props }: ButtonProps) => {
         onSuccess: ({ api_response }: ApiResponse<{ started: boolean; sid: string }>) => {
           showSuccessMessage(`${t('upload.snackbar.success')} ${api_response.sid}`);
           form.setFieldValue('state.phase', 'redirecting');
-          setTimeout(
-            () => navigate.to().create({ route: '/submission/detail/:id', path: { id: api_response.sid } }),
-            1000
-          );
+          setTimeout(() => {
+            navigate.here().create({ route: '/submission/detail/:id', path: { id: api_response.sid } });
+            cancelSubmit();
+          }, 1000);
         },
         onFailure: ({ api_error_message }) => {
           showErrorMessage(api_error_message);
@@ -900,7 +893,7 @@ const RawSubmit = memo(({ onClick = () => null, ...props }: ButtonProps) => {
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [form, navigate, showErrorMessage, showSuccessMessage, t]
+    [cancelSubmit, form, navigate, showErrorMessage, showSuccessMessage, t]
   );
 
   return (
@@ -921,6 +914,8 @@ const HashSubmit = memo(({ onClick = () => null, ...props }: ButtonProps) => {
   const navigate = useAppNavigate();
   const { apiCall } = useMyAPI();
   const { closeSnackbar, showErrorMessage, showSuccessMessage } = useAppSnackbar();
+
+  const cancelSubmit = useSubmitCancel();
 
   const handleSubmit = useCallback(
     () => {
@@ -947,10 +942,10 @@ const HashSubmit = memo(({ onClick = () => null, ...props }: ButtonProps) => {
         onSuccess: ({ api_response }: ApiResponse<{ started: boolean; sid: string }>) => {
           showSuccessMessage(`${t('upload.snackbar.success')} ${api_response.sid}`);
           form.setFieldValue('state.phase', 'redirecting');
-          setTimeout(
-            () => navigate.to().create({ route: '/submission/detail/:id', path: { id: api_response.sid } }),
-            1000
-          );
+          setTimeout(() => {
+            navigate.here().create({ route: '/submission/detail/:id', path: { id: api_response.sid } });
+            cancelSubmit();
+          }, 1000);
         },
         onFailure: ({ api_error_message }) => {
           showErrorMessage(api_error_message);
@@ -959,7 +954,7 @@ const HashSubmit = memo(({ onClick = () => null, ...props }: ButtonProps) => {
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [form, navigate, showErrorMessage, showSuccessMessage, t]
+    [cancelSubmit, form, navigate, showErrorMessage, showSuccessMessage, t]
   );
 
   return (

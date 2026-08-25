@@ -603,7 +603,7 @@ const SubmissionDetail = memo(() => {
           showSuccessMessage(t('delete.success'));
           setDeleteDialog(false);
           setTimeout(() => {
-            navigate.to().create({ route: '/submissions' });
+            navigate.here().create({ route: '/submissions' });
           }, 500);
         },
         onEnter: () => setWaitingDialog(true),
