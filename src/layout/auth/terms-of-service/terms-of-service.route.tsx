@@ -47,7 +47,10 @@ export const ToSPage = memo(() => {
       })
   }));
 
-  const { data: tos } = useApiQuery<string>({ url: '/api/v4/help/tos/', disabled: !configuration?.ui?.tos });
+  const { data: tos } = useApiQuery<string>({
+    url: '/api/v4/help/tos/',
+    disabled: !configuration?.ui?.tos
+  });
 
   return !configuration?.ui?.tos ? (
     <NotFoundPage />

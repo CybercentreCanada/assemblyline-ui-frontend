@@ -1,9 +1,9 @@
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import { CircularProgress, Typography, useTheme } from '@mui/material';
-import { invalidateApiQuery, useApiQuery } from 'core/api';
+import { invalidateApiQuery, useApiMutation } from 'core/api';
 import { createAppRoute } from 'core/routes';
 import { AppPageCardCentered, AppVerticalBanner } from 'core/template';
-import { memo } from 'react';
+import { memo, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 //*****************************************************************************************
@@ -14,14 +14,20 @@ export const LogoutPage = memo(() => {
   const { t } = useTranslation(['logout']);
   const theme = useTheme();
 
-  useApiQuery({
+  const requested = useRef<boolean>(false);
+
+  const { mutate: logout } = useApiMutation(() => ({
     url: '/api/v4/auth/logout/',
     method: 'GET',
-    onExit: () => {
-      sessionStorage.clear();
-      invalidateApiQuery(({ url }) => '/api/v4/user/whoami/' === url, 0);
-    }
-  });
+    reloadOnUnauthorize: false,
+    onExit: () => invalidateApiQuery(({ url }) => '/api/v4/user/whoami/' === url, 100)
+  }));
+
+  useEffect(() => {
+    if (requested.current) return;
+    requested.current = true;
+    logout();
+  }, [logout]);
 
   return (
     <AppPageCardCentered>

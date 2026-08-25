@@ -62,7 +62,7 @@ export const ResetPasswordConfirmation = memo(() => {
 
       <TextDivider />
 
-      <Button variant="text" color="primary" onClick={() => resetLogin()}>
+      <Button variant="text" color="primary" onClick={resetLogin}>
         {t('other')}
       </Button>
     </form>
@@ -116,7 +116,7 @@ export const ResetPasswordRequest = memo(() => {
 
       <TextDivider />
 
-      <Button variant="text" color="primary" onClick={() => resetLogin()}>
+      <Button variant="text" color="primary" onClick={resetLogin}>
         {t('other')}
       </Button>
     </form>

@@ -1,5 +1,5 @@
 import { useAppInterfaceStore } from 'core/interface';
-import { useAuthQuery } from 'layout/auth/auth.hooks';
+import { useAuthQuery, useAuthenticating } from 'layout/auth/auth.hooks';
 import { LoadingPage } from 'layout/auth/loading/loading.route';
 import { LockedPage } from 'layout/auth/locked/locked.route';
 import { LoginPage } from 'layout/auth/log-in/log-in.route';
@@ -14,9 +14,10 @@ import { memo } from 'react';
 //*****************************************************************************************
 
 export const AppAuthLayout = memo(({ children }: PropsWithChildren) => {
-  useAuthQuery();
-
   const mode = useAppInterfaceStore(s => s.auth.mode);
+
+  useAuthenticating();
+  useAuthQuery();
 
   switch (mode) {
     case 'app':

@@ -199,7 +199,6 @@ EmailInput.displayName = 'EmailInput';
 // Loading Card
 //*****************************************************************************************
 export const LoadingCard = memo(() => {
-  const { t } = useTranslation(['login']);
   const form = useLoginForm();
 
   return (

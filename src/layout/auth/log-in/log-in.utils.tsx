@@ -1,5 +1,6 @@
 export const USERNAME_MIN_LENGTH = 3;
-export const USERNAME_PATTERN = /^[a-z-]+$/;
+// eslint-disable-next-line no-useless-escape
+export const USERNAME_PATTERN = /^[a-z\-]+$/;
 export const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /**

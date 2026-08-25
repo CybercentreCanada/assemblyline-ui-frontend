@@ -17,15 +17,6 @@ import { useOAuthLogin, usePasswordResetEmail, useSAMLLogin, useSignUpEmail } fr
 import { LoginFormProvider, useLoginForm } from 'layout/auth/log-in/log-in.providers';
 import { memo } from 'react';
 
-type LoginRequest = {
-  user: string;
-  password: string;
-  otp: string;
-  webauthn_auth_resp: number[] | null;
-  oauth_token_id: string;
-  saml_token_id: string;
-};
-
 //*****************************************************************************************
 // Login Page Content
 //*****************************************************************************************
