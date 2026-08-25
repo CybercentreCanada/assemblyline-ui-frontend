@@ -6,6 +6,10 @@ import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from 'ui/buttons/Button';
 
+//*****************************************************************************************
+// One Time Password
+//*****************************************************************************************
+
 export const OneTimePassword = memo(() => {
   const { t } = useTranslation(['login']);
 

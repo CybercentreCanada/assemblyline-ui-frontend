@@ -7,11 +7,20 @@ import { LogoutPage } from 'layout/auth/log-out/log-out.route';
 import { QuotaPage } from 'layout/auth/quota/quota.route';
 import { ToSPage } from 'layout/auth/terms-of-service/terms-of-service.route';
 import type { PropsWithChildren } from 'react';
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
 
 //*****************************************************************************************
 // App Auth
 //*****************************************************************************************
+
+const AUTH_PAGES = {
+  loading: <LoadingPage />,
+  locked: <LockedPage />,
+  login: <LoginPage />,
+  logout: <LogoutPage />,
+  quota: <QuotaPage />,
+  tos: <ToSPage />
+} as const;
 
 export const AppAuthLayout = memo(({ children }: PropsWithChildren) => {
   const mode = useAppInterfaceStore(s => s.auth.mode);
@@ -19,24 +28,7 @@ export const AppAuthLayout = memo(({ children }: PropsWithChildren) => {
   useAuthenticating();
   useAuthQuery();
 
-  switch (mode) {
-    case 'app':
-      return children;
-    case 'loading':
-      return <LoadingPage />;
-    case 'locked':
-      return <LockedPage />;
-    case 'login':
-      return <LoginPage />;
-    case 'logout':
-      return <LogoutPage />;
-    case 'quota':
-      return <QuotaPage />;
-    case 'tos':
-      return <ToSPage />;
-    default:
-      return null;
-  }
+  return useMemo(() => (mode === 'app' ? children : (AUTH_PAGES[mode] ?? null)), [children, mode]);
 });
 
 AppAuthLayout.displayName = 'AppAuthLayout';

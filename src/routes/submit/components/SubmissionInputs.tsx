@@ -13,12 +13,12 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-import { useApiCallFn } from 'core/api';
 import type { ApiResponse } from 'core/api/api.models';
 import { useAppConfigStore } from 'core/config';
 import { useAppSetInterfaceStore } from 'core/interface';
 import { AppLink, useAppNavigate } from 'core/router';
 import { useAppSnackbar } from 'core/snackbar';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
 import type { ApiResponseProps } from 'layout/auth/auth.models';
 import type { SearchResult } from 'models/api/search';
 import type { File as FileModel } from 'models/base/file';
@@ -529,7 +529,7 @@ export const FindButton = memo(() => {
   const { t } = useTranslation(['submit']);
   const theme = useTheme();
   const form = useForm();
-  const apiCall = useApiCallFn();
+  const { apiCall } = useMyAPI();
 
   const [results, setResults] = useState<SearchResult<FileModel> | null>(null);
   const [open, setOpen] = useState<boolean>(false);
@@ -731,7 +731,7 @@ export const FileSubmit = memo(({ onClick = () => null, ...props }: ButtonProps)
   const { t } = useTranslation(['submit']);
   const form = useForm();
   const navigate = useAppNavigate();
-  const apiCall = useApiCallFn();
+  const { apiCall } = useMyAPI();
   const { closeSnackbar, showErrorMessage, showSuccessMessage } = useAppSnackbar();
   const settings = useAppConfigStore(s => s.settings);
   const setInterfaceStore = useAppSetInterfaceStore();
@@ -859,7 +859,7 @@ const RawSubmit = memo(({ onClick = () => null, ...props }: ButtonProps) => {
   const { t } = useTranslation(['submit']);
   const form = useForm();
   const navigate = useAppNavigate();
-  const apiCall = useApiCallFn();
+  const { apiCall } = useMyAPI();
   const { closeSnackbar, showErrorMessage, showSuccessMessage } = useAppSnackbar();
 
   const handleSubmit = useCallback(
@@ -919,7 +919,7 @@ const HashSubmit = memo(({ onClick = () => null, ...props }: ButtonProps) => {
   const { t } = useTranslation(['submit']);
   const form = useForm();
   const navigate = useAppNavigate();
-  const apiCall = useApiCallFn();
+  const { apiCall } = useMyAPI();
   const { closeSnackbar, showErrorMessage, showSuccessMessage } = useAppSnackbar();
 
   const handleSubmit = useCallback(

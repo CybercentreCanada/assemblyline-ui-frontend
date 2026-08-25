@@ -44,6 +44,8 @@ const DropZone = styled('div', {
   })
 }));
 
+DropZone.displayName = 'DropZone';
+
 type FileDropperProps = {
   file: File | null;
   setFile: (file: File | null) => void;
