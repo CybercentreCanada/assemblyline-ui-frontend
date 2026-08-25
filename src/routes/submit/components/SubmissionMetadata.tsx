@@ -5,7 +5,6 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-import { useApiCallFn } from 'core/api';
 import { useAppConfigStore } from 'core/config';
 import lodashOmit from 'lodash/omit';
 import type { Metadata, MetadataFieldTypeMap } from 'models/base/config';
@@ -46,7 +45,7 @@ export const MetadataParam = memo(({ name, metadata, loading, disabled, editing 
   const { t } = useTranslation(['submit', 'settings']);
   const theme = useTheme();
   const form = useForm();
-  const apiCall = useApiCallFn();
+  const { apiCall } = useMyAPI();
 
   const [options, setOptions] = useState<string[]>(
     [...new Set(Array.isArray(metadata?.suggestions) ? metadata.suggestions : [])].sort()
