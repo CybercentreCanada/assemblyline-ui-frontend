@@ -1,5 +1,5 @@
 import * as react0 from "react";
-import { CSSProperties, ComponentType, Dispatch, FC, HTMLAttributeAnchorTarget, KeyboardEvent, MouseEvent, PropsWithChildren, ReactElement, ReactNode, Ref, RefObject, SetStateAction, SyntheticEvent } from "react";
+import { CSSProperties, ComponentType, Dispatch, ElementType, FC, HTMLAttributeAnchorTarget, KeyboardEvent, MouseEvent, PropsWithChildren, ReactElement, ReactNode, Ref, RefObject, SetStateAction, SyntheticEvent } from "react";
 import "zustand";
 import { i18n } from "i18next";
 import * as react_jsx_runtime0 from "react/jsx-runtime";
@@ -24,6 +24,7 @@ type AppCommandRoute = AppCommandBase & {
   type: 'route';
   route: string;
   matcher?: RegExp;
+  target?: HTMLAttributeAnchorTarget;
 };
 type AppCommandAction = AppCommandBase & {
   type: 'action';
@@ -107,7 +108,11 @@ type AppSearchServiceContextType<T = any> = AppContextBase & {
 };
 type AppLeftNavContextType = AppContextBase & {
   menus: LeftNavMenuProps[];
+  loading: boolean;
   open: boolean;
+  hover: boolean;
+  setHoverOpen: (open: boolean) => void;
+  setLoading: Dispatch<SetStateAction<boolean>>;
   setOpen: (open: boolean) => void;
   toggle: () => void;
   toggleMenu: (menuId: string | number) => void;
@@ -416,6 +421,7 @@ type AppPreferenceConfigs = {
   allowFocusMode?: boolean;
   allowPersonalization?: boolean;
   allowDensitySelection?: boolean;
+  allowLeftNavHover?: boolean;
   topnav?: AppTopNavConfigs;
   leftnav?: AppLeftNavConfigs;
   commands?: AppCommand[];
@@ -460,7 +466,7 @@ type AppTopNavConfigs = {
         before?: ReactElement[];
         after?: ReactElement[];
       };
-      admin?: {
+      adminMenu?: {
         before?: ReactElement[];
         after?: ReactElement[];
       };
@@ -520,6 +526,7 @@ type TuiCookies = {
   layout: AppLayoutMode;
   density: AppDensityMode;
   drawerOpen: boolean;
+  leftNavHover: boolean;
   autoHideAppbar: boolean;
   showQuickSearch: boolean;
   showBreadcrumbs: boolean;
@@ -532,6 +539,7 @@ type TuiCookiesStore = TuiCookies & {
   setLayout: (newLayout: AppLayoutMode) => void;
   setAutoHideAppbar: (auto: boolean) => void;
   setDrawerOpen: (open: boolean) => void;
+  setLeftNavHover: (hover: boolean) => void;
   setShowQuickSearch: (show: boolean) => void;
   setShowBreadcrumbs: (show: boolean) => void;
   setDensity: (density: AppDensityMode) => void;
@@ -581,6 +589,9 @@ type AppDensityProps = PropsWithChildren<{
 }>;
 declare const AppDensity: FC<AppDensityProps>;
 //#endregion
+//#region src/themes/elements/AppThemePicker.d.ts
+declare const AppThemePicker: () => react_jsx_runtime0.JSX.Element;
+//#endregion
 //#region src/themes/index.d.ts
 declare const TUI_THEMES: AppTheme[];
 //#endregion
@@ -623,15 +634,6 @@ declare const AppInfoPanel: FC<AppInfoPanelProps>;
 //#endregion
 //#region src/display/AppListEmpty.d.ts
 declare const AppListEmpty: FC<Omit<AppInfoPanelProps, 'i18nKey'>>;
-//#endregion
-//#region src/display/AppSurface.d.ts
-type AppSurfaceProps = {
-  baseElevation?: number;
-  relativeElevation?: number;
-  withBorder?: boolean;
-  withShadow?: boolean;
-} & PaperProps;
-declare const AppSurface: FC<AppSurfaceProps>;
 //#endregion
 //#region src/display/AppToc.d.ts
 type AppTocItem = {
@@ -800,11 +802,79 @@ type PageHeaderProps = PropsWithChildren & {
 };
 declare const PageHeader: react0.NamedExoticComponent<PageHeaderProps>;
 //#endregion
+//#region src/skeleton/AppLeftNavElementSkeleton.d.ts
+type AppLeftNavElementProps = {
+  style: {
+    [styleAttr: string]: any;
+  };
+  withText?: boolean;
+  [propName: string]: any;
+};
+declare const AppLeftNavElementSkeleton: ({
+  style,
+  withText,
+  ...boxProps
+}: AppLeftNavElementProps) => react_jsx_runtime0.JSX.Element;
+//#endregion
+//#region src/skeleton/AppLeftNavSkeleton.d.ts
+declare const AppLeftNavSkeleton: ({
+  withHeader
+}: {
+  withHeader?: boolean;
+}) => react_jsx_runtime0.JSX.Element;
+//#endregion
 //#region src/skeleton/AppSkeleton.d.ts
 /**
  * Default Skeleton component that will render either [TopLayoutSkeleton] or [SideLayoutSkeleton] based on [useAppLayout::currentLayout].
  */
 declare const LayoutSkeleton: () => react_jsx_runtime0.JSX.Element;
+//#endregion
+//#region src/surface/Surface.d.ts
+declare const SURFACE_ELEVATION_STEP = 2;
+/** Elevation of the nearest enclosing surface, or null when there is none. */
+declare const useSurfaceElevation: () => number;
+/**
+ * Elevation a surface renders at: the absolute override when given, otherwise `step` above its parent.
+ * May exceed 24 so that nesting inside a Dialog, which already sits at 24, keeps counting.
+ */
+declare const useResolvedSurfaceElevation: (elevation?: number, step?: number) => number;
+/** Publishes an elevation to descendant surfaces without rendering anything of its own. */
+declare const SurfaceProvider: ({
+  children,
+  elevation
+}: {
+  children: ReactNode;
+  elevation: number;
+}) => react_jsx_runtime0.JSX.Element;
+type SurfaceProps = PaperProps & {
+  component?: ElementType;
+  /** Steps above the surface this one sits on. Pin an absolute elevation with `elevation` instead. */
+  step?: number;
+};
+declare const Surface: ({
+  children,
+  elevation,
+  step,
+  sx,
+  ...props
+}: SurfaceProps) => react_jsx_runtime0.JSX.Element;
+//#endregion
+//#region src/surface/GlassSurface.d.ts
+type GlassMaterial = 'regular' | 'thin' | 'ultraThin' | 'clear';
+type GlassSurfaceProps = SurfaceProps & {
+  /** How translucent the fill is. */
+  material?: GlassMaterial;
+  /** Whether to drop the rim, for glass that meets an adjacent surface rather than floating over one. */
+  disableBorder?: boolean;
+};
+/** A {@link Surface} rendered as translucent blurred glass. */
+declare const GlassSurface: ({
+  children,
+  disableBorder,
+  material,
+  sx,
+  ...props
+}: GlassSurfaceProps) => react_jsx_runtime0.JSX.Element;
 //#endregion
 //#region src/types/index.d.ts
 type MakeOptional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
@@ -900,5 +970,5 @@ declare const keyboard: {
   parseEvent: typeof parseEvent;
 };
 //#endregion
-export { APPBAR_READY_EVENT, ARROW_DOWN, ARROW_LEFT, ARROW_RIGHT, ARROW_UP, AppAvatar, AppAvatarProps, AppBarUserMenuElement, AppBrand, AppBrandComponentProps, AppBrandConfig, AppBrandProps, AppBreadcrumbItem, AppCookiesProvider, AppDefaultsCookieConfigs, AppDefaultsLeftNavConfigs, AppDefaultsPreferencesConfigs, AppDefaultsThemeConfigs, AppDefaultsTopNavConfigs, AppDensity, AppDensityMode, AppDensityProps, AppHistoryRoute, AppInfoPanel, AppInfoPanelProps, AppLayoutMode, AppLeftNavConfigs, AppListEmpty, AppPreferenceConfigs, AppProvider, AppRoot, AppRouterAdapter, AppRouterLocation, AppSearchItem, AppSearchItemRendererOption, AppSearchMode, AppSearchService, type AppSearchServiceState, AppSurface, AppSurfaceProps, AppTheme, AppThemeConfigs, AppThemeLocalization, AppThemeSelectionMode, AppThemesProvider, AppToc, AppTocElementProps, AppTocItem, AppTopNavConfigs, AppUser, AppUserAvatar, AppUserContext, AppUserContextType, AppUserService, AppUserValidatedProp, BACKSPACE, BRAND_VARIANTS, BrandSize, BrandSizeSpecs, BrandVariant, ENTER, ESCAPE, LayoutSkeleton, LeftNavAction, LeftNavActionProps, LeftNavChildProps, LeftNavChildRenderProps, LeftNavItem, LeftNavItemProps, LeftNavMenuItem, LeftNavMenuProps, LeftNavRoute, LeftNavRouteProps, LeftNavSlotProps, MODULE_NAME, MakeOptional, MuiColorType, OverlayDefs, OverlayLabel, OverlayProps, OverlayProvider, OverlayShadow, PageCardCentered, PageCenter, PageContent, PageFullWidth, PageFullscreen, PageHeader, PageHeaderAction, PageProps, SPACE, TUI_COOKIE_KEYS, TUI_COOKIE_OPTIONS, TUI_THEMES, TuiCookieDef, TuiCookies, TuiCookiesStore, TuiParsedJsCookies, UseAppLanguageType, UseAppThemeType, addTranslations, getBrandSizes, getDensityThemeOverrides, is, isArrowDown, isArrowLeft, isArrowRight, isArrowUp, isBackspace, isEnter, isEscape, isSpace, keyboard, parseCookies, parseEvent, parseExtraServerCookie, parseTuiClientCookies, parseTuiCookies, parseTuiServerCookies, setClientCookie, traverse, useAppBar, useAppBarHeight, useAppBarScrollTrigger, useAppBrand, useAppBreadcrumbs, useAppColor, useAppDensity, useAppEnv, useAppLanguage, useAppLayout, useAppLeftNav, useAppLogo, useAppOverlay, useAppPreferences, useAppQuickSearch, useAppRouter, useAppSearchService, useAppTheme, useAppThemeBuilder, useAppUser, useClipboard, useCookiesStore, useFullscreenStatus, useLocalStorage, useLocalStorageItem, usePageProps, usePathMatcher, visit };
+export { APPBAR_READY_EVENT, ARROW_DOWN, ARROW_LEFT, ARROW_RIGHT, ARROW_UP, AppAvatar, AppAvatarProps, AppBarUserMenuElement, AppBrand, AppBrandComponentProps, AppBrandConfig, AppBrandProps, AppBreadcrumbItem, AppCookiesProvider, AppDefaultsCookieConfigs, AppDefaultsLeftNavConfigs, AppDefaultsPreferencesConfigs, AppDefaultsThemeConfigs, AppDefaultsTopNavConfigs, AppDensity, AppDensityMode, AppDensityProps, AppHistoryRoute, AppInfoPanel, AppInfoPanelProps, AppLayoutMode, AppLeftNavConfigs, AppLeftNavElementSkeleton, AppLeftNavSkeleton, AppListEmpty, AppPreferenceConfigs, AppProvider, AppRoot, AppRouterAdapter, AppRouterLocation, AppSearchItem, AppSearchItemRendererOption, AppSearchMode, AppSearchService, type AppSearchServiceState, AppTheme, AppThemeConfigs, AppThemeLocalization, AppThemePicker, AppThemeSelectionMode, AppThemesProvider, AppToc, AppTocElementProps, AppTocItem, AppTopNavConfigs, AppUser, AppUserAvatar, AppUserContext, AppUserContextType, AppUserService, AppUserValidatedProp, BACKSPACE, BRAND_VARIANTS, BrandSize, BrandSizeSpecs, BrandVariant, ENTER, ESCAPE, GlassMaterial, GlassSurface, GlassSurfaceProps, LayoutSkeleton, LeftNavAction, LeftNavActionProps, LeftNavChildProps, LeftNavChildRenderProps, LeftNavItem, LeftNavItemProps, LeftNavMenuItem, LeftNavMenuProps, LeftNavRoute, LeftNavRouteProps, LeftNavSlotProps, MODULE_NAME, MakeOptional, MuiColorType, OverlayDefs, OverlayLabel, OverlayProps, OverlayProvider, OverlayShadow, PageCardCentered, PageCenter, PageContent, PageFullWidth, PageFullscreen, PageHeader, PageHeaderAction, PageProps, SPACE, SURFACE_ELEVATION_STEP, Surface, SurfaceProps, SurfaceProvider, TUI_COOKIE_KEYS, TUI_COOKIE_OPTIONS, TUI_THEMES, TuiCookieDef, TuiCookies, TuiCookiesStore, TuiParsedJsCookies, UseAppLanguageType, UseAppThemeType, addTranslations, getBrandSizes, getDensityThemeOverrides, is, isArrowDown, isArrowLeft, isArrowRight, isArrowUp, isBackspace, isEnter, isEscape, isSpace, keyboard, parseCookies, parseEvent, parseExtraServerCookie, parseTuiClientCookies, parseTuiCookies, parseTuiServerCookies, setClientCookie, traverse, useAppBar, useAppBarHeight, useAppBarScrollTrigger, useAppBrand, useAppBreadcrumbs, useAppColor, useAppDensity, useAppEnv, useAppLanguage, useAppLayout, useAppLeftNav, useAppLogo, useAppOverlay, useAppPreferences, useAppQuickSearch, useAppRouter, useAppSearchService, useAppTheme, useAppThemeBuilder, useAppUser, useClipboard, useCookiesStore, useFullscreenStatus, useLocalStorage, useLocalStorageItem, usePageProps, usePathMatcher, useResolvedSurfaceElevation, useSurfaceElevation, visit };
 //# sourceMappingURL=index.d.ts.map

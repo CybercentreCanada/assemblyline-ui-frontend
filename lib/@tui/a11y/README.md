@@ -2,98 +2,75 @@
 
 Accessibility module for TemplateUI v4.
 
----
+This module gives your application a standard set of accessibility controls: a button in the top navigation that opens
+a drawer where users can adjust the reading cursor, animation, line height, text size, text spacing, text alignment,
+and tooltip delay. Their choices apply immediately as MUI theme overrides.
 
-## Table of Contents
+Reach for it when you want accessibility settings that look and behave the same way across every TemplateUI app, rather
+than building your own.
 
-- [Overview](#overview)
-- [Installation](#installation)
-- [Quick Start](#quick-start)
-- [API Reference](#api-reference)
-- [Integration](#integration)
-- [Troubleshooting](#troubleshooting)
-- [Related Documentation](#related-documentation)
+The module namespace is `tui.a11y` — see [MODULE_NAME](src/name.ts). Everything public is exported from
+[src/index.ts](src/index.ts).
 
----
+## Before you start
 
-## Overview
+The accessibility panel renders inside the shared app drawer, so this module depends on
+[`@tui/drawer`](../drawer/README.md). Install both, and mount `AppDrawerProvider` above `AppAccessibilityProvider`.
 
-This module provides:
-
-- An accessibility provider that manages accessibility state and theme overrides
-- A top-nav icon button that opens the accessibility drawer
-- Built-in accessibility feature controls (cursor, animation, line height, text size, text spacing, text alignment, tooltip leave delay)
-
-Use this module when you want standardized accessibility controls and keyboard-accessible configuration in your TemplateUI application.
-
-Exports live in [`@tui/a11y`](src/index.ts). The module namespace constant is [`MODULE_NAME`](src/name.ts) (`tui.a11y`).
-
-> Dependency note: The drawer UI uses [`useAppDrawer`](../drawer/src/hooks/useAppDrawer.tsx), so install `@tui/drawer` and mount [`AppDrawerProvider`](../drawer/src/providers/AppDrawerProvider.tsx).
-
----
-
-## Installation
-
-### 1) Configure npm registry
-
-Create or update `~/.npmrc`:
+Point npm at the BoH registry:
 
 ```ini
+# ~/.npmrc
 @tui:registry=https://bagofholding.cse-cst.gc.ca/repository/npm-ap/
 ```
 
-### 2) Install the package(s)
+Then install:
 
 ```bash
 pnpm add @tui/a11y @tui/drawer
 ```
 
----
+## Setting it up
 
-## Quick Start
+Three steps: register the translations, mount the providers, and put the button somewhere users can find it.
 
-### 1) Register translations (required)
+### Register translations
 
-`@tui/a11y` ships `en`/`fr` resources. Register them on your i18n instance:
+The module ships its own `en` and `fr` resources. They are not loaded automatically — register them on your i18n
+instance before anything renders, or the panel will show raw translation keys:
 
 ```ts
-import i18n from './i18n';
 import { addTranslations as addA11yTranslations } from '@tui/a11y';
+import i18n from './i18n';
 
 addA11yTranslations(i18n);
 ```
 
-Function: [`addTranslations`](src/i18n/index.ts)
+The template app does this in [app/i18n.ts](../template/app/i18n.ts).
 
-Template example: [`addA11yTranslations(i18n)`](../template/app/i18n.ts)
+### Mount the providers
 
----
-
-### 2) Mount providers (required)
-
-Mount drawer provider first, then accessibility provider:
+Order matters. The drawer provider has to be the outer one:
 
 ```tsx
-import type { PropsWithChildren } from 'react';
 import { AppAccessibilityProvider } from '@tui/a11y';
 import { AppDrawerProvider } from '@tui/drawer';
+import type { PropsWithChildren } from 'react';
 
-export function MyAppProvider({ children }: PropsWithChildren) {
-  return (
-    <AppDrawerProvider>
-      <AppAccessibilityProvider>{children}</AppAccessibilityProvider>
-    </AppDrawerProvider>
-  );
-}
+export const MyAppProvider = ({ children }: PropsWithChildren) => (
+  <AppDrawerProvider>
+    <AppAccessibilityProvider>{children}</AppAccessibilityProvider>
+  </AppDrawerProvider>
+);
 ```
 
-Provider: [`AppAccessibilityProvider`](src/providers/AppAccessibilityProvider.tsx)
+These belong between `AppRoot` and `AppProvider` — see [Optional modules](../../docs/configuration.md#optional-modules)
+for where module providers sit in the shell.
 
----
+### Add the button
 
-### 3) Render the accessibility icon button (recommended)
-
-Render [`AppDrawerAccessibilityIconButton`](src/components/AppDrawerAccessibility.tsx) in a top-nav right-side slot:
+[AppDrawerAccessibilityIconButton](src/components/AppDrawerAccessibility.tsx) opens the panel. Put it in a top-nav
+right-side slot so it is reachable from every page:
 
 ```tsx
 import { AppDrawerAccessibilityIconButton } from '@tui/a11y';
@@ -108,113 +85,56 @@ export const preferences: AppPreferenceConfigs = {
 };
 ```
 
-Template example pattern: [`useMyAccessibility`](../template/app/hooks/useMyAccessibility.tsx)
+The button also registers keyboard shortcuts: `Ctrl+U` opens the panel, `Escape` closes it. The drawer it opens is
+registered under the id `tui.app.drawer.accessibility`.
 
----
+See [useMyAccessibility](../template/app/hooks/useMyAccessibility.tsx) for the full pattern.
 
-## API Reference
+## Choosing which controls users get
 
-### `AppAccessibilityProvider`
+Every control can be turned off individually through the provider's `preferences` prop. This is useful when a setting
+conflicts with your application — for example, if your own layout already manages line height.
 
-Source: [`AppAccessibilityProvider`](src/providers/AppAccessibilityProvider.tsx)
+```tsx
+<AppAccessibilityProvider preferences={{ enableCursor: false, enableTextSpacing: false }}>
+```
 
-**Props:**
+| Flag                      | Turns off                                   |
+| ------------------------- | ------------------------------------------- |
+| `enableAccessibility`     | The whole module, including the button      |
+| `enableCursor`            | The enlarged reading cursor                 |
+| `enableAnimation`         | The reduce-animation control                |
+| `enableLineHeight`        | Line-height adjustment                      |
+| `enableTextSize`          | Text-size adjustment                        |
+| `enableTextAlignment`     | Text-alignment adjustment                   |
+| `enableTextSpacing`       | Letter and word spacing adjustment          |
+| `enableTooltipLeaveDelay` | The control for how long tooltips stay open |
 
-| Prop          | Type                          | Description                                              |
-| ------------- | ----------------------------- | -------------------------------------------------------- |
-| `preferences` | `AppAccessibilityPreferences` | Enable/disable accessibility capabilities.               |
-| `features`    | `ReactNode[]`                 | Additional custom feature nodes to render in the drawer. |
-| `children`    | `ReactNode`                   | Child components.                                        |
+Defaults live in [AppAccessibilityDefaults.ts](src/configs/AppAccessibilityDefaults.ts); the type is
+[AppAccessibilityPreferences](src/configs/AppAccessibilityPreferences.ts).
 
-Defaults:
+To add your own control to the panel, pass it through the `features` prop as a `ReactNode`. It renders alongside the
+built-in ones.
 
-- [`AppDefaultsAccessibilityPreferences`](src/configs/AppAccessibilityDefaults.ts)
-- [`AppDefaultsAccessibilityStates`](src/configs/AppAccessibilityDefaults.ts)
+## How it works
 
----
-
-### `AppAccessibilityPreferences`
-
-Source: [`AppAccessibilityPreferences`](src/configs/AppAccessibilityPreferences.ts)
-
-Feature flags:
-
-- `enableAccessibility`
-- `enableCursor`
-- `enableAnimation`
-- `enableLineHeight`
-- `enableTextSize`
-- `enableTextAlignment`
-- `enableTextSpacing`
-- `enableTooltipLeaveDelay`
-
----
-
-### `AppDrawerAccessibilityIconButton`
-
-Source: [`AppDrawerAccessibilityIconButton`](src/components/AppDrawerAccessibility.tsx)
-
-Behavior highlights:
-
-- Opens a drawer with accessibility controls (`id: tui.app.drawer.accessibility`)
-- Registers keyboard shortcuts (`Ctrl+U` to open, `Escape` to close)
-- Respects `enableAccessibility` from preferences
-
----
-
-### i18n API
-
-- Namespace: [`MODULE_NAME`](src/name.ts)
-- Translation registration: [`addTranslations`](src/i18n/index.ts)
-
----
-
-### Hooks
-
-Exported from [`src/hooks/index.ts`](src/hooks/index.ts):
-
-- [`useAppAccessibilityContext`](src/hooks/useAppAccessibilityContext.tsx)
-- [`useAppAccessibilityPreferences`](src/hooks/useAppAccessibilityPreferences.tsx)
-- [`useAppAccessibilityStates`](src/hooks/useAppAccessibilityStates.tsx)
-- [`useAppAccessibilityFeatures`](src/hooks/useAppAccessibilityFeatures.tsx)
-- [`useAppKeyboardShortcut`](src/hooks/useAppKeyboardShortcut.tsx)
-- [`useAccessibilityThemeBuilder`](src/hooks/useAccessibilityThemeBuilder.ts)
-
----
-
-## Integration
-
-### Recommended placement in TemplateUI v4
-
-If your app follows the provider layering in [`docs/guides/configuration-guide.md`](../../docs/guides/configuration-guide.md), mount optional module providers between app root and app provider, then place feature actions (like accessibility button) in TopNav slots.
-
-### Theme and visual behavior
-
-`@tui/a11y` applies runtime MUI theme overrides through [`useAccessibilityThemeBuilder`](src/hooks/useAccessibilityThemeBuilder.ts) and renders reading cursor overlays via [`AppAccessibilityReadingCursors`](src/components/AppAccessibilityReadingCursors.tsx).
-
----
+The provider does not restyle components one by one. It builds a set of MUI theme overrides from the user's current
+settings — see [useAccessibilityThemeBuilder](src/hooks/useAccessibilityThemeBuilder.ts) — and layers them over your
+theme, so anything reading the theme picks the changes up for free. The reading cursor is a separate overlay rendered
+by [AppAccessibilityReadingCursors](src/components/AppAccessibilityReadingCursors.tsx).
 
 ## Troubleshooting
 
-### Accessibility button does not open drawer
+| Symptom                                     | Likely cause                                                               |
+| ------------------------------------------- | -------------------------------------------------------------------------- |
+| The button does nothing                     | `@tui/drawer` is missing, or `AppDrawerProvider` is not mounted above it   |
+| The panel shows raw keys                    | `addTranslations` was never called, or ran after the first render          |
+| Settings change but nothing looks different | `AppAccessibilityProvider` is not mounted, or `enableAccessibility` is off |
+| One control is missing                      | Its `enable*` flag is `false` in the provider's `preferences`              |
 
-- Ensure `@tui/drawer` is installed.
-- Ensure [`AppDrawerProvider`](../drawer/src/providers/AppDrawerProvider.tsx) is mounted above [`AppDrawerAccessibilityIconButton`](src/components/AppDrawerAccessibility.tsx).
+## Related
 
-### Missing translation keys
-
-- Ensure [`addTranslations`](src/i18n/index.ts) is called before rendering.
-
-### Accessibility settings do not visually apply
-
-- Ensure [`AppAccessibilityProvider`](src/providers/AppAccessibilityProvider.tsx) is mounted.
-- Verify `enableAccessibility` is not disabled in [`AppAccessibilityPreferences`](src/configs/AppAccessibilityPreferences.ts).
-
----
-
-## Related Documentation
-
-- [Template app accessibility hook](../template/app/hooks/useMyAccessibility.tsx)
-- [Template app i18n bootstrap](../template/app/i18n.ts)
-- [Configuration guide](../../docs/guides/configuration-guide.md)
-- [@tui/drawer README](../drawer/README.md)
+- **[Accessibility hooks reference](../../docs/reference/hooks/a11y.md)** — every hook this module exports.
+- **[Configuration](../../docs/configuration.md)** — where module providers belong in the shell.
+- **[`@tui/drawer`](../drawer/README.md)** — the drawer this module renders into.
+- **[useMyAccessibility](../template/app/hooks/useMyAccessibility.tsx)** — a working example in the template app.
