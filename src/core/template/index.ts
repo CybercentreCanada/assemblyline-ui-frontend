@@ -15,7 +15,8 @@ export {
   useAppTemplateBarHeight,
   useAppTemplateThemeInitializer,
   useAppTemplateThemeMode,
-  useAppTemplateThemePatcher
+  useAppTemplateThemePatcher,
+  useOverrideTemplatePreferences
 } from './template.hooks';
 export type { AppLegacyTheme } from './template.models';
 export { AppTemplateLayout, AppTemplateProvider } from './template.providers';

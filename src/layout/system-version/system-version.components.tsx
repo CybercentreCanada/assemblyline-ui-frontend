@@ -1,4 +1,4 @@
-import { Typography } from '@mui/material';
+import { Typography, useTheme } from '@mui/material';
 import { useAppConfigStore } from 'core/config';
 import type { SystemVersionProps } from 'layout/system-version';
 import { memo } from 'react';
@@ -8,26 +8,26 @@ import { memo } from 'react';
 //*****************************************************************************************
 
 export const SystemVersion = memo(({ className = 'no-print', style }: SystemVersionProps) => {
-  const system = useAppConfigStore(s => s?.configuration?.system);
+  const theme = useTheme();
 
-  return !(system && system.type !== 'production') ? null : (
+  const systemType = useAppConfigStore(s => s?.configuration?.system?.type);
+  const systemVersion = useAppConfigStore(s => s?.configuration?.system?.version);
+
+  return systemType === 'production' ? null : (
     <Typography
       className={className}
       variant="body2"
       style={{
         position: 'fixed',
-        bottom: '8px',
-        marginLeft: '32px',
-        opacity: '0.4',
+        bottom: theme.spacing(1),
+        opacity: 0.4,
         zIndex: 10000,
-        marginTop: 'auto',
-        marginRight: 'auto',
         pointerEvents: 'none',
         ...style
       }}
     >
-      {`Assemblyline ${system.version} :: `}
-      <span style={{ textTransform: 'capitalize' }}>{system.type}</span>
+      {`Assemblyline ${systemVersion} :: `}
+      <span style={{ textTransform: 'capitalize' }}>{systemType}</span>
     </Typography>
   );
 });

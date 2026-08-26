@@ -1,7 +1,7 @@
 import { useMediaQuery } from '@mui/material';
-import type { TuiCookies } from '@tui/core';
+import { useCookiesStore, type TuiCookies } from '@tui/core';
 import { useAppInterfaceStore, useAppSetInterfaceStore } from 'core/interface';
-import { useAppPreferenceStore } from 'core/preference';
+import { useAppPreferenceStore, useAppSetPreferenceStore } from 'core/preference';
 import { parseAppThemeFromLegacy } from 'core/template';
 import { useEffect, useLayoutEffect, useMemo } from 'react';
 
@@ -165,4 +165,39 @@ export const useAppTemplateBarHeight = (): number => {
   }, [setInterfaceStore]);
 
   return height;
+};
+
+//*****************************************************************************************
+// App Template Preference Overrider
+//*****************************************************************************************
+
+/**
+ * @name useOverrideTemplatePreferences
+ * @description Syncs template preference settings from `useCookiesStore` into the local preference store whenever cookie parameters change.
+ * @returns Nothing
+ */
+export const useOverrideTemplatePreferences = (): void => {
+  const autoHideAppbar = useCookiesStore(s => s?.autoHideAppbar);
+  const density = useCookiesStore(s => s?.density);
+  const drawerOpen = useCookiesStore(s => s?.drawerOpen);
+  const lang = useCookiesStore(s => s?.lang);
+  const layout = useCookiesStore(s => s?.layout);
+  const leftNavHover = useCookiesStore(s => Boolean(s?.leftNavHover));
+
+  const setPreferenceStore = useAppSetPreferenceStore();
+
+  useEffect(() => {
+    setPreferenceStore(s => {
+      if (autoHideAppbar !== undefined) s.template.autoHideAppbar = autoHideAppbar;
+      if (density !== undefined) s.template.density = density;
+      if (drawerOpen !== undefined) s.template.drawerOpen = drawerOpen;
+      if (lang !== undefined) s.template.lang = lang;
+      if (layout !== undefined) s.template.layout = layout;
+      if (leftNavHover !== undefined) s.template.leftNavHover = leftNavHover;
+
+      return s;
+    });
+  }, [autoHideAppbar, density, drawerOpen, lang, layout, leftNavHover, setPreferenceStore]);
+
+  return null;
 };
