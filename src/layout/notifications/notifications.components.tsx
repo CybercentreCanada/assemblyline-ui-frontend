@@ -10,9 +10,10 @@ import NotificationsActiveOutlinedIcon from '@mui/icons-material/NotificationsAc
 import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
 import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
 import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
-import type { BadgeProps, SelectChangeEvent, SvgIconProps } from '@mui/material';
+import type { SelectChangeEvent, SvgIconProps } from '@mui/material';
 import {
   Badge,
+  Button,
   Dialog,
   DialogActions,
   DialogContent,
@@ -25,72 +26,104 @@ import {
   MenuItem,
   Select,
   Skeleton,
+  styled,
   TextField,
+  Tooltip,
   Typography,
   useTheme
 } from '@mui/material';
 import { useApiMutation } from 'core/api';
-import { useAppConfigStore } from 'core/config';
+import { useAppConfigStore, useAppSetConfigStore } from 'core/config';
 import { useAppInterfaceStore, useAppSetInterfaceStore } from 'core/interface';
 import { useAppSnackbar } from 'core/snackbar';
 import DOMPurify from 'dompurify';
+import type { JSONFeedAuthor, JSONFeedItem } from 'layout/notifications';
 import {
   useNotificationClose,
   useNotificationFeed,
   useNotificationNewCount,
   useNotificationOpen
-} from 'layout/notifications/notifications.hooks';
-import type { JSONFeedAuthor, JSONFeedItem } from 'layout/notifications/notifications.models';
-import { formatDate, getBackgroundColor, getColor } from 'layout/notifications/notifications.utils';
+} from 'layout/notifications';
+import { getBackgroundColor, getColor } from 'layout/notifications/notifications.utils';
 import type { SystemMessage } from 'models/api/user';
-import type { ChangeEvent, ReactNode } from 'react';
+import type { ChangeEvent } from 'react';
 import { memo, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import Markdown from 'react-markdown';
-import { Button } from 'ui/buttons/Button';
 import { IconButton } from 'ui/buttons/IconButton';
+import ConfirmationDialog from 'ui/ConfirmationDialog';
 import { CustomChip } from 'ui/CustomChip';
+import Moment from 'ui/Moment';
 
 //*****************************************************************************************
-// Constants
+// Constants & Styled Components
 //*****************************************************************************************
 
-const TAG_COLORS: Record<string, 'info' | 'success' | 'warning' | 'secondary' | 'default'> = {
-  new: 'info',
-  current: 'success',
-  dev: 'warning',
-  community: 'warning',
-  service: 'secondary',
-  blog: 'default'
-};
+const Row = styled('div')(() => ({
+  alignItems: 'center',
+  display: 'flex',
+  flexDirection: 'row',
+  width: '100%'
+}));
 
-const VISIBLE_TAGS = ['new', 'current', 'dev', 'service', 'blog', 'community'];
+Row.displayName = 'Row';
 
-const DEFAULT_SYSTEM_MESSAGE: SystemMessage = {
-  message: '',
-  severity: 'info',
-  title: '',
-  user: ''
-};
+const Description = styled('div')(({ theme }) => ({
+  color: theme.palette.text.primary,
+  fontFamily: theme.typography.body2.fontFamily,
+  fontSize: theme.typography.body2.fontSize,
+  fontWeight: theme.typography.body2.fontWeight,
+  letterSpacing: theme.typography.body2.letterSpacing,
+  lineHeight: theme.typography.body2.lineHeight,
+  '& a': {
+    color: theme.palette.primary.main,
+    textDecoration: 'none',
+    transition: 'color 225ms cubic-bezier(0, 0, 0.2, 1) 0ms',
+    '&:hover': {
+      color: theme.palette.mode === 'dark' ? theme.palette.primary.light : theme.palette.primary.dark
+    }
+  },
+  '& > *': {
+    marginBlockEnd: theme.spacing(0.5),
+    marginBlockStart: theme.spacing(0.5)
+  }
+}));
 
-const ROW_STYLE = { width: '100%', display: 'flex', flexDirection: 'row' as const, alignItems: 'center' as const };
+Description.displayName = 'Description';
 
 //*****************************************************************************************
 // SystemMessageIcon
 //*****************************************************************************************
 
-type SystemMessageIconProps = SvgIconProps & { severity?: SystemMessage['severity'] };
+export type SystemMessageIconProps = SvgIconProps & {
+  severity?: SystemMessage['severity'];
+};
 
-const SystemMessageIcon = memo(({ severity, fontSize = 'medium', ...props }: SystemMessageIconProps) => {
-  const iconMap: Record<string, typeof ErrorOutlineOutlinedIcon> = {
-    error: ErrorOutlineOutlinedIcon,
-    warning: ReportProblemOutlinedIcon,
-    info: InfoOutlinedIcon,
-    success: CheckCircleOutlinedIcon
-  };
+const SystemMessageIcon = memo(({ severity, fontSize = 'medium', style, ...props }: SystemMessageIconProps) => {
+  const theme = useTheme();
 
-  const Icon = iconMap[severity] ?? NotificationsOutlinedIcon;
-  return <Icon fontSize={fontSize} {...props} />;
+  const Icon =
+    {
+      error: ErrorOutlineOutlinedIcon,
+      info: InfoOutlinedIcon,
+      success: CheckCircleOutlinedIcon,
+      warning: ReportProblemOutlinedIcon
+    }?.[severity] ?? NotificationsOutlinedIcon;
+
+  return (
+    <Icon
+      fontSize={fontSize}
+      style={{
+        backgroundColor: 'inherit',
+        color: 'inherit',
+        marginLeft: theme.spacing(1.5),
+        marginRight: theme.spacing(1.5),
+        ...getColor(severity, 1, theme),
+        ...style
+      }}
+      {...props}
+    />
+  );
 });
 
 SystemMessageIcon.displayName = 'SystemMessageIcon';
@@ -99,44 +132,81 @@ SystemMessageIcon.displayName = 'SystemMessageIcon';
 // NotificationAuthor
 //*****************************************************************************************
 
-const NotificationAuthor = memo(({ author }: { author: JSONFeedAuthor }) => {
+export type NotificationAuthorProps = {
+  author: JSONFeedAuthor;
+};
+
+const NotificationAuthor = memo(({ author }: NotificationAuthorProps) => {
   const theme = useTheme();
 
-  const content = useMemo(
-    () => (
-      <>
-        {author?.avatar ? (
-          <img
-            src={author.avatar}
-            alt={author.name || ''}
-            style={{
-              maxHeight: '25px',
-              borderRadius: '50%',
-              marginLeft: theme.spacing(0.25),
-              marginRight: theme.spacing(0.25)
-            }}
-          />
-        ) : null}
-        {author?.name ? (
-          <Typography
-            variant="caption"
-            color="text.secondary"
-            style={{ marginLeft: theme.spacing(0.25), marginRight: theme.spacing(0.25) }}
-          >
-            {author.name}
-          </Typography>
-        ) : null}
-      </>
-    ),
-    [author, theme]
-  );
-
-  return author?.url ? (
-    <Link href={author.url} target="_blank" rel="noopener noreferrer" style={{ display: 'contents' }}>
-      {content}
-    </Link>
+  return !author ? null : !author?.url ? (
+    <div style={{ display: 'contents' }}>
+      {!author.avatar ? null : (
+        <img
+          alt={author.avatar}
+          src={author.avatar}
+          style={{
+            borderRadius: '50%',
+            color: theme.palette.text.secondary,
+            marginLeft: theme.spacing(0.25),
+            marginRight: theme.spacing(0.25),
+            maxHeight: '25px'
+          }}
+        />
+      )}
+      {!author.name ? null : (
+        <Typography
+          color="textSecondary"
+          sx={{
+            color: theme.palette.text.secondary,
+            marginLeft: theme.spacing(0.25),
+            marginRight: theme.spacing(0.25)
+          }}
+          variant="caption"
+        >
+          {author.name}
+        </Typography>
+      )}
+    </div>
   ) : (
-    <div style={{ display: 'contents' }}>{content}</div>
+    <Link
+      href={author.url}
+      rel="noopener noreferrer"
+      style={{ display: 'contents' }}
+      target="_blank"
+      title={author.url}
+    >
+      {!author.avatar ? null : (
+        <img
+          alt={author.avatar}
+          src={author.avatar}
+          style={{
+            borderRadius: '50%',
+            color: theme.palette.text.secondary,
+            marginLeft: theme.spacing(0.25),
+            marginRight: theme.spacing(0.25),
+            maxHeight: '25px'
+          }}
+        />
+      )}
+      {!author.name ? null : (
+        <Typography
+          color="textSecondary"
+          sx={{
+            color: theme.palette.text.secondary,
+            marginLeft: theme.spacing(0.25),
+            marginRight: theme.spacing(0.25),
+            transition: 'color 225ms cubic-bezier(0, 0, 0.2, 1) 0ms',
+            '&:hover': {
+              color: theme.palette.mode === 'dark' ? theme.palette.secondary.light : theme.palette.secondary.dark
+            }
+          }}
+          variant="caption"
+        >
+          {author.name}
+        </Typography>
+      )}
+    </Link>
   );
 });
 
@@ -146,339 +216,426 @@ NotificationAuthor.displayName = 'NotificationAuthor';
 // NotificationItem
 //*****************************************************************************************
 
-const NotificationItem = memo(({ notification }: { notification: JSONFeedItem }) => {
+export type NotificationItemProps = {
+  hideDivider?: boolean;
+  notification: JSONFeedItem;
+};
+
+const NotificationItem = memo(({ hideDivider = false, notification }: NotificationItemProps) => {
   const theme = useTheme();
 
-  const content = useMemo(() => {
-    if (notification.content_md) {
-      return (
-        <Markdown
-          components={{
-            a: props => (
-              <Link href={props.href} target="_blank" rel="noopener noreferrer">
-                {props.children}
-              </Link>
-            )
-          }}
-        >
-          {notification.content_md}
-        </Markdown>
-      );
-    }
+  return !notification ? null : (
+    <>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          padding: theme.spacing(1.25),
+          width: '100%'
+        }}
+      >
+        <Typography color="secondary" sx={{ lineHeight: 'revert' }} variant="caption">
+          <Moment variant="localeDate">{notification.date_published}</Moment>
+        </Typography>
 
-    if (notification.content_html) {
-      return (
-        <span
-          dangerouslySetInnerHTML={{
-            __html: DOMPurify.sanitize(notification.content_html, { USE_PROFILES: { html: true } })
+        <div style={{ alignItems: 'center', display: 'flex', width: '100%' }}>
+          {!notification.url ? (
+            <Typography
+              color="secondary"
+              sx={{
+                color: theme.palette.primary.main,
+                flex: 1,
+                fontSize: 'large',
+                fontWeight: notification._isNew ? 800 : 500,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis'
+              }}
+              variant="body1"
+            >
+              {notification.title}
+            </Typography>
+          ) : (
+            <div>
+              <Link
+                href={notification.url}
+                rel="noopener noreferrer"
+                style={{
+                  flex: 1,
+                  overflow: 'hidden',
+                  textDecoration: 'none',
+                  width: '100%'
+                }}
+                target="_blank"
+                title={notification.url}
+              >
+                <Typography
+                  color="secondary"
+                  sx={{
+                    color: theme.palette.primary.main,
+                    flex: 1,
+                    fontSize: 'large',
+                    fontWeight: notification._isNew ? 800 : 500,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    transition: 'color 225ms cubic-bezier(0, 0, 0.2, 1) 0ms',
+                    '&:hover': {
+                      color: theme.palette.mode === 'dark' ? theme.palette.primary.light : theme.palette.primary.dark
+                    }
+                  }}
+                  variant="body1"
+                >
+                  {notification.title}
+                </Typography>
+              </Link>
+            </div>
+          )}
+        </div>
+
+        {notification.content_md ? (
+          <div>
+            <Description>
+              <Markdown components={{ a: props => <Link href={props.href}>{props.children}</Link> }}>
+                {notification.content_md}
+              </Markdown>
+            </Description>
+          </div>
+        ) : notification.content_html ? (
+          <div>
+            <Description
+              dangerouslySetInnerHTML={{
+                __html: DOMPurify.sanitize(notification.content_html, { USE_PROFILES: { html: true } })
+              }}
+            />
+          </div>
+        ) : notification.content_text ? (
+          <div>
+            <Description>{notification.content_text}</Description>
+          </div>
+        ) : null}
+
+        {!notification.image ? null : (
+          <div style={{ display: 'grid', justifyContent: 'center' }}>
+            <img
+              alt={notification.image}
+              src={notification.image}
+              style={{
+                borderRadius: '5px',
+                maxHeight: '256px',
+                maxWidth: '256px',
+                marginTop: '8px'
+              }}
+            />
+          </div>
+        )}
+
+        {!notification.authors ? null : (
+          <div
+            style={{
+              alignItems: 'center',
+              color: theme.palette.secondary.main,
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'right',
+              paddingRight: theme.spacing(1),
+              paddingTop: theme.spacing(1),
+              width: '100%'
+            }}
+          >
+            <div style={{ flexGrow: 1 }}>
+              {notification.tags
+                ?.filter(tag => ['new', 'current', 'dev', 'service', 'blog', 'community'].includes(tag))
+                .map((tag, i) => (
+                  <CustomChip
+                    key={`tag-${i}`}
+                    color={
+                      tag === 'new'
+                        ? 'info'
+                        : tag === 'current'
+                          ? 'success'
+                          : tag === 'dev' || tag === 'community'
+                            ? 'warning'
+                            : tag === 'service'
+                              ? 'secondary'
+                              : 'default'
+                    }
+                    label={tag}
+                    size="small"
+                    sx={{
+                      marginLeft: theme.spacing(0.25),
+                      marginRight: theme.spacing(0.25),
+                      textTransform: 'capitalize'
+                    }}
+                    type="round"
+                    variant="outlined"
+                  />
+                ))}
+            </div>
+            {notification.authors
+              .filter((_, i) => i < 2)
+              .map((author, i) => (
+                <NotificationAuthor key={`${i} - ${author.name}`} author={author} />
+              ))}
+          </div>
+        )}
+      </div>
+
+      {hideDivider ? null : (
+        <Divider
+          variant="fullWidth"
+          sx={{
+            width: '95%',
+            '@media print': {
+              backgroundColor: '#0000001f !important'
+            }
           }}
         />
-      );
-    }
-
-    return notification.content_text ? <>{notification.content_text}</> : null;
-  }, [notification.content_html, notification.content_md, notification.content_text]);
-
-  return (
-    <div
-      style={{
-        width: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: theme.spacing(0.75),
-        padding: `${theme.spacing(1.25)} ${theme.spacing(0.5)}`
-      }}
-    >
-      <Typography variant="caption" color="textSecondary">
-        {formatDate(notification.date_published)}
-      </Typography>
-
-      {notification.url ? (
-        <Link href={notification.url} target="_blank" rel="noopener noreferrer" underline="none">
-          <Typography
-            variant="subtitle1"
-            style={{ fontWeight: notification._isNew ? 700 : 500, color: theme.palette.primary.main }}
-          >
-            {notification.title}
-          </Typography>
-        </Link>
-      ) : (
-        <Typography variant="subtitle1" style={{ fontWeight: notification._isNew ? 700 : 500 }}>
-          {notification.title}
-        </Typography>
       )}
-
-      {content ? (
-        <Typography variant="body2" component="div">
-          {content}
-        </Typography>
-      ) : null}
-
-      {notification.tags?.length ? (
-        <div style={{ ...ROW_STYLE, flexWrap: 'wrap', gap: theme.spacing(0.5) }}>
-          {notification.tags
-            .filter(tag => VISIBLE_TAGS.includes(tag))
-            .map((tag, i) => (
-              <CustomChip
-                key={`${notification.id}-tag-${i}`}
-                size="small"
-                type="round"
-                variant="outlined"
-                color={TAG_COLORS[tag] || 'default'}
-                label={tag}
-                style={{ textTransform: 'capitalize' }}
-              />
-            ))}
-        </div>
-      ) : null}
-
-      {notification.image ? (
-        <div style={{ display: 'grid', justifyContent: 'center' }}>
-          <img
-            src={notification.image}
-            alt={notification.title || 'notification'}
-            style={{ maxWidth: '256px', maxHeight: '256px', borderRadius: '5px', marginTop: '8px' }}
-          />
-        </div>
-      ) : null}
-
-      {notification.authors?.length ? (
-        <div
-          style={{ ...ROW_STYLE, justifyContent: 'flex-end', gap: theme.spacing(0.5), paddingTop: theme.spacing(0.5) }}
-        >
-          {notification.authors
-            .filter((_, i) => i < 2)
-            .map((author, i) => (
-              <NotificationAuthor key={`${notification.id}-author-${i}`} author={author} />
-            ))}
-        </div>
-      ) : null}
-    </div>
+    </>
   );
 });
 
 NotificationItem.displayName = 'NotificationItem';
 
 //*****************************************************************************************
-// AnnouncementActions
+// AnnouncementSection
 //*****************************************************************************************
 
-const AnnouncementActions = memo(() => {
+export type AnnouncementSectionProps = Record<string, never>;
+
+export const AnnouncementSection = memo(() => {
   const { t } = useTranslation(['notifications']);
-  const isAdmin = useAppConfigStore(s => Boolean(s?.user?.is_admin));
+  const theme = useTheme();
   const systemMessage = useAppConfigStore(s => s?.systemMessage ?? null);
-  const setInterface = useAppSetInterfaceStore();
+  const currentUser = useAppConfigStore(s => s?.user);
+  const setInterfaceStore = useAppSetInterfaceStore();
 
   const handleOpenCreateDialog = useCallback(() => {
-    setInterface(s => {
-      s.notifications.announcementDraft = { ...DEFAULT_SYSTEM_MESSAGE };
+    setInterfaceStore(s => {
+      s.notifications.announcementDraft = {
+        message: '',
+        severity: 'info',
+        title: '',
+        user: currentUser?.uname || currentUser?.name || ''
+      };
       s.notifications.announcementEditOpen = true;
       return s;
     });
-  }, [setInterface]);
+  }, [currentUser, setInterfaceStore]);
 
   const handleOpenEditDialog = useCallback(() => {
-    setInterface(s => {
-      s.notifications.announcementDraft = { ...(systemMessage as SystemMessage) };
+    setInterfaceStore(s => {
+      s.notifications.announcementDraft = { ...systemMessage };
       s.notifications.announcementEditOpen = true;
       return s;
     });
-  }, [setInterface, systemMessage]);
+  }, [setInterfaceStore, systemMessage]);
 
   const handleOpenDeleteDialog = useCallback(() => {
-    setInterface(s => {
+    setInterfaceStore(s => {
       s.notifications.announcementDeleteOpen = true;
       return s;
     });
-  }, [setInterface]);
+  }, [setInterfaceStore]);
 
-  return isAdmin ? (
-    <div style={{ ...ROW_STYLE, width: 'auto' }}>
-      {Boolean(systemMessage) ? (
-        <>
-          <IconButton size="small" onClick={handleOpenEditDialog} tooltip={t('edit.title')}>
-            <EditOutlinedIcon fontSize="small" />
-          </IconButton>
-          <IconButton size="small" onClick={handleOpenDeleteDialog} tooltip={t('delete.title')}>
-            <DeleteOutlineOutlinedIcon fontSize="small" />
-          </IconButton>
-        </>
-      ) : (
-        <IconButton size="small" onClick={handleOpenCreateDialog} tooltip={t('add.title')}>
-          <AddOutlinedIcon fontSize="small" />
-        </IconButton>
-      )}
-    </div>
-  ) : null;
-});
+  const color2Style = getColor(systemMessage?.severity, 2, theme);
 
-AnnouncementActions.displayName = 'AnnouncementActions';
-
-//*****************************************************************************************
-// AnnouncementContent
-//*****************************************************************************************
-
-const AnnouncementContent = memo(() => {
-  const { t } = useTranslation(['notifications']);
-  const theme = useTheme();
-  const systemMessage = useAppConfigStore(s => (s?.systemMessage ?? null) as SystemMessage | null);
-
-  return systemMessage ? (
+  return !(systemMessage || currentUser?.is_admin) ? null : (
     <>
-      <Typography
-        variant="body1"
-        style={{ fontWeight: 700, paddingLeft: theme.spacing(1.25), ...getColor(systemMessage.severity, 2, theme) }}
-      >
-        {systemMessage.title || t('systemMessage.header')}
-      </Typography>
-      <Typography variant="body2" color="text.secondary" style={{ paddingLeft: theme.spacing(1.25) }}>
-        {systemMessage.message}
-      </Typography>
-      {systemMessage.user ? (
+      <Row style={{ paddingTop: theme.spacing(2) }}>
+        <SystemMessageIcon severity={systemMessage?.severity} />
         <Typography
-          variant="caption"
-          color="text.secondary"
-          style={{ display: 'block', textAlign: 'right', paddingTop: theme.spacing(1), paddingRight: theme.spacing(1) }}
+          variant="h6"
+          sx={{
+            fontSize: 'large',
+            fontWeight: 'bolder',
+            flex: 1,
+            ...color2Style
+          }}
         >
-          {systemMessage.user}
+          {t('systemMessage.header')}
         </Typography>
-      ) : null}
-    </>
-  ) : (
-    <Typography variant="body2" color="text.secondary">
-      {t('systemMessage.none')}
-    </Typography>
-  );
-});
+        {!currentUser?.is_admin ? null : !systemMessage ? (
+          <div style={{ paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
+            <Tooltip aria-label={t('add.title')} title={t('add.title')}>
+              <IconButton color="inherit" size="small" onClick={handleOpenCreateDialog}>
+                <AddOutlinedIcon />
+              </IconButton>
+            </Tooltip>
+          </div>
+        ) : (
+          <>
+            <div style={{ paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
+              <Tooltip aria-label={t('edit.title')} title={t('edit.title')}>
+                <IconButton size="small" onClick={handleOpenEditDialog}>
+                  <EditOutlinedIcon sx={{ ...color2Style }} />
+                </IconButton>
+              </Tooltip>
+            </div>
+            <div style={{ paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
+              <Tooltip aria-label={t('delete.title')} title={t('delete.title')}>
+                <IconButton size="small" onClick={handleOpenDeleteDialog}>
+                  <DeleteOutlineOutlinedIcon sx={{ ...color2Style }} />
+                </IconButton>
+              </Tooltip>
+            </div>
+          </>
+        )}
+      </Row>
 
-AnnouncementContent.displayName = 'AnnouncementContent';
+      <Divider
+        variant="fullWidth"
+        sx={{
+          marginBottom: theme.spacing(2),
+          width: '100%',
+          ...getBackgroundColor(systemMessage?.severity, 2, theme),
+          '@media print': {
+            backgroundColor: '#0000001f !important'
+          }
+        }}
+      />
 
-//*****************************************************************************************
-// AnnouncementSaveConfirmation
-//*****************************************************************************************
-
-const AnnouncementSaveConfirmation = memo(() => {
-  const { t } = useTranslation(['notifications']);
-  const { showSuccessMessage } = useAppSnackbar();
-  const saveConfirmationOpen = useAppInterfaceStore(s => s.notifications.saveConfirmationOpen);
-  const draftMessage = useAppInterfaceStore(s => s.notifications.announcementDraft);
-  const setInterface = useAppSetInterfaceStore();
-
-  const handleCloseDialog = useCallback(() => {
-    setInterface(s => {
-      s.notifications.saveConfirmationOpen = false;
-      return s;
-    });
-  }, [setInterface]);
-
-  const handleSaveSystemMessage = useApiMutation(() => ({
-    url: '/api/v4/system/system_message/',
-    method: 'PUT',
-    body: draftMessage,
-    onSuccess: () => {
-      showSuccessMessage(t('save.success'));
-      setInterface(s => {
-        s.notifications.saveConfirmationOpen = false;
-        s.notifications.announcementEditOpen = false;
-        return s;
-      });
-    }
-  }));
-
-  return (
-    <Dialog open={saveConfirmationOpen} onClose={handleCloseDialog}>
-      <DialogTitle>{t('save.title')}</DialogTitle>
-      <DialogContent>
-        <DialogContentText>{t('save.text')}</DialogContentText>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={handleCloseDialog} disabled={handleSaveSystemMessage.isPending}>
-          {t('save.cancelText')}
-        </Button>
-        <Button
-          color="primary"
-          onClick={() => handleSaveSystemMessage.mutate()}
-          progress={handleSaveSystemMessage.isPending}
+      {!systemMessage ? (
+        <Row style={{ justifyContent: 'center' }}>
+          <Typography color="secondary" variant="body2">
+            {t('systemMessage.none')}
+          </Typography>
+        </Row>
+      ) : (
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            paddingBottom: theme.spacing(1.25),
+            paddingTop: theme.spacing(1.25),
+            width: '100%'
+          }}
         >
-          {t('save.acceptText')}
-        </Button>
-      </DialogActions>
-    </Dialog>
+          <Typography
+            variant="body1"
+            sx={{
+              fontSize: 'large',
+              fontWeight: 'bolder',
+              paddingLeft: theme.spacing(1.25),
+              ...color2Style
+            }}
+          >
+            {systemMessage.title}
+          </Typography>
+          <Typography
+            color="textPrimary"
+            variant="body2"
+            sx={{
+              paddingLeft: theme.spacing(1.25)
+            }}
+          >
+            {systemMessage.message}
+          </Typography>
+          <Typography
+            color="textSecondary"
+            variant="caption"
+            sx={{
+              paddingRight: theme.spacing(1),
+              paddingTop: theme.spacing(1),
+              textAlign: 'right'
+            }}
+          >
+            {systemMessage.user}
+          </Typography>
+        </div>
+      )}
+    </>
   );
 });
 
-AnnouncementSaveConfirmation.displayName = 'AnnouncementSaveConfirmation';
+AnnouncementSection.displayName = 'AnnouncementSection';
 
 //*****************************************************************************************
 // AnnouncementEditDialog
 //*****************************************************************************************
 
-const AnnouncementEditDialog = memo(() => {
+export type AnnouncementEditDialogProps = Record<string, never>;
+
+export const AnnouncementEditDialog = memo(() => {
   const { t } = useTranslation(['notifications']);
+  const theme = useTheme();
+  const systemMessage = useAppConfigStore(s => s?.systemMessage ?? null);
   const isEditDialogOpen = useAppInterfaceStore(s => s.notifications.announcementEditOpen);
-  const isSaving = useAppInterfaceStore(s => s.notifications.announcementSaving);
-  const title = useAppInterfaceStore(s => s.notifications.announcementDraft.title);
-  const message = useAppInterfaceStore(s => s.notifications.announcementDraft.message);
-  const severity = useAppInterfaceStore(s => s.notifications.announcementDraft.severity);
-  const systemMessage = useAppConfigStore(s => (s?.systemMessage ?? null) as SystemMessage | null);
-  const setInterface = useAppSetInterfaceStore();
+  const draftTitle = useAppInterfaceStore(s => s.notifications.announcementDraft.title);
+  const draftMessage = useAppInterfaceStore(s => s.notifications.announcementDraft.message);
+  const draftSeverity = useAppInterfaceStore(s => s.notifications.announcementDraft.severity);
+  const setInterfaceStore = useAppSetInterfaceStore();
 
   const handleSeverityChange = useCallback(
-    (event: SelectChangeEvent<string>) => {
-      const value = event.target.value as SystemMessage['severity'];
-      setInterface(s => {
-        s.notifications.announcementDraft.severity = value;
+    (event: SelectChangeEvent) => {
+      if (!['error', 'warning', 'info', 'success'].includes(event.target.value)) return;
+      const val = event.target.value as SystemMessage['severity'];
+      setInterfaceStore(s => {
+        s.notifications.announcementDraft.severity = val;
         return s;
       });
     },
-    [setInterface]
+    [setInterfaceStore]
   );
 
   const handleTitleChange = useCallback(
     (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      setInterface(s => {
-        s.notifications.announcementDraft.title = event.target.value;
+      const val = event.target.value;
+      setInterfaceStore(s => {
+        s.notifications.announcementDraft.title = val;
         return s;
       });
     },
-    [setInterface]
+    [setInterfaceStore]
   );
 
   const handleMessageChange = useCallback(
     (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      setInterface(s => {
-        s.notifications.announcementDraft.message = event.target.value;
+      const val = event.target.value;
+      setInterfaceStore(s => {
+        s.notifications.announcementDraft.message = val;
         return s;
       });
     },
-    [setInterface]
+    [setInterfaceStore]
   );
 
   const handleCancel = useCallback(() => {
-    setInterface(s => {
+    setInterfaceStore(s => {
       s.notifications.announcementEditOpen = false;
       return s;
     });
-  }, [setInterface]);
+  }, [setInterfaceStore]);
 
-  const handleAccept = useCallback(() => {
-    setInterface(s => {
+  const handleSave = useCallback(() => {
+    setInterfaceStore(s => {
       s.notifications.saveConfirmationOpen = true;
       return s;
     });
-  }, [setInterface]);
+  }, [setInterfaceStore]);
 
   return (
-    <Dialog fullWidth maxWidth="sm" open={isEditDialogOpen} onClose={handleCancel}>
-      <DialogTitle>{Boolean(systemMessage) ? t('edit.title') : t('add.title')}</DialogTitle>
+    <Dialog
+      aria-describedby="na-dialog-description"
+      aria-labelledby="na-dialog-title"
+      fullWidth
+      open={isEditDialogOpen}
+      onClose={handleCancel}
+    >
+      <DialogTitle id="na-dialog-title">{!systemMessage ? t('add.title') : t('edit.title')}</DialogTitle>
       <DialogContent>
-        <DialogContentText style={{ marginBottom: '16px' }}>{t('edit.text')}</DialogContentText>
-
-        <Typography variant="subtitle2" style={{ marginTop: '8px', marginBottom: '6px' }}>
-          {t('edit.severity')}
-        </Typography>
-        <FormControl fullWidth size="small" style={{ marginBottom: '16px' }}>
-          <Select value={severity} onChange={handleSeverityChange}>
+        <DialogContentText id="na-dialog-description">{t('edit.text')}</DialogContentText>
+      </DialogContent>
+      <DialogContent>
+        <Typography variant="subtitle2">{t('edit.severity')}</Typography>
+        <FormControl fullWidth size="small">
+          <Select
+            fullWidth
+            id="na-severity"
+            onChange={handleSeverityChange}
+            style={{ marginBottom: theme.spacing(2) }}
+            value={!draftSeverity ? 'info' : draftSeverity}
+            variant="outlined"
+          >
             <MenuItem value="info">{t('severity.info')}</MenuItem>
             <MenuItem value="warning">{t('severity.warning')}</MenuItem>
             <MenuItem value="success">{t('severity.success')}</MenuItem>
@@ -490,20 +647,29 @@ const AnnouncementEditDialog = memo(() => {
         <TextField
           autoFocus
           fullWidth
-          size="small"
-          value={title}
           onChange={handleTitleChange}
-          style={{ marginBottom: '16px' }}
+          size="small"
+          style={{ marginBottom: theme.spacing(2) }}
+          value={!draftTitle ? '' : draftTitle}
+          variant="outlined"
         />
 
         <Typography variant="subtitle2">{t('edit.message')}</Typography>
-        <TextField fullWidth multiline rows={4} value={message} onChange={handleMessageChange} />
+        <TextField
+          fullWidth
+          multiline
+          onChange={handleMessageChange}
+          rows={4}
+          size="small"
+          value={!draftMessage ? '' : draftMessage}
+          variant="outlined"
+        />
       </DialogContent>
       <DialogActions>
-        <Button color="secondary" disabled={isSaving} onClick={handleCancel}>
+        <Button color="secondary" onClick={handleCancel}>
           {t('edit.button.cancel')}
         </Button>
-        <Button color="primary" disabled={isSaving || !message?.trim()} onClick={handleAccept}>
+        <Button color="primary" disabled={!draftMessage?.trim()} onClick={handleSave}>
           {t('edit.button.save')}
         </Button>
       </DialogActions>
@@ -514,80 +680,221 @@ const AnnouncementEditDialog = memo(() => {
 AnnouncementEditDialog.displayName = 'AnnouncementEditDialog';
 
 //*****************************************************************************************
+// AnnouncementSaveConfirmation
+//*****************************************************************************************
+
+export type AnnouncementSaveConfirmationProps = Record<string, never>;
+
+export const AnnouncementSaveConfirmation = memo(() => {
+  const { t } = useTranslation(['notifications']);
+  const { showSuccessMessage } = useAppSnackbar();
+  const saveConfirmationOpen = useAppInterfaceStore(s => s.notifications.saveConfirmationOpen);
+  const draftMessage = useAppInterfaceStore(s => s.notifications.announcementDraft);
+  const setInterfaceStore = useAppSetInterfaceStore();
+  const setConfigStore = useAppSetConfigStore();
+
+  const handleClose = useCallback(() => {
+    setInterfaceStore(s => {
+      s.notifications.saveConfirmationOpen = false;
+      return s;
+    });
+  }, [setInterfaceStore]);
+
+  const handleSaveMutation = useApiMutation(() => ({
+    body: draftMessage,
+    method: 'PUT',
+    url: '/api/v4/system/system_message/',
+    onSuccess: () => {
+      showSuccessMessage(t('save.success'));
+      setConfigStore(c => ({ ...c, systemMessage: draftMessage }));
+      setInterfaceStore(s => {
+        s.notifications.announcementEditOpen = false;
+        s.notifications.saveConfirmationOpen = false;
+        return s;
+      });
+    }
+  }));
+
+  const handleAccept = useCallback(() => {
+    handleSaveMutation.mutate();
+  }, [handleSaveMutation]);
+
+  return (
+    <ConfirmationDialog
+      acceptText={t('save.acceptText')}
+      cancelText={t('save.cancelText')}
+      handleAccept={handleAccept}
+      handleClose={handleClose}
+      open={saveConfirmationOpen}
+      text={t('save.text')}
+      title={t('save.title')}
+      waiting={handleSaveMutation.isPending}
+    />
+  );
+});
+
+AnnouncementSaveConfirmation.displayName = 'AnnouncementSaveConfirmation';
+
+//*****************************************************************************************
 // AnnouncementDeleteDialog
 //*****************************************************************************************
 
-const AnnouncementDeleteDialog = memo(() => {
+export type AnnouncementDeleteDialogProps = Record<string, never>;
+
+export const AnnouncementDeleteDialog = memo(() => {
   const { t } = useTranslation(['notifications']);
   const { showSuccessMessage } = useAppSnackbar();
-  const isDeleteDialogOpen = useAppInterfaceStore(s => s.notifications.announcementDeleteOpen);
-  const setInterface = useAppSetInterfaceStore();
+  const deleteConfirmationOpen = useAppInterfaceStore(s => s.notifications.announcementDeleteOpen);
+  const setInterfaceStore = useAppSetInterfaceStore();
+  const setConfigStore = useAppSetConfigStore();
 
-  const handleCloseDialog = useCallback(() => {
-    setInterface(s => {
+  const handleClose = useCallback(() => {
+    setInterfaceStore(s => {
       s.notifications.announcementDeleteOpen = false;
       return s;
     });
-  }, [setInterface]);
+  }, [setInterfaceStore]);
 
-  const handleDeleteSystemMessage = useApiMutation(() => ({
-    url: '/api/v4/system/system_message/',
-    method: 'DELETE',
+  const handleDeleteMutation = useApiMutation(() => ({
     body: null,
+    method: 'DELETE',
+    url: '/api/v4/system/system_message/',
     onSuccess: () => {
       showSuccessMessage(t('delete.success'));
-      setInterface(s => {
+      setConfigStore(c => ({ ...c, systemMessage: null }));
+      setInterfaceStore(s => {
         s.notifications.announcementDeleteOpen = false;
         return s;
       });
     }
   }));
 
+  const handleAccept = useCallback(() => {
+    handleDeleteMutation.mutate();
+  }, [handleDeleteMutation]);
+
   return (
-    <Dialog fullWidth maxWidth="xs" open={isDeleteDialogOpen} onClose={handleCloseDialog}>
-      <DialogTitle>{t('delete.title')}</DialogTitle>
-      <DialogContent>
-        <DialogContentText>{t('delete.text')}</DialogContentText>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={handleCloseDialog} disabled={handleDeleteSystemMessage.isPending}>
-          {t('delete.cancelText')}
-        </Button>
-        <Button
-          color="error"
-          variant="contained"
-          onClick={() => handleDeleteSystemMessage.mutate()}
-          progress={handleDeleteSystemMessage.isPending}
-        >
-          {t('delete.acceptText')}
-        </Button>
-      </DialogActions>
-    </Dialog>
+    <ConfirmationDialog
+      acceptText={t('delete.acceptText')}
+      cancelText={t('delete.cancelText')}
+      handleAccept={handleAccept}
+      handleClose={handleClose}
+      open={deleteConfirmationOpen}
+      text={t('delete.text')}
+      title={t('delete.title')}
+      waiting={handleDeleteMutation.isPending}
+    />
   );
 });
 
 AnnouncementDeleteDialog.displayName = 'AnnouncementDeleteDialog';
 
 //*****************************************************************************************
+// NotificationIconButton
+//*****************************************************************************************
+
+export type NotificationIconButtonProps = Record<string, never>;
+
+export const NotificationIconButton = memo(() => {
+  const { t } = useTranslation(['notifications']);
+  const theme = useTheme();
+  const systemMessage = useAppConfigStore(s => s?.systemMessage ?? null);
+  const isSystemMessageRead = useAppInterfaceStore(s => s.notifications.read);
+  const newNotificationsCount = useNotificationNewCount();
+  const handleOpen = useNotificationOpen();
+
+  const invisible = useMemo(
+    () => (isSystemMessageRead || !systemMessage?.message) && newNotificationsCount === 0,
+    [isSystemMessageRead, newNotificationsCount, systemMessage?.message]
+  );
+
+  const badgeContent = useMemo(() => {
+    if (systemMessage) {
+      switch (systemMessage.severity) {
+        case 'error':
+          return '!';
+        case 'warning':
+          return '!';
+        case 'info':
+          return 'i';
+        case 'success':
+          return '\u2714';
+        default:
+          return '';
+      }
+    }
+    return newNotificationsCount;
+  }, [newNotificationsCount, systemMessage]);
+
+  return (
+    <Tooltip aria-label={t('add.title')} title={t('notification.title')}>
+      <IconButton aria-label="open drawer" color="inherit" onClick={handleOpen} size="large">
+        <Badge
+          badgeContent={badgeContent}
+          invisible={invisible}
+          max={99}
+          slotProps={{
+            badge: {
+              style: {
+                backgroundColor: theme.palette.primary.main,
+                color: theme.palette.getContrastText(theme.palette.primary.main),
+                ...getBackgroundColor(systemMessage?.severity, 1, theme)
+              }
+            }
+          }}
+        >
+          {invisible ? <NotificationsNoneOutlinedIcon /> : <NotificationsActiveOutlinedIcon />}
+        </Badge>
+      </IconButton>
+    </Tooltip>
+  );
+});
+
+NotificationIconButton.displayName = 'NotificationIconButton';
+
+//*****************************************************************************************
 // NotificationFeedHeader
 //*****************************************************************************************
 
-const NotificationFeedHeader = memo(() => {
+export type NotificationFeedHeaderProps = Record<string, never>;
+
+export const NotificationFeedHeader = memo(() => {
   const { t } = useTranslation(['notifications']);
   const theme = useTheme();
 
   return (
     <>
-      <div style={ROW_STYLE}>
+      <Row style={{ paddingTop: theme.spacing(2) }}>
         <FeedbackOutlinedIcon
           fontSize="medium"
-          style={{ marginLeft: theme.spacing(1.5), marginRight: theme.spacing(1.5) }}
+          sx={{
+            backgroundColor: 'inherit',
+            color: 'inherit',
+            marginLeft: theme.spacing(1.5),
+            marginRight: theme.spacing(1.5)
+          }}
         />
-        <Typography variant="h6" style={{ fontSize: 'large', fontWeight: 'bolder', flex: 1 }}>
+        <Typography
+          variant="h6"
+          sx={{
+            flex: 1,
+            fontSize: 'large',
+            fontWeight: 'bolder'
+          }}
+        >
           {t('notification.header')}
         </Typography>
-      </div>
-      <Divider style={{ marginBottom: '16px', width: '100%' }} />
+      </Row>
+      <Divider
+        variant="fullWidth"
+        sx={{
+          marginBottom: theme.spacing(2),
+          width: '100%',
+          '@media print': {
+            backgroundColor: '#0000001f !important'
+          }
+        }}
+      />
     </>
   );
 });
@@ -598,26 +905,28 @@ NotificationFeedHeader.displayName = 'NotificationFeedHeader';
 // NotificationContent
 //*****************************************************************************************
 
-const NotificationContent = memo(() => {
+export type NotificationContentProps = Record<string, never>;
+
+export const NotificationContent = memo(() => {
   const { t } = useTranslation(['notifications']);
   const theme = useTheme();
   const isLoading = useAppInterfaceStore(s => s.notifications.loading);
   const notifications = useAppInterfaceStore(s => s.notifications.items);
 
   return isLoading ? (
-    <div style={ROW_STYLE}>
-      <Skeleton variant="text" animation="wave" style={{ width: '100%', height: theme.spacing(8) }} />
-    </div>
-  ) : notifications.length === 0 ? (
-    <div style={{ ...ROW_STYLE, justifyContent: 'center' }}>
-      <Typography variant="body2" color="secondary">
+    <Row>
+      <Skeleton animation="wave" sx={{ height: theme.spacing(8), width: '100%' }} variant="text" />
+    </Row>
+  ) : !notifications?.length ? (
+    <Row style={{ justifyContent: 'center' }}>
+      <Typography color="secondary" variant="body2">
         {t('notification.none')}
       </Typography>
-    </div>
+    </Row>
   ) : (
     <>
       {notifications.map((n, i) => (
-        <NotificationItem key={n.id || i} notification={n} />
+        <NotificationItem key={n.id || i} hideDivider={i === notifications.length - 1} notification={n} />
       ))}
     </>
   );
@@ -626,205 +935,16 @@ const NotificationContent = memo(() => {
 NotificationContent.displayName = 'NotificationContent';
 
 //*****************************************************************************************
-// AnnouncementSection
+// Notifications
 //*****************************************************************************************
 
-export const AnnouncementSection = memo(() => {
-  const { t } = useTranslation(['notifications']);
-  const theme = useTheme();
-  const systemMessage = useAppConfigStore(s => s?.systemMessage);
+export type NotificationsProps = Record<string, never>;
 
-  return (
-    <>
-      <div style={{ ...ROW_STYLE, paddingTop: theme.spacing(2) }}>
-        <SystemMessageIcon
-          severity={systemMessage?.severity}
-          style={{
-            marginLeft: theme.spacing(1.5),
-            marginRight: theme.spacing(1.5),
-            ...getColor(systemMessage?.severity, 1, theme)
-          }}
-        />
-        <Typography
-          variant="h6"
-          style={{
-            fontSize: 'large',
-            fontWeight: 'bolder',
-            flex: 1,
-            ...getColor(systemMessage?.severity, 2, theme)
-          }}
-        >
-          {t('systemMessage.header')}
-        </Typography>
-        <AnnouncementActions />
-      </div>
-
-      <Divider
-        style={{
-          marginBottom: '16px',
-          width: '100%',
-          ...getBackgroundColor(systemMessage?.severity, 2, theme)
-        }}
-      />
-
-      <div
-        style={{
-          width: '100%',
-          paddingTop: theme.spacing(1.25),
-          paddingBottom: theme.spacing(1.25),
-          marginBottom: theme.spacing(1.5)
-        }}
-      >
-        <AnnouncementContent />
-      </div>
-    </>
-  );
-});
-
-AnnouncementSection.displayName = 'AnnouncementSection';
-
-//*****************************************************************************************
-// NotificationIconButton
-//*****************************************************************************************
-
-const NotificationIconButton = memo(() => {
-  const { t } = useTranslation(['notifications']);
-  const theme = useTheme();
-  const systemMessage = useAppConfigStore(s => s?.systemMessage);
-  const isSystemMessageRead = useAppInterfaceStore(s => s.notifications.read);
-  const newNotificationsCount = useNotificationNewCount();
-  const handleOpen = useNotificationOpen();
-
-  const hasUnreadSystemMessage = useMemo(
-    () => Boolean(systemMessage?.message) && !isSystemMessageRead,
-    [isSystemMessageRead, systemMessage]
-  );
-
-  const invisible = useMemo<BadgeProps['invisible']>(
-    () => !hasUnreadSystemMessage && newNotificationsCount === 0,
-    [hasUnreadSystemMessage, newNotificationsCount]
-  );
-
-  const badgeContent = useMemo<BadgeProps['badgeContent']>(() => {
-    if (!systemMessage) return newNotificationsCount;
-
-    switch (systemMessage.severity) {
-      case 'success':
-        return '\u2714';
-      case 'info':
-        return 'i';
-      case 'warning':
-        return '!';
-      case 'error':
-        return '!';
-      default:
-        return '';
-    }
-  }, [newNotificationsCount, systemMessage]);
-
-  return (
-    <IconButton size="large" tooltip={t('notification.title')} onClick={handleOpen}>
-      <Badge
-        invisible={invisible}
-        max={99}
-        badgeContent={badgeContent}
-        slotProps={{
-          badge: {
-            style: {
-              color: theme.palette.getContrastText(theme.palette.primary.main),
-              backgroundColor: theme.palette.primary.main,
-              ...getBackgroundColor(systemMessage?.severity, 1, theme)
-            }
-          }
-        }}
-      >
-        {invisible ? <NotificationsNoneOutlinedIcon /> : <NotificationsActiveOutlinedIcon />}
-      </Badge>
-    </IconButton>
-  );
-});
-
-NotificationIconButton.displayName = 'NotificationIconButton';
-
-//*****************************************************************************************
-// NotificationCloseButton
-//*****************************************************************************************
-
-const NotificationCloseButton = memo(() => {
-  const theme = useTheme();
-  const handleClose = useNotificationClose();
-
-  return (
-    <div
-      style={{
-        ...ROW_STYLE,
-        position: 'sticky',
-        paddingTop: theme.spacing(1),
-        zIndex: 20000,
-        top: '0px',
-        backgroundColor: theme.palette.background.paper
-      }}
-    >
-      <IconButton size="large" onClick={handleClose}>
-        <CloseOutlinedIcon fontSize="medium" />
-      </IconButton>
-    </div>
-  );
-});
-
-NotificationCloseButton.displayName = 'NotificationCloseButton';
-
-//*****************************************************************************************
-// NotificationDrawer
-//*****************************************************************************************
-
-const NotificationDrawer = memo(({ children }: { children: ReactNode }) => {
+export const Notifications = memo(() => {
   const theme = useTheme();
   const isDrawerOpen = useAppInterfaceStore(s => s.notifications.open);
   const handleClose = useNotificationClose();
 
-  return (
-    <Drawer
-      anchor="right"
-      open={isDrawerOpen}
-      onClose={handleClose}
-      slotProps={{ paper: { style: { width: '80%', maxWidth: '500px' } } }}
-    >
-      <div
-        style={{
-          height: '100%',
-          width: '100%',
-          overflowX: 'hidden',
-          pageBreakBefore: 'avoid',
-          pageBreakInside: 'avoid',
-          padding: theme.spacing(2.5),
-          paddingTop: 0
-        }}
-      >
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'flex-start',
-            alignItems: 'center',
-            alignContent: 'stretch',
-            flexWrap: 'nowrap'
-          }}
-        >
-          {children}
-        </div>
-      </div>
-    </Drawer>
-  );
-});
-
-NotificationDrawer.displayName = 'NotificationDrawer';
-
-//*****************************************************************************************
-// Notifications
-//*****************************************************************************************
-
-export const Notifications = memo(() => {
   useNotificationFeed();
 
   return (
@@ -833,12 +953,63 @@ export const Notifications = memo(() => {
       <AnnouncementEditDialog />
       <AnnouncementDeleteDialog />
       <NotificationIconButton />
-      <NotificationDrawer>
-        <NotificationCloseButton />
-        <AnnouncementSection />
-        <NotificationFeedHeader />
-        <NotificationContent />
-      </NotificationDrawer>
+      <Drawer
+        anchor="right"
+        onClose={handleClose}
+        open={isDrawerOpen}
+        slotProps={{
+          paper: {
+            sx: {
+              maxWidth: '500px',
+              width: '80%',
+              [theme.breakpoints.down('sm')]: {
+                width: '100%'
+              }
+            }
+          }
+        }}
+      >
+        <div
+          style={{
+            height: '100%',
+            overflowX: 'hidden',
+            pageBreakBefore: 'avoid',
+            pageBreakInside: 'avoid',
+            padding: theme.spacing(2.5),
+            paddingTop: 0,
+            width: '100%'
+          }}
+        >
+          <div
+            style={{
+              alignContent: 'stretch',
+              alignItems: 'center',
+              display: 'flex',
+              flexDirection: 'column',
+              flexWrap: 'nowrap',
+              justifyContent: 'flex-start'
+            }}
+          >
+            <Row
+              style={{
+                backgroundColor: theme.palette.background.paper,
+                paddingTop: theme.spacing(1),
+                position: 'sticky',
+                top: '0px',
+                zIndex: 20000
+              }}
+            >
+              <IconButton size="large" onClick={handleClose}>
+                <CloseOutlinedIcon fontSize="medium" />
+              </IconButton>
+            </Row>
+
+            <AnnouncementSection />
+            <NotificationFeedHeader />
+            <NotificationContent />
+          </div>
+        </div>
+      </Drawer>
     </>
   );
 });

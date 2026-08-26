@@ -1,24 +1,9 @@
 import type { Theme } from '@mui/material';
 import { blue } from '@mui/material/colors';
-import type {
-  JSONFeed,
-  JSONFeedAuthor,
-  JSONFeedItem,
-  JSONFeedItemAttachment,
-  MinimalService,
-  NotificationVersionType
-} from 'layout/notifications/notifications.models';
-import {
-  DEFAULT_JSON_FEED,
-  DEFAULT_JSON_FEED_AUTHOR,
-  DEFAULT_JSON_FEED_ITEM,
-  DEFAULT_JSON_FEED_ITEM_ATTACHMENT
-} from 'layout/notifications/notifications.models';
+import type { JSONFeed, JSONFeedItem, MinimalService, NotificationVersionType } from 'layout/notifications';
+import { DEFAULT_JSON_FEED, JSON_FEED_SCHEMA } from 'layout/notifications';
 import type { Configuration } from 'models/base/config';
 import type { CSSProperties } from 'react';
-
-const NOTIFICATIONS_LAST_OPENED_AT_KEY = 'notifications.lastOpenedAt';
-const ONE_YEAR_IN_MS = 365 * 24 * 60 * 60 * 1000;
 
 //*****************************************************************************************
 // Color Utilities
@@ -113,36 +98,11 @@ export const formatDate = (value?: string): string => {
 
 /**
  * @name readLastOpenedAt
- * @description Reads the last-opened timestamp from localStorage.
+ * @description Reads the last-opened timestamp from preferences.
+ * @param prefLastOpenedAt - Timestamp from preference store
  * @returns Date representing when notifications were last opened
  */
-export const readLastOpenedAt = (): Date => {
-  try {
-    const rawValue = localStorage.getItem(NOTIFICATIONS_LAST_OPENED_AT_KEY);
-    if (!rawValue) return new Date(0);
-
-    const timestamp = Number(JSON.parse(rawValue));
-    if (Number.isNaN(timestamp)) return new Date(0);
-
-    return new Date(timestamp);
-  } catch {
-    return new Date(0);
-  }
-};
-
-/**
- * @name writeLastOpenedAt
- * @description Persists the last-opened timestamp to localStorage.
- * @param date - Date to store
- * @returns void
- */
-export const writeLastOpenedAt = (date: Date): void => {
-  try {
-    localStorage.setItem(NOTIFICATIONS_LAST_OPENED_AT_KEY, JSON.stringify(date.valueOf()));
-  } catch {
-    // Silently ignore write failures
-  }
-};
+export const readLastOpenedAt = (prefLastOpenedAt?: number): Date => new Date(prefLastOpenedAt || 0);
 
 //*****************************************************************************************
 // Item Transformations
@@ -272,9 +232,31 @@ export const getNewService = (notification: JSONFeedItem, services: MinimalServi
 //*****************************************************************************************
 
 /**
+ * @name getNotificationMaxAge
+ * @description Determines the minimum maximum age in milliseconds allowed for a notification based on all its tags.
+ * @param item - Notification item
+ * @param prefs - Notification preferences from store
+ * @returns Minimum max age in milliseconds across matching tags
+ */
+export const getNotificationMaxAge = (item: JSONFeedItem, prefs?: AppPreferenceStore['notifications']): number => {
+  const defaultOneYear = 365 * 24 * 60 * 60 * 1000;
+  if (!prefs?.maxAge) return defaultOneYear;
+
+  const ages: number[] = [];
+
+  if (item?.tags?.includes('dev')) ages.push(prefs.maxAge.dev);
+  if (item?.tags?.includes('service')) ages.push(prefs.maxAge.service);
+  if (item?.tags?.includes('community')) ages.push(prefs.maxAge.community);
+
+  if (ages.length === 0) return prefs.maxAge.stable;
+
+  return Math.min(...ages);
+};
+
+/**
  * @name applyLegacyNotificationRules
  * @description Filters and enriches feed items with version/service tags and newness status.
- * @param params - Configuration, items, services, and admin status
+ * @param params - Configuration, items, services, admin status, and notification preferences
  * @returns Filtered, enriched, and sorted items
  */
 export const applyLegacyNotificationRules = ({
@@ -282,18 +264,23 @@ export const applyLegacyNotificationRules = ({
   isAdmin,
   items,
   lastOpenedAt,
+  notificationPreferences,
   services
 }: {
   config: Configuration;
   isAdmin: boolean;
   items: JSONFeedItem[];
   lastOpenedAt: Date;
+  notificationPreferences?: AppPreferenceStore['notifications'];
   services: MinimalService[];
 }): JSONFeedItem[] => {
   const filtered: JSONFeedItem[] = [];
 
   for (const item of items) {
-    if (new Date(item?.date_published || 0).valueOf() < Date.now() - ONE_YEAR_IN_MS) continue;
+    const itemPublishedAt = new Date(item?.date_published || 0).valueOf();
+    const maxAge = getNotificationMaxAge(item, notificationPreferences);
+
+    if (itemPublishedAt < Date.now() - maxAge) continue;
 
     if (!isAdmin) {
       const isKnownService = getNewService(item, services);
@@ -331,78 +318,15 @@ export const applyLegacyNotificationRules = ({
 //*****************************************************************************************
 
 /**
- * @name decodeHTML
- * @description Decodes HTML entities in a string.
- * @param html - HTML-encoded string
- * @returns Decoded plain text
- */
-export const decodeHTML = (html: string): string => {
-  if (!html) return '';
-  const txt = document.createElement('textarea');
-  txt.innerHTML = html;
-  return txt.value;
-};
-
-/**
- * @name parseJSONFeedItemAttachment
- * @description Parses raw attachment data into typed JSONFeedItemAttachment objects.
- * @param attachments - Raw attachment array from JSON
- * @returns Parsed attachments
- */
-export const parseJSONFeedItemAttachment = (attachments: unknown[]): JSONFeedItemAttachment[] =>
-  !attachments
-    ? []
-    : attachments.map(attachment => ({
-        ...DEFAULT_JSON_FEED_ITEM_ATTACHMENT,
-        ...(attachment as Record<string, unknown>)
-      }));
-
-/**
- * @name parseJSONFeedAuthor
- * @description Parses raw author data into typed JSONFeedAuthor objects.
- * @param authors - Raw author array from JSON
- * @returns Parsed authors
- */
-export const parseJSONFeedAuthor = (authors: unknown[]): JSONFeedAuthor[] =>
-  !authors ? [] : authors.map(author => ({ ...DEFAULT_JSON_FEED_AUTHOR, ...(author as Record<string, unknown>) }));
-
-/**
- * @name parseJSONFeedItem
- * @description Parses raw item data into typed JSONFeedItem objects.
- * @param items - Raw item array from JSON
- * @returns Parsed feed items
- */
-export const parseJSONFeedItem = (items: unknown[]): JSONFeedItem[] =>
-  !items
-    ? []
-    : items.map(rawItem => {
-        const item = rawItem as Record<string, unknown>;
-        return {
-          ...DEFAULT_JSON_FEED_ITEM,
-          ...item,
-          date_published: String(new Date(item.date_published as string)),
-          date_modified: String(new Date(item.date_modified as string)),
-          authors: parseJSONFeedAuthor(item?.authors as unknown[]),
-          attachments: parseJSONFeedItemAttachment(item?.attachment as unknown[]),
-          content_html: decodeHTML(item?.content_html as string)
-        };
-      });
-
-/**
  * @name parseJSONFeed
- * @description Parses raw JSON feed data into a typed JSONFeed object.
+ * @description Parses raw JSON feed data using Zod schema validation.
  * @param feed - Raw feed object from JSON
- * @returns Parsed feed, or null if input is falsy
+ * @returns Parsed JSONFeed object
  */
-export const parseJSONFeed = (feed: unknown): JSONFeed | null =>
-  !feed
-    ? null
-    : {
-        ...DEFAULT_JSON_FEED,
-        ...(feed as Record<string, unknown>),
-        items: parseJSONFeedItem((feed as Record<string, unknown>)?.items as unknown[]),
-        authors: parseJSONFeedAuthor((feed as Record<string, unknown>)?.authors as unknown[])
-      };
+export const parseJSONFeed = (feed: unknown): JSONFeed => {
+  const result = JSON_FEED_SCHEMA.safeParse(feed);
+  return result.success ? result.data : DEFAULT_JSON_FEED;
+};
 
 //*****************************************************************************************
 // Network
@@ -417,15 +341,15 @@ export const parseJSONFeed = (feed: unknown): JSONFeed | null =>
 export const fetchJSON = async (url: string): Promise<JSONFeed> => {
   try {
     const response = await fetch(url, { method: 'GET' });
-    if (!response) return { ...DEFAULT_JSON_FEED };
+    if (!response) return DEFAULT_JSON_FEED;
 
     const textResponse = await response.text();
     const jsonFeed = JSON.parse(textResponse) as unknown;
-    return parseJSONFeed(jsonFeed) ?? { ...DEFAULT_JSON_FEED };
+    return parseJSONFeed(jsonFeed) || DEFAULT_JSON_FEED;
   } catch (err) {
     // eslint-disable-next-line no-console
     console.error(`Notification Area: error fetching "${url}"`, err);
-    return { ...DEFAULT_JSON_FEED };
+    return DEFAULT_JSON_FEED;
   }
 };
 

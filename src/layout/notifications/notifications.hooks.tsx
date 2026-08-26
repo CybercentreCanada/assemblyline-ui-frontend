@@ -1,12 +1,13 @@
+import { useApiQuery } from 'core/api';
 import { useAppConfigStore } from 'core/config';
 import { useAppInterfaceStore, useAppSetInterfaceStore } from 'core/interface';
-import type { MinimalService } from 'layout/notifications/notifications.models';
+import { useAppPreferenceStore, useAppSetPreferenceStore } from 'core/preference';
+import type { MinimalService } from 'layout/notifications';
 import {
   applyLegacyNotificationRules,
   fetchJSONNotifications,
   markItemsAsNewerThan,
-  readLastOpenedAt,
-  writeLastOpenedAt
+  readLastOpenedAt
 } from 'layout/notifications/notifications.utils';
 import { useCallback, useEffect, useMemo } from 'react';
 
@@ -24,19 +25,30 @@ const EMPTY_SERVICES: MinimalService[] = [];
 export const useNotificationFeed = (): void => {
   const isAdmin = useAppConfigStore(s => Boolean(s?.user?.is_admin));
   const configuration = useAppConfigStore(s => s?.configuration || null);
+  const notificationPreferences = useAppPreferenceStore(s => s.notifications);
   const feedUrls = useMemo(() => configuration?.ui?.rss_feeds ?? EMPTY_FEED_URLS, [configuration]);
 
-  const setInterface = useAppSetInterfaceStore();
+  const setInterfaceStore = useAppSetInterfaceStore();
+
+  const servicesQuery = useApiQuery<MinimalService[]>({
+    disabled: !configuration || !feedUrls?.length,
+    url: '/api/v4/service/all/'
+  });
+
+  const services = useMemo<MinimalService[]>(
+    () => (Array.isArray(servicesQuery.data) ? servicesQuery.data : EMPTY_SERVICES),
+    [servicesQuery]
+  );
 
   useEffect(() => {
     if (!configuration || !feedUrls?.length) return;
 
-    setInterface(s => {
+    setInterfaceStore(s => {
       s.notifications.loading = true;
       return s;
     });
 
-    const lastOpenedAt = readLastOpenedAt();
+    const lastOpenedAt = readLastOpenedAt(notificationPreferences?.lastOpenedAt);
 
     fetchJSONNotifications({
       urls: feedUrls,
@@ -46,23 +58,24 @@ export const useNotificationFeed = (): void => {
           isAdmin,
           items: fetchedItems,
           lastOpenedAt,
-          services: EMPTY_SERVICES
+          notificationPreferences,
+          services
         });
 
-        setInterface(s => {
+        setInterfaceStore(s => {
           s.notifications.items = processed;
           s.notifications.loading = false;
           return s;
         });
       },
       onError: () => {
-        setInterface(s => {
+        setInterfaceStore(s => {
           s.notifications.loading = false;
           return s;
         });
       }
     });
-  }, [configuration, feedUrls, isAdmin, setInterface]);
+  }, [configuration, feedUrls, isAdmin, notificationPreferences, services, setInterfaceStore]);
 };
 
 //*****************************************************************************************
@@ -74,19 +87,24 @@ export const useNotificationFeed = (): void => {
  * @description Returns a callback that closes the drawer, marks items as read, and persists timestamp.
  */
 export const useNotificationClose = (): (() => void) => {
-  const setInterface = useAppSetInterfaceStore();
+  const setInterfaceStore = useAppSetInterfaceStore();
+  const setPreferenceStore = useAppSetPreferenceStore();
 
   return useCallback(() => {
     const now = new Date();
-    writeLastOpenedAt(now);
 
-    setInterface(s => {
+    setInterfaceStore(s => {
       s.notifications.open = false;
       s.notifications.read = true;
       s.notifications.items = markItemsAsNewerThan([...s.notifications.items], now);
       return s;
     });
-  }, [setInterface]);
+
+    setPreferenceStore(s => {
+      s.notifications.lastOpenedAt = now.valueOf();
+      return s;
+    });
+  }, [setInterfaceStore, setPreferenceStore]);
 };
 
 //*****************************************************************************************
@@ -98,14 +116,14 @@ export const useNotificationClose = (): (() => void) => {
  * @description Returns a callback that opens the notification drawer.
  */
 export const useNotificationOpen = (): (() => void) => {
-  const setInterface = useAppSetInterfaceStore();
+  const setInterfaceStore = useAppSetInterfaceStore();
 
   return useCallback(() => {
-    setInterface(s => {
+    setInterfaceStore(s => {
       s.notifications.open = true;
       return s;
     });
-  }, [setInterface]);
+  }, [setInterfaceStore]);
 };
 
 //*****************************************************************************************

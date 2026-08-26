@@ -48,7 +48,7 @@ import { useAppInterfaceStore, useAppSetInterfaceStore } from 'core/interface';
 const isOpen = useAppInterfaceStore(s => s.notifications.open);
 
 // Write with immer-style updater
-const setInterface = useAppSetInterfaceStore();
+const setInterfaceStore = useAppSetInterfaceStore();
 setInterface(s => {
   s.notifications.open = true;
   return s;

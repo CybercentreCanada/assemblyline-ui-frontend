@@ -33,7 +33,7 @@ export const useAppExternalLookup = (): UseAppExternalLookup => {
 
   const enrichmentState = useAppInterfaceStore(s => s.externalLookup.enrichment);
 
-  const setInterface = useAppSetInterfaceStore();
+  const setInterfaceStore = useAppSetInterfaceStore();
 
   const isActionable = useCallback(
     (category, type, value) => {
@@ -98,7 +98,7 @@ export const useAppExternalLookup = (): UseAppExternalLookup => {
       }
       url += `?${qs}`;
 
-      setInterface(s => {
+      setInterfaceStore(s => {
         s.externalLookup.enrichment = {
           ...s.externalLookup.enrichment,
           [stateKey]: {
@@ -143,7 +143,7 @@ export const useAppExternalLookup = (): UseAppExternalLookup => {
             pendingStates[src].inProgress = false;
           });
 
-          setInterface(prevState => {
+          setInterfaceStore(prevState => {
             return {
               ...prevState,
               [stateKey]: {
@@ -164,7 +164,7 @@ export const useAppExternalLookup = (): UseAppExternalLookup => {
             pendingStates[src].inProgess = false;
           });
           const res = { ...pendingStates, ...(api_data.api_response as ExternalEnrichmentResults) };
-          setInterface(s => {
+          setInterfaceStore(s => {
             s.externalLookup.enrichment = {
               ...s.externalLookup.enrichment,
               [stateKey]: {
@@ -178,7 +178,7 @@ export const useAppExternalLookup = (): UseAppExternalLookup => {
         }
       });
     },
-    [configuration, apiCall, showErrorMessage, t, showWarningMessage, showSuccessMessage]
+    [configuration, setInterfaceStore, showErrorMessage, t, showWarningMessage, showSuccessMessage]
   );
 
   return {
