@@ -61,6 +61,8 @@ const TEMPLATE_PREFERENCE_SCHEMA = zObject({
   lang: zString().catch('en'),
   /** Whether the navigation bar is positioned on the side or top. */
   layout: zEnum(['side', 'top']).catch('side'),
+  /** Whether the left navigation drawer expands on hover. */
+  leftNavHover: zBoolean().catch(false),
   /** Light/dark/system colour mode. */
   mode: zEnum(['system', 'light', 'dark']).catch('system'),
   /** Whether breadcrumb navigation is visible. */
