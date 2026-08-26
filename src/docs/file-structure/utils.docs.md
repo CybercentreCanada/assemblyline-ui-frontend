@@ -30,10 +30,7 @@ All utility functions use `const` arrow functions with JSDoc:
  * @param partial - Partial item matcher
  * @returns Matching item index, or -1 when not found
  */
-export const findItemIndex = (
-  items: Item[],
-  partial: Partial<Item>
-): number => {
+export const findItemIndex = (items: Item[], partial: Partial<Item>): number => {
   // ...
 };
 ```
@@ -79,7 +76,7 @@ export const removeCategory = (...) => { ... };
 ## Naming Conventions
 
 | Prefix | Purpose | Example |
-|--------|---------|---------|
+| ------ | ------- | ------- |
 
 | `find*` | Locate and return an item | `findItemIndex`, `findEntry` |
 | `get*` | Compute/derive a value | `getBackgroundColor`, `getLabel` |

@@ -46,6 +46,7 @@ Each mounted route gets its own scoped store (`AppRouteStore`) via `AppRouteProv
 ### Location State Handshake
 
 The route system participates in the router's synchronization handshake via `location.state`. When a route is navigated to:
+
 - `syncStoreToLocation()` encodes all routes and panels into `location.state`
 - This state includes a `state.id` (UUID) that acts as a version token
 - `syncLocationToStore()` reads the incoming `state.id` and compares it against the current `store.id` to prevent re-processing
@@ -73,32 +74,32 @@ export const APP_ROUTES = [
     params: blueprints => ({ id: blueprints.string() }),
     search: blueprints => ({ tab: blueprints.enum(['details', 'history']) }),
     component: AlertDetailPage,
-    forbidden: () => !hasPermission('alert_view'),
+    forbidden: () => !hasPermission('alert_view')
   }),
 
   createAppRoute({
     path: '/submit',
-    component: SubmitPage,
-  }),
+    component: SubmitPage
+  })
 ] as const;
 ```
 
 ### Route Options
 
-| Option | Purpose |
-| ------ | ------- |
-| `path` | URL pattern with `:param` segments |
-| `params` | Path param blueprints — defines codec for each `:param` |
-| `search` | Search param blueprints — defines typed query params |
-| `hash` | Hash codec function |
-| `disabled` | Boolean or function — shows disabled fallback when true |
-| `forbidden` | Boolean or function — shows forbidden fallback when true |
-| `loading` | Boolean or function — shows loading fallback when true |
-| `component` | The page component to render |
-| `disabledComponent` | Custom fallback for disabled state |
-| `forbiddenComponent` | Custom fallback for forbidden state |
-| `errorComponent` | Custom fallback for render errors |
-| `meta` | Metadata (title, breadcrumb, icon) |
+| Option               | Purpose                                                  |
+| -------------------- | -------------------------------------------------------- |
+| `path`               | URL pattern with `:param` segments                       |
+| `params`             | Path param blueprints — defines codec for each `:param`  |
+| `search`             | Search param blueprints — defines typed query params     |
+| `hash`               | Hash codec function                                      |
+| `disabled`           | Boolean or function — shows disabled fallback when true  |
+| `forbidden`          | Boolean or function — shows forbidden fallback when true |
+| `loading`            | Boolean or function — shows loading fallback when true   |
+| `component`          | The page component to render                             |
+| `disabledComponent`  | Custom fallback for disabled state                       |
+| `forbiddenComponent` | Custom fallback for forbidden state                      |
+| `errorComponent`     | Custom fallback for render errors                        |
+| `meta`               | Metadata (title, breadcrumb, icon)                       |
 
 ## 5. Usage (Consumer API)
 
@@ -166,26 +167,26 @@ const { href, state } = buildLocationParam(APP_ROUTES, {
 
 ### Key Files
 
-| File | Role |
-| ---- | ---- |
-| `routes.models.ts` | Type definitions: `AppRoute`, `CreatedAppRoute`, `CreatedAppRouteParamsMap`, `AppLocationParam` |
-| `routes.factories.tsx` | `createAppRoute` — builds a route object from path + options |
-| `routes.hooks.tsx` | `useAppPathParams`, `useAppSearchParams`, `useAppHashParams`, `useAppRoute` |
-| `routes.providers.tsx` | `AppRouteProvider` (per-route store), `AppPageKeyProvider` (route identity) |
-| `routes.components.tsx` | `DisabledBoundary`, `ForbiddenBoundary` — route guard components |
-| `routes.utils.tsx` | `findAppRoute`, `buildRoutePathname`, `buildRouteSearch`, `buildRouteHash`, `buildLocationParam` |
-| `routes.utils.test.tsx` | Unit tests for route building utilities |
+| File                    | Role                                                                                             |
+| ----------------------- | ------------------------------------------------------------------------------------------------ |
+| `routes.models.ts`      | Type definitions: `AppRoute`, `CreatedAppRoute`, `CreatedAppRouteParamsMap`, `AppLocationParam`  |
+| `routes.factories.tsx`  | `createAppRoute` — builds a route object from path + options                                     |
+| `routes.hooks.tsx`      | `useAppPathParams`, `useAppSearchParams`, `useAppHashParams`, `useAppRoute`                      |
+| `routes.providers.tsx`  | `AppRouteProvider` (per-route store), `AppPageKeyProvider` (route identity)                      |
+| `routes.components.tsx` | `DisabledBoundary`, `ForbiddenBoundary` — route guard components                                 |
+| `routes.utils.tsx`      | `findAppRoute`, `buildRoutePathname`, `buildRouteSearch`, `buildRouteHash`, `buildLocationParam` |
+| `routes.utils.test.tsx` | Unit tests for route building utilities                                                          |
 
 ### Utility Functions
 
-| Function | Purpose |
-| -------- | ------- |
-| `findAppRoute` | Finds a route definition matching a typed destination |
-| `buildRoutePathname` | Resolves `:param` segments into actual values via codec |
-| `buildRouteSearch` | Serializes search params via delta (only non-default values) |
-| `buildRouteHash` | Normalizes hash value through codec |
-| `buildRouteState` | Builds `location.state` from search delta for state-based navigation |
-| `buildLocationParam` | Composes all of the above into a final `{ href, state }` payload |
+| Function             | Purpose                                                              |
+| -------------------- | -------------------------------------------------------------------- |
+| `findAppRoute`       | Finds a route definition matching a typed destination                |
+| `buildRoutePathname` | Resolves `:param` segments into actual values via codec              |
+| `buildRouteSearch`   | Serializes search params via delta (only non-default values)         |
+| `buildRouteHash`     | Normalizes hash value through codec                                  |
+| `buildRouteState`    | Builds `location.state` from search delta for state-based navigation |
+| `buildLocationParam` | Composes all of the above into a final `{ href, state }` payload     |
 
 ### Related Modules
 

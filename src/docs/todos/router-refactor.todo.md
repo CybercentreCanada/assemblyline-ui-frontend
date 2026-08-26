@@ -1,6 +1,7 @@
 # Tasklist — Router Refactor (2026-07-16)
 
 Status legend:
+
 - 🚫 Not planned
 - ✅ Completed
 - 🟡 In progress
@@ -11,10 +12,12 @@ Status legend:
 - ✅ Create the `AppRouteLayoutProvider` to handle route-level scrolling behavior, including scroll restoration and hash-based scrolling.
 - ✅ Move scrolling from the panel level to the route level.
 - ✅ Fix panel scrolling: make the panel take the whole height of the page.
+
 ## 📱 Page-Level Responsive Design
 
 - ✅ Create a custom `useAppMediaQuery` hook that wraps individual pages, not the whole interface.
 - ✅ Allow each page to independently respond to media query changes without affecting global layout.
+
 ## 🚨 Priority 1 – Navigation Risk & Data-Loss Guards
 
 - ✅ Ensure page refresh/close blockers continue to work when required.
@@ -41,6 +44,7 @@ Status legend:
 - ⬜ Add explicit "Proceed anyway" actions for each warning/blocker dialog so users can acknowledge and continue with the current navigation request.
 - ⬜ Add per-request and per-reason skip controls (for example skip once, skip for session, optional "don't ask again" where policy allows).
 - ⬜ Add audit/debug metadata when a warning/blocker is bypassed (who, which risk reason, and how it was overridden).
+
 ## 🔍 Priority 2 – Simplify the Search Parameter Engine
 
 - 🚫 Simplify the implementation of the search params parser. (Not going to be implemented)
@@ -111,6 +115,7 @@ Status legend:
 - ⬜ In AppLocationParamProvider, add configurable fallback overrides for Not Found and Forbidden pages.
 - ✅ Add blocked-page reason support so the UI can explain why access/navigation was blocked.
 - ✅ Add wildcard-like route fallback support (similar to React Router `*`) so navigating to a route not present in the spec registry resolves to the Not Found page.
+
 ## ⚙️ Priority 7 – Search Parameter Defaults
 
 - ⬜ Verify pages can define default search parameter values.
@@ -144,6 +149,7 @@ Status legend:
 - ⬜ Apply scroll behavior independently instead of serializing it into route data.
 - ⬜ Keep `hash` only for in-page anchors/sections.
 - ⬜ Avoid using `hash` for application state.
+
 ## 💭 Future Investigation (No implementation yet)
 
 - ✅ Evaluate whether the router should support ephemeral (non-history) navigation state for page-to-page communication. -> that's the `transient` params

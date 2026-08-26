@@ -23,7 +23,7 @@
 ## Semantic HTML
 
 | Need | Use | Not |
-|------|-----|-----|
+| ---- | --- | --- |
 
 | Action | `<button>` | `<div onClick>` |
 | Navigation | `<nav>` | `<div role="navigation">` |

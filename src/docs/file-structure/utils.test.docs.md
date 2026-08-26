@@ -8,10 +8,10 @@ The relationship is strict: if you create a `*.utils.ts` file, you must create i
 
 ## File Pairing
 
-| Source | Test |
-|--------|------|
+| Source                   | Test                          |
+| ------------------------ | ----------------------------- |
 | `notifications.utils.ts` | `notifications.utils.test.ts` |
-| `utils/sanitize.ts` | `utils/sanitize.test.ts` |
+| `utils/sanitize.ts`      | `utils/sanitize.test.ts`      |
 
 Tests live beside their source — same folder, same name with `.test` suffix.
 
@@ -126,4 +126,3 @@ it('preserves other items when removing from the middle', () => { ... });
 it('calls splice', () => { ... });
 it('uses findIndex internally', () => { ... });
 ```
-

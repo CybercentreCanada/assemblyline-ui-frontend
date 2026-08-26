@@ -17,12 +17,12 @@ Well-typed models also serve as living documentation — reading a type definiti
 
 ### `models/` Structure
 
-| Path | Purpose |
-| ---- | ------- |
-| `models/base/` | Mirror of backend models from the assemblyline-base repository. Must match the backend exactly — same field names, descriptions, and sorting |
-| `models/messages/` | Mirror of backend message models from assemblyline-base. Same parity rules apply |
-| `models/ontology/` | Mirror of backend ontology models from assemblyline-base. Same parity rules apply |
-| `models/api/` | Types for API request inputs and response outputs. Will eventually be auto-generated from OpenAPI specs to guarantee frontend/backend parity |
+| Path               | Purpose                                                                                                                                      |
+| ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `models/base/`     | Mirror of backend models from the assemblyline-base repository. Must match the backend exactly — same field names, descriptions, and sorting |
+| `models/messages/` | Mirror of backend message models from assemblyline-base. Same parity rules apply                                                             |
+| `models/ontology/` | Mirror of backend ontology models from assemblyline-base. Same parity rules apply                                                            |
+| `models/api/`      | Types for API request inputs and response outputs. Will eventually be auto-generated from OpenAPI specs to guarantee frontend/backend parity |
 
 **Backend parity rule:** Models mirrored from assemblyline-base must be identical to the backend definitions — same field descriptions, same field ordering, same optionality. When the backend changes, these types must be updated to match.
 
@@ -104,7 +104,7 @@ export const DEFAULT_RECORD: Record = {
   createdAt: '',
   id: '',
   label: '',
-  score: 0,
+  score: 0
 };
 ```
 
@@ -123,7 +123,7 @@ Zod is used exclusively for parsing and validating localStorage config values. S
 export const StoredConfigSchema = z.object({
   enabled: z.boolean(),
   label: z.string(),
-  maxItems: z.number(),
+  maxItems: z.number()
 });
 
 export type StoredConfig = z.infer<typeof StoredConfigSchema>;
@@ -151,7 +151,12 @@ export const STATUS = ['pending', 'active', 'completed', 'archived'] as const;
 export type Status = (typeof STATUS)[number];
 
 // ❌ Never use enum
-enum Status { Pending, Active, Completed, Archived }
+enum Status {
+  Pending,
+  Active,
+  Completed,
+  Archived
+}
 ```
 
 **Rules:**
@@ -168,7 +173,7 @@ export const STATUS_LABELS = {
   active: 'Active',
   archived: 'Archived',
   completed: 'Done',
-  pending: 'Waiting',
+  pending: 'Waiting'
 } as const;
 ```
 
@@ -176,19 +181,19 @@ export const STATUS_LABELS = {
 
 When modelling a collection of items and their derived types, use these suffixes consistently:
 
-| Prefix/Suffix       | Meaning                                                          | Example                                       |
-| ------------------- | ---------------------------------------------------------------- | --------------------------------------------- |
-| `Base` (prefix)     | Generic template shape from a factory (before narrowing)         | `BaseItem`, `BaseItems`                       |
-| `s` (plural)        | Array/tuple of all items                                         | `Items`, `Widgets`                            |
-| (singular)          | Union of items from the array (`Array[number]`)                  | `Item`, `Widget`                              |
-| `Infer<Thing>From<Model>` | Infer a type from another type via a generic | `InferItemFromId<I>`, `InferValueFromConfig<C>` |
-| `Map`               | Keyed record of definitions, blueprints, or runtimes             | `WidgetMap`, `ConfigMap<C>`                   |
-| `Values`            | Inferred runtime values derived from the map's types             | `WidgetValues<M>`, `ConfigValues<M>`          |
+| Prefix/Suffix             | Meaning                                                  | Example                                         |
+| ------------------------- | -------------------------------------------------------- | ----------------------------------------------- |
+| `Base` (prefix)           | Generic template shape from a factory (before narrowing) | `BaseItem`, `BaseItems`                         |
+| `s` (plural)              | Array/tuple of all items                                 | `Items`, `Widgets`                              |
+| (singular)                | Union of items from the array (`Array[number]`)          | `Item`, `Widget`                                |
+| `Infer<Thing>From<Model>` | Infer a type from another type via a generic             | `InferItemFromId<I>`, `InferValueFromConfig<C>` |
+| `Map`                     | Keyed record of definitions, blueprints, or runtimes     | `WidgetMap`, `ConfigMap<C>`                     |
+| `Values`                  | Inferred runtime values derived from the map's types     | `WidgetValues<M>`, `ConfigValues<M>`            |
 
 ### Distinction Between Map and Values
 
-- **`Map`** holds the *definitions/configuration* — the objects that describe structure or behavior. It's always a `Record<Key, Definition>`.
-- **`Values`** holds the *resolved output* — the actual runtime values inferred by applying each definition's type system. It's always `{ [K in keyof Map]: InferValue<Map[K]> }`.
+- **`Map`** holds the _definitions/configuration_ — the objects that describe structure or behavior. It's always a `Record<Key, Definition>`.
+- **`Values`** holds the _resolved output_ — the actual runtime values inferred by applying each definition's type system. It's always `{ [K in keyof Map]: InferValue<Map[K]> }`.
 
 ```typescript
 // Map — contains DEFINITIONS (the configuration objects)
@@ -206,7 +211,7 @@ When a generic type definition infers/extracts a type from another type, use the
 
 - `Infer` prefix signals that the type is derived/computed from the generic input
 - `From` separates the output type from the input model
-- The model name tells you *what type* is being used as the source
+- The model name tells you _what type_ is being used as the source
 - Implemented via `Extract<Union, { field: Key }>`, conditional types, or template literal inference
 
 ```typescript
@@ -245,10 +250,10 @@ export type SearchParamRuntimeMap = typeof SEARCH_PARAM_RUNTIME_MAP;
 
 When a factory function produces a generic shape and the app later narrows it to specific instances, use the `Base` **prefix** to distinguish the two levels:
 
-| Prefix | Meaning | When to use |
-| ------ | ------- | ----------- |
+| Prefix | Meaning                                                             | When to use                                                |
+| ------ | ------------------------------------------------------------------- | ---------------------------------------------------------- |
 | `Base` | Generic template shape — the factory's return type before narrowing | Utility functions, library constraints, factory signatures |
-| (none) | Specific registered instances — the app's actual implementations | App-level code, hooks, components consuming real instances |
+| (none) | Specific registered instances — the app's actual implementations    | App-level code, hooks, components consuming real instances |
 
 The `Base` type is always **wider** — it accepts any output of the factory. The unprefixed type is always a **narrower subset** — it only includes the items actually registered in your app.
 
@@ -359,8 +364,10 @@ type Action = { type: 'increment' } | { type: 'set_error'; payload: string };
 const [state, dispatch] = useReducer<State, Action>(
   (prev, action) => {
     switch (action.type) {
-      case 'increment': return { ...prev, count: prev.count + 1 };
-      case 'set_error': return { ...prev, error: action.payload };
+      case 'increment':
+        return { ...prev, count: prev.count + 1 };
+      case 'set_error':
+        return { ...prev, error: action.payload };
     }
   },
   { count: 0, error: null }
@@ -381,10 +388,14 @@ const theme = useContext<ThemeContextValue | null>(ThemeContext);
 ```typescript
 type Handle = { focus: () => void; reset: () => void };
 
-useImperativeHandle<Handle>(ref, () => ({
-  focus: () => inputRef.current?.focus(),
-  reset: () => inputRef.current?.value = '',
-}), []);
+useImperativeHandle<Handle>(
+  ref,
+  () => ({
+    focus: () => inputRef.current?.focus(),
+    reset: () => (inputRef.current?.value = '')
+  }),
+  []
+);
 ```
 
 ### useDeferredValue
@@ -398,7 +409,10 @@ const deferredItems = useDeferredValue<Item[]>(items);
 
 ```typescript
 const width = useSyncExternalStore<number>(
-  (callback) => { window.addEventListener('resize', callback); return () => window.removeEventListener('resize', callback); },
+  callback => {
+    window.addEventListener('resize', callback);
+    return () => window.removeEventListener('resize', callback);
+  },
   () => window.innerWidth
 );
 ```

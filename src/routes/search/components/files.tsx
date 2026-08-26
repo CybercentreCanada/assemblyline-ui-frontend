@@ -41,69 +41,69 @@ export const FilesTable = memo(({ fileResults, allowSort = true, onRowClick = ()
     </div>
   ) : (
     <TableContainer component={Paper}>
-        <DivTable>
-          <DivTableHead>
-            <DivTableRow>
-              <SortableHeaderCell sortField="seen.last" allowSort={allowSort}>
-                {t('header.lasttimeseen')}
+      <DivTable>
+        <DivTableHead>
+          <DivTableRow>
+            <SortableHeaderCell sortField="seen.last" allowSort={allowSort}>
+              {t('header.lasttimeseen')}
+            </SortableHeaderCell>
+            <SortableHeaderCell sortField="seen.count" allowSort={allowSort}>
+              {t('header.count')}
+            </SortableHeaderCell>
+            <SortableHeaderCell sortField="sha256" allowSort={allowSort}>
+              {t('header.sha256')}
+            </SortableHeaderCell>
+            <SortableHeaderCell sortField="type" allowSort={allowSort}>
+              {t('header.filetype')}
+            </SortableHeaderCell>
+            <SortableHeaderCell sortField="size" allowSort={allowSort}>
+              {t('header.size')}
+            </SortableHeaderCell>
+            {c12nDef.enforce && (
+              <SortableHeaderCell sortField="classification" allowSort={allowSort}>
+                {t('header.classification')}
               </SortableHeaderCell>
-              <SortableHeaderCell sortField="seen.count" allowSort={allowSort}>
-                {t('header.count')}
-              </SortableHeaderCell>
-              <SortableHeaderCell sortField="sha256" allowSort={allowSort}>
-                {t('header.sha256')}
-              </SortableHeaderCell>
-              <SortableHeaderCell sortField="type" allowSort={allowSort}>
-                {t('header.filetype')}
-              </SortableHeaderCell>
-              <SortableHeaderCell sortField="size" allowSort={allowSort}>
-                {t('header.size')}
-              </SortableHeaderCell>
+            )}
+            <DivTableCell />
+          </DivTableRow>
+        </DivTableHead>
+        <DivTableBody>
+          {fileResults.items.map((file, id) => (
+            <LinkRow
+              key={`${file.id}-${id}`}
+              nav={nav => nav.to().create({ route: '/file/detail/:id', path: { id: file.sha256 } })}
+              navDeps={[file.sha256]}
+              onClick={event => onRowClick(event, file)}
+              hover
+              style={{ textDecoration: 'none' }}
+            >
+              <DivTableCell>
+                <Tooltip title={file.seen.last}>
+                  <div>
+                    <Moment variant="fromNow">{file.seen.last}</Moment>
+                  </div>
+                </Tooltip>
+              </DivTableCell>
+              <DivTableCell>{file.seen.count}</DivTableCell>
+              <DivTableCell breakable>{file.sha256}</DivTableCell>
+              <DivTableCell>{file.type}</DivTableCell>
+              <DivTableCell>{file.size}</DivTableCell>
               {c12nDef.enforce && (
-                <SortableHeaderCell sortField="classification" allowSort={allowSort}>
-                  {t('header.classification')}
-                </SortableHeaderCell>
-              )}
-              <DivTableCell />
-            </DivTableRow>
-          </DivTableHead>
-          <DivTableBody>
-            {fileResults.items.map((file, id) => (
-              <LinkRow
-                key={`${file.id}-${id}`}
-                nav={nav => nav.to().create({ route: '/file/detail/:id', path: { id: file.sha256 } })}
-                navDeps={[file.sha256]}
-                onClick={event => onRowClick(event, file)}
-                hover
-                style={{ textDecoration: 'none' }}
-              >
                 <DivTableCell>
-                  <Tooltip title={file.seen.last}>
-                    <div>
-                      <Moment variant="fromNow">{file.seen.last}</Moment>
-                    </div>
+                  <Classification type="text" size="tiny" c12n={file.classification} format="short" />
+                </DivTableCell>
+              )}
+              <DivTableCell style={{ textAlign: 'center' }}>
+                {file.from_archive && (
+                  <Tooltip title={t('archive')}>
+                    <ArchiveOutlinedIcon />
                   </Tooltip>
-                </DivTableCell>
-                <DivTableCell>{file.seen.count}</DivTableCell>
-                <DivTableCell breakable>{file.sha256}</DivTableCell>
-                <DivTableCell>{file.type}</DivTableCell>
-                <DivTableCell>{file.size}</DivTableCell>
-                {c12nDef.enforce && (
-                  <DivTableCell>
-                    <Classification type="text" size="tiny" c12n={file.classification} format="short" />
-                  </DivTableCell>
                 )}
-                <DivTableCell style={{ textAlign: 'center' }}>
-                  {file.from_archive && (
-                    <Tooltip title={t('archive')}>
-                      <ArchiveOutlinedIcon />
-                    </Tooltip>
-                  )}
-                </DivTableCell>
-              </LinkRow>
-            ))}
-          </DivTableBody>
-        </DivTable>
-      </TableContainer>
+              </DivTableCell>
+            </LinkRow>
+          ))}
+        </DivTableBody>
+      </DivTable>
+    </TableContainer>
   );
 });

@@ -8,12 +8,12 @@ Every file declares its resource and role in its name:
 <primary>-<secondary>.<role>.<ext>
 ```
 
-| Segment | Purpose | Examples |
-|---------|---------|---------|
-| `<primary>` | The resource/domain being affected | `alert`, `submission`, `user` |
-| `<secondary>` | The action or sub-feature | `list`, `detail`, `create`, `search` |
-| `<role>` | The technical role of the file | `components`, `hooks`, `utils`, `models`, `store`, `providers`, `i18n` |
-| `<ext>` | File extension | `.tsx`, `.ts`, `.test.ts`, `.spec.ts` |
+| Segment       | Purpose                            | Examples                                                               |
+| ------------- | ---------------------------------- | ---------------------------------------------------------------------- |
+| `<primary>`   | The resource/domain being affected | `alert`, `submission`, `user`                                          |
+| `<secondary>` | The action or sub-feature          | `list`, `detail`, `create`, `search`                                   |
+| `<role>`      | The technical role of the file     | `components`, `hooks`, `utils`, `models`, `store`, `providers`, `i18n` |
+| `<ext>`       | File extension                     | `.tsx`, `.ts`, `.test.ts`, `.spec.ts`                                  |
 
 **Examples:**
 
@@ -36,16 +36,16 @@ alert.i18n.en.json
 
 ## General Naming Conventions
 
-| What | Convention | Example |
-|------|------------|---------|
-| Folders | `kebab-case` | `user-profile/`, `account-settings/` |
-| Component files | `PascalCase.tsx` | `UserProfileCard.tsx` |
-| Non-component TS files | `kebab-case.ts` | `date-utils.ts`, `api-client.ts` |
-| Hooks | `useXxx.tsx` (camelCase) | `useAuth.tsx`, `useLocalStorage.tsx` |
-| Tests | Mirror source filename | `UserProfileCard.test.tsx`, `date-utils.test.ts` |
-| Constant/type files | `kebab-case` | `app-constants.ts`, `user-models.ts` |
-| Constant exports | `SCREAMING_SNAKE_CASE` | `MAX_RETRY_COUNT`, `DEFAULT_APP_CONFIG` |
-| Type/interface exports | `PascalCase` | `AppConfig`, `NotificationModel` |
+| What                   | Convention               | Example                                          |
+| ---------------------- | ------------------------ | ------------------------------------------------ |
+| Folders                | `kebab-case`             | `user-profile/`, `account-settings/`             |
+| Component files        | `PascalCase.tsx`         | `UserProfileCard.tsx`                            |
+| Non-component TS files | `kebab-case.ts`          | `date-utils.ts`, `api-client.ts`                 |
+| Hooks                  | `useXxx.tsx` (camelCase) | `useAuth.tsx`, `useLocalStorage.tsx`             |
+| Tests                  | Mirror source filename   | `UserProfileCard.test.tsx`, `date-utils.test.ts` |
+| Constant/type files    | `kebab-case`             | `app-constants.ts`, `user-models.ts`             |
+| Constant exports       | `SCREAMING_SNAKE_CASE`   | `MAX_RETRY_COUNT`, `DEFAULT_APP_CONFIG`          |
+| Type/interface exports | `PascalCase`             | `AppConfig`, `NotificationModel`                 |
 
 **Why:**
 
@@ -82,18 +82,18 @@ Use when a module is small enough that each role fits in a single file:
 
 ### Module File Roles
 
-| Role Suffix | Extension | Purpose |
-|-------------|-----------|--------|
-| `.components` | `.tsx` | UI components (memo, displayName, props) |
-| `.hooks` | `.tsx` | Shared hooks (reused in 3+ components) |
-| `.i18n.en` / `.i18n.fr` | `.json` | Translation files |
-| `.models` | `.ts` | Type declarations, `DEFAULT_*` constants, const arrays |
-| `.pom` | `.ts` | Playwright Page Object Model |
-| `.providers` | `.tsx` | Context providers |
-| `.spec` | `.ts` | Playwright E2E tests |
-| `.store` | `.ts` | Store provider for that module |
-| `.utils` | `.ts` | Pure utility functions |
-| `.utils.test` | `.ts` | Unit tests for utils |
+| Role Suffix             | Extension | Purpose                                                |
+| ----------------------- | --------- | ------------------------------------------------------ |
+| `.components`           | `.tsx`    | UI components (memo, displayName, props)               |
+| `.hooks`                | `.tsx`    | Shared hooks (reused in 3+ components)                 |
+| `.i18n.en` / `.i18n.fr` | `.json`   | Translation files                                      |
+| `.models`               | `.ts`     | Type declarations, `DEFAULT_*` constants, const arrays |
+| `.pom`                  | `.ts`     | Playwright Page Object Model                           |
+| `.providers`            | `.tsx`    | Context providers                                      |
+| `.spec`                 | `.ts`     | Playwright E2E tests                                   |
+| `.store`                | `.ts`     | Store provider for that module                         |
+| `.utils`                | `.ts`     | Pure utility functions                                 |
+| `.utils.test`           | `.ts`     | Unit tests for utils                                   |
 
 ### Folder-Based (nested)
 
@@ -128,12 +128,12 @@ Use when a module grows large enough that individual roles benefit from splittin
 
 ### When to Use Which
 
-| Signal | Approach |
-|--------|----------|
-| < 5 components, simple hooks | File-based |
+| Signal                                       | Approach     |
+| -------------------------------------------- | ------------ |
+| < 5 components, simple hooks                 | File-based   |
 | Growing file size (300+ lines per role file) | Folder-based |
-| Many independently testable components | Folder-based |
-| Small utility module (config, models only) | File-based |
+| Many independently testable components       | Folder-based |
+| Small utility module (config, models only)   | File-based   |
 
 Both approaches can coexist — pick per-module based on complexity.
 
@@ -149,5 +149,3 @@ Both approaches can coexist — pick per-module based on complexity.
 - Folder-based subfolders may have their own `index.ts` for internal barrel exports
 
 ---
-
-

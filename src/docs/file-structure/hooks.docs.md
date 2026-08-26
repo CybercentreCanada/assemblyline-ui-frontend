@@ -15,6 +15,7 @@ Custom hooks exist for three purposes:
 3. **Browser/frontend control** — Managing a browser API or frontend concern (e.g., `useLocalStorage`, `useTimeout`, `useMediaQuery`, `useIntersectionObserver`)
 
 Do NOT create hooks for:
+
 - Single-use state access (use `useAppConfig` directly in the component)
 - Simple mutations (use `useAPIMutation` directly — no wrapper)
 - Wrapping a single hook call with no added logic
@@ -34,10 +35,7 @@ Hooks use `const` arrow functions with JSDoc, same as utility functions:
  */
 export const useNotificationCount = (): number => {
   const notifications = useAppConfigStore(c => c.notifications.items);
-  return useMemo(
-    () => notifications.filter(n => !n.read).length,
-    [notifications]
-  );
+  return useMemo(() => notifications.filter(n => !n.read).length, [notifications]);
 };
 ```
 
@@ -95,4 +93,3 @@ export const useSaveNotification = () => useAPIMutation(() => ({ ... }));
 export const useIsOpen = () => useAppConfigStore(c => c.layout.panel.open);
 // (valid only if used by 3+ components as a named access hook)
 ```
-

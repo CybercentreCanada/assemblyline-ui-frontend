@@ -99,19 +99,19 @@ const node = createReversePortalNode();
 
 ### Key Files
 
-| File | Role |
-| ---- | ---- |
+| File                    | Role                                               |
+| ----------------------- | -------------------------------------------------- |
 | `portal.components.tsx` | `createReversePortalNode`, `InPortal`, `OutPortal` |
-| `index.tsx` | Public exports |
+| `index.tsx`             | Public exports                                     |
 
 ### Exports
 
-| Export | Type | Purpose |
-| ------ | ---- | ------- |
-| `createReversePortalNode()` | Function | Creates a detached portal node with `hostEl` + `setOutlet` |
-| `InPortal` | Component | Renders children into `node.hostEl` via `createPortal` |
-| `OutPortal` | Component | Mounts `node.hostEl` into its DOM position via `setOutlet` |
-| `ReversePortalNode` | Type | `{ hostEl: HTMLDivElement, setOutlet: (el \| null) => void }` |
+| Export                      | Type      | Purpose                                                       |
+| --------------------------- | --------- | ------------------------------------------------------------- |
+| `createReversePortalNode()` | Function  | Creates a detached portal node with `hostEl` + `setOutlet`    |
+| `InPortal`                  | Component | Renders children into `node.hostEl` via `createPortal`        |
+| `OutPortal`                 | Component | Mounts `node.hostEl` into its DOM position via `setOutlet`    |
+| `ReversePortalNode`         | Type      | `{ hostEl: HTMLDivElement, setOutlet: (el \| null) => void }` |
 
 ### Implementation Notes
 

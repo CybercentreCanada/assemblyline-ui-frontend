@@ -181,5 +181,6 @@ export const DevelopmentCustomizeRoute = createAppRoute({
   fullicon: () => <DataObjectOutlinedIcon />,
 
   disabled: () => false,
-  forbidden: (_location, config) => !config.user.is_admin || !['development', 'staging'].includes(config.configuration.system.type)
+  forbidden: (_location, config) =>
+    !config.user.is_admin || !['development', 'staging'].includes(config.configuration.system.type)
 });

@@ -1,4 +1,3 @@
-
 # Page Object Model (POM)
 
 ## Purpose

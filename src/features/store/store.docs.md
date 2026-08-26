@@ -60,7 +60,7 @@ setStore({ open: true });
 
 ## When to Use Which
 
-| Factory | Use case |
-| ------- | -------- |
-| `createAppStore` | Feature stores that benefit from Zustand devtools and shallow comparison |
+| Factory              | Use case                                                                   |
+| -------------------- | -------------------------------------------------------------------------- |
+| `createAppStore`     | Feature stores that benefit from Zustand devtools and shallow comparison   |
 | `createStoreContext` | Simple prop-driven stores where parent data changes should reset the store |

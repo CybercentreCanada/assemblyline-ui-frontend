@@ -65,14 +65,14 @@ Add `aria-*` attributes to every interactive and meaningful element. These attri
 
 Use the correct HTML element before reaching for aria attributes:
 
-| Need | Use | Not |
-| ---- | --- | --- |
-| Navigation | `<nav>` | `<div role="navigation">` |
-| Main content | `<main>` | `<div role="main">` |
-| Section heading | `<h1>`–`<h6>` | `<div aria-level="1">` |
-| Button | `<button>` | `<div onClick>` |
-| List | `<ul>` / `<ol>` + `<li>` | `<div>` with divs inside |
-| Table | `<table>` | `<div>` grid layout pretending to be a table |
+| Need            | Use                      | Not                                          |
+| --------------- | ------------------------ | -------------------------------------------- |
+| Navigation      | `<nav>`                  | `<div role="navigation">`                    |
+| Main content    | `<main>`                 | `<div role="main">`                          |
+| Section heading | `<h1>`–`<h6>`            | `<div aria-level="1">`                       |
+| Button          | `<button>`               | `<div onClick>`                              |
+| List            | `<ul>` / `<ol>` + `<li>` | `<div>` with divs inside                     |
+| Table           | `<table>`                | `<div>` grid layout pretending to be a table |
 
 ## Keyboard Navigation
 

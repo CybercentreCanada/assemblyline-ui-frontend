@@ -43,11 +43,11 @@ The `PathParamKeyForPath<Path>` utility type recursively extracts `:param` segme
 
 ### Available Blueprint Types
 
-| Blueprint | Default | Parse logic |
-| --------- | ------- | ----------- |
-| `string(defaultValue?)` | `''` | Returns raw segment or default |
-| `number(defaultValue?)` | `0` | `Number(value)`, falls back if `NaN` |
-| `boolean(defaultValue?)` | `false` | `'true'`/`'1'` → true, `'false'`/`'0'` → false |
+| Blueprint                     | Default     | Parse logic                                                          |
+| ----------------------------- | ----------- | -------------------------------------------------------------------- |
+| `string(defaultValue?)`       | `''`        | Returns raw segment or default                                       |
+| `number(defaultValue?)`       | `0`         | `Number(value)`, falls back if `NaN`                                 |
+| `boolean(defaultValue?)`      | `false`     | `'true'`/`'1'` → true, `'false'`/`'0'` → false                       |
 | `enum(values, defaultValue?)` | `values[0]` | Returns the value only when it exists in `values`, otherwise default |
 
 ### Creating a Codec
@@ -97,23 +97,23 @@ The codec handles the parsing step invisibly — when the router detects a locat
 
 ### Key Files
 
-| File | Role |
-| ---- | ---- |
-| `path-params.models.ts` | Type definitions: `RoutePath`, `PathParamBlueprint`, `PathParamBlueprintMap`, `PathParamCodec`, `PathParamKeyForPath` |
-| `path-params.codec.ts` | `PATH_PARAM_BLUEPRINTS_MAP` (blueprint factories), `createPathParamsCodec` (codec factory) |
-| `path-params.codec.test.ts` | Unit tests for codec parse/stringify |
-| `index.ts` | Public exports |
+| File                        | Role                                                                                                                  |
+| --------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `path-params.models.ts`     | Type definitions: `RoutePath`, `PathParamBlueprint`, `PathParamBlueprintMap`, `PathParamCodec`, `PathParamKeyForPath` |
+| `path-params.codec.ts`      | `PATH_PARAM_BLUEPRINTS_MAP` (blueprint factories), `createPathParamsCodec` (codec factory)                            |
+| `path-params.codec.test.ts` | Unit tests for codec parse/stringify                                                                                  |
+| `index.ts`                  | Public exports                                                                                                        |
 
 ### Type Utilities
 
-| Type | Purpose |
-| ---- | ------- |
-| `RoutePath` | Alias for `string` — the raw path pattern |
-| `PathParamKeyForPath<Path>` | Extracts `:param` keys from a path literal |
-| `PathParamBlueprint<T>` | Single param definition (type + parse + stringify) |
-| `PathParamBlueprintMap<Path>` | Record of all params for a given path |
-| `PathParamBlueprintValues<Blueprints>` | Resolved value types for all params |
-| `PathParamCodec<Blueprints>` | The full codec (blueprints + type + parse + stringify) |
+| Type                                   | Purpose                                                |
+| -------------------------------------- | ------------------------------------------------------ |
+| `RoutePath`                            | Alias for `string` — the raw path pattern              |
+| `PathParamKeyForPath<Path>`            | Extracts `:param` keys from a path literal             |
+| `PathParamBlueprint<T>`                | Single param definition (type + parse + stringify)     |
+| `PathParamBlueprintMap<Path>`          | Record of all params for a given path                  |
+| `PathParamBlueprintValues<Blueprints>` | Resolved value types for all params                    |
+| `PathParamCodec<Blueprints>`           | The full codec (blueprints + type + parse + stringify) |
 
 ### Related Modules
 

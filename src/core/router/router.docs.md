@@ -61,6 +61,7 @@ Routes are immutable URL entries stored by UUID key. Each route tracks an `href`
 The router maintains two-way sync between the store and the URL using a **versioning handshake** to prevent infinite loops:
 
 **Forward (Store → Location):**
+
 1. Component calls `navigate()` or stages a navigation request on a panel
 2. The store subscription fires (`routerStoreApi.subscribe`)
 3. `syncStoreToLocation(store, location)` generates a **new `store.id`** (UUID)
@@ -68,6 +69,7 @@ The router maintains two-way sync between the store and the URL using a **versio
 5. `navigate()` is called, updating `location.state`
 
 **Backward (Location → Store):**
+
 1. React Router updates the location (URL bar, history, etc.)
 2. The location effect fires (`useLocation()` dependency)
 3. `syncLocationToStore(store, location)` is called
@@ -76,6 +78,7 @@ The router maintains two-way sync between the store and the URL using a **versio
 6. The store subscription fires again, but now `syncStoreToLocation` sees `location.state.id === store.id` and returns `[null, null]`
 
 **Critical Guards:**
+
 - `syncStoreToLocation` checks: `if (!location?.state?.id || location.state.id === store.id || panelKey < 0) return [null, null];`
 - `syncLocationToStore` checks: `if (location.state?.id && location.state.id === store.id) return store;`
 - These must match the incoming location's `state.id` against the current `store.id` to prevent re-processing
@@ -88,6 +91,7 @@ The router maintains two-way sync between the store and the URL using a **versio
 
 **For Maintainers:**
 When modifying sync logic, always verify:
+
 - The id guards are comparing the most recent location against the most recent store
 - `parseLocationState` only stages navigations for routes that have actually changed
 - The effect dependencies include `location` so stale closures don't defeat the guards
@@ -120,20 +124,20 @@ Router configuration lives in `AppConfig.router` and is read by the store sync:
 
 ```typescript
 type AppRouterConfig = {
-  maxPanels?: number;     // Max concurrent panels (default: 2)
-  maxNodes?: number;      // Extra cached nodes beyond active panels (default: 2)
-  navigation?: 'push' | 'loop';  // Navigation style (default: 'push')
+  maxPanels?: number; // Max concurrent panels (default: 2)
+  maxNodes?: number; // Extra cached nodes beyond active panels (default: 2)
+  navigation?: 'push' | 'loop'; // Navigation style (default: 'push')
 };
 ```
 
-| Setting | Effect |
-| ------- | ------ |
-| `maxPanels: 1` | Single panel, no split view. Navigating always replaces the current view. |
-| `maxPanels: 2` | Two panels max. Navigating opens a split to the right; if already at 2, the leftmost is collapsed. |
-| `maxNodes: 0` | No background caching. Only active panel routes stay mounted. Navigating away always unmounts. |
-| `maxNodes: 2` | Two extra routes stay mounted beyond what's currently displayed. Navigating back to a recent route is instant. |
-| `navigation: 'push'` | New navigations open in the next panel to the right (or create one if below `maxPanels`). |
-| `navigation: 'loop'` | (Planned) New navigations cycle within the current panel. |
+| Setting              | Effect                                                                                                         |
+| -------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `maxPanels: 1`       | Single panel, no split view. Navigating always replaces the current view.                                      |
+| `maxPanels: 2`       | Two panels max. Navigating opens a split to the right; if already at 2, the leftmost is collapsed.             |
+| `maxNodes: 0`        | No background caching. Only active panel routes stay mounted. Navigating away always unmounts.                 |
+| `maxNodes: 2`        | Two extra routes stay mounted beyond what's currently displayed. Navigating back to a recent route is instant. |
+| `navigation: 'push'` | New navigations open in the next panel to the right (or create one if below `maxPanels`).                      |
+| `navigation: 'loop'` | (Planned) New navigations cycle within the current panel.                                                      |
 
 The total number of mounted component trees at any time is `maxPanels + maxNodes`.
 
@@ -222,16 +226,16 @@ const setStore = useAppRouterSetStore();
 
 ### Key Files
 
-| File | Role |
-| ---- | ---- |
-| `router.models.tsx` | Type definitions: `AppRouterPanel`, `AppRouterNode`, `AppRouterRoute`, `AppRouterStore`, `AppLinkProps` |
-| `router.config.tsx` | Zod schema for config validation, `AppRouterConfig` type |
-| `router.defaults.tsx` | Default values for panels, nodes, routes, store; example store for fallback |
-| `router.providers.tsx` | `AppRouterProvider` (BrowserRouter + store sync), `useAppRouterStore`, `useAppRouterSetStore` |
-| `router.hooks.tsx` | `useAppNavigate` (main navigation hook), `useAppLocationParam` (href builder) |
-| `router.components.tsx` | `AppLink` — type-safe link component |
-| `router.utils.tsx` | Pure functions for all store operations (panels, nodes, routes, tabs, serialization) |
-| `router.utils.test.tsx` | Unit tests for utility functions |
+| File                    | Role                                                                                                    |
+| ----------------------- | ------------------------------------------------------------------------------------------------------- |
+| `router.models.tsx`     | Type definitions: `AppRouterPanel`, `AppRouterNode`, `AppRouterRoute`, `AppRouterStore`, `AppLinkProps` |
+| `router.config.tsx`     | Zod schema for config validation, `AppRouterConfig` type                                                |
+| `router.defaults.tsx`   | Default values for panels, nodes, routes, store; example store for fallback                             |
+| `router.providers.tsx`  | `AppRouterProvider` (BrowserRouter + store sync), `useAppRouterStore`, `useAppRouterSetStore`           |
+| `router.hooks.tsx`      | `useAppNavigate` (main navigation hook), `useAppLocationParam` (href builder)                           |
+| `router.components.tsx` | `AppLink` — type-safe link component                                                                    |
+| `router.utils.tsx`      | Pure functions for all store operations (panels, nodes, routes, tabs, serialization)                    |
+| `router.utils.test.tsx` | Unit tests for utility functions                                                                        |
 
 ### Related Modules
 
@@ -244,10 +248,10 @@ const setStore = useAppRouterSetStore();
 
 The previous implementation used a "Drawer" component for side-by-side viewing. Every page managed the Drawer's state (what page was open in it, its actions, its transitions), creating massive coupling. Some states were stored only in component memory and couldn't be reproduced from the URL, so shared links were broken. The hash (`#sha256=...`) was used as a partial workaround but only covered a few variables.
 
-| Legacy Limitation | New Router Solution |
-| ----------------- | ------------------- |
-| Pages managed each other's state via Drawer | Pages have zero awareness of other panels — router handles orchestration |
-| States not reproducible from URL | Full state serialized into query params + `location.state` |
-| Navigation unmounts previous view | LRU nodes keep views mounted; navigation is instant |
-| Each new page required Drawer integration code | Pages just render content — placement is automatic |
-| Hash-based partial state hacks | Type-safe route factories with full param/search encoding |
+| Legacy Limitation                              | New Router Solution                                                      |
+| ---------------------------------------------- | ------------------------------------------------------------------------ |
+| Pages managed each other's state via Drawer    | Pages have zero awareness of other panels — router handles orchestration |
+| States not reproducible from URL               | Full state serialized into query params + `location.state`               |
+| Navigation unmounts previous view              | LRU nodes keep views mounted; navigation is instant                      |
+| Each new page required Drawer integration code | Pages just render content — placement is automatic                       |
+| Hash-based partial state hacks                 | Type-safe route factories with full param/search encoding                |

@@ -4,12 +4,12 @@ Application configuration store — **read-only after bootstrap**. Holds the `Ap
 
 ## Architecture (3-layer model)
 
-| Layer | Store | Mutability | Persistence | Owner |
-| ----- | ----- | ---------- | ----------- | ----- |
-| **App Config** | `useAppConfig` | Read-only after auth sets it | None (from backend via auth) | Auth (populates), Config (stores) |
-| **System Config** | `useSystemConfig` | Read-only after bootstrap | None (from backend/env) | Backend/Admin |
-| **User Preferences** | `usePreferences` | User-writable | Backend API + localStorage | User |
-| **Session State** | Module-owned stores | Ephemeral | None | Each module |
+| Layer                | Store               | Mutability                   | Persistence                  | Owner                             |
+| -------------------- | ------------------- | ---------------------------- | ---------------------------- | --------------------------------- |
+| **App Config**       | `useAppConfig`      | Read-only after auth sets it | None (from backend via auth) | Auth (populates), Config (stores) |
+| **System Config**    | `useSystemConfig`   | Read-only after bootstrap    | None (from backend/env)      | Backend/Admin                     |
+| **User Preferences** | `usePreferences`    | User-writable                | Backend API + localStorage   | User                              |
+| **Session State**    | Module-owned stores | Ephemeral                    | None                         | Each module                       |
 
 ### App Config (`core/config/`)
 

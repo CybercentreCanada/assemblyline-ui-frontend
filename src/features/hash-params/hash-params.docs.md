@@ -49,9 +49,7 @@ useEffect(() => {
 ```tsx
 import { createHashParamCodec } from 'features/hash-params';
 
-const hashCodec = createHashParamCodec()(blueprint =>
-  blueprint.enum(['introduction', 'api', 'examples', 'faq'])
-);
+const hashCodec = createHashParamCodec()(blueprint => blueprint.enum(['introduction', 'api', 'examples', 'faq']));
 
 const value = hashCodec.parse(location);
 // value: 'introduction' | 'api' | 'examples' | 'faq' | undefined
@@ -96,6 +94,7 @@ function DocumentationPage() {
 ```
 
 Users can now:
+
 - Visit `/docs#usage` to jump directly to the usage section
 - Bookmark `/docs#api-reference` to return to that section later
 - Share `/docs#faq` to link others to the FAQ
@@ -105,9 +104,7 @@ Users can now:
 The hash param type is automatically inferred from the enum values:
 
 ```tsx
-const codec = createHashParamCodec()(blueprint =>
-  blueprint.enum(['overview', 'installation', 'usage'] as const)
-);
+const codec = createHashParamCodec()(blueprint => blueprint.enum(['overview', 'installation', 'usage'] as const));
 
 // codec.parse() returns: 'overview' | 'installation' | 'usage' | undefined
 // codec.type is: 'overview'
@@ -128,9 +125,7 @@ navigate.to().create({ route: '/docs', hash: 'invalid' });
 Hash values are automatically URL-encoded when stringified and decoded when parsed:
 
 ```tsx
-const codec = createHashParamCodec()(blueprint =>
-  blueprint.enum(['api-overview', 'getting-started'])
-);
+const codec = createHashParamCodec()(blueprint => blueprint.enum(['api-overview', 'getting-started']));
 
 codec.stringify('api-overview'); // '#api-overview'
 // For special characters: '#my%20section' for 'my section'

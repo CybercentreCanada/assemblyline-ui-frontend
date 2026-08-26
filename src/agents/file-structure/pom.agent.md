@@ -49,7 +49,7 @@ export class MyFeaturePOM {
 
 ## Placement
 
-| File | Location |
-|------|----------|
-| POM | `pom/<ComponentName>.pom.ts` |
-| Adjacent to | `<module>.components.tsx` |
+| File        | Location                     |
+| ----------- | ---------------------------- |
+| POM         | `pom/<ComponentName>.pom.ts` |
+| Adjacent to | `<module>.components.tsx`    |

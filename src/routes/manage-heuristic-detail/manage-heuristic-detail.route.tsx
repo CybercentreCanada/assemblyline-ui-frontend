@@ -286,8 +286,14 @@ export const ManageHeuristicDetailRoute = createAppRoute({
   }),
 
   ancestor: '/manage/heuristics',
-  shortname: location => ['app_route.manage_heuristic_detail.shortname', { ns: 'manageHeuristicDetail', id: location.path.id }],
-  fullname: location => ['app_route.manage_heuristic_detail.fullname', { ns: 'manageHeuristicDetail', id: location.path.id }],
+  shortname: location => [
+    'app_route.manage_heuristic_detail.shortname',
+    { ns: 'manageHeuristicDetail', id: location.path.id }
+  ],
+  fullname: location => [
+    'app_route.manage_heuristic_detail.fullname',
+    { ns: 'manageHeuristicDetail', id: location.path.id }
+  ],
   shorticon: () => <ListOutlinedIcon />,
   fullicon: () => <ListOutlinedIcon />,
 

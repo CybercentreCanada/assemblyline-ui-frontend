@@ -25,10 +25,10 @@ Utility functions extract complex logic from hooks/components to make it unit-te
 
 ## Placement
 
-| Scope | Location |
-|-------|----------|
-| Module-specific | `<module>.utils.ts` or `utils/` folder |
-| Tests | `<module>.utils.test.ts` or `utils/<name>.test.ts` |
+| Scope           | Location                                           |
+| --------------- | -------------------------------------------------- |
+| Module-specific | `<module>.utils.ts` or `utils/` folder             |
+| Tests           | `<module>.utils.test.ts` or `utils/<name>.test.ts` |
 
 ## Declaration Template
 
@@ -40,10 +40,7 @@ Utility functions extract complex logic from hooks/components to make it unit-te
  * @param partial - Partial item matcher
  * @returns Matching item index, or -1 when not found
  */
-export const findItemIndex = (
-  items: Item[],
-  partial: Partial<Item>
-): number => {
+export const findItemIndex = (items: Item[], partial: Partial<Item>): number => {
   // ...
 };
 ```
@@ -93,19 +90,19 @@ export const findCategoryIndex = (...) => { ... };
 
 ## Naming Conventions
 
-| Prefix | Purpose |
-|--------|---------|
-| `find*` | Locate and return an item |
-| `get*` | Compute/derive a value |
-| `remove*` | Remove from a collection |
-| `filter*` | Remove items matching a condition |
-| `update*` | Patch fields on existing item |
-| `set*` | Replace/overwrite a value |
-| `add*` | Create and insert new item |
-| `insert*` | Add at specific position |
-| `upsert*` | Update if exists, create if not |
-| `sanitize*` | Normalize/clean up a structure |
-| `parse*` | Transform external input |
-| `format*` | Transform for display |
-| `mark*` | Tag items with metadata |
-| `write*` | Persist to external storage |
+| Prefix      | Purpose                           |
+| ----------- | --------------------------------- |
+| `find*`     | Locate and return an item         |
+| `get*`      | Compute/derive a value            |
+| `remove*`   | Remove from a collection          |
+| `filter*`   | Remove items matching a condition |
+| `update*`   | Patch fields on existing item     |
+| `set*`      | Replace/overwrite a value         |
+| `add*`      | Create and insert new item        |
+| `insert*`   | Add at specific position          |
+| `upsert*`   | Update if exists, create if not   |
+| `sanitize*` | Normalize/clean up a structure    |
+| `parse*`    | Transform external input          |
+| `format*`   | Transform for display             |
+| `mark*`     | Tag items with metadata           |
+| `write*`    | Persist to external storage       |
