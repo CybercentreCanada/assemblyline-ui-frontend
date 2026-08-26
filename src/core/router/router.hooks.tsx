@@ -311,7 +311,7 @@ export function useAppNavigate<const Origin extends AppRoute['path']>() {
   const closePanel = useCallback(
     function <const Destination extends AppRoute['path']>(
       destinationPanelKey: number,
-      dispatch: InferAppNavigationOperationMapFromPath<Destination>['closePanel'] = true,
+      dispatch: InferAppNavigationOperationMapFromPath<Destination>['closePanel'],
       options: AppNavigateOptions
     ) {
       const locationState = getAppLocationParamStateFromApi(locationParamStoreApi);
@@ -320,14 +320,25 @@ export function useAppNavigate<const Origin extends AppRoute['path']>() {
 
       const prevPageKey = findPageKeyFromPanelKey(routerState, destinationPanelKey);
       const prevPageParam = getRouteParamFromKey<Origin>(locationState, prevPageKey);
-      const shouldClose = typeof dispatch === 'function' ? dispatch(prevPageParam as never) : dispatch;
+      const nextPageParam = applyNavigationDispatch(dispatch, prevPageParam as never) as never;
+      const nextPageInput = getPageFromInput<Destination>(locationState, nextPageParam);
+      const context = { operation: 'closePanel', originPageKey: prevPageKey, targetPanelKey: destinationPanelKey };
+      const nextPage = resolveNotFoundPage(nextPageInput, nextPageParam, context);
 
-      if (!shouldClose) return;
+      if (!shouldUpdatePage(routerState, prevPageKey, nextPage)) return;
 
       setNavigationStore(store => {
         store = getNavigationStoreFromRouter(store, routerState);
         store = setPageScrollPositions(store);
         store = removePanel(store, destinationPanelKey);
+
+        const firstPanel = store.panels[0];
+        const firstPage = firstPanel?.pageKey ? store.pages[firstPanel.pageKey] : null;
+        if (store.panels.length === 0 || !firstPage?.href) {
+          const [nextStore, nextPageKey] = addPage(store, nextPage);
+          [store] = upsertPanel(nextStore, 0, { pageKey: nextPageKey }, preferenceState);
+        }
+
         store = sanitizeRouterStore(store, preferenceState);
         store.id = generateRandomUUID();
         store.options = options;

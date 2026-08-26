@@ -478,7 +478,7 @@ export const ManageSignatureSourceDetailPage = memo(() => {
       onSuccess: () => {
         showSuccessMessage(t(base?.name ? 'change.success' : 'add.success'));
         setModified(false);
-        if (!base || !isXL) navigate.here().closePanel(true);
+        if (!base || !isXL) navigate.here().closePanel({ route: '/manage/sources' });
         setTimeout(() => window.dispatchEvent(new CustomEvent('reloadUpdateSources')), 1000);
       },
       onEnter: () => setButtonLoading(true),
@@ -489,7 +489,7 @@ export const ManageSignatureSourceDetailPage = memo(() => {
   const deleteSource = () => setDeleteDialog(true);
 
   const executeDeleteSource = () => {
-    navigate.here().closePanel(true);
+    navigate.here().closePanel({ route: '/manage/sources' });
     apiCall({
       url: `/api/v4/signature/sources/${service}/${encodeURIComponent(source.name)}/`,
       method: 'DELETE',
@@ -655,8 +655,14 @@ export const ManageSignatureSourceDetailRoute = createAppRoute({
   }),
 
   ancestor: '/manage/sources',
-  shortname: location => ['app_route.manage_signature_source_detail.shortname', { ns: 'manageSignatureSources', id: location.path.id }],
-  fullname: location => ['app_route.manage_signature_source_detail.fullname', { ns: 'manageSignatureSources', id: location.path.id }],
+  shortname: location => [
+    'app_route.manage_signature_source_detail.shortname',
+    { ns: 'manageSignatureSources', id: location.path.id }
+  ],
+  fullname: location => [
+    'app_route.manage_signature_source_detail.fullname',
+    { ns: 'manageSignatureSources', id: location.path.id }
+  ],
   shorticon: () => null,
   fullicon: () => null,
 

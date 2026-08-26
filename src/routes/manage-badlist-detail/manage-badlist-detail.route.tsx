@@ -76,7 +76,7 @@ export const ManageBadlistDetailPage = memo(() => {
       setDeleteDialog(false);
       showSuccessMessage(t('delete.success'));
       invalidateAppQuery({ url: '/api/v4/search/badlist/' }, 1000);
-      navigate.here().closePanel(true);
+      navigate.here().closePanel({ route: '/manage/badlists' });
       close();
     }
   }));
@@ -637,8 +637,14 @@ export const ManageBadlistDetailRoute = createAppRoute({
   }),
 
   ancestor: '/manage/badlists',
-  shortname: location => ['app_route.manage_badlist_detail.shortname', { ns: 'manageBadlistDetail', id: location.path.id }],
-  fullname: location => ['app_route.manage_badlist_detail.fullname', { ns: 'manageBadlistDetail', id: location.path.id }],
+  shortname: location => [
+    'app_route.manage_badlist_detail.shortname',
+    { ns: 'manageBadlistDetail', id: location.path.id }
+  ],
+  fullname: location => [
+    'app_route.manage_badlist_detail.fullname',
+    { ns: 'manageBadlistDetail', id: location.path.id }
+  ],
   shorticon: () => <BugReportOutlinedIcon />,
   fullicon: () => <BugReportOutlinedIcon />,
 

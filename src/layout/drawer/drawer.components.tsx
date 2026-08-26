@@ -93,7 +93,7 @@ export const AppDrawerCloseButton = memo(() => {
   const navigate = useAppNavigate();
 
   const handleClose = useCallback(() => {
-    navigate.at(1).closePanel(true);
+    navigate.at(1).closePanel({ route: '/submit' });
   }, [navigate]);
 
   return (
@@ -112,7 +112,7 @@ export const AppDrawerMaximizeButton = memo(() => {
   const navigate = useAppNavigate();
 
   const handleMoveToLeft = useCallback(() => {
-    navigate.at(0).closePanel(true);
+    navigate.at(0).closePanel({ route: '/submit' });
   }, [navigate]);
 
   return !isXL ? null : (
