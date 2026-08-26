@@ -66,6 +66,7 @@ import { useTranslation } from 'react-i18next';
 import type { Location, NavigateOptions } from 'react-router';
 import { useLocation, useNavigate } from 'react-router';
 import { generateRandomUUID } from 'shared/utils/app.utils';
+import { resetFavicon } from 'shared/utils/utils';
 
 //*****************************************************************************************
 // useAppExternalHref
@@ -626,6 +627,7 @@ export function useAppSyncRouterStoreFromNavigation() {
       const titles = getTitlesFromNavigation(navigation, locationState, configState, t);
       const nextTitle = navigation?.options?.nextTitle?.trim();
       document.title = nextTitle ? nextTitle : titles?.length > 0 ? titles.join(' | ') : 'Assemblyline 4';
+      resetFavicon();
 
       setRouterStore(router => reconcileRouterFromNavigation(router, navigation));
     },
