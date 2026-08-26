@@ -7,7 +7,7 @@ Displays the system environment type and software version watermark on non-produ
 - Renders a fixed footer watermark displaying Assemblyline system version and environment type (e.g., `Assemblyline 4.5.0 :: staging`)
 - Reads system configuration directly from `useAppConfigStore`
 - Automatically hides on production environments (`system.type === 'production'`)
-- Positions watermark relative to LeftNav drawer via `AppSystemVersionLayout`
+- Observes the drawer toggle element (`aria-label="Collapse drawer"` / `aria-label="Expand drawer"`) via `ResizeObserver` and dynamically positions the fixed watermark to its right
 
 ## Key Files
 
@@ -15,13 +15,13 @@ Displays the system environment type and software version watermark on non-produ
 | --- | --- |
 | `system-version.components.tsx` | `SystemVersion` memoized component |
 | `system-version.models.ts` | Type definitions and default models for system version info |
-| `system-version.providers.tsx` | `AppSystemVersionLayout` layout wrapper that dynamically positions watermark next to LeftNav drawer |
+| `system-version.providers.tsx` | `AppSystemVersionLayout` layout wrapper that attaches `ResizeObserver` to drawer toggle and manages positioning |
 | `index.ts` | Barrel exports |
 
 ## Usage
 
 ```tsx
-import { AppSystemVersionLayout, SystemVersion } from 'layout/system-version';
+import { AppSystemVersionLayout } from 'layout/system-version';
 
 export const AppLayout = () => (
   <AppSystemVersionLayout>

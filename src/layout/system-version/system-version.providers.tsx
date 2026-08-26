@@ -1,68 +1,82 @@
 import { useAppLeftNav } from '@tui/core';
 import { SystemVersion } from 'layout/system-version';
 import type { CSSProperties, PropsWithChildren } from 'react';
-import { memo, useCallback, useEffect, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 //*****************************************************************************************
 // AppSystemVersionLayout
 //*****************************************************************************************
 
-export type AppSystemVersionLayoutProps = PropsWithChildren<{
-  /** Optional class name override for custom styling. */
-  className?: string;
-}>;
-
-export const AppSystemVersionLayout = memo(({ children, className }: AppSystemVersionLayoutProps) => {
+export const AppSystemVersionLayout = memo(({ children }: PropsWithChildren) => {
   const leftnav = useAppLeftNav();
   const leftnavHover = Boolean(leftnav?.hover);
   const leftnavOpen = Boolean(leftnav?.open);
 
-  const [versionStyle, setVersionStyle] = useState<CSSProperties>({});
+  const [leftPos, setLeftPos] = useState<string | null>(null);
+
+  const currentLeftRef = useRef<string | null>(null);
+  const observedElRef = useRef<HTMLElement | null>(null);
+
+  const getDrawerToggleElement = useCallback(
+    (): HTMLElement | null =>
+      document.querySelector<HTMLElement>('[aria-label="Collapse drawer"]') ||
+      document.querySelector<HTMLElement>('[aria-label="Expand drawer"]') ||
+      document.querySelector<HTMLElement>('[aria-label="Fermer le menu"]') ||
+      document.querySelector<HTMLElement>('[aria-label="Ouvrir le menu"]') ||
+      document.querySelector<HTMLElement>('[aria-label*="drawer"]') ||
+      document.querySelector<HTMLElement>('[aria-label*="Drawer"]') ||
+      document.querySelector<HTMLElement>('.MuiDrawer-docked .MuiDrawer-paper') ||
+      document.querySelector<HTMLElement>('.MuiDrawer-paperAnchorLeft') ||
+      document.querySelector<HTMLElement>('.MuiDrawer-paper'),
+    []
+  );
 
   const updatePosition = useCallback(() => {
-    const navEl =
-      document.querySelector('.MuiDrawer-docked .MuiDrawer-paper') ||
-      document.querySelector('.MuiDrawer-paperAnchorLeft') ||
-      document.querySelector('.MuiDrawer-paper') ||
-      document.querySelector('[data-testid="left-nav"]');
+    const targetEl = getDrawerToggleElement();
+    let newLeft: string | null = null;
 
-    if (navEl) {
-      const rect = navEl.getBoundingClientRect();
-      if (rect.right > 0) {
-        setVersionStyle({
-          left: `${rect.right + 12}px`,
-          marginLeft: 0
-        });
-        return;
+    if (targetEl) {
+      const rect = targetEl.getBoundingClientRect();
+      const rightEdge = rect.right > 0 ? rect.right : rect.left + rect.width;
+      if (rightEdge > 0) {
+        newLeft = `${Math.round(rightEdge + 12)}px`;
       }
     }
 
-    setVersionStyle({});
-  }, []);
+    if (newLeft !== currentLeftRef.current) {
+      currentLeftRef.current = newLeft;
+      setLeftPos(newLeft);
+    }
+  }, [getDrawerToggleElement]);
 
   useEffect(() => {
     updatePosition();
 
-    const navEl =
-      document.querySelector('.MuiDrawer-docked .MuiDrawer-paper') ||
-      document.querySelector('.MuiDrawer-paperAnchorLeft') ||
-      document.querySelector('.MuiDrawer-paper');
-
     let resizeObserver: ResizeObserver | null = null;
     let mutationObserver: MutationObserver | null = null;
+
+    const attachObserver = () => {
+      const targetEl = getDrawerToggleElement();
+
+      if (targetEl && resizeObserver && targetEl !== observedElRef.current) {
+        if (observedElRef.current) {
+          resizeObserver.unobserve(observedElRef.current);
+        }
+        resizeObserver.observe(targetEl);
+        observedElRef.current = targetEl;
+      }
+    };
 
     if (typeof ResizeObserver !== 'undefined') {
       resizeObserver = new ResizeObserver(() => {
         updatePosition();
       });
-      if (navEl) {
-        resizeObserver.observe(navEl);
-      }
-      resizeObserver.observe(document.body);
+      attachObserver();
     }
 
     if (typeof MutationObserver !== 'undefined') {
       mutationObserver = new MutationObserver(() => {
+        attachObserver();
         updatePosition();
       });
       mutationObserver.observe(document.body, {
@@ -92,32 +106,30 @@ export const AppSystemVersionLayout = memo(({ children, className }: AppSystemVe
       updatePosition();
     };
 
-    if (navEl) {
-      navEl.addEventListener('transitionrun', handleTransition);
-      navEl.addEventListener('transitionstart', handleTransition);
-      navEl.addEventListener('transitionend', handleTransitionEnd);
-      navEl.addEventListener('transitioncancel', handleTransitionEnd);
-    }
+    window.addEventListener('transitionrun', handleTransition, true);
+    window.addEventListener('transitionstart', handleTransition, true);
+    window.addEventListener('transitionend', handleTransitionEnd, true);
+    window.addEventListener('transitioncancel', handleTransitionEnd, true);
 
     return () => {
       if (resizeObserver) resizeObserver.disconnect();
       if (mutationObserver) mutationObserver.disconnect();
       if (animationFrameId !== null) cancelAnimationFrame(animationFrameId);
-      if (navEl) {
-        navEl.removeEventListener('transitionrun', handleTransition);
-        navEl.removeEventListener('transitionstart', handleTransition);
-        navEl.removeEventListener('transitionend', handleTransitionEnd);
-        navEl.removeEventListener('transitioncancel', handleTransitionEnd);
-      }
+      window.removeEventListener('transitionrun', handleTransition, true);
+      window.removeEventListener('transitionstart', handleTransition, true);
+      window.removeEventListener('transitionend', handleTransitionEnd, true);
+      window.removeEventListener('transitioncancel', handleTransitionEnd, true);
       window.removeEventListener('resize', updatePosition);
       window.removeEventListener('scroll', updatePosition, true);
     };
-  }, [leftnavHover, leftnavOpen, updatePosition]);
+  }, [getDrawerToggleElement, leftnavHover, leftnavOpen, updatePosition]);
+
+  const versionStyle = useMemo<CSSProperties>(() => ({ left: leftPos }), [leftPos]);
 
   return (
     <>
       {children}
-      <SystemVersion className={className} style={versionStyle} />
+      <SystemVersion style={versionStyle} />
     </>
   );
 });

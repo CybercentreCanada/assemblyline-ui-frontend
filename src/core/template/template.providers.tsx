@@ -6,7 +6,8 @@ import {
   useAppTemplateBarHeight,
   useAppTemplateThemeInitializer,
   useAppTemplateThemeMode,
-  useAppTemplateThemePatcher
+  useAppTemplateThemePatcher,
+  useOverrideTemplatePreferences
 } from 'core/template';
 import type { i18n } from 'i18next';
 import type { PropsWithChildren } from 'react';
@@ -19,6 +20,8 @@ import { memo, useEffect, useMemo } from 'react';
 const Inner = ({ children }: PropsWithChildren) => {
   const appLayout = useAppLayout();
   const { isReady } = useAppUser();
+
+  useOverrideTemplatePreferences();
 
   useEffect(() => {
     isReady();
