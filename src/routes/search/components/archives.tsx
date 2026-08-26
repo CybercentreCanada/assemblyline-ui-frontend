@@ -147,7 +147,15 @@ export const ArchivesTable = memo(
             {fileResults.items.map((file, i) => (
               <LinkRow
                 key={`${file.sha256}-${i}`}
-                nav={nav => nav.to().create({ route: '/archive/:id', path: { id: file.sha256 } })}
+                nav={nav =>
+                  nav
+                    .to()
+                    .create(s =>
+                      s?.route === '/archive/:id/:tab'
+                        ? { route: '/archive/:id/:tab', path: { id: file.sha256, tab: s.path.tab } }
+                        : { route: '/archive/:id', path: { id: file.sha256 } }
+                    )
+                }
                 navDeps={[file.sha256]}
                 onClick={event => onRowClick(event, file)}
                 hover

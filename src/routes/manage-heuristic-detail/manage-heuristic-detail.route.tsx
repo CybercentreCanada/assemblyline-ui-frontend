@@ -26,7 +26,8 @@ const Preview = memo(
     margin: 0,
     padding: theme.spacing(0.75, 1),
     whiteSpace: 'pre-wrap',
-    wordBreak: 'break-word'
+    wordBreak: 'break-word',
+    backgroundColor: theme.palette.background.default
   }))
 );
 
