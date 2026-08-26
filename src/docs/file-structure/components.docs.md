@@ -109,12 +109,10 @@ export type ComponentProps = {
   propB?: string;
 };
 
-export const Component = memo(
-  ({ propA = false, propB = '', ...props }: ComponentProps) => {
-    // ...
-    return null;
-  }
-);
+export const Component = memo(({ propA = false, propB = '', ...props }: ComponentProps) => {
+  // ...
+  return null;
+});
 
 Component.displayName = 'Component';
 ```
@@ -159,20 +157,20 @@ WrappedComponent.displayName = 'WrappedComponent';
 
 ### When to use which
 
-| Scenario | Style |
-| -------- | ----- |
-| Component without generic props | Arrow function inside `memo()` |
+| Scenario                           | Style                                                       |
+| ---------------------------------- | ----------------------------------------------------------- |
+| Component without generic props    | Arrow function inside `memo()`                              |
 | Component with generic type params | `function` keyword + `memo(forwardRef(...))` with type cast |
-| Hooks, handlers, utilities | Arrow function |
+| Hooks, handlers, utilities         | Arrow function                                              |
 
 ## Event Handlers
 
 Every function inside a component must be wrapped in `useCallback`. Naming distinguishes local handlers from prop callbacks:
 
-| Prefix | Meaning | Example |
-| ------ | ------- | ------- |
+| Prefix    | Meaning                   | Example                               |
+| --------- | ------------------------- | ------------------------------------- |
 | `handle*` | Handled in this component | `const handleOpen = useCallback(...)` |
-| `on*` | Passed in as a prop | `onClose: () => void` |
+| `on*`     | Passed in as a prop       | `onClose: () => void`                 |
 
 ```typescript
 //*****************************************************************************************
@@ -210,11 +208,11 @@ MyDialog.displayName = 'MyDialog';
 
 Limit prop drilling in favor of store-based solutions for maximum performance and focused re-renders:
 
-| Solution | When to Use |
-| -------- | ----------- |
-| `useAppConfig` / `useAppSetConfig` | App-wide state (layout, auth, config) |
-| `createAppStore` | Feature-scoped state shared across a component tree |
-| TanStack Form stores | Form state with validation |
+| Solution                           | When to Use                                         |
+| ---------------------------------- | --------------------------------------------------- |
+| `useAppConfig` / `useAppSetConfig` | App-wide state (layout, auth, config)               |
+| `createAppStore`                   | Feature-scoped state shared across a component tree |
+| TanStack Form stores               | Form state with validation                          |
 
 Components read state directly from stores via selectors. This ensures only the subscribing component re-renders when its specific slice changes.
 
@@ -267,6 +265,7 @@ return <Content />;
 ```
 
 **Rules:**
+
 - Ternary for either/or rendering (show A or B)
 - `&&` for show-or-nothing (show A or nothing)
 - Never early return — the component always returns a single JSX expression
@@ -276,26 +275,26 @@ return <Content />;
 
 ### Hooks
 
-| Hook | Guidance |
-|------|----------|
-| `useState` | Rarely needed — most state belongs in a store. Use only for truly local, ephemeral UI state (e.g., tooltip anchor, local animation flag) |
-| `useEffect` | Avoid — waits for a render cycle before executing. Prefer event handlers, mutation callbacks, or store subscriptions |
-| `useRef` | Fine to use whenever needed (DOM refs, mutable values that don't trigger re-renders) |
-| `useMemo` | Fine to use for expensive derived computations |
-| `useCallback` | Required for all component-internal handlers |
-| `useContext` | Avoid for shared state (use Zustand). Acceptable for dependency injection of non-reactive values (e.g., store instance from `createAppStore`) |
-| `useReducer` | Avoid — use a store instead. Only acceptable for complex local state machines that are truly component-private |
-| `useImperativeHandle` | Use with `forwardRef` when a parent needs to call imperative methods on a child |
-| `useLayoutEffect` | Use when you need synchronous DOM measurements before paint. Prefer over `useEffect` for layout calculations |
-| `useDeferredValue` | Use for deferring expensive re-renders of non-urgent UI (e.g., filtering a large list while typing) |
-| `useTransition` | Use to mark state updates as non-blocking transitions (e.g., tab switching, heavy computations) |
-| `useId` | Use for generating unique IDs for accessibility attributes (`aria-labelledby`, `htmlFor`) — never for keys |
+| Hook                  | Guidance                                                                                                                                      |
+| --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `useState`            | Rarely needed — most state belongs in a store. Use only for truly local, ephemeral UI state (e.g., tooltip anchor, local animation flag)      |
+| `useEffect`           | Avoid — waits for a render cycle before executing. Prefer event handlers, mutation callbacks, or store subscriptions                          |
+| `useRef`              | Fine to use whenever needed (DOM refs, mutable values that don't trigger re-renders)                                                          |
+| `useMemo`             | Fine to use for expensive derived computations                                                                                                |
+| `useCallback`         | Required for all component-internal handlers                                                                                                  |
+| `useContext`          | Avoid for shared state (use Zustand). Acceptable for dependency injection of non-reactive values (e.g., store instance from `createAppStore`) |
+| `useReducer`          | Avoid — use a store instead. Only acceptable for complex local state machines that are truly component-private                                |
+| `useImperativeHandle` | Use with `forwardRef` when a parent needs to call imperative methods on a child                                                               |
+| `useLayoutEffect`     | Use when you need synchronous DOM measurements before paint. Prefer over `useEffect` for layout calculations                                  |
+| `useDeferredValue`    | Use for deferring expensive re-renders of non-urgent UI (e.g., filtering a large list while typing)                                           |
+| `useTransition`       | Use to mark state updates as non-blocking transitions (e.g., tab switching, heavy computations)                                               |
+| `useId`               | Use for generating unique IDs for accessibility attributes (`aria-labelledby`, `htmlFor`) — never for keys                                    |
 
 ### Components
 
-| Component | Guidance |
-|-----------|----------|
-| `Fragment` (`<>...</>`) | Use freely to group elements without adding DOM nodes |
-| `Suspense` | Use to wrap async boundaries. Place at meaningful UI boundaries |
-| `StrictMode` | Enabled at app root — do not remove |
-| `lazy` | Use for route-level code splitting only. Do not lazy-load small components |
+| Component               | Guidance                                                                   |
+| ----------------------- | -------------------------------------------------------------------------- |
+| `Fragment` (`<>...</>`) | Use freely to group elements without adding DOM nodes                      |
+| `Suspense`              | Use to wrap async boundaries. Place at meaningful UI boundaries            |
+| `StrictMode`            | Enabled at app root — do not remove                                        |
+| `lazy`                  | Use for route-level code splitting only. Do not lazy-load small components |

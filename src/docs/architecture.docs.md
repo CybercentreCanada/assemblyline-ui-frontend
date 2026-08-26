@@ -19,17 +19,17 @@ This architecture was redesigned to move away from a **technology-based structur
 
 ## Technology Stack
 
-| Layer | Technology |
-| ----- | ---------- |
-| UI Framework | React 18+ (StrictMode, memo, Activity API) |
-| State | Zustand (vanilla store + devtools) |
+| Layer        | Technology                                             |
+| ------------ | ------------------------------------------------------ |
+| UI Framework | React 18+ (StrictMode, memo, Activity API)             |
+| State        | Zustand (vanilla store + devtools)                     |
 | Server State | TanStack React Query (persisted, lz-string compressed) |
-| Routing | react-router v6 + custom multi-panel system |
-| Styling | MUI v5+ (styled components, theme system) |
-| Validation | Zod (settings persistence, schema parsing) |
-| i18n | i18next (per-module JSON files, en/fr) |
-| Build | Vite + SWC, pnpm workspace |
-| Testing | Vitest (unit), Playwright (e2e) |
+| Routing      | react-router v6 + custom multi-panel system            |
+| Styling      | MUI v5+ (styled components, theme system)              |
+| Validation   | Zod (settings persistence, schema parsing)             |
+| i18n         | i18next (per-module JSON files, en/fr)                 |
+| Build        | Vite + SWC, pnpm workspace                             |
+| Testing      | Vitest (unit), Playwright (e2e)                        |
 
 ## Application Layers
 

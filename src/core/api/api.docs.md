@@ -44,7 +44,7 @@ Use `useApiQuery` for all GET requests:
 ```typescript
 const { data, isLoading, isError, error } = useApiQuery<ResponseType>({
   url: '/api/v4/alert/',
-  method: 'GET',
+  method: 'GET'
 });
 ```
 
@@ -54,11 +54,11 @@ const { data, isLoading, isError, error } = useApiQuery<ResponseType>({
 const { data } = useApiQuery<ResponseType>({
   url: `/api/v4/submission/${id}/`,
   method: 'GET',
-  disabled: !id,                    // Skip query until ID is available
-  delay: 300,                       // Debounce (useful for search-as-you-type)
-  allowCache: true,                 // Enable React Query caching
-  onSuccess: (response) => { },     // Side effect on success
-  onFailure: (error) => { },        // Side effect on failure
+  disabled: !id, // Skip query until ID is available
+  delay: 300, // Debounce (useful for search-as-you-type)
+  allowCache: true, // Enable React Query caching
+  onSuccess: response => {}, // Side effect on success
+  onFailure: error => {} // Side effect on failure
 });
 ```
 
@@ -89,16 +89,14 @@ if (alertId) {
 Use `useApiMutation` for all POST, PUT, DELETE requests. Mutations are defined inline in the component — no wrapper hooks for single-use mutations.
 
 ```typescript
-const handleSubmit = useApiMutation(
-  (body: SubmitRequest) => ({
-    url: '/api/v4/submission/',
-    method: 'POST',
-    body,
-    onSuccess: () => {
-      // Navigate, show snackbar, invalidate queries, etc.
-    },
-  })
-);
+const handleSubmit = useApiMutation((body: SubmitRequest) => ({
+  url: '/api/v4/submission/',
+  method: 'POST',
+  body,
+  onSuccess: () => {
+    // Navigate, show snackbar, invalidate queries, etc.
+  }
+}));
 
 // Usage
 handleSubmit.mutate(formData);
@@ -109,15 +107,13 @@ handleSubmit.mutate(formData);
 ```typescript
 import { invalidateApiQuery } from 'core/api';
 
-const handleDelete = useApiMutation(
-  (id: string) => ({
-    url: `/api/v4/alert/${id}/`,
-    method: 'DELETE',
-    onSuccess: () => {
-      invalidateApiQuery(({ url }) => url.startsWith('/api/v4/alert/'));
-    },
-  })
-);
+const handleDelete = useApiMutation((id: string) => ({
+  url: `/api/v4/alert/${id}/`,
+  method: 'DELETE',
+  onSuccess: () => {
+    invalidateApiQuery(({ url }) => url.startsWith('/api/v4/alert/'));
+  }
+}));
 ```
 
 #### Mutation State in UI
@@ -210,10 +206,10 @@ const { data, isError, error } = useApiQuery<ResponseType>({
 
 ### What NOT to Do
 
-| Anti-pattern | Why | Do instead |
-| ------------ | --- | ---------- |
-| Raw `fetch` or `axios` | Bypasses token handling, error normalization, caching | `useApiQuery` / `useApiMutation` |
-| `useQuery` / `useMutation` directly | Bypasses app conventions and response normalization | Use the app's hooks |
-| Wrapper hooks for single mutations | Hides data flow, premature abstraction | Inline mutations |
-| Calling hooks conditionally | Breaks Rules of Hooks | Use `disabled` prop |
-| Manual `refetch()` after mutations | Easy to forget, stale data | `invalidateApiQuery` |
+| Anti-pattern                        | Why                                                   | Do instead                       |
+| ----------------------------------- | ----------------------------------------------------- | -------------------------------- |
+| Raw `fetch` or `axios`              | Bypasses token handling, error normalization, caching | `useApiQuery` / `useApiMutation` |
+| `useQuery` / `useMutation` directly | Bypasses app conventions and response normalization   | Use the app's hooks              |
+| Wrapper hooks for single mutations  | Hides data flow, premature abstraction                | Inline mutations                 |
+| Calling hooks conditionally         | Breaks Rules of Hooks                                 | Use `disabled` prop              |
+| Manual `refetch()` after mutations  | Easy to forget, stale data                            | `invalidateApiQuery`             |

@@ -125,5 +125,6 @@ export const DevelopmentLibraryRoute = createAppRoute({
   fullicon: () => <LibraryBooksIcon />,
 
   disabled: () => false,
-  forbidden: (_location, config) => !config.user.is_admin || !['development', 'staging'].includes(config.configuration.system.type)
+  forbidden: (_location, config) =>
+    !config.user.is_admin || !['development', 'staging'].includes(config.configuration.system.type)
 });

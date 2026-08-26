@@ -11,6 +11,7 @@ Tasks related to `src/core/` (api, assistant, config, error, interface, preferen
 - [ ] **Restore pre-refactor color behavior** — Audit current theme token usage across route/layout surfaces and re-align colors to previous visual behavior where regressions were introduced.
 
 - [ ] **Port `AssistantProvider`** — Migrate the full AI assistant implementation from `src/components/providers/AssistantProvider.tsx` to `src/core/assistant/`. The old implementation includes:
+
   - Chat UI (Popper + Backdrop + FAB)
   - Insight system (file, submission, report, code insights with chip triggers)
   - Conversation history + context management

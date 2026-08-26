@@ -138,12 +138,12 @@ stateCodec.stringify({
 
 ### Key Files
 
-| File | Role |
-| ---- | ---- |
-| `state-params.models.ts` | State param primitives, shapes, blueprint, and codec inference types |
-| `state-params.codec.ts` | Merge helpers, blueprint factory, and codec factory |
-| `state-params.codec.test.ts` | Unit tests for merge, blueprint, and codec behavior |
-| `index.ts` | Public exports |
+| File                         | Role                                                                 |
+| ---------------------------- | -------------------------------------------------------------------- |
+| `state-params.models.ts`     | State param primitives, shapes, blueprint, and codec inference types |
+| `state-params.codec.ts`      | Merge helpers, blueprint factory, and codec factory                  |
+| `state-params.codec.test.ts` | Unit tests for merge, blueprint, and codec behavior                  |
+| `index.ts`                   | Public exports                                                       |
 
 ### Related Modules
 

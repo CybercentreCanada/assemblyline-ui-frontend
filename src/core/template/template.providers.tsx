@@ -88,6 +88,7 @@ export const AppTemplateProvider = memo(({ children, i18n }: AppTemplateProvider
   const drawerOpen = useAppPreferenceStore(s => s.template.drawerOpen);
   const lang = useAppPreferenceStore(s => s.template.lang);
   const layout = useAppPreferenceStore(s => s.template.layout);
+  const leftNavHover = useAppPreferenceStore(s => s.template.leftNavHover);
   const themeID = useAppPreferenceStore(s => s.template.theme);
   const initialized = useAppInterfaceStore(s => s.theme.initialized);
   const skin = useAppInterfaceStore(s => s.theme.skin);
@@ -107,6 +108,7 @@ export const AppTemplateProvider = memo(({ children, i18n }: AppTemplateProvider
         drawerOpen,
         lang,
         layout,
+        leftNavHover,
         mode,
         showBreadcrumbs: false,
         showQuickSearch: false,

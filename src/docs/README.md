@@ -37,7 +37,7 @@ src/docs/
 
 ## Audience
 
-| Reader | Use |
-|--------|-----|
-| New developer | `src/docs/*.docs.md` files — start with architecture, then file-structure |
-| Returning developer | Relevant `*.docs.md` for the topic at hand |
+| Reader              | Use                                                                       |
+| ------------------- | ------------------------------------------------------------------------- |
+| New developer       | `src/docs/*.docs.md` files — start with architecture, then file-structure |
+| Returning developer | Relevant `*.docs.md` for the topic at hand                                |

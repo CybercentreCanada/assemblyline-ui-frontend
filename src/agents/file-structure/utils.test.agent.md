@@ -21,10 +21,10 @@
 
 ## File Pairing
 
-| Source | Test |
-|--------|------|
+| Source              | Test                     |
+| ------------------- | ------------------------ |
 | `<module>.utils.ts` | `<module>.utils.test.ts` |
-| `utils/<name>.ts` | `utils/<name>.test.ts` |
+| `utils/<name>.ts`   | `utils/<name>.test.ts`   |
 
 ## Template
 

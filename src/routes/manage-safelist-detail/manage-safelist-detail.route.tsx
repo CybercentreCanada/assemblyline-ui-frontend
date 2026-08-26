@@ -87,7 +87,7 @@ export const ManageSafelistDetailPage = memo(() => {
       onSuccess: () => {
         setDeleteDialog(false);
         showSuccessMessage(t('delete.success'));
-        setTimeout(() => navigate.here().closePanel(true), 1000);
+        setTimeout(() => navigate.here().closePanel({ route: '/manage/safelists' }), 1000);
         setTimeout(() => window.dispatchEvent(new CustomEvent('reloadSafelist')), 1000);
         close();
       },
@@ -543,8 +543,14 @@ export const ManageSafelistDetailRoute = createAppRoute({
   }),
 
   ancestor: '/manage/safelists',
-  shortname: location => ['app_route.manage_safelist_detail.shortname', { ns: 'manageSafelistDetail', id: location.path.id }],
-  fullname: location => ['app_route.manage_safelist_detail.fullname', { ns: 'manageSafelistDetail', id: location.path.id }],
+  shortname: location => [
+    'app_route.manage_safelist_detail.shortname',
+    { ns: 'manageSafelistDetail', id: location.path.id }
+  ],
+  fullname: location => [
+    'app_route.manage_safelist_detail.fullname',
+    { ns: 'manageSafelistDetail', id: location.path.id }
+  ],
   shorticon: () => <ListOutlinedIcon />,
   fullicon: () => <ListOutlinedIcon />,
 

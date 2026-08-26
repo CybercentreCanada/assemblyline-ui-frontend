@@ -32,13 +32,13 @@ A class extending `BaseBlueprint<T>` that defines:
 
 Available blueprint classes:
 
-| Class | Value type | Notes |
-| ----- | ---------- | ----- |
-| `BooleanBlueprint` | `boolean` | Parses `'true'`/`'false'` |
-| `NumberBlueprint` | `number` | Supports `.min()` / `.max()` clamping |
-| `StringBlueprint` | `string` | Direct string passthrough |
-| `EnumBlueprint<O>` | `O[number]` | Validates against `.options()` list |
-| `FiltersBlueprint` | `string[]` | Handles `NOT()`/`!()` prefix expressions |
+| Class              | Value type  | Notes                                    |
+| ------------------ | ----------- | ---------------------------------------- |
+| `BooleanBlueprint` | `boolean`   | Parses `'true'`/`'false'`                |
+| `NumberBlueprint`  | `number`    | Supports `.min()` / `.max()` clamping    |
+| `StringBlueprint`  | `string`    | Direct string passthrough                |
+| `EnumBlueprint<O>` | `O[number]` | Validates against `.options()` list      |
+| `FiltersBlueprint` | `string[]`  | Handles `NOT()`/`!()` prefix expressions |
 
 ### Engine
 
@@ -80,7 +80,13 @@ The `Runtime()` factory wraps a blueprint class, promoting its protected methods
 ### Defining Search Params
 
 ```typescript
-import { BooleanBlueprint, NumberBlueprint, StringBlueprint, EnumBlueprint, FiltersBlueprint } from 'features/search-params';
+import {
+  BooleanBlueprint,
+  NumberBlueprint,
+  StringBlueprint,
+  EnumBlueprint,
+  FiltersBlueprint
+} from 'features/search-params';
 
 const PARAMS = {
   page: new NumberBlueprint().defaultValue(1).min(1),
@@ -88,23 +94,23 @@ const PARAMS = {
   query: new StringBlueprint().defaultValue(''),
   sort: new EnumBlueprint().options(['name', 'date', 'score'] as const).defaultValue('date'),
   filters: new FiltersBlueprint().defaultValue([]),
-  showAdvanced: new BooleanBlueprint().defaultValue(false).ephemeral(),
+  showAdvanced: new BooleanBlueprint().defaultValue(false).ephemeral()
 };
 ```
 
 ### Blueprint Options (Builder Methods)
 
-| Method | Effect |
-| ------ | ------ |
-| `.defaultValue(v)` | Set the default/fallback value |
-| `.ephemeral()` | Exclude from localStorage persistence |
-| `.ignored()` | Changes don't trigger snapshot difference detection |
-| `.locked()` | Always returns default regardless of URL value |
-| `.nullable()` | Allows `null` as a valid value |
-| `.source('search' \| 'state' \| 'transient')` | Source for value resolution |
-| `.min(n)` / `.max(n)` | Number bounds (NumberBlueprint only) |
-| `.options(valueList)` | Valid values list (EnumBlueprint only) |
-| `.not(prefix)` / `.omit(prefix)` | Prefix expressions (FiltersBlueprint only) |
+| Method                                        | Effect                                              |
+| --------------------------------------------- | --------------------------------------------------- |
+| `.defaultValue(v)`                            | Set the default/fallback value                      |
+| `.ephemeral()`                                | Exclude from localStorage persistence               |
+| `.ignored()`                                  | Changes don't trigger snapshot difference detection |
+| `.locked()`                                   | Always returns default regardless of URL value      |
+| `.nullable()`                                 | Allows `null` as a valid value                      |
+| `.source('search' \| 'state' \| 'transient')` | Source for value resolution                         |
+| `.min(n)` / `.max(n)`                         | Number bounds (NumberBlueprint only)                |
+| `.options(valueList)`                         | Valid values list (EnumBlueprint only)              |
+| `.not(prefix)` / `.omit(prefix)`              | Prefix expressions (FiltersBlueprint only)          |
 
 ## 5. Usage (Consumer API)
 
@@ -124,8 +130,8 @@ const { SearchParamsProvider, useSearchParams } = createSearchParamsStore();
 ```typescript
 const { search } = useSearchParams();
 
-const page = search.get('page');        // number
-const sort = search.get('sort');        // 'name' | 'date' | 'score'
+const page = search.get('page'); // number
+const sort = search.get('sort'); // 'name' | 'date' | 'score'
 const hasFilters = search.has('filters'); // boolean
 ```
 
@@ -172,28 +178,28 @@ clearDefaultParams();
 
 ### Key Files
 
-| File | Role |
-| ---- | ---- |
-| `search-params.models.tsx` | Type definitions: `SearchParamValue`, `SearchParamSource`, `SearchParamBlueprint`, `SearchParamBlueprintMap`, `SearchParamValueMap`, `InferSearchParamValueFromBlueprint`, `InferSearchParamValueMapFromBlueprintMap`, `InferSearchParamRuntimeFromBlueprint`, `InferSearchParamRuntimeMapFromBlueprintMap` |
-| `search-params.blueprints.tsx` | `BaseBlueprint<T>` abstract class + concrete classes: `BooleanBlueprint`, `NumberBlueprint`, `StringBlueprint`, `EnumBlueprint`, `FiltersBlueprint` |
-| `search-params.engines.tsx` | `SearchParamEngine` — orchestrates blueprints into full/delta/fromLocation resolution |
-| `search-params.snapshots.tsx` | `SearchParamSnapshot` — immutable value object with has/get/pick/omit/set/toLocationSearch/toLocationState |
-| `search-params.runtimes.tsx` | `Runtime()` factory + `PARAM_RUNTIMES` map — promotes protected methods to public |
-| `search-params.stores.tsx` | `createSearchParamsStore()` — Context provider + `useSearchParams` hook with `useSyncExternalStore` |
-| `index.ts` | Public exports |
+| File                           | Role                                                                                                                                                                                                                                                                                                        |
+| ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `search-params.models.tsx`     | Type definitions: `SearchParamValue`, `SearchParamSource`, `SearchParamBlueprint`, `SearchParamBlueprintMap`, `SearchParamValueMap`, `InferSearchParamValueFromBlueprint`, `InferSearchParamValueMapFromBlueprintMap`, `InferSearchParamRuntimeFromBlueprint`, `InferSearchParamRuntimeMapFromBlueprintMap` |
+| `search-params.blueprints.tsx` | `BaseBlueprint<T>` abstract class + concrete classes: `BooleanBlueprint`, `NumberBlueprint`, `StringBlueprint`, `EnumBlueprint`, `FiltersBlueprint`                                                                                                                                                         |
+| `search-params.engines.tsx`    | `SearchParamEngine` — orchestrates blueprints into full/delta/fromLocation resolution                                                                                                                                                                                                                       |
+| `search-params.snapshots.tsx`  | `SearchParamSnapshot` — immutable value object with has/get/pick/omit/set/toLocationSearch/toLocationState                                                                                                                                                                                                  |
+| `search-params.runtimes.tsx`   | `Runtime()` factory + `PARAM_RUNTIMES` map — promotes protected methods to public                                                                                                                                                                                                                           |
+| `search-params.stores.tsx`     | `createSearchParamsStore()` — Context provider + `useSearchParams` hook with `useSyncExternalStore`                                                                                                                                                                                                         |
+| `index.ts`                     | Public exports                                                                                                                                                                                                                                                                                              |
 
 ### Engine Methods
 
-| Method | Purpose |
-| ------ | ------- |
-| `getDefaultValues()` | Snapshot with all defaults |
-| `setDefaultValues(params)` | Override defaults from URLSearchParams (used for localStorage restore) |
-| `getEphemeralKeys()` | Keys excluded from persistence |
-| `getIgnoredKeys()` | Keys excluded from difference detection |
-| `getLockedKeys()` | Keys that always return default |
-| `full(value)` | Resolve all params, filling defaults |
-| `delta(value)` | Resolve only non-default params |
-| `fromLocation(location, snapshot?)` | Resolve from browser location |
+| Method                              | Purpose                                                                |
+| ----------------------------------- | ---------------------------------------------------------------------- |
+| `getDefaultValues()`                | Snapshot with all defaults                                             |
+| `setDefaultValues(params)`          | Override defaults from URLSearchParams (used for localStorage restore) |
+| `getEphemeralKeys()`                | Keys excluded from persistence                                         |
+| `getIgnoredKeys()`                  | Keys excluded from difference detection                                |
+| `getLockedKeys()`                   | Keys that always return default                                        |
+| `full(value)`                       | Resolve all params, filling defaults                                   |
+| `delta(value)`                      | Resolve only non-default params                                        |
+| `fromLocation(location, snapshot?)` | Resolve from browser location                                          |
 
 ### Related Modules
 

@@ -143,7 +143,9 @@ export type InferAppNavigationOperationMapFromPath<Origin extends AppRoute['path
   only:
     | InferAppNavigationInputFromPath<Origin>
     | ((props: InferAppRouteParamFromPath<Origin>) => InferAppNavigationInputFromPath<Origin>);
-  closePanel: boolean | ((props: InferAppRouteParamFromPath<Origin>) => boolean);
+  closePanel:
+    | InferAppNavigationInputFromPath<AppRoute['path']>
+    | ((props: InferAppRouteParamFromPath<Origin>) => InferAppNavigationInputFromPath<AppRoute['path']>);
   delete: boolean | ((props: InferAppRouteParamFromPath<Origin>) => boolean);
 };
 

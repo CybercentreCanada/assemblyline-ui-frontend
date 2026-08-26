@@ -19,6 +19,6 @@ export const useAppDrawerClose = (): (() => void) => {
   const navigate = useAppNavigate();
 
   return useCallback(() => {
-    navigate.at(1).closePanel(true);
+    navigate.at(1).closePanel({ route: '/submit' });
   }, [navigate]);
 };

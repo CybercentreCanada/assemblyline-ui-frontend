@@ -1,4 +1,4 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Stack } from '@mui/material';
+import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Stack } from '@mui/material';
 import { getAppConfigStateFromApi, useAppConfigStoreApi } from 'core/config';
 import type { AppNavigationStore, InferAppNavigationPropsFromPath } from 'core/router';
 import {
@@ -24,6 +24,7 @@ import { forwardRef, memo, useCallback, useEffect, useLayoutEffect, useMemo, use
 import { useTranslation } from 'react-i18next';
 import type { LinkProps as RouterLinkProps } from 'react-router';
 import { Link } from 'react-router';
+import { Button } from 'ui/buttons/Button';
 
 //*****************************************************************************************
 // App Link

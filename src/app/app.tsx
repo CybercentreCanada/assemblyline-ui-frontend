@@ -26,6 +26,7 @@ import { AppAuthLayout } from 'layout/auth';
 import { AppCarouselProvider } from 'layout/carousel';
 import { AppClueProvider } from 'layout/clue';
 import { AppDrawerLayout } from 'layout/drawer';
+import { AppSystemVersionLayout } from 'layout/system-version';
 import type { PropsWithChildren } from 'react';
 import { memo, StrictMode } from 'react';
 
@@ -136,7 +137,9 @@ export const AppLayout = memo(() => {
         <AppRouterLayout>
           <AppDrawerLayout content={<AppRouterPanelLayout panelKey={1} />}>
             <AppTemplateLayout preferences={preferences} router={router} user={user}>
-              <AppRouterPanelLayout panelKey={0} />
+              <AppSystemVersionLayout>
+                <AppRouterPanelLayout panelKey={0} />
+              </AppSystemVersionLayout>
             </AppTemplateLayout>
           </AppDrawerLayout>
         </AppRouterLayout>

@@ -229,8 +229,14 @@ export const ManageWorkflowDetailRoute = createAppRoute({
   }),
 
   ancestor: '/manage/workflows',
-  shortname: location => ['app_route.manage_workflow_detail.shortname', { ns: 'manageWorkflowDetail', id: location.path.id }],
-  fullname: location => ['app_route.manage_workflow_detail.fullname', { ns: 'manageWorkflowDetail', id: location.path.id }],
+  shortname: location => [
+    'app_route.manage_workflow_detail.shortname',
+    { ns: 'manageWorkflowDetail', id: location.path.id }
+  ],
+  fullname: location => [
+    'app_route.manage_workflow_detail.fullname',
+    { ns: 'manageWorkflowDetail', id: location.path.id }
+  ],
   shorticon: () => <ListOutlinedIcon />,
   fullicon: () => <ListOutlinedIcon />,
 

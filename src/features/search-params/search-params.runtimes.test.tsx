@@ -42,9 +42,9 @@ describe('SEARCH_PARAM_RUNTIME_MAP', () => {
 
   it('constructs an enum runtime that falls back to the default for invalid values', () => {
     const runtime = new SEARCH_PARAM_RUNTIME_MAP.enum('mode');
-    (
-      runtime as unknown as { defaultValue: (v: string) => { options: (v: readonly string[]) => unknown } }
-    ).defaultValue('a').options(['a', 'b'] as const);
+    (runtime as unknown as { defaultValue: (v: string) => { options: (v: readonly string[]) => unknown } })
+      .defaultValue('a')
+      .options(['a', 'b'] as const);
 
     const values: Record<string, unknown> = {};
     runtime.full(values, new URLSearchParams('mode=zzz'));

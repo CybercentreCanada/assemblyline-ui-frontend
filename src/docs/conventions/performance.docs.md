@@ -54,7 +54,10 @@ Never spread or replace a parent object in the store. Mutate individual fields d
 setStore(s => ({ ...s, routes: { ...s.routes, [key]: { ...s.routes[key], href: newHref } } }));
 
 // ✅ Mutate in place — only selectors for `href` will re-render
-setStore(s => { s.routes[key].href = newHref; return s; });
+setStore(s => {
+  s.routes[key].href = newHref;
+  return s;
+});
 ```
 
 **Why this matters:** The combination of in-place mutation + leaf-level selectors is what gives us surgical re-renders. If you break either side of the contract (spread a parent, or select a parent), the system stops working correctly.
@@ -64,10 +67,12 @@ setStore(s => { s.routes[key].href = newHref; return s; });
 Not all inline objects break `memo()`. Simple, static objects (like a `style` prop with a few properties) are cheap to create and compare — React's shallow comparison handles them fine in practice. The rule is about **complexity**, not just inline syntax.
 
 **When inline is OK:**
+
 - Simple `style` objects with static values: `style={{ display: 'flex', gap: 8 }}`
 - Small static configuration objects with primitive values
 
 **When `useMemo`/`useCallback` is required:**
+
 - Arrays that are filtered, sorted, or transformed
 - Objects built from dynamic data or state
 - Functions passed as props (always `useCallback`)
@@ -167,10 +172,7 @@ When typing into a search field that filters a large list, defer the filtered re
 const [query, setQuery] = useState('');
 const deferredQuery = useDeferredValue(query);
 
-const filtered = useMemo(
-  () => items.filter(i => i.label.includes(deferredQuery)),
-  [items, deferredQuery]
-);
+const filtered = useMemo(() => items.filter(i => i.label.includes(deferredQuery)), [items, deferredQuery]);
 ```
 
 ## No Code Splitting / No Lazy Loading
@@ -189,15 +191,15 @@ import { Page } from './page.components';
 
 ## What to Avoid
 
-| Anti-pattern | Why | Fix |
-|-------------|-----|-----|
-| `useEffect` for derived state | Extra render cycle | Use `useMemo` instead |
-| Computed arrays/objects as props | New reference every render, breaks `memo()` | `useMemo` |
-| Inline arrow functions as props | New reference every render | `useCallback` |
-| Subscribing to entire store | Re-renders on any change | Focused selectors |
-| Selecting a parent object from store | Won't react to field mutations | Select each leaf field separately |
-| Spreading/replacing objects in store | Re-renders all selectors on that subtree | Mutate fields in place |
-| MUI layout components (`Box`, `Stack`, `Grid`) | Heavy per-instance overhead | Raw HTML + `style` |
-| MUI `sx` prop | Emotion CSS-in-JS overhead | `styled()` or `style` prop |
-| Unvirtualized lists of 100+ items | All items rendered, slow layout | Virtualize |
-| Re-computing on every render | Wasted CPU | `useMemo` with deps |
+| Anti-pattern                                   | Why                                         | Fix                               |
+| ---------------------------------------------- | ------------------------------------------- | --------------------------------- |
+| `useEffect` for derived state                  | Extra render cycle                          | Use `useMemo` instead             |
+| Computed arrays/objects as props               | New reference every render, breaks `memo()` | `useMemo`                         |
+| Inline arrow functions as props                | New reference every render                  | `useCallback`                     |
+| Subscribing to entire store                    | Re-renders on any change                    | Focused selectors                 |
+| Selecting a parent object from store           | Won't react to field mutations              | Select each leaf field separately |
+| Spreading/replacing objects in store           | Re-renders all selectors on that subtree    | Mutate fields in place            |
+| MUI layout components (`Box`, `Stack`, `Grid`) | Heavy per-instance overhead                 | Raw HTML + `style`                |
+| MUI `sx` prop                                  | Emotion CSS-in-JS overhead                  | `styled()` or `style` prop        |
+| Unvirtualized lists of 100+ items              | All items rendered, slow layout             | Virtualize                        |
+| Re-computing on every render                   | Wasted CPU                                  | `useMemo` with deps               |

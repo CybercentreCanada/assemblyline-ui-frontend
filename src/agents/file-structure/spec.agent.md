@@ -44,7 +44,7 @@ test.describe('MyFeature', () => {
 
 ## Placement
 
-| File | Location |
-|------|----------|
-| Spec | `spec/<module>.spec.ts` |
+| File        | Location                     |
+| ----------- | ---------------------------- |
+| Spec        | `spec/<module>.spec.ts`      |
 | Adjacent to | `pom/<ComponentName>.pom.ts` |

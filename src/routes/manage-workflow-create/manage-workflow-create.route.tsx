@@ -118,7 +118,7 @@ export const ManageWorkflowCreatePage = memo(() => {
     },
     onFailure: api_data => {
       showErrorMessage(api_data.api_error_message);
-      navigate.here().closePanel(true);
+      navigate.here().closePanel({ route: '/manage/workflows' });
     }
   });
 
@@ -319,8 +319,14 @@ export const ManageWorkflowCreateRoute = createAppRoute({
   }),
 
   ancestor: '/manage/workflows',
-  shortname: location => ['app_route.manage_workflow_create_id.shortname', { ns: 'manageWorkflowDetail', id: location.path.id }],
-  fullname: location => ['app_route.manage_workflow_create_id.fullname', { ns: 'manageWorkflowDetail', id: location.path.id }],
+  shortname: location => [
+    'app_route.manage_workflow_create_id.shortname',
+    { ns: 'manageWorkflowDetail', id: location.path.id }
+  ],
+  fullname: location => [
+    'app_route.manage_workflow_create_id.fullname',
+    { ns: 'manageWorkflowDetail', id: location.path.id }
+  ],
   shorticon: () => <CreateOutlinedIcon />,
   fullicon: () => <CreateOutlinedIcon />,
 

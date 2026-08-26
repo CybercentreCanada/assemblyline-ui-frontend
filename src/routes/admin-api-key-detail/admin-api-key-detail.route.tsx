@@ -72,7 +72,7 @@ export const AdminAPIKeyDetailPage = memo(() => {
       onSuccess: () => {
         setDeleteDialog(false);
         showSuccessMessage(t('delete.success'));
-        navigate.here().closePanel(true);
+        navigate.here().closePanel({ route: '/admin/apikeys' });
       },
       onEnter: () => {
         setLoading(true);
@@ -128,7 +128,7 @@ export const AdminAPIKeyDetailPage = memo(() => {
         open={deleteDialog}
         handleClose={() => {
           setDeleteDialog(false);
-          navigate.here().closePanel(true);
+          navigate.here().closePanel({ route: '/admin/apikeys' });
         }}
         handleAccept={() => handleDelete()}
         title={t('delete.title')}

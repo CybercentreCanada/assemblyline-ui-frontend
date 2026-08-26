@@ -357,7 +357,7 @@ export const ManageSignatureDetailPage = memo(() => {
       onSuccess: () => {
         showSuccessMessage(t('change.success'));
         setModified(false);
-        navigate.here().closePanel(true);
+        navigate.here().closePanel({ route: '/manage/signatures' });
         setTimeout(() => window.dispatchEvent(new CustomEvent('reloadSignatures')), 1000);
         setSignature(s => ({
           ...s,
@@ -377,8 +377,8 @@ export const ManageSignatureDetailPage = memo(() => {
       method: 'DELETE',
       onSuccess: () => {
         showSuccessMessage(t('delete.success'));
-        if (id) setTimeout(() => navigate.here().closePanel(true), 1000);
-        navigate.here().closePanel(true);
+        if (id) setTimeout(() => navigate.here().closePanel({ route: '/manage/signatures' }), 1000);
+        navigate.here().closePanel({ route: '/manage/signatures' });
         setTimeout(() => window.dispatchEvent(new CustomEvent('reloadSignatures')), 1000);
       },
       onEnter: () => setButtonLoading(true),
@@ -639,7 +639,7 @@ export const ManageSignatureDetailPage = memo(() => {
           modified={modified}
           handleSuccess={() => {
             setModified(false);
-            navigate.here().closePanel(true);
+            navigate.here().closePanel({ route: '/manage/signatures' });
             setTimeout(() => window.dispatchEvent(new CustomEvent('reloadSignatures')), 1000);
             setSignature({
               ...signature,

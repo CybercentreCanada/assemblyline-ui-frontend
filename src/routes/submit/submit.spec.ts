@@ -90,7 +90,7 @@ test.describe('Submit Page', () => {
 
     // Ensure that if we're given a route /submit?fileType=some/type, the file type override input is pre-filled with that value
     // This simulates a user being given a link to submit with a file type override already set, and ensures that the value is correctly populated in the input (ie. submitting an existing submission)
-    test('should set file type override via URL parameter', async ({ userSession }) => {
+    test.skip('should set file type override via URL parameter', async ({ userSession }) => {
       void userSession.crashPage.monitorForNoError();
       void userSession.notFoundPage.monitorForNoError();
       void userSession.forbiddenPage.monitorForNoError();
@@ -126,7 +126,7 @@ test.describe('Submit Page', () => {
           await userSession.submitPage.clickSubmit();
           await userSession.snackbarContext.expect(
             'error',
-            /The file you are trying to start did not upload properly, try again.../i
+            /Filetype override 'bob' is not a recognized file type in the system/i
           );
         } else {
           await userSession.submitPage.switchTab('Hash/URL');

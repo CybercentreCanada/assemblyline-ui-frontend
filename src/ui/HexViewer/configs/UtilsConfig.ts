@@ -31,9 +31,8 @@ type MyExclude<T, U> = T extends U ? never : T;
 type MyPick<O, K> = IsObject<O> extends never ? never : { [P in keyof O as P extends K ? P : never]: O[P] };
 
 // Create Object with the chosen specific keys omitted
-export type MyOmit<O, K> = IsObject<O> extends never
-  ? never
-  : { [P in Exclude<keyof O, K extends keyof O ? K : never>]: O[P] };
+export type MyOmit<O, K> =
+  IsObject<O> extends never ? never : { [P in Exclude<keyof O, K extends keyof O ? K : never>]: O[P] };
 
 // Create an object with the keys of specified types selected
 type Pull<O, T> = IsObject<O> extends never ? never : { [P in keyof O as O[P] extends T ? P : never]: O[P] };
@@ -48,15 +47,16 @@ type HasChildObject<O> = keyof {
   : O;
 
 // Create an object with the keys of specified types selected recursively
-type PullR<O, T> = IsObject<O> extends never
-  ? never
-  : {
-      [P in keyof O as O[P] extends T ? P : IsObject<PullR<O[P], T>> extends never ? never : P]: IsObject<
-        O[P]
-      > extends never
-        ? O[P]
-        : PullR<O[P], T>;
-    };
+type PullR<O, T> =
+  IsObject<O> extends never
+    ? never
+    : {
+        [P in keyof O as O[P] extends T ? P : IsObject<PullR<O[P], T>> extends never ? never : P]: IsObject<
+          O[P]
+        > extends never
+          ? O[P]
+          : PullR<O[P], T>;
+      };
 
 // Apply partial to every key element recursively
 // type PartialR<T> = { [P in keyof T]?: T[P]; }
@@ -65,49 +65,50 @@ export type PartialR<T> = {
 };
 
 // Create an object with the keys of specified types dropped recursively
-type DropR<O, T> = IsObject<O> extends never
-  ? never
-  : {
-      [P in keyof O as O[P] extends IsObject<DropR<O[P], T>> ? P : O[P] extends T ? never : P]: IsObject<
-        O[P]
-      > extends never
-        ? O[P]
-        : DropR<O[P], T>;
-    };
+type DropR<O, T> =
+  IsObject<O> extends never
+    ? never
+    : {
+        [P in keyof O as O[P] extends IsObject<DropR<O[P], T>> ? P : O[P] extends T ? never : P]: IsObject<
+          O[P]
+        > extends never
+          ? O[P]
+          : DropR<O[P], T>;
+      };
 
 export type KeyType<O extends object, T> = keyof {
   [P in keyof O as O[P] extends T
     ? P
     : O[P] extends null | Array<any> | Map<any, any>
-    ? never
-    : O[P] extends object
-    ? KeyType<O[P], T> extends never
       ? never
-      : P
-    : never];
+      : O[P] extends object
+        ? KeyType<O[P], T> extends never
+          ? never
+          : P
+        : never];
 };
 
 export type PickType<O extends object, T> = {
   [P in keyof O as O[P] extends null | Array<any> | Map<any, any>
     ? never
     : O[P] extends T
-    ? P
-    : O[P] extends object
-    ? PickType<O[P], T> extends never
-      ? never
-      : P
-    : never]: Value<O, P>;
+      ? P
+      : O[P] extends object
+        ? PickType<O[P], T> extends never
+          ? never
+          : P
+        : never]: Value<O, P>;
 };
 export type OmitType<O extends object, T> = {
   [P in keyof O as O[P] extends null | Array<any> | Map<any, any>
     ? never
     : O[P] extends T
-    ? never
-    : O[P] extends object
-    ? OmitType<O[P], T> extends never
-      ? P
-      : never
-    : never]: Value<O, P>;
+      ? never
+      : O[P] extends object
+        ? OmitType<O[P], T> extends never
+          ? P
+          : never
+        : never]: Value<O, P>;
 };
 
 // 2. TYPE CONFIG
@@ -135,65 +136,71 @@ type ItemArrayConfig<T extends string | number | symbol> = Array<
   }]
 >;
 
-export type TypesConfig<O, T extends string | number | symbol> = IsObject<O> extends never
-  ? never
-  : {
-      [K in keyof PullR<O, T>]: Value<O, K> extends T
-        ? ItemArrayConfig<Value<O, K>>
-        : IsObject<Value<O, K>> extends never
-        ? never
-        : TypesConfig<Value<O, K>, T>;
-    };
+export type TypesConfig<O, T extends string | number | symbol> =
+  IsObject<O> extends never
+    ? never
+    : {
+        [K in keyof PullR<O, T>]: Value<O, K> extends T
+          ? ItemArrayConfig<Value<O, K>>
+          : IsObject<Value<O, K>> extends never
+            ? never
+            : TypesConfig<Value<O, K>, T>;
+      };
 
-export type IsTypeConfig<O, T extends string | number | symbol> = IsObject<O> extends never
-  ? never
-  : {
-      [K in keyof PullR<O, T>]: Value<O, K> extends T
-        ? (property?: Value<O, K> | object | number, match?: Value<O, K>) => boolean
-        : IsObject<Value<O, K>> extends never
-        ? never
-        : IsTypeConfig<Value<O, K>, T>;
-    };
+export type IsTypeConfig<O, T extends string | number | symbol> =
+  IsObject<O> extends never
+    ? never
+    : {
+        [K in keyof PullR<O, T>]: Value<O, K> extends T
+          ? (property?: Value<O, K> | object | number, match?: Value<O, K>) => boolean
+          : IsObject<Value<O, K>> extends never
+            ? never
+            : IsTypeConfig<Value<O, K>, T>;
+      };
 
-export type ItemsConfig<O, T extends string | number | symbol> = IsObject<O> extends never
-  ? never
-  : {
-      [K in keyof PullR<O, T>]: Value<O, K> extends T
-        ? (store: Store) => Array<{ value: number; label: string }>
-        : IsObject<Value<O, K>> extends never
-        ? never
-        : ItemsConfig<Value<O, K>, T>;
-    };
+export type ItemsConfig<O, T extends string | number | symbol> =
+  IsObject<O> extends never
+    ? never
+    : {
+        [K in keyof PullR<O, T>]: Value<O, K> extends T
+          ? (store: Store) => Array<{ value: number; label: string }>
+          : IsObject<Value<O, K>> extends never
+            ? never
+            : ItemsConfig<Value<O, K>, T>;
+      };
 
-export type GetValueConfig<O, T extends string | number | symbol> = IsObject<O> extends never
-  ? never
-  : {
-      [K in keyof PullR<O, T>]: Value<O, K> extends T
-        ? (store: Value<O, K> | Store | number) => number
-        : IsObject<Value<O, K>> extends never
-        ? never
-        : GetValueConfig<Value<O, K>, T>;
-    };
+export type GetValueConfig<O, T extends string | number | symbol> =
+  IsObject<O> extends never
+    ? never
+    : {
+        [K in keyof PullR<O, T>]: Value<O, K> extends T
+          ? (store: Value<O, K> | Store | number) => number
+          : IsObject<Value<O, K>> extends never
+            ? never
+            : GetValueConfig<Value<O, K>, T>;
+      };
 
-export type GetTypeConfig<O, T extends string | number | symbol> = IsObject<O> extends never
-  ? never
-  : {
-      [K in keyof PullR<O, T>]: Value<O, K> extends T
-        ? (value: number | Store) => Value<O, K>
-        : IsObject<Value<O, K>> extends never
-        ? never
-        : GetTypeConfig<Value<O, K>, T>;
-    };
+export type GetTypeConfig<O, T extends string | number | symbol> =
+  IsObject<O> extends never
+    ? never
+    : {
+        [K in keyof PullR<O, T>]: Value<O, K> extends T
+          ? (value: number | Store) => Value<O, K>
+          : IsObject<Value<O, K>> extends never
+            ? never
+            : GetTypeConfig<Value<O, K>, T>;
+      };
 
-export type FindTypeConfig<O, T extends string | number | symbol> = IsObject<O> extends never
-  ? never
-  : {
-      [K in keyof PullR<O, T>]: Value<O, K> extends T
-        ? (first: Value<O, K> | Store | number, second: Value<O, K> | Store | number) => Value<O, K>
-        : IsObject<Value<O, K>> extends never
-        ? never
-        : FindTypeConfig<Value<O, K>, T>;
-    };
+export type FindTypeConfig<O, T extends string | number | symbol> =
+  IsObject<O> extends never
+    ? never
+    : {
+        [K in keyof PullR<O, T>]: Value<O, K> extends T
+          ? (first: Value<O, K> | Store | number, second: Value<O, K> | Store | number) => Value<O, K>
+          : IsObject<Value<O, K>> extends never
+            ? never
+            : FindTypeConfig<Value<O, K>, T>;
+      };
 
 // 3. STORE CONFIG
 export type SetStoreConfig<O> = {
@@ -235,8 +242,8 @@ export type RemoveStoreKeysConfig<O> = {
   [K in keyof O as IsObject<O[K]> extends never
     ? never
     : HasChildObject<O[K]> extends never
-    ? never
-    : K]: RemoveStoreKeysConfig<O[K]>;
+      ? never
+      : K]: RemoveStoreKeysConfig<O[K]>;
 };
 
 export type SetStoreWithPathConfig<O> = {

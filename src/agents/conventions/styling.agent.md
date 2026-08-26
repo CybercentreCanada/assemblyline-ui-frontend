@@ -2,13 +2,13 @@
 
 ## Decision Table
 
-| Scenario | Approach |
-|----------|----------|
-| Single-use layout element | Raw HTML + `style` prop |
-| Reusable styled element | `styled('div')` from MUI |
-| 10+ instances (lists, grids) | Raw HTML + `style` prop |
-| Need MUI behavior (ripple, transitions) | Use MUI component + `sx` prop |
-| Performance-sensitive path | Prefer raw HTML + `style` over MUI |
+| Scenario                                | Approach                           |
+| --------------------------------------- | ---------------------------------- |
+| Single-use layout element               | Raw HTML + `style` prop            |
+| Reusable styled element                 | `styled('div')` from MUI           |
+| 10+ instances (lists, grids)            | Raw HTML + `style` prop            |
+| Need MUI behavior (ripple, transitions) | Use MUI component + `sx` prop      |
+| Performance-sensitive path              | Prefer raw HTML + `style` over MUI |
 
 ## Styling Props
 

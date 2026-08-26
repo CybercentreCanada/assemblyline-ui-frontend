@@ -21,20 +21,20 @@ Holds values that the user controls about how the app looks and behaves for them
 
 ## Key Files
 
-| File | Purpose |
-| ---- | ------- |
-| `preference.providers.tsx` | Store creation, `AppPreferenceProvider`, `AppPreferencePersistence` |
-| `preference.utils.ts` | `savePreferenceToLocalStorage`, `loadPreferenceFromLocalStorage`, `deepDiff` |
-| `preference.utils.test.ts` | Unit tests for persistence utilities |
-| `index.ts` | Barrel exports |
+| File                       | Purpose                                                                      |
+| -------------------------- | ---------------------------------------------------------------------------- |
+| `preference.providers.tsx` | Store creation, `AppPreferenceProvider`, `AppPreferencePersistence`          |
+| `preference.utils.ts`      | `savePreferenceToLocalStorage`, `loadPreferenceFromLocalStorage`, `deepDiff` |
+| `preference.utils.test.ts` | Unit tests for persistence utilities                                         |
+| `index.ts`                 | Barrel exports                                                               |
 
 ## Exports
 
-| Export | Description |
-| ------ | ----------- |
+| Export                       | Description                                                  |
+| ---------------------------- | ------------------------------------------------------------ |
 | `useAppPreference(selector)` | Read a slice of preference with selector-based subscriptions |
-| `useAppSetPreference()` | Returns a setter to shallow-merge a patch into preference |
-| `AppPreferenceProvider` | Mount at app root with `schema` + `storageKey` props |
+| `useAppSetPreference()`      | Returns a setter to shallow-merge a patch into preference    |
+| `AppPreferenceProvider`      | Mount at app root with `schema` + `storageKey` props         |
 
 ## Usage
 
@@ -47,7 +47,7 @@ const APP_PREFERENCES_KEY = 'al.preference';
 
 <AppPreferenceProvider schema={AppPreferenceSchema} storageKey={APP_PREFERENCES_KEY}>
   <App />
-</AppPreferenceProvider>
+</AppPreferenceProvider>;
 ```
 
 ```tsx

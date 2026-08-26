@@ -319,7 +319,7 @@ export const DeleteWorkflowAction: React.FC<DeleteWorkflowActionProps> = React.m
         onSuccess: () => {
           setDeleteDialog(false);
           showSuccessMessage(t('delete.success'));
-          navigate.here().closePanel(true);
+          navigate.here().closePanel({ route: '/manage/workflows' });
           setTimeout(() => window.dispatchEvent(new CustomEvent('reloadWorkflows')), 1000);
         },
         onEnter: () => setLoading(true),

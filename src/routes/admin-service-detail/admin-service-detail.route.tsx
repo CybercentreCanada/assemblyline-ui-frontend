@@ -84,7 +84,7 @@ export const AdminServiceDetailPage = memo(() => {
       onSuccess: () => {
         setModified(false);
         showSuccessMessage(t('save.success'));
-        if (svc) setTimeout(() => navigate.here().closePanel(true), 1000);
+        if (svc) setTimeout(() => navigate.here().closePanel({ route: '/admin/services' }), 1000);
         setTimeout(() => window.dispatchEvent(new CustomEvent('reloadServicesEvent')), 1000);
         invalidateApiQuery(({ url }) => '/api/v4/user/whoami/' === url, 3000);
       },
@@ -101,7 +101,7 @@ export const AdminServiceDetailPage = memo(() => {
       method: 'DELETE',
       onSuccess: () => {
         showSuccessMessage(t('delete.success'));
-        if (svc) setTimeout(() => navigate.here().closePanel(true), 1000);
+        if (svc) setTimeout(() => navigate.here().closePanel({ route: '/admin/services' }), 1000);
         setTimeout(() => window.dispatchEvent(new CustomEvent('reloadServicesEvent')), 1000);
         invalidateApiQuery(({ url }) => '/api/v4/user/whoami/' === url, 3000);
       },

@@ -1,9 +1,4 @@
-import type {
-  ConnectionDirection,
-  ConnectionType,
-  LookupType,
-  RequestMethod
-} from 'models/ontology/results/network';
+import type { ConnectionDirection, ConnectionType, LookupType, RequestMethod } from 'models/ontology/results/network';
 import type { SignatureType } from 'models/ontology/results/signature';
 
 export const BODY_FORMAT = [
