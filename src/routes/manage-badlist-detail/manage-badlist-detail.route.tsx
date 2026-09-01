@@ -16,7 +16,7 @@ import type { Badlist } from 'models/base/badlist';
 import { ATTRIBUTION_TYPES, DEFAULT_TEMP_ATTRIBUTION } from 'models/base/badlist';
 import { memo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { bytesToSize, safeFieldValue, safeFieldValueURI } from 'shared/utils/utils';
+import { bytesToSize, safeFieldValue } from 'shared/utils/utils';
 import { IconButton } from 'ui/buttons/IconButton';
 import Classification from 'ui/Classification';
 import ConfirmationDialog from 'ui/ConfirmationDialog';
@@ -271,7 +271,7 @@ export const ManageBadlistDetailPage = memo(() => {
                           route: '/search/:index',
                           path: { index: 'result' },
                           search: {
-                            query: `result.sections.tags.${badlist.tag.type}:${safeFieldValueURI(badlist.tag.value)}`
+                            query: `result.sections.tags.${badlist.tag.type}:${safeFieldValue(badlist.tag.value)}`
                           }
                         }
                   )

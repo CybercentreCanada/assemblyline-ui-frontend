@@ -481,7 +481,7 @@ export const ManageSignatureDetailPage = memo(() => {
                     route: '/search/:index',
                     path: { index: 'result' },
                     search: {
-                      query: `result.sections.tags.file.rule.${signature.type}:${safeFieldValueURI(`${signature.source}.${signature.name}`)}`
+                      query: `result.sections.tags.file.rule.${signature.type}:${safeFieldValue(`${signature.source}.${signature.name}`)}`
                     }
                   })
                 }

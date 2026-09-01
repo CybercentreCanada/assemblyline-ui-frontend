@@ -14,7 +14,7 @@ import useMySnackbar from 'deprecated/hooks/useMySnackbar';
 import type { Safelist } from 'models/base/safelist';
 import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { bytesToSize, safeFieldValue, safeFieldValueURI } from 'shared/utils/utils';
+import { bytesToSize, safeFieldValue } from 'shared/utils/utils';
 import { IconButton } from 'ui/buttons/IconButton';
 import Classification from 'ui/Classification';
 import ConfirmationDialog from 'ui/ConfirmationDialog';
@@ -252,8 +252,8 @@ export const ManageSafelistDetailPage = memo(() => {
                         safelist.type === 'file'
                           ? `result.sections.heuristic.signature.name:"SAFELIST_${safelistID}"`
                           : safelist.type === 'signature'
-                            ? `result.sections.heuristic.signature.name:${safeFieldValueURI(safelist.signature.name)}`
-                            : `result.sections.safelisted_tags.${safelist.tag.type}:${safeFieldValueURI(safelist.tag.value)}`
+                            ? `result.sections.heuristic.signature.name:${safeFieldValue(safelist.signature.name)}`
+                            : `result.sections.safelisted_tags.${safelist.tag.type}:${safeFieldValue(safelist.tag.value)}`
                     }
                   })
                 }

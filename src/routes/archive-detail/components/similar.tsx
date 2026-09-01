@@ -6,7 +6,7 @@ import useMySnackbar from 'deprecated/hooks/useMySnackbar';
 import type { File, SimilarResult, SimilarResults, SimilarType } from 'models/api/file';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { safeFieldValueURI } from 'shared/utils/utils';
+import { safeFieldValue } from 'shared/utils/utils';
 import { IconButton } from 'ui/buttons/IconButton';
 import {
   GridLinkRow,
@@ -79,7 +79,7 @@ const SimilarItem: React.FC<SimilarItemProps> = ({ data, drawer }) => {
                 nav
                   .to()
                   .create(
-                    `${DEFAULT_SIMILAR[data.type].prefix}${safeFieldValueURI(data.value)}${
+                    `${DEFAULT_SIMILAR[data.type].prefix}${safeFieldValue(data.value)}${
                       DEFAULT_SIMILAR[data.type].suffix
                     }`
                   )

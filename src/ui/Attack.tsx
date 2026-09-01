@@ -11,7 +11,7 @@ import { useAppIsHighlighted } from 'layout/highlighter/highlighter.hooks';
 import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { PossibleColor } from 'shared/utils/colors';
-import { safeFieldValueURI } from 'shared/utils/utils';
+import { safeFieldValue } from 'shared/utils/utils';
 import { CustomChip } from 'ui/CustomChip';
 
 const STYLE = { height: 'auto', minHeight: '20px' };
@@ -107,7 +107,7 @@ const WrappedAttack: React.FC<AttackProps> = ({
               nav.to().create({
                 route: '/search/:index',
                 path: { index: 'result' },
-                search: { query: `result.sections.heuristic.attack.pattern:${safeFieldValueURI(text)}` }
+                search: { query: `result.sections.heuristic.attack.pattern:${safeFieldValue(text)}` }
               })
             }
           >

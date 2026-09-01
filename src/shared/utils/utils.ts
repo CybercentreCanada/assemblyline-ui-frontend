@@ -5,13 +5,10 @@ import type { PossibleColor } from 'shared/utils/colors';
 import { LOWERCASE_HASH, URL_REGEX } from 'shared/utils/constant';
 
 /**
- *
- * Given a string, converts to Title Case by splitting on `_` and whitespace
- *
- * @param s - string to conver to title case
- *
+ * @name toTitleCase
+ * @description Converts a string to Title Case by splitting on `_` and whitespace.
+ * @param s - string to convert to title case
  * @returns title cased string
- *
  */
 export function toTitleCase(s: string) {
   return s
@@ -23,13 +20,10 @@ export function toTitleCase(s: string) {
 }
 
 /**
- *
- * Extract the `filename` parameter out of the `Content-Disposition` HTTP response header
- *
- * @param disposition - `Content-Disposition` header
- *
- * @returns filename contents
- *
+ * @name getFileName
+ * @description Extracts the `filename` parameter from a `Content-Disposition` HTTP response header.
+ * @param disposition - `Content-Disposition` header value
+ * @returns the filename, or null if not found
  */
 export function getFileName(disposition: string): string {
   const utf8FilenameRegex = /filename\*=UTF-8''([\w%\-.]+)(?:; ?|$)/i;
@@ -54,13 +48,11 @@ export function getFileName(disposition: string): string {
 }
 
 /**
- *
- * Convert a given second to human readable form
- *
- * @param seconds - seconds to convert
- *
- * @returns Human readable string
- *
+ * @name humanSeconds
+ * @description Converts a duration in seconds to a human-readable string.
+ * @param seconds - duration in seconds
+ * @param t - i18n translation function
+ * @returns human-readable duration string
  */
 export function humanSeconds(seconds: number, t) {
   if (seconds < 1) {
@@ -71,13 +63,10 @@ export function humanSeconds(seconds: number, t) {
 }
 
 /**
- *
- * Convert a given bytes to human readable form (base 2)
- *
- * @param bytes - total bytes to convert
- *
- * @returns Human readable string
- *
+ * @name bytesToSize
+ * @description Converts a byte count to a human-readable string (base 2).
+ * @param bytes - total bytes
+ * @returns human-readable size string
  */
 export function bytesToSize(bytes: number | null) {
   const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
@@ -87,13 +76,10 @@ export function bytesToSize(bytes: number | null) {
 }
 
 /**
- *
- * Format a version string into a standard response.
- *
- * @param verison - version string to parse
- *
- * @returns response.service_version:<framework>.<major>.<minor>.<build>
- *
+ * @name getVersionQuery
+ * @description Formats a version string into an Elasticsearch query for `response.service_version`.
+ * @param version - version string to parse
+ * @returns Elasticsearch query string
  */
 export function getVersionQuery(version: string | null) {
   try {
@@ -108,13 +94,10 @@ export function getVersionQuery(version: string | null) {
 }
 
 /**
- *
- * Convert a given number to human readable form (base 10)
- *
- * @param number - number to convert
- *
- * @returns Human readable string (with SI suffix)
- *
+ * @name humanReadableNumber
+ * @description Converts a number to a human-readable string with an SI suffix (base 10).
+ * @param num - number to convert
+ * @returns human-readable string with SI suffix
  */
 export function humanReadableNumber(num: number | null) {
   const sizes = ['', 'k', 'm', 'g', 't', 'p', 'e', 'z', 'y'];
@@ -124,11 +107,8 @@ export function humanReadableNumber(num: number | null) {
 }
 
 /**
- *
- * Sets the favicon link back to the default icon
- *
- * @returns {void}
- *
+ * @name resetFavicon
+ * @description Resets the favicon to the default icon.
  */
 export function resetFavicon() {
   const favicon: HTMLLinkElement = document.querySelector('#favicon');
@@ -136,11 +116,8 @@ export function resetFavicon() {
 }
 
 /**
- *
- * Sets the favicon to the default notify/done icon
- *
- * @returns {void}
- *
+ * @name setNotifyFavicon
+ * @description Sets the favicon to the notify/done icon.
  */
 export function setNotifyFavicon() {
   const favicon: HTMLLinkElement = document.querySelector('#favicon');
@@ -159,15 +136,12 @@ const COLOR_MAP = {
 };
 
 /**
- *
- * Get the corresponding color class for the given verdict
- *
+ * @name verdictToColor
+ * @description Returns the MUI color name corresponding to the given verdict string.
  * @param verdict - maliciousness verdict
- *
- * @returns color
- *
+ * @returns MUI color name
  */
-export function verdictToColor(verdict): PossibleColor {
+export function verdictToColor(verdict: string): PossibleColor {
   return COLOR_MAP[verdict];
 }
 
@@ -183,26 +157,20 @@ const RANK_MAP = {
 };
 
 /**
- *
- * Get the corresponding ranking number for the given verdict
- *
+ * @name verdictRank
+ * @description Returns a numeric rank for the given verdict, where lower is more severe.
  * @param verdict - maliciousness verdict
- *
- * @returns rank
- *
+ * @returns numeric rank
  */
-export function verdictRank(verdict): number {
+export function verdictRank(verdict: string): number {
   return RANK_MAP[verdict];
 }
 
 /**
- *
- * Get the text representation of the given priority number
- *
- * @param priority - priority number
- *
- * @returns human readable priority
- *
+ * @name priorityText
+ * @description Returns a human-readable label for the given numeric priority.
+ * @param priority - numeric priority value
+ * @returns human-readable priority label
  */
 export function priorityText(priority: number | null) {
   if (priority > 1000) {
@@ -233,14 +201,11 @@ export function priorityText(priority: number | null) {
 }
 
 /**
- *
- * Get a value from an object for a given path
- *
- * @param obj - the object to parse
- * @param path - the dotted path to look up
- *
- * @returns value from path
- *
+ * @name getValueFromPath
+ * @description Retrieves a nested value from an object using a dot-separated path.
+ * @param obj - the object to traverse
+ * @param path - dot-separated path string (e.g. `"a.b.c"`)
+ * @returns the value at the path, or `undefined` if not found
  */
 export function getValueFromPath(obj: object, path: string): undefined | string | object {
   if (path === undefined || path === null) {
@@ -260,11 +225,9 @@ export function getValueFromPath(obj: object, path: string): undefined | string 
 }
 
 /**
- *
- * Get the oauth provider info
- *
- * @returns oauth provider
- *
+ * @name getProvider
+ * @description Returns the OAuth provider name from the current URL.
+ * @returns OAuth provider name, or null if not found
  */
 export function getProvider() {
   if (window.location.pathname.indexOf(`/oauth/`) !== -1) {
@@ -275,11 +238,9 @@ export function getProvider() {
 }
 
 /**
- *
- * Check if we are receiving a SAML sign-in message
- *
- * @returns oauth provider
- *
+ * @name getSAMLData
+ * @description Parses SAML sign-in data from the current URL.
+ * @returns parsed SAML data object, or null if not a SAML sign-in
  */
 export function getSAMLData() {
   if (window.location.pathname.indexOf('/saml/') !== -1) {
@@ -294,16 +255,12 @@ export function getSAMLData() {
 }
 
 /**
- *
- * Convert the returned result count from an Elasticsearch query into a meaningful string.
- * Only in the case of results exactly totaling the limit, Elastic may or may not still have more results.
- * In this case, a '+' is appended to indicate an approximiation.
- *
- * @param count - number of results returned from an Elasticsearch query
- * @param max - the result limit set in Elasticsearch
- *
- * @returns count
- *
+ * @name searchResultsDisplay
+ * @description Converts an Elasticsearch result count to a display string.
+ * Appends `+` when the count exactly matches the limit, indicating more results may exist.
+ * @param count - number of results returned
+ * @param max - result cap used in the query (default: 10000)
+ * @returns display string, e.g. `"42"` or `"10000+"`
  */
 export function searchResultsDisplay(count: number, max: number = 10000) {
   const params = new URLSearchParams(window.location.search);
@@ -317,14 +274,11 @@ export function searchResultsDisplay(count: number, max: number = 10000) {
 }
 
 /**
- *
- * Truncate the given string to the provided length and append ellipses.
- *
+ * @name maxLenStr
+ * @description Truncates a string to the given length and appends `...` if truncated.
  * @param str - string to truncate
- * @param len - max length of string
- *
+ * @param len - maximum length
  * @returns truncated string
- *
  */
 export function maxLenStr(str: string, len: number) {
   if (str.length > len) {
@@ -334,13 +288,11 @@ export function maxLenStr(str: string, len: number) {
 }
 
 /**
- *
- * Converts data to a string, escapes double backslash and double quotes and wraps in double quotes.
- *
- * @param data - data to esacpe
- *
- * @returns escaped string
- *
+ * @name safeFieldValue
+ * @description Wraps a value in double quotes for use in Elasticsearch field queries,
+ * escaping backslashes and double quotes.
+ * @param data - value to escape
+ * @returns quoted, escaped string (e.g. `"foo \"bar\""`)
  */
 export function safeFieldValue(data: string | number | boolean) {
   const temp = String(data);
@@ -348,26 +300,22 @@ export function safeFieldValue(data: string | number | boolean) {
 }
 
 /**
- *
- * Converts data to a "safe" string and then URI encodes it.
- *
- * @param data - data to esacpe
- *
- * @returns URI encoded, escaped string
- *
+ * @name safeFieldValueURI
+ * @description Identical to `safeFieldValue` — wraps and escapes a value for use in Elasticsearch field queries.
+ * The URI-encoding step was removed; use `safeFieldValue` directly instead.
+ * @param data - value to escape
+ * @returns quoted, escaped string
  */
 export function safeFieldValueURI(data: string | number | boolean) {
   return `${encodeURIComponent(safeFieldValue(data))}`;
 }
 
 /**
- *
- * Matches on valid SHA256 hashes and returns the hash. Returns `null` on invalid hashes.
- *
- * @param data - data to parse
- *
- * @returns sha256 hash as a string, or null
- *
+ * @name matchSHA256
+ * @description Matches a valid SHA-256 hash and returns it, trimming surrounding whitespace.
+ * Returns `null` for non-matching input.
+ * @param data - string to test
+ * @returns SHA-256 hash string, or null
  */
 export function matchSHA256(data: string) {
   const sha256ParseRE = /^\s*([a-fA-F0-9]{64})\s*$/;
@@ -376,13 +324,11 @@ export function matchSHA256(data: string) {
 }
 
 /**
- *
- * A defanged URL has had some of its parts changed to make it inaccessible or unclickable
- * Here is the list of techniques used to refang URLs:
- * https://www.npmjs.com/package/fanger
- *
- * @param value - URL to be refanged
- * @returns refanged URL
+ * @name refang
+ * @description Reverses common URL defanging techniques to restore a usable URL.
+ * See https://www.npmjs.com/package/fanger for the techniques handled.
+ * @param value - defanged URL string
+ * @returns refanged URL string
  */
 const refang = (value: string): string =>
   value
@@ -396,40 +342,31 @@ const refang = (value: string): string =>
     .replaceAll(/h(x|X){1,2}p/g, 'http');
 
 /**
- *
- * Matches on valid URL and returns the result array. Returns `null` on invalid URLs.
- * Note: Path and Query params are validated but not captured.
- *
- * @param data - string to parse
- *
- * @returns Matching RegEx Result Array or NULL
- *
+ * @name isURL
+ * @description Matches on valid URLs and returns `true` for valid input.
+ * Defanged URLs (e.g. `hxxp://`, `[.]`) are refanged before matching.
+ * @param value - string to test
+ * @returns `true` if the value is a valid (or defanged) URL
  */
 export const isURL = (value: string): boolean => !!URL_REGEX.exec(refang(value));
 
 /**
- *
- * A function working the same way as array.filter but for object
- *
- * @param obj - obj to filter
- * @param callback - function used to do the filtering
- *
- * @returns new object with filtered keys
- *
+ * @name filterObject
+ * @description Filters an object's entries by a callback, similar to `Array.prototype.filter`.
+ * @param obj - object to filter
+ * @param callback - `(value, key) => boolean` predicate
+ * @returns new object containing only entries for which the callback returns truthy
  */
-export function filterObject(obj: object, callback) {
+export function filterObject(obj: object, callback: (val: unknown, key: string) => boolean) {
   return Object.fromEntries(Object.entries(obj).filter(([key, val]) => callback(val, key)));
 }
 
 /**
- *
- * A function that determines the submittable type of the input string, if any.
- *
- * @param input - value to check
- *
- * @param configuration - the Assemblyline context configuration
- *
- * @returns [type, input]: A tuple where the type is a string of the detected type of the input provided and the input string is parsed where hashes have their start and ending spaces removed.
+ * @name getSubmitType
+ * @description Determines the submittable type of the input string (hash type, URL, or unknown).
+ * @param input - value to classify
+ * @param configuration - Assemblyline configuration (used for file source patterns)
+ * @returns tuple of `[type, normalizedInput]`; type is `null` when unrecognised
  */
 export function getSubmitType(input: string, configuration: Configuration): [HashPatternMap, string] {
   const value = String(input);
@@ -451,22 +388,19 @@ export function getSubmitType(input: string, configuration: Configuration): [Has
 }
 
 /**
- *
- * Sum all the values of an object
- *
- * @param obj an object of values to be added together
- *
- * @returns type as number
- *
+ * @name sumValues
+ * @description Sums all numeric values of an object.
+ * @param obj - object whose values are numbers
+ * @returns sum of all values
  */
 type ObjectOfInts = Record<string, number>;
 export const sumValues = (obj: ObjectOfInts) => Object.values(obj).reduce((a, b) => a + b, 0);
 
 /**
- * Computes the SHA-256 hash of a given string.
- *
- * @param {string} message - The input string to hash.
- * @returns {string} - The SHA-256 hash as a hexadecimal string.
+ * @name getSHA256
+ * @description Computes the SHA-256 hash of a string.
+ * @param value - input string to hash
+ * @returns SHA-256 hash as a lowercase hexadecimal string
  */
 export const getSHA256 = (value: string) =>
   new Promise<string>(async (resolve, reject) => {
@@ -492,14 +426,11 @@ export const getSHA256 = (value: string) =>
   });
 
 /**
- * Recursively extracts text content from ReactNode, including nested elements.
- *
- * This function processes a `ReactNode` (which can be text, numbers, React elements,
- * fragments, or arrays of nodes) and concatenates all the text content found,
- * even in deeply nested structures.
- *
- * @param children - The ReactNode to extract text content from.
- * @returns A string containing all the concatenated text content from the children.
+ * @name getTextContent
+ * @description Recursively extracts and concatenates all text content from a `ReactNode` tree.
+ * Returns the result lowercased with spaces replaced by `-`.
+ * @param children - React node tree to extract text from
+ * @returns concatenated, lowercased, hyphenated text content
  */
 export const getTextContent = (children: ReactNode): string => {
   let textContent = '';

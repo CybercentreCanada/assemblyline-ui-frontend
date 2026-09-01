@@ -12,7 +12,7 @@ import { DEFAULT_STATS } from 'models/base/statistic';
 import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ResultsTable } from 'routes/search/components/results';
-import { safeFieldValueURI } from 'shared/utils/utils';
+import { safeFieldValue } from 'shared/utils/utils';
 import { IconButton } from 'ui/buttons/IconButton';
 import Classification from 'ui/Classification';
 import Histogram from 'ui/Histogram';
@@ -122,7 +122,7 @@ export const ManageHeuristicDetailPage = memo(() => {
                 nav.to().create({
                   route: '/search/:index',
                   path: { index: 'result' },
-                  search: { query: `result.sections.heuristic.heur_id:${safeFieldValueURI(heuristic.heur_id)}` }
+                  search: { query: `result.sections.heuristic.heur_id:${safeFieldValue(heuristic.heur_id)}` }
                 })
               }
               tooltip={t('usage')}

@@ -23,7 +23,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { HiOutlineExternalLink } from 'react-icons/hi';
 import type { Index } from 'routes/search/search.route';
-import { getSHA256, getSubmitType, safeFieldValueURI, toTitleCase } from 'shared/utils/utils';
+import { getSHA256, getSubmitType, safeFieldValue, toTitleCase } from 'shared/utils/utils';
 import Classification from 'ui/Classification';
 import ClassificationMismatchDialog from 'ui/ClassificationMismatchDialog';
 import { CLUE_TYPE_MAP } from 'ui/EnrichmentCustomChip';
@@ -459,13 +459,13 @@ const WrappedActionMenu = ({
                 ? nav.to<'/search/:index'>().create({
                     route: '/search/:index',
                     path: { index: index as Index },
-                    search: { query: `${type}:${safeFieldValueURI(value)}` }
+                    search: { query: `${type}:${safeFieldValue(value)}` }
                   })
                 : nav.to<'/search/:index'>().create({
                     route: '/search/:index',
                     path: { index: categoryIndex[category] as Index },
                     search: {
-                      query: `${category === 'tag' && maliciousness === 'safe' ? 'result.sections.safelisted_tags.' : categoryPrefix[category]}${type}:${safeFieldValueURI(
+                      query: `${category === 'tag' && maliciousness === 'safe' ? 'result.sections.safelisted_tags.' : categoryPrefix[category]}${type}:${safeFieldValue(
                         value
                       )}`
                     }

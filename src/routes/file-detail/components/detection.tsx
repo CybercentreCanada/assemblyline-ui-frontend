@@ -12,7 +12,7 @@ import { HEURISTIC_LEVELS } from 'models/base/heuristic';
 import type { Section } from 'models/base/result';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { safeFieldValueURI } from 'shared/utils/utils';
+import { safeFieldValue } from 'shared/utils/utils';
 import ResultSection from 'ui/ResultCard/result_section';
 import SectionContainer from 'ui/SectionContainer';
 
@@ -150,7 +150,7 @@ const WrappedHeuristic: React.FC<HeuristicProps> = ({ name, id, sections, level,
                 nav.to().create({
                   route: '/search/:index',
                   path: { index: 'result' },
-                  search: { query: `result.sections.heuristic.heur_id:${safeFieldValueURI(id)}` }
+                  search: { query: `result.sections.heuristic.heur_id:${safeFieldValue(id)}` }
                 })
               }
               navDeps={[id]}
