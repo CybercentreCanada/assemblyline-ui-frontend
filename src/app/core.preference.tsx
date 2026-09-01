@@ -25,8 +25,8 @@ const AUTH_PREFERENCE_SCHEMA = zObject({
 
 /** Panel layout and navigation behaviour settings. */
 const ROUTER_PREFERENCE_SCHEMA = zObject({
-  /** Maximum number of nested route nodes allowed per panel. */
-  maxNodes: zNumber().catch(2),
+  /** Maximum number of extra nodes. */
+  maxNodes: zNumber().catch(0),
   /** Maximum number of side-by-side panels allowed. */
   maxPanels: zNumber().catch(2),
   /** How navigation behaves when reaching the end of the stack. */
