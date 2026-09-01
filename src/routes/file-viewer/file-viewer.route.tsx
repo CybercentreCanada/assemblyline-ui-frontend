@@ -27,7 +27,7 @@ import {
   useTheme
 } from '@mui/material';
 import { AppLink, AppNavigate, useAppNavigate } from 'core/router';
-import { createAppRoute, useAppPathParams } from 'core/routes';
+import { createAppRoute, useAppPathParams, useAppSearchParams } from 'core/routes';
 import { AppPageFullSize } from 'core/template';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
@@ -293,11 +293,11 @@ const FileViewerPage = React.memo(() => {
                       onClick={() => setSubmitAnchor(null)}
                       {...(isSelection
                         ? {
-                            to: '/submit',
-                            state: { raw: selection?.getSelection() }
+                            nav: nav =>
+                              nav.to().create({ route: '/submit', search: { raw: selection?.getSelection() } })
                           }
                         : {
-                            to: `/submit?hash=${sha256}`
+                            nav: nav => nav.to().create({ route: '/submit', search: { hash: sha256 } })
                           })}
                     >
                       <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
@@ -473,7 +473,6 @@ const WrappedFileViewerPage = React.memo(() => (
   </SelectionProvider>
 ));
 
-// TODO: it shows the /:tab at the end where it shouldn't. if the tab value is null, it will show null where it should have shown "ascii" as the default value
 export const FileViewerRoute = createAppRoute({
   component: WrappedFileViewerPage,
 
@@ -481,6 +480,15 @@ export const FileViewerRoute = createAppRoute({
   params: s => ({
     id: s.string(),
     tab: s.enum(TAB_OPTIONS, 'ascii')
+  }),
+  search: s => ({
+    cursor: s.number(null),
+    endIndex: s.number(null),
+    mode: s.enum('text', ['cursor', 'hex', 'text']),
+    query: s.string(''),
+    scroll: s.number(null),
+    selectedResult: s.number(null),
+    startIndex: s.number(null)
   }),
 
   ancestor: null,
@@ -498,10 +506,15 @@ export const FileViewerRoute = createAppRoute({
 
 const FileViewerRootPage = React.memo(() => {
   const { id = null } = useAppPathParams<'/file/viewer/:id'>();
+  const search = useAppSearchParams<'/file/viewer/:id'>();
   return (
     <AppNavigate
-      nav={nav => nav.to({ replace: true }).update({ route: '/file/viewer/:id/:tab', path: { id, tab: null } })}
-      navDeps={[id]}
+      nav={nav =>
+        nav
+          .to({ replace: true })
+          .update({ route: '/file/viewer/:id/:tab', path: { id, tab: null }, search: search as never })
+      }
+      navDeps={[id, search]}
     />
   );
 });
@@ -512,6 +525,15 @@ export const FileViewerRootRoute = createAppRoute({
   path: '/file/viewer/:id',
   params: s => ({
     id: s.string()
+  }),
+  search: s => ({
+    cursor: s.number(null),
+    endIndex: s.number(null),
+    mode: s.enum('text', ['cursor', 'hex', 'text']),
+    query: s.string(''),
+    scroll: s.number(null),
+    selectedResult: s.number(null),
+    startIndex: s.number(null)
   }),
 
   ancestor: null,
