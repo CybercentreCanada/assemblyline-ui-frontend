@@ -357,8 +357,13 @@ export const isURL = (value: string): boolean => !!URL_REGEX.exec(refang(value))
  * @param callback - `(value, key) => boolean` predicate
  * @returns new object containing only entries for which the callback returns truthy
  */
-export function filterObject(obj: object, callback: (val: unknown, key: string) => boolean) {
-  return Object.fromEntries(Object.entries(obj).filter(([key, val]) => callback(val, key)));
+export function filterObject<T extends object>(
+  obj: T,
+  callback: (val: T[keyof T], key: keyof T) => boolean
+): Partial<T> {
+  return Object.fromEntries(
+    (Object.entries(obj) as [keyof T, T[keyof T]][]).filter(([key, val]) => callback(val, key))
+  ) as Partial<T>;
 }
 
 /**
