@@ -53,14 +53,20 @@ const ServiceGeneral = ({
 
   useEffect(() => {
     // Check for issues with range selection
-    if (service.licence_count < 1) {
+    if (!service.licence_count || service.licence_count < 1) {
       // Maximum has no limit, so settings are always valid
-    } else if (service.min_instances >= 0 && service.min_instances > service.licence_count) {
+      setInstancesError(false);
+    } else if (
+      service.min_instances !== null &&
+      service.min_instances !== undefined &&
+      service.min_instances >= 0 &&
+      service.min_instances > service.licence_count
+    ) {
       // Minimum number of instances should never surpass maximum
       setInstancesError(true);
-      return;
+    } else {
+      setInstancesError(false);
     }
-    setInstancesError(false);
   }, [service.min_instances, service.licence_count]);
 
   if (!constants || !defaults || !service || !serviceNames || !versions) {
@@ -275,22 +281,26 @@ const ServiceGeneral = ({
               label={t('general.instances')}
               loading={!service}
               placeholder={t('limit.system_default')}
-              value={!service ? null : service.min_instances > 0 ? service.min_instances : null}
-              defaultValue={!service ? undefined : defaults?.min_instances || 0}
+              value={!service ? null : (service.min_instances ?? null)}
+              defaultValue={!service ? undefined : (defaults?.min_instances ?? null)}
               reset={showReset(service, defaults, 'min_instances')}
               min={0}
-              {...(service.licence_count && { max: service.licence_count })}
+              {...(typeof service.licence_count === 'number' &&
+                service.licence_count >= 0 && { max: service.licence_count })}
               endAdornment="↓"
               validators={v => v.inRange().isInteger()}
               coercers={c => c.inRange().floor()}
               validate={val =>
-                service.licence_count > 0 && val > service.licence_count
+                typeof service.licence_count === 'number' &&
+                service.licence_count >= 0 &&
+                typeof val === 'number' &&
+                val > service.licence_count
                   ? { status: 'error', message: t('general.instances.error') }
                   : null
               }
               onChange={(e, v) => {
                 if (service?.min_instances !== v) setModified(true);
-                setService(s => ({ ...s, min_instances: !v ? 0 : s.licence_count ? Math.min(s.licence_count, v) : v }));
+                setService(s => ({ ...s, min_instances: v }));
               }}
             />
           </Grid>
@@ -300,8 +310,8 @@ const ServiceGeneral = ({
               id="licence_count"
               loading={!service}
               placeholder={t('limit.none')}
-              value={!service ? null : service.licence_count > 0 ? service.licence_count : null}
-              defaultValue={!service ? undefined : defaults?.licence_count || 0}
+              value={!service ? null : (service.licence_count ?? null)}
+              defaultValue={!service ? undefined : (defaults?.licence_count ?? null)}
               reset={showReset(service, defaults, 'licence_count')}
               min={0}
               validators={v => v.inRange().isInteger()}
@@ -311,8 +321,8 @@ const ServiceGeneral = ({
                 if (service?.licence_count !== v) setModified(true);
                 setService(s => ({
                   ...s,
-                  ...(!v
-                    ? { min_instances: 0, licence_count: 0 }
+                  ...(v == null || typeof s.min_instances !== 'number'
+                    ? { licence_count: v }
                     : { min_instances: Math.min(s.min_instances, v), licence_count: v })
                 }));
               }}
