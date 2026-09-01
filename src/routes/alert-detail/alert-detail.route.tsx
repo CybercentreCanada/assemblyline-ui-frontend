@@ -104,7 +104,7 @@ export const AlertDetailPage = memo(() => {
 
   const upSM = useMediaQuery(theme.breakpoints.up('sm'));
 
-  const alert = useMemo(() => fetchedAlert || search.get('alert') || null, [fetchedAlert, search]);
+  const alert = useMemo(() => fetchedAlert || search.get('alert') || null, [fetchedAlert, search?.toString()]);
 
   useEffect(() => {
     if (!currentUser.roles.includes('alert_view') || search.get('alert')) return;

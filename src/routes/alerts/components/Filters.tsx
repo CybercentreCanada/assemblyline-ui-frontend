@@ -647,7 +647,7 @@ const WrappedAlertFilters = () => {
 
   useEffect(() => {
     if (open) setQuery(search.toParams());
-  }, [open, search]);
+  }, [open, search?.toString()]);
 
   useEffect(() => {
     if (render) {

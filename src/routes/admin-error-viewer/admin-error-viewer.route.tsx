@@ -128,7 +128,7 @@ export const AdminErrorViewerPage = memo(() => {
     });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentUser.is_admin, search]);
+  }, [currentUser.is_admin, search?.toString()]);
 
   useEffect(() => {
     apiCall<IndexDefinition>({

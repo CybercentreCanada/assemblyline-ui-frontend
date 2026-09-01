@@ -217,7 +217,7 @@ export const AlertGroup: React.FC<AlertActionProps> = React.memo(
       const g = search.get('group_by');
       if (!alert || !alert.group_count || !g) return null;
       else return `${g}:${getValueFromPath(alert, g) as string}`;
-    }, [alert, search]);
+    }, [alert, search?.toString()]);
 
     return (
       <AlertActionButton
@@ -280,7 +280,7 @@ export const AlertOwnership: React.FC<AlertActionProps> = React.memo(
           return { ...p, q: p.group_by ? f : `alert_id:${alert.alert_id}` };
         })
         .pick(['tc', 'tc_start', 'fq', 'q']);
-    }, [alert, search]);
+    }, [alert, search?.toString()]);
 
     const handleTakeOwnership = useCallback(
       (prevAlert: AlertItem, q: string) => {
@@ -448,7 +448,7 @@ export const AlertWorkflow: React.FC<AlertWorkflowProps> = React.memo(
             ? `${p.group_by}:${getValueFromPath(alert, p.group_by) as string}`
             : `alert_id:${alert.alert_id}`
       }));
-    }, [alert, inDrawer, search, speedDial]);
+    }, [alert, inDrawer, search?.toString(), speedDial]);
 
     return (
       <>

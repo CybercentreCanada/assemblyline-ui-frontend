@@ -80,11 +80,11 @@ export const AlertWorkflowDrawer = React.memo(
       if (!search || !search.has('q')) return false;
       const query = search.get('q');
       return typeof query === 'string' && query.startsWith('alert_id');
-    }, [search]);
+    }, [search?.toString()]);
 
     const filteredSearch = useMemo(
       () => (!search ? null : search.pick(isSingleAlert ? ['q', 'tc', 'tc_start'] : ['q', 'tc', 'tc_start', 'fq'])),
-      [isSingleAlert, search]
+      [isSingleAlert, search?.toString()]
     );
 
     const hasParams = useMemo<boolean>(

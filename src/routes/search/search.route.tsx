@@ -23,7 +23,7 @@ import type { SignatureIndexed } from 'models/base/signature';
 import type { SubmissionIndexed } from 'models/base/submission';
 import type { Role } from 'models/base/user';
 import type React from 'react';
-import { memo, useCallback, useMemo } from 'react';
+import { memo, useCallback, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ForbiddenPage } from 'routes/forbidden/forbidden';
 import { AlertsTable } from 'routes/search/components/alerts';
@@ -58,6 +58,8 @@ export const SearchPage = () => {
   const { showErrorMessage } = useMySnackbar();
 
   const index = search.get('index');
+
+  const queryValue = useRef<string>('');
 
   const downSM = useMediaQuery(theme.breakpoints.down('md'));
 
@@ -109,7 +111,7 @@ export const SearchPage = () => {
             .set(s => ({ ...s, ...search.defaults().pick(['offset', 'rows', 'sort']).toObject() }))
             .pick(['query', 'offset', 'rows', 'sort', 'use_archive'])
             .toObject(),
-    [index, search]
+    [index, search.toString()]
   );
 
   const submissionResults = useApiQuery<SearchResult<SubmissionIndexed>>({
@@ -218,9 +220,24 @@ export const SearchPage = () => {
         <div style={{ paddingTop: theme.spacing(1) }}>
           <SearchBar
             initValue={search ? search.get('query') : ''}
-            // searching={searching}
+            searching={
+              tab === 'alert'
+                ? alertResults.isFetching
+                : tab === 'file'
+                  ? fileResults.isFetching
+                  : tab === 'result'
+                    ? resultResults.isFetching
+                    : tab === 'retrohunt'
+                      ? retrohuntResults.isFetching
+                      : tab === 'signature'
+                        ? signatureResults.isFetching
+                        : submissionResults.isFetching
+            }
             placeholder={t(`search_${index || id || 'all'}`)}
             suggestions={suggestions}
+            onValueChange={(inputValue: string) => {
+              queryValue.current = inputValue;
+            }}
             onClear={() =>
               navigate.here<'/search/:index'>().update(s => ({ ...s, search: { ...s.search, query: '', offset: 0 } }))
             }
@@ -294,7 +311,7 @@ export const SearchPage = () => {
                 {currentUser.roles.includes('submission_view') ? (
                   <Tab
                     label={`${t('submission')} (${
-                      !submissionResults.isPending ? searchResultsDisplay(submissionResults.data.total) : '...'
+                      !submissionResults.isFetching ? searchResultsDisplay(submissionResults.data.total) : '...'
                     })`}
                     value="submission"
                   />
@@ -303,7 +320,7 @@ export const SearchPage = () => {
                 )}
                 {currentUser.roles.includes('submission_view') ? (
                   <Tab
-                    label={`${t('file')} (${!fileResults.isPending ? searchResultsDisplay(fileResults.data.total) : '...'})`}
+                    label={`${t('file')} (${!fileResults.isFetching ? searchResultsDisplay(fileResults.data.total) : '...'})`}
                     value="file"
                   />
                 ) : (
@@ -311,7 +328,7 @@ export const SearchPage = () => {
                 )}
                 {currentUser.roles.includes('submission_view') ? (
                   <Tab
-                    label={`${t('result')} (${!resultResults.isPending ? searchResultsDisplay(resultResults.data.total) : '...'})`}
+                    label={`${t('result')} (${!resultResults.isFetching ? searchResultsDisplay(resultResults.data.total) : '...'})`}
                     value="result"
                   />
                 ) : (
@@ -320,7 +337,7 @@ export const SearchPage = () => {
                 {currentUser.roles.includes('signature_view') ? (
                   <Tab
                     label={`${t('signature')} (${
-                      !signatureResults.isPending ? searchResultsDisplay(signatureResults.data.total) : '...'
+                      !signatureResults.isFetching ? searchResultsDisplay(signatureResults.data.total) : '...'
                     })`}
                     value="signature"
                   />
@@ -329,7 +346,7 @@ export const SearchPage = () => {
                 )}
                 {currentUser.roles.includes('alert_view') ? (
                   <Tab
-                    label={`${t('alert')} (${!alertResults.isPending ? searchResultsDisplay(alertResults.data.total) : '...'})`}
+                    label={`${t('alert')} (${!alertResults.isFetching ? searchResultsDisplay(alertResults.data.total) : '...'})`}
                     value="alert"
                   />
                 ) : (
@@ -338,7 +355,7 @@ export const SearchPage = () => {
                 {currentUser.roles.includes(permissionMap.retrohunt) && configuration.retrohunt.enabled ? (
                   <Tab
                     label={`${t('retrohunt')} (${
-                      !retrohuntResults.isPending ? searchResultsDisplay(retrohuntResults.data.total) : '...'
+                      !retrohuntResults.isFetching ? searchResultsDisplay(retrohuntResults.data.total) : '...'
                     })`}
                     value="retrohunt"
                   />
