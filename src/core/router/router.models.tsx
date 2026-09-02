@@ -27,8 +27,6 @@ export type AppRouterPanel = {
 
 /** Represents a cached portal node in the router. */
 export type AppRouterNode = {
-  /** Timestamp of last use for cache eviction. */
-  lastUsedAt?: number;
   /** Reverse portal node reference. */
   portal: ReversePortalNode;
   /** Route key this node renders. */
