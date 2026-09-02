@@ -441,6 +441,7 @@ const WrappedActionMenu = ({
                 }
               })
             }
+            onClick={handleClose}
           >
             {SIGNATURE_ICON}
             {t('goto_signature')}
@@ -511,6 +512,7 @@ const WrappedActionMenu = ({
               dense
               component={AppLink}
               nav={nav => nav.to().create({ route: '/submit', search: { hash: value, classification } })}
+              onClick={handleClose}
             >
               {SUBMIT_ICON}
               {t('submit') + ` ${submitType.toUpperCase()}`}
