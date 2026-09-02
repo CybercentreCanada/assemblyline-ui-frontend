@@ -1832,6 +1832,18 @@ export const getTitlesFromNavigation = function (
     .filter((title): title is string => Boolean(title));
 };
 
+export const setDocumentTitleFromNavigation = function (
+  navigation: AppNavigationStore,
+  locationParam: AppLocationParamStore,
+  config: AppConfigStore,
+  t: TFunction
+) {
+  const titles = getTitlesFromNavigation(navigation, locationParam, config, t);
+  const nextTitle = navigation?.options?.nextTitle?.trim();
+  const trimmedTitles = titles.map(title => (title.length > 33 ? `${title.slice(0, 30)}...` : title));
+  document.title = nextTitle ? nextTitle : trimmedTitles?.length > 0 ? trimmedTitles.join(' | ') : 'Assemblyline 4';
+};
+
 // export const getNextTitleFromPage = function (page: Pick<AppRouterPage, 'href'>): string {
 //   if (!page?.href) return null;
 

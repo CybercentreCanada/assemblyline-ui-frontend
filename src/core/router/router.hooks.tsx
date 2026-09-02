@@ -26,7 +26,6 @@ import {
   getLocationStateFromRouter,
   getNavigationStoreFromRouter,
   getPageFromPanelKey,
-  getTitlesFromNavigation,
   hasBlockedPages,
   isPageVisible,
   reconcileRouterFromNavigation,
@@ -37,6 +36,7 @@ import {
   resolveNotFoundPage,
   sanitizeRouterStore,
   setBlockedPage,
+  setDocumentTitleFromNavigation,
   setPageScrollPositions,
   shouldUpdatePage,
   updatePage,
@@ -629,9 +629,7 @@ export function useAppSyncRouterStoreFromNavigation() {
         replace: navigation?.options?.replace || false
       });
 
-      const titles = getTitlesFromNavigation(navigation, locationState, configState, t);
-      const nextTitle = navigation?.options?.nextTitle?.trim();
-      document.title = nextTitle ? nextTitle : titles?.length > 0 ? titles.join(' | ') : 'Assemblyline 4';
+      setDocumentTitleFromNavigation(navigation, locationState, configState, t);
       resetFavicon();
 
       setRouterStore(router => reconcileRouterFromNavigation(router, navigation));

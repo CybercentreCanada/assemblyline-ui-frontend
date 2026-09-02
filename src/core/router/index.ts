@@ -111,6 +111,7 @@ export {
   sanitizePanels,
   sanitizeRouterStore,
   setBlockedPage,
+  setDocumentTitleFromNavigation,
   setNode,
   setPage,
   setPageScrollPositions,
