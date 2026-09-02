@@ -22,7 +22,7 @@ import type { Safelist } from 'models/base/safelist';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { HiOutlineExternalLink } from 'react-icons/hi';
-import type { Index } from 'routes/search/search.route';
+import type { SearchIndex } from 'routes/search/search.route';
 import { getSHA256, getSubmitType, safeFieldValue, toTitleCase } from 'shared/utils/utils';
 import Classification from 'ui/Classification';
 import ClassificationMismatchDialog from 'ui/ClassificationMismatchDialog';
@@ -65,19 +65,19 @@ const categoryPrefix = {
   metadata: 'metadata.',
   tag: 'result.sections.tags.',
   hash: ''
-} as const;
+} as Record<ExternalLinkType | 'heuristic' | 'signature', string>;
 
 const categoryIndex = {
-  heuristic: '/result',
-  signature: '/result',
-  metadata: '',
-  tag: '/result',
-  hash: ''
-} as const;
+  heuristic: 'result',
+  signature: 'result',
+  metadata: null,
+  tag: 'result',
+  hash: null
+} as Record<ExternalLinkType | 'heuristic' | 'signature', SearchIndex>;
 
 export type ActionMenuProps = {
-  category: 'heuristic' | 'signature' | 'hash' | 'metadata' | 'tag';
-  index?: string;
+  category: ExternalLinkType | 'heuristic' | 'signature';
+  index?: SearchIndex;
   type: string;
   value: string;
   classification?: string | null;
@@ -459,18 +459,27 @@ const WrappedActionMenu = ({
               index
                 ? nav.to<'/search/:index'>().create({
                     route: '/search/:index',
-                    path: { index: index as Index },
+                    path: { index },
                     search: { query: `${type}:${safeFieldValue(value)}` }
                   })
-                : nav.to<'/search/:index'>().create({
-                    route: '/search/:index',
-                    path: { index: categoryIndex[category] as Index },
-                    search: {
-                      query: `${category === 'tag' && maliciousness === 'safe' ? 'result.sections.safelisted_tags.' : categoryPrefix[category]}${type}:${safeFieldValue(
-                        value
-                      )}`
-                    }
-                  })
+                : categoryIndex[category]
+                  ? nav.to<'/search/:index'>().create({
+                      route: '/search/:index',
+                      path: { index: categoryIndex[category] as SearchIndex },
+                      search: {
+                        query: `${category === 'tag' && maliciousness === 'safe' ? 'result.sections.safelisted_tags.' : categoryPrefix[category]}${type}:${safeFieldValue(
+                          value
+                        )}`
+                      }
+                    })
+                  : nav.to<'/search'>().create({
+                      route: '/search',
+                      search: {
+                        query: `${category === 'tag' && maliciousness === 'safe' ? 'result.sections.safelisted_tags.' : categoryPrefix[category]}${type}:${safeFieldValue(
+                          value
+                        )}`
+                      }
+                    })
             }
             onClick={handleClose}
           >

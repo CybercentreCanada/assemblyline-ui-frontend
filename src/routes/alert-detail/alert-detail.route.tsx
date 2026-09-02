@@ -590,7 +590,7 @@ export const AlertDetailPage = memo(() => {
                                 classification: alert.classification,
                                 color: verdictToColor(item.verdict),
                                 data_type: item.subtype in dataTypes ? dataTypes[item.subtype] : null,
-                                index: '/result',
+                                index: 'result',
                                 label: item.subtype ? `${item.value} - ${item.subtype}` : item.value,
                                 value: item.value,
                                 variant: 'outlined'
@@ -854,7 +854,7 @@ export const AlertDetailPage = memo(() => {
                           <AutoHideChipList
                             category={null}
                             defaultClassification={alert.classification}
-                            index="/result"
+                            index="result"
                             items={alert.al.detailed.heuristic}
                             type="result.sections.heuristic.name"
                           />
@@ -951,7 +951,7 @@ export const AlertDetailPage = memo(() => {
                               <AutoHideChipList
                                 category={null}
                                 defaultClassification={alert.classification}
-                                index="/result"
+                                index="result"
                                 items={alert.al.detailed.attack_category}
                                 type="result.sections.heuristic.attack.categories"
                               />
@@ -977,7 +977,7 @@ export const AlertDetailPage = memo(() => {
                               <AutoHideChipList
                                 category={null}
                                 defaultClassification={alert.classification}
-                                index="/result"
+                                index="result"
                                 items={alert.al.detailed.attack_pattern}
                                 type="result.sections.heuristic.attack.pattern"
                               />

@@ -3,6 +3,7 @@ import useExternalLookup from 'deprecated/hooks/useExternalLookup';
 import type { ExternalLinkType } from 'models/base/config';
 import React, { useCallback, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
+import type { SearchIndex } from 'routes/search/search.route';
 import ActionMenu from 'ui/ActionMenu';
 import type { CustomChipProps } from 'ui/CustomChip';
 import CustomChip from 'ui/CustomChip';
@@ -13,7 +14,7 @@ export type ActionableCustomChipProps = CustomChipProps & {
   category?: ExternalLinkType;
   classification?: string;
   data_type?: string;
-  index?: string;
+  index?: SearchIndex;
   label?: string;
   value?: string;
 };

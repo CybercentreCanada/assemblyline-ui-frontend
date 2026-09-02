@@ -38,11 +38,9 @@ import SearchBar from 'ui/SearchBar/search-bar';
 import { DEFAULT_SUGGESTION } from 'ui/SearchBar/search-textfield';
 import SearchResultCount from 'ui/SearchResultCount';
 
-export const INDEX_OPTIONS = ['submission', 'file', 'result', 'signature', 'alert', 'retrohunt'] as const;
+export const SEARCH_INDICES = ['submission', 'file', 'result', 'signature', 'alert', 'retrohunt'] as const;
 
-export type Index = (typeof INDEX_OPTIONS)[number];
-
-type SearchIndexes = Pick<Indexes, Index>;
+export type SearchIndex = (typeof SEARCH_INDICES)[number];
 
 //*****************************************************************************************
 // Search Page
@@ -63,7 +61,7 @@ export const SearchPage = () => {
 
   const downSM = useMediaQuery(theme.breakpoints.down('md'));
 
-  const permissionMap = useMemo<Record<Index, Role>>(
+  const permissionMap = useMemo<Record<SearchIndex, Role>>(
     () => ({
       submission: 'submission_view',
       file: 'submission_view',
@@ -75,9 +73,9 @@ export const SearchPage = () => {
     []
   );
 
-  const tab = useMemo<Index>(() => {
+  const tab = useMemo<SearchIndex>(() => {
     const nextAvailableTab = () => {
-      for (const curTab of [...Object.keys(permissionMap)] as Index[]) {
+      for (const curTab of [...Object.keys(permissionMap)] as SearchIndex[]) {
         if (currentUser.roles.includes(permissionMap[curTab])) return curTab;
       }
       return 'submission';
@@ -103,7 +101,7 @@ export const SearchPage = () => {
   }, [id, index, indexes]);
 
   const getBody = useCallback(
-    (value: Index) =>
+    (value: SearchIndex) =>
       index === value
         ? search.pick(['query', 'offset', 'rows', 'sort', 'use_archive']).toObject()
         : search
@@ -190,7 +188,7 @@ export const SearchPage = () => {
     }
   });
 
-  const resMap = useMemo<Record<Index, SearchResult<unknown>>>(
+  const resMap = useMemo<Record<SearchIndex, SearchResult<unknown>>>(
     () => ({
       submission: submissionResults.data,
       file: fileResults.data,
@@ -278,7 +276,7 @@ export const SearchPage = () => {
             <Paper square style={{ marginBottom: theme.spacing(0.5) }}>
               <Tabs
                 value={tab}
-                onChange={(e, v: Index) =>
+                onChange={(e, v: SearchIndex) =>
                   navigate
                     .here<'/search/:index'>()
                     .update(s => ({ ...s, search: { ...s.search, index: v, offset: 0, sort: null } }))
@@ -449,10 +447,10 @@ export const SearchRoute = createAppRoute({
 
   path: '/search/:index',
   params: s => ({
-    index: s.enum(INDEX_OPTIONS, 'submission')
+    index: s.enum(SEARCH_INDICES, 'submission')
   }),
   search: s => ({
-    index: s.enum(null, INDEX_OPTIONS).nullable(),
+    index: s.enum(null, SEARCH_INDICES).nullable(),
     query: s.string(''),
     offset: s.number(0).min(0).source('transient').ephemeral(),
     rows: s.number(25).locked().source('transient').ephemeral(),
@@ -509,7 +507,7 @@ export const SearchRootRoute = createAppRoute({
 
   path: '/search',
   search: s => ({
-    index: s.enum(null, INDEX_OPTIONS).nullable(),
+    index: s.enum(null, SEARCH_INDICES).nullable(),
     query: s.string(''),
     offset: s.number(0).min(0).source('transient').ephemeral(),
     rows: s.number(25).locked().source('transient').ephemeral(),
