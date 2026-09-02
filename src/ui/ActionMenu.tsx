@@ -22,8 +22,8 @@ import type { Safelist } from 'models/base/safelist';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { HiOutlineExternalLink } from 'react-icons/hi';
-import type { Index } from 'routes/search/search.route';
-import { getSHA256, getSubmitType, safeFieldValueURI, toTitleCase } from 'shared/utils/utils';
+import type { SearchIndex } from 'routes/search/search.route';
+import { getSHA256, getSubmitType, safeFieldValue, toTitleCase } from 'shared/utils/utils';
 import Classification from 'ui/Classification';
 import ClassificationMismatchDialog from 'ui/ClassificationMismatchDialog';
 import { CLUE_TYPE_MAP } from 'ui/EnrichmentCustomChip';
@@ -59,7 +59,7 @@ const initialMenuState: Coordinates = {
   mouseY: null
 };
 
-const categoryPrefix = {
+export const CATEGORY_PREFIX_MAP: Record<ExternalLinkType | 'heuristic' | 'signature', string> = {
   heuristic: 'result.sections.heuristic.name',
   signature: 'result.sections.heuristic.signature.name',
   metadata: 'metadata.',
@@ -67,17 +67,17 @@ const categoryPrefix = {
   hash: ''
 } as const;
 
-const categoryIndex = {
-  heuristic: '/result',
-  signature: '/result',
-  metadata: '',
-  tag: '/result',
-  hash: ''
+export const CATEGORY_INDEX_MAP: Record<ExternalLinkType | 'heuristic' | 'signature', SearchIndex> = {
+  heuristic: 'result',
+  signature: 'result',
+  metadata: null,
+  tag: 'result',
+  hash: null
 } as const;
 
 export type ActionMenuProps = {
-  category: 'heuristic' | 'signature' | 'hash' | 'metadata' | 'tag';
-  index?: string;
+  category: ExternalLinkType | 'heuristic' | 'signature';
+  index?: SearchIndex;
   type: string;
   value: string;
   classification?: string | null;
@@ -441,6 +441,7 @@ const WrappedActionMenu = ({
                 }
               })
             }
+            onClick={handleClose}
           >
             {SIGNATURE_ICON}
             {t('goto_signature')}
@@ -458,18 +459,27 @@ const WrappedActionMenu = ({
               index
                 ? nav.to<'/search/:index'>().create({
                     route: '/search/:index',
-                    path: { index: index as Index },
-                    search: { query: `${type}:${safeFieldValueURI(value)}` }
+                    path: { index },
+                    search: { query: `${type}:${safeFieldValue(value)}` }
                   })
-                : nav.to<'/search/:index'>().create({
-                    route: '/search/:index',
-                    path: { index: categoryIndex[category] as Index },
-                    search: {
-                      query: `${category === 'tag' && maliciousness === 'safe' ? 'result.sections.safelisted_tags.' : categoryPrefix[category]}${type}:${safeFieldValueURI(
-                        value
-                      )}`
-                    }
-                  })
+                : CATEGORY_INDEX_MAP[category]
+                  ? nav.to<'/search/:index'>().create({
+                      route: '/search/:index',
+                      path: { index: CATEGORY_INDEX_MAP[category] },
+                      search: {
+                        query: `${category === 'tag' && maliciousness === 'safe' ? 'result.sections.safelisted_tags.' : CATEGORY_PREFIX_MAP[category]}${type}:${safeFieldValue(
+                          value
+                        )}`
+                      }
+                    })
+                  : nav.to<'/search'>().create({
+                      route: '/search',
+                      search: {
+                        query: `${category === 'tag' && maliciousness === 'safe' ? 'result.sections.safelisted_tags.' : CATEGORY_PREFIX_MAP[category]}${type}:${safeFieldValue(
+                          value
+                        )}`
+                      }
+                    })
             }
             onClick={handleClose}
           >
@@ -511,6 +521,7 @@ const WrappedActionMenu = ({
               dense
               component={AppLink}
               nav={nav => nav.to().create({ route: '/submit', search: { hash: value, classification } })}
+              onClick={handleClose}
             >
               {SUBMIT_ICON}
               {t('submit') + ` ${submitType.toUpperCase()}`}

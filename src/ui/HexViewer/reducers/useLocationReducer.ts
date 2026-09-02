@@ -1,41 +1,40 @@
+import { useAppPathParams, useAppSearchSnapshot } from 'core/routes';
 import useClipboard from 'deprecated/hooks/useClipboard';
-import SimpleSearchQuery from 'ui/SearchBar/simple-search-query';
-import { useCallback, useRef } from 'react';
-import type { LocationParam, LocationQuery, ReducerHandler, Reducers, Store, UseReducer } from '..';
+import { useCallback } from 'react';
+import type { LocationParam, ReducerHandler, Reducers, Store, UseReducer } from '..';
 import { DEFAULT_STORE, getValueFromPath, isAction, LOCATION_PARAMS, setStoreWithPath } from '..';
 
 export const useLocationReducer: UseReducer = () => {
+  const path = useAppPathParams<'/file/viewer/:id/:tab'>();
+  const search = useAppSearchSnapshot<'/file/viewer/:id/:tab'>();
+
   const { copy } = useClipboard();
-
-  const query = useRef<SimpleSearchQuery>(new SimpleSearchQuery(window.location.search, ''));
-
-  const handleLocationShare = useCallback((store: Store, param: LocationParam): void => {
-    const value = getValueFromPath(store, param.path);
-    const origin = getValueFromPath(DEFAULT_STORE, param.path);
-    if (origin === value) return;
-    query.current.set(param.key, value);
-    return;
-  }, []);
-
-  const handleScrollLocationShare = useCallback((store: Store): void => {
-    if (store.layout.folding.active) {
-      if (store.mode.body === 'table') query.current.set('z', store.cellsRendered.visibleStartIndex);
-      else if (store.mode.body === 'window') query.current.set('z', store.cellsRendered.visibleStartIndex);
-    } else {
-      if (store.mode.body === 'table') query.current.set('z', store.scroll.index);
-      else if (store.mode.body === 'window') query.current.set('z', store.cellsRendered.visibleStartIndex);
-    }
-  }, []);
 
   const locationShare: Reducers['locationShare'] = useCallback(
     store => {
-      query.current.deleteAll();
-      LOCATION_PARAMS.forEach(param => handleLocationShare(store, param));
-      handleScrollLocationShare(store);
-      copy(`${window.location.origin}${window.location.pathname}?${query.current.toString()}${window.location.hash}`);
+      let scrollIndex: number | null = null;
+      if (store.layout.folding.active || store.mode.body === 'window') {
+        scrollIndex = store.cellsRendered.visibleStartIndex ?? null;
+      } else if (store.mode.body === 'table') {
+        scrollIndex = store.scroll.index ?? null;
+      }
+
+      const next = search.set(() => ({
+        cursor: store.cursor.index ?? null,
+        startIndex: store.select.startIndex !== DEFAULT_STORE.select.startIndex ? store.select.startIndex : null,
+        endIndex: store.select.endIndex !== DEFAULT_STORE.select.endIndex ? store.select.endIndex : null,
+        mode: store.search.mode.type ?? null,
+        query: store.search.inputValue ?? '',
+        selectedResult: store.search.selectedResult ?? null,
+        scroll: scrollIndex !== DEFAULT_STORE.scroll.index ? scrollIndex : null
+      }));
+
+      void copy(
+        `${window.location.origin}${window.location.pathname}#/file/viewer/${path?.id}/${path?.tab}?${next.toLocationSearch()}`
+      );
       return store;
     },
-    [copy, handleLocationShare, handleScrollLocationShare]
+    [copy, path, search]
   );
 
   const handleLocationLoad = useCallback((store: Store, param: LocationParam, value: string): Store => {
@@ -53,30 +52,34 @@ export const useLocationReducer: UseReducer = () => {
 
   const locationLoad: Reducers['locationLoad'] = useCallback(
     store => {
-      query.current = new SimpleSearchQuery(window.location.search, '');
-      const params: LocationQuery = query.current.getParams();
-
       let newStore = { ...store };
-      Object.keys(params).forEach(key => {
-        for (let i = 0; i < LOCATION_PARAMS.length; i++) {
-          if (key === LOCATION_PARAMS[i].key) newStore = handleLocationLoad(newStore, LOCATION_PARAMS[i], params[key]);
-          else if (key === 'z')
-            newStore = handleLocationLoad(
-              newStore,
-              { key: 'z', type: 'number', path: ['scroll', 'index'] },
-              params[key]
-            );
+      const v = search?.values;
+      if (!v) return newStore;
+
+      LOCATION_PARAMS.forEach(param => {
+        const value = (v as Record<string, unknown>)[param.key];
+        if (typeof value === 'string' || typeof value === 'number') {
+          newStore = handleLocationLoad(newStore, param, String(value));
         }
       });
+
+      if (v.scroll != null) {
+        newStore = handleLocationLoad(
+          newStore,
+          { key: 'scroll', type: 'number', path: ['scroll', 'index'] },
+          String(v.scroll)
+        );
+      }
+
       return newStore;
     },
-    [handleLocationLoad]
+    [search, handleLocationLoad]
   );
 
   const reducer: ReducerHandler = useCallback(
-    ({ store, action: { type, payload } }) => {
-      if (isAction.locationLoad(type)) return locationLoad(store, payload);
-      else if (isAction.locationShare(type)) return locationShare(store, payload);
+    ({ store, action: { type } }) => {
+      if (isAction.locationLoad(type)) return locationLoad(store);
+      else if (isAction.locationShare(type)) return locationShare(store);
       else return { ...store };
     },
     [locationLoad, locationShare]

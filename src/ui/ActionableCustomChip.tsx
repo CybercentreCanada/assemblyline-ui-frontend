@@ -2,6 +2,8 @@ import useALContext from 'deprecated/hooks/useALContext';
 import useExternalLookup from 'deprecated/hooks/useExternalLookup';
 import type { ExternalLinkType } from 'models/base/config';
 import React, { useCallback, useState } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
+import type { SearchIndex } from 'routes/search/search.route';
 import ActionMenu from 'ui/ActionMenu';
 import type { CustomChipProps } from 'ui/CustomChip';
 import CustomChip from 'ui/CustomChip';
@@ -12,7 +14,7 @@ export type ActionableCustomChipProps = CustomChipProps & {
   category?: ExternalLinkType;
   classification?: string;
   data_type?: string;
-  index?: string;
+  index?: SearchIndex;
   label?: string;
   value?: string;
 };
@@ -61,26 +63,39 @@ const WrappedActionableCustomChip: React.FC<ActionableCustomChipProps> = ({
           classification={classification}
         />
       )}
-      {'clue' in configuration.ui.api_proxies && data_type in CLUE_TYPE_MAP && label !== null ? (
-        <EnrichmentCustomChip
-          dataType={CLUE_TYPE_MAP[data_type]}
-          dataValue={label}
-          dataClassification={classification}
-          icon={<ExternalLinks category={category} type={data_type} value={label} round={variant === 'outlined'} />}
-          label={label}
-          variant={variant}
-          {...otherProps}
-          onContextMenu={actionable ? handleMenuClick : null}
-        />
-      ) : (
-        <CustomChip
-          icon={<ExternalLinks category={category} type={data_type} value={label} round={variant === 'outlined'} />}
-          label={label}
-          variant={variant}
-          {...otherProps}
-          onContextMenu={actionable ? handleMenuClick : null}
-        />
-      )}
+
+      <ErrorBoundary
+        fallback={
+          <CustomChip
+            icon={<ExternalLinks category={category} type={data_type} value={label} round={variant === 'outlined'} />}
+            label={label}
+            variant={variant}
+            {...otherProps}
+            onContextMenu={actionable ? handleMenuClick : null}
+          />
+        }
+      >
+        {'clue' in configuration.ui.api_proxies && data_type in CLUE_TYPE_MAP && label !== null ? (
+          <EnrichmentCustomChip
+            dataType={CLUE_TYPE_MAP[data_type]}
+            dataValue={label}
+            dataClassification={classification}
+            icon={<ExternalLinks category={category} type={data_type} value={label} round={variant === 'outlined'} />}
+            label={label}
+            variant={variant}
+            {...otherProps}
+            onContextMenu={actionable ? handleMenuClick : null}
+          />
+        ) : (
+          <CustomChip
+            icon={<ExternalLinks category={category} type={data_type} value={label} round={variant === 'outlined'} />}
+            label={label}
+            variant={variant}
+            {...otherProps}
+            onContextMenu={actionable ? handleMenuClick : null}
+          />
+        )}
+      </ErrorBoundary>
     </>
   );
 };

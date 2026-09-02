@@ -479,14 +479,12 @@ describe('getDefaultRouterNode', () => {
   it('returns a node with a null pageKey and Infinity lastUsedAt by default', () => {
     const node = getDefaultRouterNode();
     expect(node.pageKey).toBeNull();
-    expect(node.lastUsedAt).toBe(Infinity);
     expect(node.portal).toBeDefined();
   });
 
   it('applies partial overrides', () => {
-    const node = getDefaultRouterNode({ pageKey: 'r1', lastUsedAt: 5 });
+    const node = getDefaultRouterNode({ pageKey: 'r1' });
     expect(node.pageKey).toBe('r1');
-    expect(node.lastUsedAt).toBe(5);
   });
 });
 
@@ -1150,8 +1148,7 @@ describe('sanitizePages', () => {
       nodes: {
         n1: {
           pageKey: 'from-node',
-          portal: { hostEl: document.createElement('div'), setOutlet: () => {} },
-          lastUsedAt: 1
+          portal: { hostEl: document.createElement('div'), setOutlet: () => {} }
         }
       },
       pages: {
@@ -1595,8 +1592,7 @@ describe('reconcileRouterFromNavigation', () => {
       nodes: {
         stale: {
           pageKey: 'old',
-          portal: createReversePortalNode(),
-          lastUsedAt: 5
+          portal: createReversePortalNode()
         }
       },
       pages: {
@@ -1610,7 +1606,6 @@ describe('reconcileRouterFromNavigation', () => {
     expect(router.id).toBe('navigation-id');
     expect(router.panels[0].pageKey).toBe('r1');
     expect(router.nodes.n1.pageKey).toBe('r1');
-    expect(router.nodes.n1.lastUsedAt).toBe(20);
     expect(router.nodes.n1.portal).toBeDefined();
     expect(router.pages.r1.href).toBe('/submit');
     expect('old' in router.pages).toBe(false);
@@ -1665,8 +1660,7 @@ describe('getNavigationStoreFromRouter', () => {
       nodes: {
         n1: {
           pageKey: 'r1',
-          portal: createReversePortalNode(),
-          lastUsedAt: 10
+          portal: createReversePortalNode()
         }
       },
       pages: {
@@ -1680,8 +1674,7 @@ describe('getNavigationStoreFromRouter', () => {
       panels: [{ ...getDefaultRouterPanel(), pageKey: 'old' }],
       nodes: {
         n1: {
-          pageKey: 'old',
-          lastUsedAt: 1
+          pageKey: 'old'
         }
       },
       pages: {
@@ -1698,7 +1691,6 @@ describe('getNavigationStoreFromRouter', () => {
     expect(navigation.id).toBe('router-id');
     expect(navigation.panels[0].pageKey).toBe('r1');
     expect(navigation.nodes.n1.pageKey).toBe('r1');
-    expect(navigation.nodes.n1.lastUsedAt).toBe(10);
     expect(navigation.pages.r1.href).toBe('/submit');
     expect('old' in navigation.pages).toBe(false);
     expect('stale' in navigation.blockedPages).toBe(false);

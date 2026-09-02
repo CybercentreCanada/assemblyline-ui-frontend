@@ -22,12 +22,14 @@ import {
   useTheme
 } from '@mui/material';
 import type { AlertItem, DetailedItem } from 'models/base/alert';
+import type { ExternalLinkType } from 'models/base/config';
 import type { ReactNode } from 'react';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
 import { HiOutlineExternalLink } from 'react-icons/hi';
 import { detailedItemCompare } from 'routes/alerts/utils/alertUtils';
+import type { SearchIndex } from 'routes/search/search.route';
 import { verdictToColor } from 'shared/utils/utils';
 import { ActionableChipList } from 'ui/ActionableChipList';
 import type { ActionableCustomChipProps } from 'ui/ActionableCustomChip';
@@ -291,9 +293,9 @@ export const SkeletonInline = () => <Skeleton style={{ display: 'inline-block', 
 const TARGET_RESULT_COUNT = 10;
 
 type AutoHideChipListProps = {
-  category?: string;
+  category?: ExternalLinkType;
   defaultClassification: string;
-  index?: string;
+  index?: SearchIndex;
   items: DetailedItem[];
   type?: string;
 };
@@ -306,18 +308,15 @@ export const AutoHideChipList: React.FC<AutoHideChipListProps> = React.memo(
 
     const chips = useMemo<ActionableCustomChipProps[]>(
       () =>
-        items.sort(detailedItemCompare).map(
-          item =>
-            ({
-              category: category,
-              classification: defaultClassification,
-              color: verdictToColor(item.verdict),
-              data_type: type,
-              index: index,
-              label: item.subtype ? `${item.value} - ${item.subtype}` : item.value,
-              variant: 'outlined'
-            }) as ActionableCustomChipProps
-        ),
+        items.sort(detailedItemCompare).map(item => ({
+          category: category,
+          classification: defaultClassification,
+          color: verdictToColor(item.verdict),
+          data_type: type,
+          index: index,
+          label: item.subtype ? `${item.value} - ${item.subtype}` : item.value,
+          variant: 'outlined'
+        })),
       [category, defaultClassification, index, items, type]
     );
 

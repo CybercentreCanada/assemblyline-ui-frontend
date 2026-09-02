@@ -13,6 +13,7 @@ export type CluePublicConfig = {
   default_timeout?: number;
   iconify_url?: string;
   max_request_count?: number;
+  silent?: boolean;
 };
 
 // Built once at module scope: the provider otherwise creates a new database on every mount.
@@ -64,6 +65,7 @@ const AppClueLayout = memo(({ children }: PropsWithChildren) => {
       defaultTimeout={clueConfig?.default_timeout || 60}
       i18next={i18next as never}
       maxRequestCount={clueConfig?.max_request_count || 3}
+      silent={clueConfig?.silent ?? true}
       ReactJson={JSONEditor}
       {...(clueConfig?.iconify_url
         ? {

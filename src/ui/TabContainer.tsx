@@ -135,11 +135,12 @@ export const TabContainer = React.memo(function <const T extends TabElements>({
           }}
           {...props}
         >
-          {Object.entries(tabs).map(([key, tab], i) =>
-            tab.preventRender ? null : (
-              <Tab key={i} tabIndex={0} role="button" value={key} sx={{ minWidth: 120 }} {...tab} />
-            )
-          )}
+          {Object.entries(tabs).map(([key, tab], i) => {
+            const { preventRender, ...tabProps } = tab;
+            return !preventRender ? (
+              <Tab key={i} tabIndex={0} role="button" value={key} sx={{ minWidth: 120 }} {...tabProps} />
+            ) : null;
+          })}
         </Tabs>
       </div>
 

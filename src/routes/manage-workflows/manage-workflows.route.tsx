@@ -183,8 +183,8 @@ export const ManageWorkflowsRoute = createAppRoute({
   ancestor: '/manage',
   shortname: () => ['app_route.manage_workflows.shortname', { ns: 'manageWorkflows' }],
   fullname: () => ['app_route.manage_workflows.fullname', { ns: 'manageWorkflows' }],
-  shorticon: () => <BiNetworkChart />,
-  fullicon: () => <BiNetworkChart />,
+  shorticon: () => <BiNetworkChart fontSize="1.3rem" />,
+  fullicon: () => <BiNetworkChart fontSize="1.3rem" />,
 
   disabled: () => false,
   forbidden: (_location, config) => !config.user.roles.includes('workflow_view')

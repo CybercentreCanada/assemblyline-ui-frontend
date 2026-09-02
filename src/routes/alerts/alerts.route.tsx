@@ -143,11 +143,11 @@ export const AlertsPage = memo(() => {
       .join(' AND ');
 
     navigate.to().create({ route: '/manage/workflow/create', search: { query } });
-  }, [currentUser.roles, navigate, search]);
+  }, [currentUser.roles, navigate, search?.toString()]);
 
   useEffect(() => {
     handleFetch(search);
-  }, [handleFetch, search]);
+  }, [handleFetch, search?.toString()]);
 
   useEffect(() => {
     if (!!search.get('group_by')) return;
@@ -161,7 +161,7 @@ export const AlertsPage = memo(() => {
         search: { ...s.search, tc_start: new Date(min).toISOString() }
       }));
     }
-  }, [alerts, navigate, search]);
+  }, [alerts, navigate, search?.toString()]);
 
   useEffect(() => {
     const update = ({ detail }: CustomEvent<Alert[]>) => {

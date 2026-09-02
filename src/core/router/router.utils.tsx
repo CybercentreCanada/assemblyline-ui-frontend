@@ -455,7 +455,6 @@ export const getDefaultRouterNode = function (node: Partial<AppRouterNode> = nul
   return {
     portal: createReversePortalNode(),
     pageKey: null,
-    lastUsedAt: Infinity,
     ...node
   };
 };
@@ -641,14 +640,10 @@ export const addMissingNodes = function <const Store extends AppSharedRouterStor
 
     const nextNodeKey = generateRandomUUID(Object.keys(store.nodes));
     if ('blockedPages' in (store as Record<string, unknown>)) {
-      store.nodes[nextNodeKey] = {
-        pageKey: panel.pageKey,
-        lastUsedAt: Infinity
-      } as Store['nodes'][string];
+      store.nodes[nextNodeKey] = { pageKey: panel.pageKey } as Store['nodes'][string];
     } else {
       store.nodes[nextNodeKey] = {
         pageKey: panel.pageKey,
-        lastUsedAt: Infinity,
         portal: createReversePortalNode()
       } as unknown as Store['nodes'][string];
     }
@@ -1837,6 +1832,18 @@ export const getTitlesFromNavigation = function (
     .filter((title): title is string => Boolean(title));
 };
 
+export const setDocumentTitleFromNavigation = function (
+  navigation: AppNavigationStore,
+  locationParam: AppLocationParamStore,
+  config: AppConfigStore,
+  t: TFunction
+) {
+  const titles = getTitlesFromNavigation(navigation, locationParam, config, t);
+  const nextTitle = navigation?.options?.nextTitle?.trim();
+  const trimmedTitles = titles.map(title => (title.length > 33 ? `${title.slice(0, 30)}...` : title));
+  document.title = nextTitle ? nextTitle : trimmedTitles?.length > 0 ? trimmedTitles.join(' | ') : 'Assemblyline 4';
+};
+
 // export const getNextTitleFromPage = function (page: Pick<AppRouterPage, 'href'>): string {
 //   if (!page?.href) return null;
 
@@ -2047,7 +2054,6 @@ export const reconcileRouterFromNavigation = (
   for (const [nodeKey, node] of Object.entries(navigation.nodes)) {
     router.nodes[nodeKey] = {
       pageKey: node.pageKey,
-      lastUsedAt: node.lastUsedAt,
       portal: router.nodes[nodeKey]?.portal || createReversePortalNode()
     };
   }
@@ -2065,6 +2071,7 @@ export const sanitizeRouterStore = function <const Store extends AppSharedRouter
   preferences: AppPreferenceStore
 ): Store {
   store = sanitizePanels(store, preferences);
+  store = sanitizePages(store);
   store = sanitizeNodes(store, preferences);
   store = sanitizePages(store);
   return store;
@@ -2134,11 +2141,11 @@ export const getNavigationStoreFromRouter = (store: AppNavigationStore, router: 
   for (const [nodeKey, node] of Object.entries(router.nodes)) {
     const currentNode = store.nodes[nodeKey];
 
-    if (currentNode?.pageKey === node.pageKey && currentNode?.lastUsedAt === node.lastUsedAt) {
+    if (currentNode?.pageKey === node.pageKey) {
       continue;
     }
 
-    store.nodes[nodeKey] = { pageKey: node.pageKey, lastUsedAt: node.lastUsedAt };
+    store.nodes[nodeKey] = { pageKey: node.pageKey };
   }
 
   for (const nodeKey of Object.keys(store.nodes)) {

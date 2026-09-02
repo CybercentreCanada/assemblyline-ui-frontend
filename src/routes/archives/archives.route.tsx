@@ -13,7 +13,7 @@ import useMySnackbar from 'deprecated/hooks/useMySnackbar';
 import type { FacetResult, HistogramResult, SearchResult } from 'models/api/search';
 import type { IndexDefinition } from 'models/api/user';
 import type { FileIndexed } from 'models/base/file';
-import { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArchivesTable } from 'routes/search/components/archives';
 import { safeFieldValue } from 'shared/utils/utils';
@@ -69,9 +69,11 @@ export const ArchivesPage = memo(() => {
   const [labels, setLabels] = useState<Record<string, number>>(null);
   const [searching, setSearching] = useState<boolean>(false);
 
+  const queryValue = useRef<string>('');
+
   const suggestions = useMemo<IndexDefinition>(() => ({ ...indexes.file, ...DEFAULT_SUGGESTION }), [indexes.file]);
 
-  const hasFilter = useCallback((filter: string) => search.get('filters')?.includes(filter), [search]);
+  const hasFilter = useCallback((filter: string) => search.get('filters')?.includes(filter), [search?.toString()]);
 
   const handleToggleFilter = useCallback(
     (filter: string) =>
@@ -134,7 +136,7 @@ export const ArchivesPage = memo(() => {
       filters,
       archive_only: true
     };
-  }, [search]);
+  }, [search?.toString()]);
 
   const buildFacetParams = useCallback((body: Record<string, unknown>) => {
     const params = new URLSearchParams();
@@ -254,6 +256,9 @@ export const ArchivesPage = memo(() => {
             suggestions={suggestions}
             onClear={handleClear}
             onSearch={handleSearch}
+            onValueChange={(inputValue: string) => {
+              queryValue.current = inputValue;
+            }}
             buttons={[
               {
                 icon: <AssignmentLateOutlinedIcon fontSize={downSM ? 'small' : 'medium'} />,

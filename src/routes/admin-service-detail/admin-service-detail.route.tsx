@@ -33,7 +33,7 @@ export const AdminServiceDetailPage = memo(() => {
   const { t } = useTranslation(['adminServices']);
   const theme = useTheme();
   const navigate = useAppNavigate();
-  const { svc } = useAppPathParams<'/admin/services/:svc'>();
+  const svc = useAppPathParams<'/admin/services/:svc'>()?.svc;
   const { apiCall } = useMyAPI();
   const { user: currentUser, configuration } = useALContext();
   const { showSuccessMessage } = useMySnackbar();
@@ -59,8 +59,6 @@ export const AdminServiceDetailPage = memo(() => {
     [serviceFeeds]
   );
 
-  const nameOrSvc = useMemo<string>(() => svc, [svc]);
-
   const isSaveDisabled = useMemo<boolean>(
     () => overallError || buttonLoading || !modified,
     [overallError, buttonLoading, modified]
@@ -78,7 +76,7 @@ export const AdminServiceDetailPage = memo(() => {
 
   const handleSaveService = useCallback(() => {
     apiCall({
-      url: `/api/v4/service/${nameOrSvc}/`,
+      url: `/api/v4/service/${svc}/`,
       method: 'POST',
       body: service,
       onSuccess: () => {
@@ -92,12 +90,12 @@ export const AdminServiceDetailPage = memo(() => {
       onExit: () => setButtonLoading(false)
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [nameOrSvc, service, showSuccessMessage, t]);
+  }, [svc, service, showSuccessMessage, t]);
 
   const handleExecuteDeleteButtonClick = useCallback(() => {
     handleCloseDialog();
     apiCall({
-      url: `/api/v4/service/${nameOrSvc}/`,
+      url: `/api/v4/service/${svc}/`,
       method: 'DELETE',
       onSuccess: () => {
         showSuccessMessage(t('delete.success'));
@@ -109,7 +107,7 @@ export const AdminServiceDetailPage = memo(() => {
       onExit: () => setButtonLoading(false)
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [handleCloseDialog, nameOrSvc, showSuccessMessage, t, svc]);
+  }, [handleCloseDialog, showSuccessMessage, t, svc]);
 
   const handleDeleteButtonClick = useCallback(() => {
     setDeleteDialog(true);
@@ -128,7 +126,7 @@ export const AdminServiceDetailPage = memo(() => {
     // Load user on start
     if (currentUser.is_admin) {
       apiCall<ServiceData>({
-        url: `/api/v4/service/${nameOrSvc}/`,
+        url: `/api/v4/service/${svc}/`,
         onEnter: () => {
           setService(null);
           setServiceVersion(null);
@@ -139,19 +137,19 @@ export const AdminServiceDetailPage = memo(() => {
         }
       });
       apiCall<string[]>({
-        url: `/api/v4/service/versions/${nameOrSvc}/`,
+        url: `/api/v4/service/versions/${svc}/`,
         onEnter: () => setVersions(null),
         onSuccess: api_data => setVersions(api_data.api_response)
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentUser.is_admin, nameOrSvc]);
+  }, [currentUser.is_admin, svc]);
 
   useEffect(() => {
     // Load user on start
     if (currentUser.is_admin && serviceVersion) {
       apiCall<ServiceData>({
-        url: `/api/v4/service/${nameOrSvc}/${serviceVersion}/`,
+        url: `/api/v4/service/${svc}/${serviceVersion}/`,
         onEnter: () => setServiceDefault(null),
         onSuccess: ({ api_response }) => setServiceDefault(api_response)
       });
@@ -266,10 +264,7 @@ export const AdminServiceDetailPage = memo(() => {
 
       {service ? (
         <TabContext value={tab}>
-          <Paper
-            square
-            style={{ backgroundColor: svc ? theme.palette.background.default : theme.palette.background.paper }}
-          >
+          <Paper square>
             <TabList
               onChange={handleTabChange}
               indicatorColor="primary"
@@ -283,7 +278,7 @@ export const AdminServiceDetailPage = memo(() => {
               <Tab label={t('tab.params')} value="params" />
             </TabList>
           </Paper>
-          <TabPanel value="general" sx={{ paddingLeft: 0, paddingRight: 0 }}>
+          <TabPanel value="general" sx={{ paddingLeft: 0, paddingRight: 0, textAlign: 'left' }}>
             <ServiceGeneral
               constants={constants}
               defaults={serviceDefault}
@@ -296,7 +291,7 @@ export const AdminServiceDetailPage = memo(() => {
               setServiceVersion={setServiceVersion}
             />
           </TabPanel>
-          <TabPanel value="docker" sx={{ paddingLeft: 0, paddingRight: 0 }}>
+          <TabPanel value="docker" sx={{ paddingLeft: 0, paddingRight: 0, textAlign: 'left' }}>
             <ServiceContainer
               service={service}
               defaults={serviceDefault}
@@ -305,7 +300,7 @@ export const AdminServiceDetailPage = memo(() => {
             />
           </TabPanel>
           {service.update_config && (
-            <TabPanel value="updater" sx={{ paddingLeft: 0, paddingRight: 0 }}>
+            <TabPanel value="updater" sx={{ paddingLeft: 0, paddingRight: 0, textAlign: 'left' }}>
               <ServiceUpdater
                 service={service}
                 defaults={serviceDefault}
@@ -314,7 +309,7 @@ export const AdminServiceDetailPage = memo(() => {
               />
             </TabPanel>
           )}
-          <TabPanel value="params" sx={{ paddingLeft: 0, paddingRight: 0 }}>
+          <TabPanel value="params" sx={{ paddingLeft: 0, paddingRight: 0, textAlign: 'left' }}>
             <ServiceParams
               service={service}
               defaults={serviceDefault}

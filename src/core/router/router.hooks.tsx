@@ -26,7 +26,6 @@ import {
   getLocationStateFromRouter,
   getNavigationStoreFromRouter,
   getPageFromPanelKey,
-  getTitlesFromNavigation,
   hasBlockedPages,
   isPageVisible,
   reconcileRouterFromNavigation,
@@ -37,6 +36,7 @@ import {
   resolveNotFoundPage,
   sanitizeRouterStore,
   setBlockedPage,
+  setDocumentTitleFromNavigation,
   setPageScrollPositions,
   shouldUpdatePage,
   updatePage,
@@ -194,13 +194,14 @@ export function useAppNavigate<const Origin extends AppRoute['path']>() {
         store = setPageScrollPositions(store);
         const [nextStore, nextPageKey] = addPage(store, nextPage);
         [store] = upsertPanel(nextStore, destinationPanelKey, { pageKey: nextPageKey }, preferenceState);
+        store = updatePage(store, pageKey, { age: 0 });
         store = sanitizeRouterStore(store, preferenceState);
         store.id = generateRandomUUID();
         store.options = options;
         return store;
       });
     },
-    [locationParamStoreApi, preferenceStoreApi, routerStoreApi, setNavigationStore]
+    [locationParamStoreApi, pageKey, preferenceStoreApi, routerStoreApi, setNavigationStore]
   );
 
   const update = useCallback(
@@ -226,13 +227,14 @@ export function useAppNavigate<const Origin extends AppRoute['path']>() {
         store = getNavigationStoreFromRouter(store, routerState);
         store = setPageScrollPositions(store);
         store = updatePage(store, prevPageKey, nextPage);
+        store = updatePage(store, pageKey, { age: 0 });
         store = sanitizeRouterStore(store, preferenceState);
         store.id = generateRandomUUID();
         store.options = options;
         return store;
       });
     },
-    [locationParamStoreApi, preferenceStoreApi, routerStoreApi, setNavigationStore]
+    [locationParamStoreApi, pageKey, preferenceStoreApi, routerStoreApi, setNavigationStore]
   );
 
   const search = useCallback(
@@ -263,14 +265,15 @@ export function useAppNavigate<const Origin extends AppRoute['path']>() {
       setNavigationStore(store => {
         store = getNavigationStoreFromRouter(store, routerState);
         store = setPageScrollPositions(store);
-        store = updatePage(store, prevPageKey, nextPage);
+        store = updatePage(store, prevPageKey, { ...nextPage, age: 0 });
+        store = updatePage(store, pageKey, { age: 0 });
         store = sanitizeRouterStore(store, preferenceState);
         store.id = generateRandomUUID();
         store.options = options;
         return store;
       });
     },
-    [locationParamStoreApi, preferenceStoreApi, routerStoreApi, setNavigationStore]
+    [locationParamStoreApi, pageKey, preferenceStoreApi, routerStoreApi, setNavigationStore]
   );
 
   const only = useCallback(
@@ -300,13 +303,14 @@ export function useAppNavigate<const Origin extends AppRoute['path']>() {
           store = removePanel(store, panelKey);
         }
 
+        store = updatePage(store, pageKey, { age: 0 });
         store = sanitizeRouterStore(store, preferenceState);
         store.id = generateRandomUUID();
         store.options = options;
         return store;
       });
     },
-    [locationParamStoreApi, preferenceStoreApi, routerStoreApi, setNavigationStore]
+    [locationParamStoreApi, pageKey, preferenceStoreApi, routerStoreApi, setNavigationStore]
   );
 
   const closePanel = useCallback(
@@ -340,13 +344,14 @@ export function useAppNavigate<const Origin extends AppRoute['path']>() {
           [store] = upsertPanel(nextStore, 0, { pageKey: nextPageKey }, preferenceState);
         }
 
+        store = updatePage(store, pageKey, { age: 0 });
         store = sanitizeRouterStore(store, preferenceState);
         store.id = generateRandomUUID();
         store.options = options;
         return store;
       });
     },
-    [locationParamStoreApi, preferenceStoreApi, routerStoreApi, setNavigationStore]
+    [locationParamStoreApi, pageKey, preferenceStoreApi, routerStoreApi, setNavigationStore]
   );
 
   const buildOperations = useCallback(
@@ -624,9 +629,7 @@ export function useAppSyncRouterStoreFromNavigation() {
         replace: navigation?.options?.replace || false
       });
 
-      const titles = getTitlesFromNavigation(navigation, locationState, configState, t);
-      const nextTitle = navigation?.options?.nextTitle?.trim();
-      document.title = nextTitle ? nextTitle : titles?.length > 0 ? titles.join(' | ') : 'Assemblyline 4';
+      setDocumentTitleFromNavigation(navigation, locationState, configState, t);
       resetFavicon();
 
       setRouterStore(router => reconcileRouterFromNavigation(router, navigation));

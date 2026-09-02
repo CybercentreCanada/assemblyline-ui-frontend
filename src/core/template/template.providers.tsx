@@ -6,7 +6,6 @@ import {
   useAppTemplateBarHeight,
   useAppTemplateThemeInitializer,
   useAppTemplateThemeMode,
-  useAppTemplateThemePatcher,
   useOverrideTemplatePreferences
 } from 'core/template';
 import type { i18n } from 'i18next';
@@ -97,7 +96,7 @@ export const AppTemplateProvider = memo(({ children, i18n }: AppTemplateProvider
   const skin = useAppInterfaceStore(s => s.theme.skin);
 
   useAppTemplateThemeInitializer();
-  useAppTemplateThemePatcher();
+  // useAppTemplateThemePatcher();
   useAppTemplateBarHeight();
 
   const mode = useAppTemplateThemeMode();

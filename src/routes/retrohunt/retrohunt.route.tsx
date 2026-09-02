@@ -95,7 +95,7 @@ export const RetrohuntPage = memo(() => {
 
   useEffect(() => {
     if (search) handleReload(search);
-  }, [handleReload, search]);
+  }, [handleReload, search?.toString()]);
 
   useEffect(() => {
     function reload() {
@@ -105,7 +105,7 @@ export const RetrohuntPage = memo(() => {
     return () => {
       window.removeEventListener('reloadRetrohunts', reload);
     };
-  }, [handleReload, search]);
+  }, [handleReload, search?.toString()]);
 
   useEffect(() => {
     const socket = io(SOCKETIO_NAMESPACE);

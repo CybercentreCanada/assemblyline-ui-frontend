@@ -12,8 +12,8 @@ importers:
   .:
     dependencies:
       '@cccsaurora/clue-ui':
-        specifier: ^1.2.8
-        version: 1.3.0(9485ffcc074e85fa728e5dc7ee5acb7a)
+        specifier: ^1.4.1
+        version: 1.4.1(9485ffcc074e85fa728e5dc7ee5acb7a)
       '@date-io/date-fns':
         specifier: ^3.2.1
         version: 3.2.1(date-fns@3.6.0)
@@ -823,8 +823,8 @@ packages:
     resolution: {integrity: sha512-6zABk/ECA/QYSCQ1NGiVwwbQerUCZ+TQbp64Q3AgmfNvurHH0j8TtXa1qbShXA6qqkpAj4V5W8pP6mLe1mcMqA==}
     engines: {node: '>=18'}
 
-  '@cccsaurora/clue-ui@1.3.0':
-    resolution: {integrity: sha512-F1b91IJ1Ti/hEoFHtf1XwfiehzZfBhOxm+O5NquRPn7Jt9zBAItq1+/Wj6xO7ePFpC+GPDpOHnzzI0SZYtXk8Q==}
+  '@cccsaurora/clue-ui@1.4.1':
+    resolution: {integrity: sha512-H43KZQGmrJE1QN7LD4pHHwqXWGlMf0k1Ju7MVbTlSuLzBaPQjoSo10BATmCcwivaqwTQ9kS06AaLZVppO2Vvtg==}
     peerDependencies:
       '@emotion/react': ^11.11.1
       '@emotion/styled': ^11.11.0
@@ -6674,7 +6674,7 @@ snapshots:
 
   '@bcoe/v8-coverage@1.0.2': {}
 
-  '@cccsaurora/clue-ui@1.3.0(9485ffcc074e85fa728e5dc7ee5acb7a)':
+  '@cccsaurora/clue-ui@1.4.1(9485ffcc074e85fa728e5dc7ee5acb7a)':
     dependencies:
       '@emotion/react': 11.14.0(@types/react@19.2.14)(react@19.2.3)
       '@emotion/styled': 11.14.0(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.3))(@types/react@19.2.14)(react@19.2.3)
