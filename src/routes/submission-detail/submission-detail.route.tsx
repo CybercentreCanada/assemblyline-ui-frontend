@@ -116,7 +116,7 @@ const SubmissionDetail = memo(() => {
   const { showSuccessMessage, showErrorMessage } = useMySnackbar();
   const { user: currentUser, configuration: systemConfig, settings } = useALContext();
   const { setHighlightMap } = useHighlighter();
-  const { id = null } = useAppPathParams<'/submission/detail/:id'>();
+  const id = useAppPathParams<'/submission/detail/:id'>()?.id;
 
   const [submission, setSubmission] = useState<ParsedSubmission>(null);
   const [summary, setSummary] = useState<SubmissionSummary>(null);
@@ -1084,6 +1084,7 @@ const SubmissionDetail = memo(() => {
           .filter(metakey => systemConfig.submission.metadata.archive[metakey].required)
           .some(metakey => !Object.keys(archivingMetadata).includes(metakey))}
       />
+
       <div ref={anchorRef} style={{ width: '100%' }} />
       {outstandingOpen && outstanding && Object.keys(outstanding).length > 0 && (
         <Popper
