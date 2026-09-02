@@ -25,13 +25,17 @@ import type { Role } from 'models/base/user';
 import type React from 'react';
 import { memo, useCallback, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { AlertsRoute } from 'routes/alerts/alerts.route';
 import { ForbiddenPage } from 'routes/forbidden/forbidden';
+import { ManageSignaturesRoute } from 'routes/manage-signatures/manage-signatures.route';
+import { RetrohuntRoute } from 'routes/retrohunt/retrohunt.route';
 import { AlertsTable } from 'routes/search/components/alerts';
 import { FilesTable } from 'routes/search/components/files';
 import { ResultsTable } from 'routes/search/components/results';
 import { RetrohuntTable } from 'routes/search/components/retrohunt';
 import { SignaturesTable } from 'routes/search/components/signatures';
 import { SubmissionsTable } from 'routes/search/components/submissions';
+import { SubmissionsRoute } from 'routes/submissions/submissions.route';
 import { searchResultsDisplay } from 'shared/utils/utils';
 import Empty from 'ui/Empty';
 import SearchBar from 'ui/SearchBar/search-bar';
@@ -41,6 +45,24 @@ import SearchResultCount from 'ui/SearchResultCount';
 export const SEARCH_INDICES = ['submission', 'file', 'result', 'signature', 'alert', 'retrohunt'] as const;
 
 export type SearchIndex = (typeof SEARCH_INDICES)[number];
+
+export const SEARCH_PERMISSION_MAP: Record<SearchIndex, Role> = {
+  alert: 'alert_view',
+  file: 'submission_view',
+  result: 'submission_view',
+  retrohunt: 'retrohunt_view',
+  signature: 'signature_view',
+  submission: 'submission_view'
+} as const;
+
+export const SEARCH_SORTING_MAP: Record<SearchIndex, string> = {
+  alert: AlertsRoute.search.getDefaultValues().get('sort'),
+  file: 'seen.last desc',
+  result: 'created desc',
+  retrohunt: RetrohuntRoute.search.getDefaultValues().get('sort'),
+  signature: ManageSignaturesRoute.search.getDefaultValues().get('sort'),
+  submission: SubmissionsRoute.search.getDefaultValues().get('sort')
+} as const;
 
 //*****************************************************************************************
 // Search Page
@@ -61,28 +83,16 @@ export const SearchPage = () => {
 
   const downSM = useMediaQuery(theme.breakpoints.down('md'));
 
-  const permissionMap = useMemo<Record<SearchIndex, Role>>(
-    () => ({
-      submission: 'submission_view',
-      file: 'submission_view',
-      result: 'submission_view',
-      signature: 'signature_view',
-      alert: 'alert_view',
-      retrohunt: 'retrohunt_view'
-    }),
-    []
-  );
-
   const tab = useMemo<SearchIndex>(() => {
     const nextAvailableTab = () => {
-      for (const curTab of [...Object.keys(permissionMap)] as SearchIndex[]) {
-        if (currentUser.roles.includes(permissionMap[curTab])) return curTab;
+      for (const curTab of [...Object.keys(SEARCH_PERMISSION_MAP)] as SearchIndex[]) {
+        if (currentUser.roles.includes(SEARCH_PERMISSION_MAP[curTab])) return curTab;
       }
       return 'submission';
     };
 
     return id || index || nextAvailableTab();
-  }, [currentUser.roles, id, index, permissionMap]);
+  }, [currentUser.roles, id, index]);
 
   const suggestions = useMemo(() => {
     let indexFields: IndexDefinition = {};
@@ -100,23 +110,19 @@ export const SearchPage = () => {
     return { ...indexFields, ...DEFAULT_SUGGESTION };
   }, [id, index, indexes]);
 
-  const getBody = useCallback(
-    (value: SearchIndex) =>
-      index === value
-        ? search.pick(['query', 'offset', 'rows', 'sort', 'use_archive']).toObject()
-        : search
-            .omit(['index'])
-            .set(s => ({ ...s, ...search.defaults().pick(['offset', 'rows', 'sort']).toObject() }))
-            .pick(['query', 'offset', 'rows', 'sort', 'use_archive'])
-            .toObject(),
-    [index, search.toString()]
-  );
-
   const submissionResults = useApiQuery<SearchResult<SubmissionIndexed>>({
     url: `/api/v4/search/submission/`,
     method: 'POST',
     disabled: !currentUser.roles.includes('submission_view') || (!!id && id !== 'submission') || !search.get('query'),
-    body: getBody('submission'),
+    body: search
+      .set(s => ({
+        ...s,
+        ...((index || id) === 'submission'
+          ? null
+          : { ...search.defaults().pick(['offset', 'rows']).toObject(), sort: SEARCH_SORTING_MAP.submission })
+      }))
+      .pick(['query', 'offset', 'rows', 'sort', 'use_archive'])
+      .toObject(),
     onFailure: api_data => {
       if (index || id || !api_data.api_error_message.includes('Rewrite first')) {
         showErrorMessage(api_data.api_error_message);
@@ -128,7 +134,15 @@ export const SearchPage = () => {
     url: `/api/v4/search/file/`,
     method: 'POST',
     disabled: !currentUser.roles.includes('submission_view') || (!!id && id !== 'file') || !search.get('query'),
-    body: getBody('file'),
+    body: search
+      .set(s => ({
+        ...s,
+        ...((index || id) === 'file'
+          ? null
+          : { ...search.defaults().pick(['offset', 'rows']).toObject(), sort: SEARCH_SORTING_MAP.file })
+      }))
+      .pick(['query', 'offset', 'rows', 'sort', 'use_archive'])
+      .toObject(),
     onFailure: api_data => {
       if (index || id || !api_data.api_error_message.includes('Rewrite first')) {
         showErrorMessage(api_data.api_error_message);
@@ -140,7 +154,15 @@ export const SearchPage = () => {
     url: `/api/v4/search/result/`,
     method: 'POST',
     disabled: !currentUser.roles.includes('submission_view') || (!!id && id !== 'result') || !search.get('query'),
-    body: getBody('result'),
+    body: search
+      .set(s => ({
+        ...s,
+        ...((index || id) === 'result'
+          ? null
+          : { ...search.defaults().pick(['offset', 'rows']).toObject(), sort: SEARCH_SORTING_MAP.result })
+      }))
+      .pick(['query', 'offset', 'rows', 'sort', 'use_archive'])
+      .toObject(),
     onFailure: api_data => {
       if (index || id || !api_data.api_error_message.includes('Rewrite first')) {
         showErrorMessage(api_data.api_error_message);
@@ -152,7 +174,15 @@ export const SearchPage = () => {
     url: `/api/v4/search/signature/`,
     method: 'POST',
     disabled: !currentUser.roles.includes('signature_view') || (!!id && id !== 'signature') || !search.get('query'),
-    body: getBody('signature'),
+    body: search
+      .set(s => ({
+        ...s,
+        ...((index || id) === 'signature'
+          ? null
+          : { ...search.defaults().pick(['offset', 'rows']).toObject(), sort: SEARCH_SORTING_MAP.signature })
+      }))
+      .pick(['query', 'offset', 'rows', 'sort', 'use_archive'])
+      .toObject(),
     onFailure: api_data => {
       if (index || id || !api_data.api_error_message.includes('Rewrite first')) {
         showErrorMessage(api_data.api_error_message);
@@ -164,7 +194,15 @@ export const SearchPage = () => {
     url: `/api/v4/search/alert/`,
     method: 'POST',
     disabled: !currentUser.roles.includes('alert_view') || (!!id && id !== 'alert') || !search.get('query'),
-    body: getBody('alert'),
+    body: search
+      .set(s => ({
+        ...s,
+        ...((index || id) === 'alert'
+          ? null
+          : { ...search.defaults().pick(['offset', 'rows']).toObject(), sort: SEARCH_SORTING_MAP.alert })
+      }))
+      .pick(['query', 'offset', 'rows', 'sort', 'use_archive'])
+      .toObject(),
     onFailure: api_data => {
       if (index || id || !api_data.api_error_message.includes('Rewrite first')) {
         showErrorMessage(api_data.api_error_message);
@@ -180,7 +218,15 @@ export const SearchPage = () => {
       !configuration?.retrohunt?.enabled ||
       (!!id && id !== 'retrohunt') ||
       !search.get('query'),
-    body: getBody('retrohunt'),
+    body: search
+      .set(s => ({
+        ...s,
+        ...((index || id) === 'retrohunt'
+          ? null
+          : { ...search.defaults().pick(['offset', 'rows']).toObject(), sort: SEARCH_SORTING_MAP.retrohunt })
+      }))
+      .pick(['query', 'offset', 'rows', 'sort', 'use_archive'])
+      .toObject(),
     onFailure: api_data => {
       if (index || id || !api_data.api_error_message.includes('Rewrite first')) {
         showErrorMessage(api_data.api_error_message);
@@ -204,8 +250,8 @@ export const SearchPage = () => {
 
   const SpecialTab = useCallback(({ children }: { children: React.ReactNode }) => children, []);
 
-  return (id && !currentUser.roles.includes(permissionMap[index || id])) ||
-    (!id && Object.values(permissionMap).every(val => !currentUser.roles.includes(val))) ||
+  return (id && !currentUser.roles.includes(SEARCH_PERMISSION_MAP[index || id])) ||
+    (!id && Object.values(SEARCH_PERMISSION_MAP).every(val => !currentUser.roles.includes(val))) ||
     (id === 'retrohunt' && !configuration.retrohunt.enabled) ? (
     <ForbiddenPage />
   ) : (
@@ -277,9 +323,10 @@ export const SearchPage = () => {
               <Tabs
                 value={tab}
                 onChange={(e, v: SearchIndex) =>
-                  navigate
-                    .here<'/search/:index'>()
-                    .update(s => ({ ...s, search: { ...s.search, index: v, offset: 0, sort: null } }))
+                  navigate.here<'/search/:index'>().update(s => ({
+                    ...s,
+                    search: { ...s.search, index: v, offset: 0, sort: SEARCH_SORTING_MAP?.[v] }
+                  }))
                 }
                 allowScrollButtonsMobile
                 indicatorColor="primary"
@@ -350,7 +397,7 @@ export const SearchPage = () => {
                 ) : (
                   <Empty />
                 )}
-                {currentUser.roles.includes(permissionMap.retrohunt) && configuration.retrohunt.enabled ? (
+                {currentUser.roles.includes(SEARCH_PERMISSION_MAP.retrohunt) && configuration.retrohunt.enabled ? (
                   <Tab
                     label={`${t('retrohunt')} (${
                       !retrohuntResults.isFetching ? searchResultsDisplay(retrohuntResults.data.total) : '...'

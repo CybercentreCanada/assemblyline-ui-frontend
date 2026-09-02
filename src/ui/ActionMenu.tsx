@@ -59,21 +59,21 @@ const initialMenuState: Coordinates = {
   mouseY: null
 };
 
-const categoryPrefix = {
+export const CATEGORY_PREFIX_MAP: Record<ExternalLinkType | 'heuristic' | 'signature', string> = {
   heuristic: 'result.sections.heuristic.name',
   signature: 'result.sections.heuristic.signature.name',
   metadata: 'metadata.',
   tag: 'result.sections.tags.',
   hash: ''
-} as Record<ExternalLinkType | 'heuristic' | 'signature', string>;
+} as const;
 
-const categoryIndex = {
+export const CATEGORY_INDEX_MAP: Record<ExternalLinkType | 'heuristic' | 'signature', SearchIndex> = {
   heuristic: 'result',
   signature: 'result',
   metadata: null,
   tag: 'result',
   hash: null
-} as Record<ExternalLinkType | 'heuristic' | 'signature', SearchIndex>;
+} as const;
 
 export type ActionMenuProps = {
   category: ExternalLinkType | 'heuristic' | 'signature';
@@ -462,12 +462,12 @@ const WrappedActionMenu = ({
                     path: { index },
                     search: { query: `${type}:${safeFieldValue(value)}` }
                   })
-                : categoryIndex[category]
+                : CATEGORY_INDEX_MAP[category]
                   ? nav.to<'/search/:index'>().create({
                       route: '/search/:index',
-                      path: { index: categoryIndex[category] as SearchIndex },
+                      path: { index: CATEGORY_INDEX_MAP[category] },
                       search: {
-                        query: `${category === 'tag' && maliciousness === 'safe' ? 'result.sections.safelisted_tags.' : categoryPrefix[category]}${type}:${safeFieldValue(
+                        query: `${category === 'tag' && maliciousness === 'safe' ? 'result.sections.safelisted_tags.' : CATEGORY_PREFIX_MAP[category]}${type}:${safeFieldValue(
                           value
                         )}`
                       }
@@ -475,7 +475,7 @@ const WrappedActionMenu = ({
                   : nav.to<'/search'>().create({
                       route: '/search',
                       search: {
-                        query: `${category === 'tag' && maliciousness === 'safe' ? 'result.sections.safelisted_tags.' : categoryPrefix[category]}${type}:${safeFieldValue(
+                        query: `${category === 'tag' && maliciousness === 'safe' ? 'result.sections.safelisted_tags.' : CATEGORY_PREFIX_MAP[category]}${type}:${safeFieldValue(
                           value
                         )}`
                       }
