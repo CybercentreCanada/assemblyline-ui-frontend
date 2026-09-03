@@ -10,7 +10,7 @@ import { AppPageContainer, AppPageFullWidth } from 'core/template';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import useMySnackbar from 'deprecated/hooks/useMySnackbar';
-import { InferSearchParamValueMapFromEngine } from 'features/search-params';
+import type { InferSearchParamValueMapFromEngine } from 'features/search-params';
 import type { FacetResult, HistogramResult, SearchResult } from 'models/api/search';
 import type { IndexDefinition } from 'models/api/user';
 import type { FileIndexed } from 'models/base/file';
