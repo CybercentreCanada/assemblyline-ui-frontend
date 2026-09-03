@@ -10,6 +10,7 @@ import { AppPageContainer, AppPageFullWidth } from 'core/template';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import useMySnackbar from 'deprecated/hooks/useMySnackbar';
+import { InferSearchParamValueMapFromEngine } from 'features/search-params';
 import type { FacetResult, HistogramResult, SearchResult } from 'models/api/search';
 import type { IndexDefinition } from 'models/api/user';
 import type { FileIndexed } from 'models/base/file';
@@ -133,17 +134,18 @@ export const ArchivesPage = memo(() => {
         .omit(['tc', 'supplementary'])
         .set(s => ({ ...s, query: s.query || '*' }))
         .toObject(),
-      filters,
-      archive_only: true
+      filters
     };
   }, [search?.toString()]);
 
-  const buildFacetParams = useCallback((body: Record<string, unknown>) => {
+  const buildFacetParams = useCallback((body: InferSearchParamValueMapFromEngine<typeof ArchivesRoute.search>) => {
     const params = new URLSearchParams();
-    params.set('query', body.query as string);
+    params.set('query', body.query);
     for (const filter of (body.filters as string[]) ?? []) {
       params.append('filters', filter);
     }
+
+    params.set('archive_only', `${body.archive_only}`);
     return params;
   }, []);
 
@@ -436,7 +438,8 @@ export const ArchivesRoute = createAppRoute({
     filters: s.filters([]),
     tc: s.string(DEFAULT_TC),
     supplementary: s.boolean(false),
-    track_total_hits: s.number(null).source('transient').nullable().ephemeral()
+    track_total_hits: s.number(null).source('transient').nullable().ephemeral(),
+    archive_only: s.boolean(true).locked().source('transient').ephemeral()
   }),
 
   ancestor: null,
