@@ -210,7 +210,7 @@ Limit prop drilling in favor of store-based solutions for maximum performance an
 
 | Solution                           | When to Use                                         |
 | ---------------------------------- | --------------------------------------------------- |
-| `useAppConfig` / `useAppSetConfig` | App-wide state (layout, auth, config)               |
+| `useAppConfigStore` / `useAppSetConfigStore` | App-wide state (layout, auth, config)               |
 | `createAppStore`                   | Feature-scoped state shared across a component tree |
 | TanStack Form stores               | Form state with validation                          |
 

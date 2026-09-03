@@ -1,6 +1,6 @@
 # core/preference
 
-User preference store — **user-owned, persisted to localStorage (and eventually backend)**.
+User preference store — **user-owned and persisted to localStorage**.
 
 ## Purpose
 
@@ -8,7 +8,7 @@ Holds values that the user controls about how the app looks and behaves for them
 
 ## How It Works
 
-1. The app defines a Zod schema (`AppPreferenceSchema`) in `app/core.preference.tsx` using `.catch()` on every field so invalid values fall back to defaults instead of throwing.
+1. The app defines a Zod schema (`APP_PREFERENCE_SCHEMA`) in `app/core.preference.tsx` using `.catch()` on every field so invalid values fall back to defaults instead of throwing.
 2. `AppPreferenceProvider` receives the `schema` and `storageKey` as props.
 3. On mount, the provider hydrates the store by calling `loadPreferenceFromLocalStorage` which parses stored data through the schema — missing or invalid fields are replaced with defaults.
 4. An internal `AppPreferencePersistence` component subscribes to the full store and auto-saves to localStorage on every change (skipping the initial hydration).
@@ -32,8 +32,8 @@ Holds values that the user controls about how the app looks and behaves for them
 
 | Export                       | Description                                                  |
 | ---------------------------- | ------------------------------------------------------------ |
-| `useAppPreference(selector)` | Read a slice of preference with selector-based subscriptions |
-| `useAppSetPreference()`      | Returns a setter to shallow-merge a patch into preference    |
+| `useAppPreferenceStore(selector)` | Read a slice of preference with selector-based subscriptions |
+| `useAppSetPreferenceStore()`      | Returns a setter to shallow-merge a patch into preference    |
 | `AppPreferenceProvider`      | Mount at app root with `schema` + `storageKey` props         |
 
 ## Usage
@@ -41,30 +41,30 @@ Holds values that the user controls about how the app looks and behaves for them
 ```tsx
 // app/app.tsx
 import { AppPreferenceProvider } from 'core/preference';
-import { AppPreferenceSchema } from './core.preference';
+import { APP_PREFERENCE_SCHEMA } from 'app/core.preference';
 
-const APP_PREFERENCES_KEY = 'al.preference';
+const APP_PREFERENCES_KEY = 'Assemblyline.preferences';
 
-<AppPreferenceProvider schema={AppPreferenceSchema} storageKey={APP_PREFERENCES_KEY}>
+<AppPreferenceProvider schema={APP_PREFERENCE_SCHEMA} storageKey={APP_PREFERENCES_KEY}>
   <App />
 </AppPreferenceProvider>;
 ```
 
 ```tsx
 // Reading in a component
-const lang = useAppPreference(s => s.layout.lang);
-const density = useAppPreference(s => s.layout.density);
+const lang = useAppPreferenceStore(s => s.template.lang);
+const density = useAppPreferenceStore(s => s.template.density);
 ```
 
 ```tsx
 // Writing in a component
-const setPrefs = useAppSetPreference();
+const setPrefs = useAppSetPreferenceStore();
 setPrefs(prev => ({ ...prev, layout: { ...prev.layout, lang: 'fr' } }));
 ```
 
 ## Global Type
 
-The `AppPreference` type is declared globally via `declare global` in `app/core.preference.tsx`, inferred from the Zod schema (`z.infer<typeof AppPreferenceSchema>`). This makes it available everywhere without imports.
+The `AppPreferenceStore` type is declared globally via `declare global` in `app/core.preference.tsx`, inferred from the Zod schema (`z.infer<typeof APP_PREFERENCE_SCHEMA>`). This makes it available everywhere without imports.
 
 ## Schema Design
 

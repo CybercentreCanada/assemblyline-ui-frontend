@@ -10,13 +10,13 @@ Custom hooks encapsulate reusable reactive logic that multiple components need. 
 
 Custom hooks exist for three purposes:
 
-1. **Named store access** — Wrapping a store selector or setter with a semantic name (e.g., `useAppConfig`, `useAppSetConfig`, `usePanel`)
+1. **Named store access** — Wrapping a store selector or setter with a semantic name (e.g., `useAppConfigStore`, `useAppSetConfigStore`, `usePanel`)
 2. **Utility-style logic** — Encapsulating a `useMemo`/`useCallback`-style computation that benefits from a reusable name (e.g., `useFormattedDate`, `useSortedItems`)
 3. **Browser/frontend control** — Managing a browser API or frontend concern (e.g., `useLocalStorage`, `useTimeout`, `useMediaQuery`, `useIntersectionObserver`)
 
 Do NOT create hooks for:
 
-- Single-use state access (use `useAppConfig` directly in the component)
+- Single-use state access (use `useAppConfigStore` directly in the component)
 - Simple mutations (use `useAPIMutation` directly — no wrapper)
 - Wrapping a single hook call with no added logic
 - Complex multi-step flows that are hard to test indirectly
