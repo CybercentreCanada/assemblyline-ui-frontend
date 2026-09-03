@@ -3,6 +3,8 @@ import { boolean as zBoolean, enum as zEnum, number as zNumber, object as zObjec
 
 export const APP_PREFERENCE_STORAGE_KEY = 'Assemblyline.preferences';
 
+const DAY_IN_MS: number = 24 * 60 * 60 * 1000;
+
 /** React Query cache timing settings. */
 const API_PREFERENCE_SCHEMA = zObject({
   /** How long cached data is retained after all subscribers unmount (ms). */
@@ -23,12 +25,18 @@ const AUTH_PREFERENCE_SCHEMA = zObject({
   redirectTo: zString().catch(null)
 });
 
+/** Debug panel settings. */
+const DEBUG_PREFERENCE_SCHEMA = zObject({
+  /** Number of snapshots retained per store before the oldest are dropped. */
+  maxSnapshots: zNumber().min(1).max(50).catch(10)
+});
+
 /** Panel layout and navigation behaviour settings. */
 const ROUTER_PREFERENCE_SCHEMA = zObject({
   /** Maximum number of extra nodes. */
-  maxNodes: zNumber().catch(0),
+  maxNodes: zNumber().min(0).catch(0),
   /** Maximum number of side-by-side panels allowed. */
-  maxPanels: zNumber().catch(2),
+  maxPanels: zNumber().min(1).catch(2),
   /** How navigation behaves when reaching the end of the stack. */
   navigation: zEnum(['push', 'loop']).catch('push')
 });
@@ -44,7 +52,7 @@ const SNACKBAR_PREFERENCE_SCHEMA = zObject({
   /** Whether notifications use compact (dense) layout. */
   dense: zBoolean().catch(true),
   /** Maximum number of notifications shown simultaneously. */
-  maxSnack: zNumber().catch(3)
+  maxSnack: zNumber().min(1).catch(3)
 });
 
 /** Global UI template and appearance settings. */
@@ -58,7 +66,7 @@ const TEMPLATE_PREFERENCE_SCHEMA = zObject({
   /** Whether the side drawer is open by default. */
   drawerOpen: zBoolean().catch(true),
   /** Active UI language code. */
-  lang: zString().catch('en'),
+  lang: zEnum(['en', 'fr']).catch('en'),
   /** Whether the navigation bar is positioned on the side or top. */
   layout: zEnum(['side', 'top']).catch('side'),
   /** Whether the left navigation drawer expands on hover. */
@@ -76,13 +84,21 @@ const TEMPLATE_PREFERENCE_SCHEMA = zObject({
 /** Notification max age filtering schema for tags. */
 const NOTIFICATION_MAX_AGE_SCHEMA = zObject({
   /** Timespan in ms to show community-tagged notifications (default 1 year). */
-  community: zNumber().catch(365 * 24 * 60 * 60 * 1000),
+  community: zNumber()
+    .min(DAY_IN_MS)
+    .catch(365 * DAY_IN_MS),
   /** Timespan in ms to show dev-tagged notifications (default 30 days). */
-  dev: zNumber().catch(30 * 24 * 60 * 60 * 1000),
+  dev: zNumber()
+    .min(DAY_IN_MS)
+    .catch(30 * DAY_IN_MS),
   /** Timespan in ms to show service-tagged notifications (default 1 year). */
-  service: zNumber().catch(365 * 24 * 60 * 60 * 1000),
+  service: zNumber()
+    .min(DAY_IN_MS)
+    .catch(365 * DAY_IN_MS),
   /** Timespan in ms to show stable/general notifications (default 90 days). */
-  stable: zNumber().catch(90 * 24 * 60 * 60 * 1000)
+  stable: zNumber()
+    .min(DAY_IN_MS)
+    .catch(90 * DAY_IN_MS)
 });
 
 /** Notification filtering, timespan and timestamp preferences. */
@@ -99,6 +115,8 @@ export const APP_PREFERENCE_SCHEMA = zObject({
   api: API_PREFERENCE_SCHEMA.catch(() => API_PREFERENCE_SCHEMA.parse({})),
   /** Login provider and redirect preferences. */
   auth: AUTH_PREFERENCE_SCHEMA.catch(() => AUTH_PREFERENCE_SCHEMA.parse({})),
+  /** Debug panel settings. */
+  debug: DEBUG_PREFERENCE_SCHEMA.catch(() => DEBUG_PREFERENCE_SCHEMA.parse({})),
   /** Notification display, filtering, and timestamp settings. */
   notifications: NOTIFICATION_PREFERENCE_SCHEMA.catch(() => NOTIFICATION_PREFERENCE_SCHEMA.parse({})),
   /** Panel layout and navigation behaviour. */

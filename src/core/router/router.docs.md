@@ -2,256 +2,213 @@
 
 ## 1. Purpose
 
-The router is a custom multi-panel navigation engine built on top of react-router v6. It manages concurrent split views where each panel operates independently, and preserves component state across navigations using LRU-cached nodes with reverse portals. The URL is the single source of truth — the complete panel/route state is serialized into query parameters and `location.state`, making any view reproducible from a link.
+The router is the application's typed, multi-panel navigation layer. It sits on top of React Router and keeps the active page for each panel in Zustand stores. Pages can remain mounted through cached portal nodes, allowing navigation between panels without unnecessarily losing component state.
+
+The route registry and route-parameter logic live in `core/routes`. The router owns page placement, navigation operations, blockers, node caching, URL synchronization, and browser document navigation.
 
 ## 2. Features
 
-- **Multi-panel split views** — Up to N concurrent panels rendered side-by-side, each with independent navigation
-- **LRU node caching** — Recently visited routes stay mounted in the background; oldest are evicted when capacity is exceeded
-- **Reverse portal rendering** — Component trees rendered through React portals so they survive DOM relocation without unmounting
-- **Tabbed routes per panel** — Each panel can have temporary, tabbed (persistent), and pinned routes
-- **Type-safe navigation** — Route factories encode path params, search params, and hash; navigation and reading are fully typed
-- **URL-state synchronization** — Router state is serialized into query parameters (`?p=...&p=...`) and also passed through `location.state` for full-fidelity restoration
-- **Automatic garbage collection** — Orphaned routes, empty panels, and stale nodes are cleaned up on every navigation via sanitization passes
-- **Navigation styles** — Configurable behavior: `push` (opens in next panel) or `loop` (cycles within current panel)
-- **Route guards** — `disabled`, `forbidden`, and `loading` boundaries per route with customizable fallback components
+- Typed route navigation with path parameters, search parameters, hash values, and navigation options.
+- Multiple visible panels with `from`, `here`, `to`, and `at` navigation targets.
+- Portal-backed page nodes that preserve mounted component trees while pages are cached.
+- Navigation blockers for unsaved changes, possible data loss, and external navigation risk.
+- URL and `location.state` synchronization with revision IDs to prevent processing the same navigation twice.
+- Automatic sanitization of orphaned pages, missing nodes, empty panels, and over-capacity node caches.
+- Browser-compatible links through `AppLink`, including external href generation and normal link behavior.
+- Document title generation from route metadata, including optional title overrides and truncation.
 
 ## 3. Concepts
 
-### Store
+### Page
 
-The router maintains its own Zustand store (`AppRouterStore`) separate from AppConfig. This store holds three collections:
+An `AppRouterPage` is a resolved location entry:
 
-- **`routes`** — A flat map of all known routes (`Record<string, { href, state, age }>`). Each entry is a URL + optional state with an age counter for LRU ordering.
-- **`panels`** — An ordered array of panel descriptors. Each panel tracks its active route, temporary route, tabbed routes, and pinned routes via route keys.
-- **`nodes`** — A map of cached render slots (`Record<string, { routeKey, portal }>`). Each node holds a reference to a reverse portal that keeps a component tree alive.
+- `href` — serialized pathname, search, and hash.
+- `state` — durable location state.
+- `transient` — transient location state.
+- `digest` — identity hash derived from the page location and state.
+- `age` — eviction priority, recomputed during sanitization.
+- `scroll` — saved scroll position.
 
-### Panels
+Pages are stored in `AppRouterStore.pages` and `AppNavigationStore.pages`, keyed by generated page keys.
 
-A panel is a viewport slot. The `panels` array determines what's visible — panel[0] is the leftmost view, panel[1] is the right split, etc. Each panel has:
+### Panel
 
-- `routeKey` — The currently active/displayed route
-- `temporaryRouteKey` — A transient route that will be replaced on next navigation (like Chrome's "preview" tab)
-- `tabbedRouteKeys` — Permanent tabs that persist until explicitly closed
-- `pinnedRouteKeys` — Pinned tabs that cannot be evicted and sort to the left
+An `AppRouterPanel` contains the `pageKey` for its active page. Panel order determines the visible split layout: panel `0` is the primary panel and later panels are additional views.
 
-### Nodes
+### Node
 
-A node is the rendering unit. Each node owns a **reverse portal** — a React portal node that allows a component subtree to be rendered into different DOM locations without unmounting. Nodes are associated with routes. When a panel displays a route, it renders through that route's node. If the user navigates away but the node hasn't been evicted, the component tree stays alive in memory.
+An `AppRouterNode` owns a reverse portal for a page. The node cache keeps page component trees mounted while they are not currently active. `sanitizeRouterStore` removes orphaned pages, creates missing nodes, and removes old nodes according to router preferences.
 
-Node count is bounded by `maxPanels + maxNodes`. When exceeded, the oldest node (by route age) is evicted and its component tree unmounts.
+### Router and Navigation Stores
 
-### Routes
+The router uses two related stores:
 
-Routes are immutable URL entries stored by UUID key. Each route tracks an `href` (pathname + search + hash), optional navigation `state`, and an `age` counter. Age is recomputed on every navigation — displayed routes always have the lowest age (youngest), ensuring they're never evicted.
+- `AppRouterStore` — committed router state used to render pages and nodes.
+- `AppNavigationStore` — staged navigation request, including blockers and navigation options.
 
-### Navigation Flow
-
-1. User calls `useAppNavigate()` with a typed route descriptor
-2. The hook resolves the route to an `href` via route factories
-3. A new route entry is created in the store
-4. Based on the navigation style (`push`/`replace`/`to`), the target panel is determined
-5. The store is sanitized (orphaned routes removed, empty panels collapsed, missing nodes added, excess nodes evicted)
-6. The store is serialized to `location.state` and `?p=` query params
-7. react-router's `navigate()` is called with the serialized state
-8. On the receiving end, `AppRouterStoreSync` reads the location and hydrates the store
-
-### Synchronization Handshake
-
-The router maintains two-way sync between the store and the URL using a **versioning handshake** to prevent infinite loops:
-
-**Forward (Store → Location):**
-
-1. Component calls `navigate()` or stages a navigation request on a panel
-2. The store subscription fires (`routerStoreApi.subscribe`)
-3. `syncStoreToLocation(store, location)` generates a **new `store.id`** (UUID)
-4. It returns a navigation payload with `options.state.id = store.id` and `options.state.panels/routes`
-5. `navigate()` is called, updating `location.state`
-
-**Backward (Location → Store):**
-
-1. React Router updates the location (URL bar, history, etc.)
-2. The location effect fires (`useLocation()` dependency)
-3. `syncLocationToStore(store, location)` is called
-4. **Guard:** If `location.state.id === store.id`, return early (already synced)
-5. Otherwise, parse the location and stage navigation requests in the store
-6. The store subscription fires again, but now `syncStoreToLocation` sees `location.state.id === store.id` and returns `[null, null]`
-
-**Critical Guards:**
-
-- `syncStoreToLocation` checks: `if (!location?.state?.id || location.state.id === store.id || panelKey < 0) return [null, null];`
-- `syncLocationToStore` checks: `if (location.state?.id && location.state.id === store.id) return store;`
-- These must match the incoming location's `state.id` against the current `store.id` to prevent re-processing
-
-**Known Pitfalls — Can Cause Infinite Loops:**
-
-1. **Stale `location` in subscription closure** — If the store subscription effect has stale `location` in its closure (missing from deps), the id guard always compares new `store.id` against old `location.state.id`, which never match. Fix: include `location` in the effect's dependency array.
-
-2. **Re-staging in `parseLocationState`** — After `navigate()` writes new state to the location, if `syncLocationToStore` → `parseLocationState` re-stages navigation requests for all panels (via `setNavigation(..., type: 'update')`), the store changes again, the subscription fires, and the cycle restarts. Fix: only stage navigation if the route is genuinely different from what's already in the store (check current href against incoming href and skip `setNavigation` for routes that haven't changed).
-
-**For Maintainers:**
-When modifying sync logic, always verify:
-
-- The id guards are comparing the most recent location against the most recent store
-- `parseLocationState` only stages navigations for routes that have actually changed
-- The effect dependencies include `location` so stale closures don't defeat the guards
+Navigation operations update the navigation store first. Synchronization commits the request to React Router and reconciles the committed router store.
 
 ## 4. Configuration
 
-### Provider Setup
+Panel and node limits are read from application preferences under `router`:
 
-At the application root, wrap your app in `AppRouterProvider`:
-
-```typescript
-// app/app.tsx
-import { AppRouterProvider } from 'core/router';
-
-const App = memo(() => (
-  <AppRouterProvider>
-    <AppLayout />
-  </AppRouterProvider>
-));
-```
-
-`AppRouterProvider` composes:
-
-1. `BrowserRouter` (react-router's base with `basename="/"`)
-2. `AppRouterStoreSync` — reads `useLocation()` on every navigation and hydrates the router store from either `location.state` (preferred, full fidelity) or `location.search` (fallback, query params only)
-
-### AppConfig Settings
-
-Router configuration lives in `AppConfig.router` and is read by the store sync:
-
-```typescript
-type AppRouterConfig = {
-  maxPanels?: number; // Max concurrent panels (default: 2)
-  maxNodes?: number; // Extra cached nodes beyond active panels (default: 2)
-  navigation?: 'push' | 'loop'; // Navigation style (default: 'push')
+```ts
+type RouterPreferences = {
+  maxPanels: number;
+  maxNodes: number;
+  navigation: 'push' | 'loop';
 };
 ```
 
-| Setting              | Effect                                                                                                         |
-| -------------------- | -------------------------------------------------------------------------------------------------------------- |
-| `maxPanels: 1`       | Single panel, no split view. Navigating always replaces the current view.                                      |
-| `maxPanels: 2`       | Two panels max. Navigating opens a split to the right; if already at 2, the leftmost is collapsed.             |
-| `maxNodes: 0`        | No background caching. Only active panel routes stay mounted. Navigating away always unmounts.                 |
-| `maxNodes: 2`        | Two extra routes stay mounted beyond what's currently displayed. Navigating back to a recent route is instant. |
-| `navigation: 'push'` | New navigations open in the next panel to the right (or create one if below `maxPanels`).                      |
-| `navigation: 'loop'` | (Planned) New navigations cycle within the current panel.                                                      |
+- `maxPanels` limits the number of visible panels.
+- `maxNodes` controls additional cached nodes.
+- `navigation: 'push'` advances to another panel.
+- `navigation: 'loop'` cycles through available panels.
 
-The total number of mounted component trees at any time is `maxPanels + maxNodes`.
+`AppNavigateOptions` controls individual navigations:
 
-### Zod Validation
+- `replace` — replace the browser history entry.
+- `resetScroll` — reset the destination scroll position.
+- `ignoreBlocker` — bypass registered navigation blockers.
+- `reloadDocument` — perform a full document navigation.
+- `nextTitle` — override the next document title.
+- `hashScrollIntoView` — scroll to a matching hash element.
+- `viewTransition` — enable a browser view transition when supported.
 
-Settings are validated on load via `AppRouterSettingsSchema`:
-
-```typescript
-const AppRouterSettingsSchema = z.object({
-  maxPanels: z.number().min(1).optional(),
-  maxNodes: z.number().min(0).optional(),
-  navigation: z.enum(['push', 'loop']).optional()
-});
-```
-
-## 5. Usage (Consumer API)
-
-These are the hooks and components available to pages and layout code.
+## 5. Usage
 
 ### Navigation
 
-```typescript
-import { useAppNavigate } from 'core/router';
+`useAppNavigate` returns four panel-targeting functions:
 
-const navigate = useAppNavigate();
+- `from()` — target the previous panel according to the configured navigation mode.
+- `here()` — target the panel containing the requesting page.
+- `to()` — target the next panel according to the configured navigation mode.
+- `at(panelKey)` — target an explicit panel index.
 
-// Open in next panel (default 'open' variant)
-navigate({ path: '/alerts/:id', params: { id: '123' } });
+Each target returns these operations:
 
-// Replace current panel's route
-navigate({ path: '/alerts/:id', params: { id: '123' }, variant: 'replace' });
+- `create` — create a new page and assign it to the target panel.
+- `update` — update the existing target page.
+- `search` — update only the route's typed search snapshot.
+- `only` — create a page and make it the only visible panel.
+- `closePanel` — remove the target panel and create a fallback page when necessary.
 
-// Open in a specific panel index
-navigate({ path: '/alerts/:id', params: { id: '123' }, variant: 'to', panel: 0 });
+```tsx
+const navigate = useAppNavigate<'/alerts'>();
+
+navigate.to().create({
+  route: '/submission/detail/:id',
+  path: { id: submissionId }
+});
+
+navigate.here<'/alerts'>().update(state => ({
+  ...state,
+  search: { ...state.search, offset: 0 }
+}));
+
+navigate.at(0).only({ route: '/submit' });
 ```
 
-### Link Component
+### Links
 
-```typescript
-import { AppLink } from 'core/router';
+Use `AppLink` with a `nav` callback. It computes an external href for browser behavior such as opening a link in a new tab, while left-click navigation is routed through the panel engine. Pass `navDeps` when the callback closes over changing values:
 
-<AppLink to={{ path: '/alerts/:id', params: { id: alert.id } }}>
-  View Alert
-</AppLink>
-
-// With navigation variant
-<AppLink to={{ path: '/submit', variant: 'replace' }}>
-  Submit
+```tsx
+<AppLink
+  nav={navigate =>
+    navigate.to().create({
+      route: '/submission/detail/:id',
+      path: { id: submissionId }
+    })
+  }
+  navDeps={[submissionId]}
+>
+  Open submission
 </AppLink>
 ```
 
-`AppLink` renders a real `<a>` tag (for accessibility and right-click/open-in-new-tab) but intercepts clicks to route through the panel system.
+Use `AppNavigate` when navigation should occur from a rendered component rather than a user link.
 
 ### Reading Route State
 
-Route params and search params are accessed through `core/routes` hooks (separate from `core/router`):
+Route definitions and typed parameter hooks are provided by `core/routes`:
 
-```typescript
-import { useAppPathParams, useAppSearchParams } from 'core/routes';
+```tsx
+import { useAppPathParams, useAppSearchSnapshot } from 'core/routes';
 
-// Path params — typed by route path
-const id = useAppPathParams('/alerts/:id', params => params.id);
-
-// Search params — typed by route search schema
-const tab = useAppSearchParams('/alerts/:id', search => search.tab);
+const { id } = useAppPathParams<'/submission/detail/:id'>();
+const search = useAppSearchSnapshot<'/alerts'>();
+const offset = search.get('offset');
 ```
 
-### Store Access (Advanced)
+Use `useAppSearchSnapshot` when reading or updating a route search schema through `useAppNavigate().here().search()` or `.update()`.
 
-For layout code that needs to read router state directly (e.g., rendering panel tabs):
+### Blockers
 
-```typescript
-import { useAppRouterStore } from 'core/router';
+Pages can register a navigation blocker with `useAppBlocker`:
 
-// Read panels
-const panels = useAppRouterStore(s => s.panels);
-
-// Read a specific route
-const route = useAppRouterStore(s => s.routes[routeKey]);
-
-// Write to router store (for panel/tab management UI)
-const setStore = useAppRouterSetStore();
+```tsx
+useAppBlocker('unsaved_changes', [isDirty]);
 ```
 
-## 6. Codebase (Internals)
+Supported reasons are `unsaved_changes`, `data_loss_on_leave`, and `external_leave_risk`. `useAppBlockNavigation` detects staged navigation while blockers differ from the committed router state and asks the user for confirmation.
 
-### Key Files
+### Store Access
 
-| File                    | Role                                                                                                    |
-| ----------------------- | ------------------------------------------------------------------------------------------------------- |
-| `router.models.tsx`     | Type definitions: `AppRouterPanel`, `AppRouterNode`, `AppRouterRoute`, `AppRouterStore`, `AppLinkProps` |
-| `router.config.tsx`     | Zod schema for config validation, `AppRouterConfig` type                                                |
-| `router.defaults.tsx`   | Default values for panels, nodes, routes, store; example store for fallback                             |
-| `router.providers.tsx`  | `AppRouterProvider` (BrowserRouter + store sync), `useAppRouterStore`, `useAppRouterSetStore`           |
-| `router.hooks.tsx`      | `useAppNavigate` (main navigation hook), `useAppLocationParam` (href builder)                           |
-| `router.components.tsx` | `AppLink` — type-safe link component                                                                    |
-| `router.utils.tsx`      | Pure functions for all store operations (panels, nodes, routes, tabs, serialization)                    |
-| `router.utils.test.tsx` | Unit tests for utility functions                                                                        |
+Read committed state with selectors:
 
-### Related Modules
+```tsx
+import { useAppNavigationStore, useAppRouterStore } from 'core/router';
 
-- `core/routes/` — Route factories, typed param/search hooks, route providers
-- `layout/router/` — The UI shell that renders panels using this engine
-- `features/portal/` — Reverse portal implementation (`createReversePortalNode`, `InPortal`, `OutPortal`)
-- `app/app.routes.tsx` — Route registry where all pages are declared
+const panels = useAppRouterStore(state => state.panels);
+const pages = useAppRouterStore(state => state.pages);
+const pendingNavigationId = useAppNavigationStore(state => state.id);
+```
 
-## 7. Improvements Over Legacy Drawer
+For non-React integrations, use the store API helpers:
 
-The previous implementation used a "Drawer" component for side-by-side viewing. Every page managed the Drawer's state (what page was open in it, its actions, its transitions), creating massive coupling. Some states were stored only in component memory and couldn't be reproduced from the URL, so shared links were broken. The hash (`#sha256=...`) was used as a partial workaround but only covered a few variables.
+```tsx
+import { getAppRouterStateFromApi, useAppRouterStoreApi } from 'core/router';
 
-| Legacy Limitation                              | New Router Solution                                                      |
-| ---------------------------------------------- | ------------------------------------------------------------------------ |
-| Pages managed each other's state via Drawer    | Pages have zero awareness of other panels — router handles orchestration |
-| States not reproducible from URL               | Full state serialized into query params + `location.state`               |
-| Navigation unmounts previous view              | LRU nodes keep views mounted; navigation is instant                      |
-| Each new page required Drawer integration code | Pages just render content — placement is automatic                       |
-| Hash-based partial state hacks                 | Type-safe route factories with full param/search encoding                |
+const routerStoreApi = useAppRouterStoreApi();
+const router = getAppRouterStateFromApi(routerStoreApi);
+```
+
+Most application code should use `useAppNavigate`, `AppLink`, and typed `core/routes` hooks instead of mutating stores directly.
+
+## 6. Codebase
+
+### Providers and stores
+
+- `router.providers.tsx` — Zustand providers, store APIs, defaults, and `AppRouterProvider`.
+- `router.models.tsx` — Router, navigation, page, panel, node, blocker, and operation types.
+
+### Navigation and rendering
+
+- `router.hooks.tsx` — `useAppNavigate`, external href generation, synchronization, and blocker hooks.
+- `router.components.tsx` — `AppLink`, `AppNavigate`, and `AppNavigationBlocker`.
+- `router.layout.tsx` — Router, panel, page, and node rendering layouts.
+
+### Utilities and related modules
+
+- `router.utils.tsx` — Page, panel, node, blocker, sanitization, serialization, and document-title utilities.
+- `router.utils.test.tsx` — Unit tests for router utilities.
+- `core/routes` — Route factories, path parameters, search schemas, and location snapshots.
+- `features/portal` — Reverse portal implementation.
+- `layout/router` — Application-specific panel presentation.
+
+### Synchronization flow
+
+`AppRouterProvider` composes the React Router provider and router store providers. `useAppSyncNavigationStoreFromLocation` reads locations and hydrates the navigation store from location state, the `/v1` hash, or legacy locations. `useAppSyncRouterStoreFromNavigation` writes `/v1` plus serialized panel fragments to React Router, updates the document title, and reconciles the committed router store.
+
+The location state carries an `id`, panel descriptors, and page location data. The revision ID prevents a location written by the router from being processed as a new navigation request when it returns through React Router.
+
+### Maintenance rules
+
+- Use route factories and typed route params rather than assembling href strings manually.
+- Use `navDeps` whenever a `nav` callback closes over changing values.
+- Preserve the revision-ID synchronization guard when changing location or navigation flow.
+- Run sanitization after direct page, panel, or node mutations.
+- Do not confuse page keys with route paths: page keys identify stored page instances, while route paths identify route definitions.

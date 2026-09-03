@@ -180,7 +180,7 @@ export const AdminErrorDetailPage = memo(() => {
 
             <Grid size={{ xs: 12 }}>
               <label>{t('message')}</label>
-              <Card variant="outlined">
+              <Card variant="outlined" sx={{ backgroundColor: theme.palette.background.default }}>
                 <pre
                   style={{
                     paddingLeft: theme.spacing(1),
@@ -198,7 +198,7 @@ export const AdminErrorDetailPage = memo(() => {
             {error.response.service_debug_info && (
               <Grid size={{ xs: 12 }}>
                 <label>{t('debug_info')}</label>
-                <Card variant="outlined">
+                <Card variant="outlined" sx={{ backgroundColor: theme.palette.background.default }}>
                   <pre
                     style={{
                       paddingLeft: theme.spacing(1),

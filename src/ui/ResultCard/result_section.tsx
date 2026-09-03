@@ -21,8 +21,9 @@ import useALContext from 'deprecated/hooks/useALContext';
 import useClipboard from 'deprecated/hooks/useClipboard';
 import useHighlighter from 'deprecated/hooks/useHighlighter';
 import useSafeResults from 'deprecated/hooks/useSafeResults';
+import { useAppHasHighlightedKeys } from 'layout/highlighter';
 import type { Section, SectionItem } from 'models/base/result';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Attack from 'ui/Attack';
 import Classification from 'ui/Classification';
@@ -90,7 +91,7 @@ const WrappedResultSection: React.FC<Props> = ({
   const theme = useTheme();
   const { c12nDef } = useALContext();
   const { copy } = useClipboard();
-  const { getKey, hasHighlightedKeys } = useHighlighter();
+  const { getKey } = useHighlighter();
   const { showSafeResults } = useSafeResults();
 
   const [state, setState] = useState<{ mouseX: number; mouseY: number }>(null);
@@ -101,8 +102,8 @@ const WrappedResultSection: React.FC<Props> = ({
   const [showAttack, setShowAttack] = useState<boolean>(false);
   const [showTable, setShowTable] = useState<boolean>(false);
 
-  const allTags = useMemo(() => {
-    const tagList = [];
+  const highlighted = useAppHasHighlightedKeys(() => {
+    const tagList: string[] = [];
     if (!printable) {
       if (Array.isArray(section.tags)) {
         for (const tag of section.tags) {
@@ -127,10 +128,7 @@ const WrappedResultSection: React.FC<Props> = ({
       }
     }
     return tagList;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [section]);
-
-  const highlighted = hasHighlightedKeys(allTags);
 
   const handleMenuClick = useCallback(
     event => {

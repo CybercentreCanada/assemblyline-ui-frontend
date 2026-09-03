@@ -606,14 +606,14 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
               wordBreak: 'break-word',
               whiteSpace: 'wrap !important'
             },
-            '&>div:nth-child(1)': {
+            '&>div:nth-of-type(1)': {
               gridRow: 'span 2',
               fontWeight: 500
             },
-            '&>div:nth-child(2n + 2)': {
+            '&>div:nth-of-type(2n + 2)': {
               fontWeight: 500
             },
-            '&>div:nth-child(2n + 3)': {
+            '&>div:nth-of-type(2n + 3)': {
               fontWeight: 400
               // overflowX: 'hidden',
               // whiteSpace: 'nowrap',
@@ -624,7 +624,7 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
               columnGap: theme.spacing(2),
               gridTemplateColumns: 'auto 1fr',
               gridTemplateRows: 'repeat(4, auto)',
-              '&>div:nth-child(1)': {
+              '&>div:nth-of-type(1)': {
                 gridRow: 'span 1',
                 gridColumn: 'span 2'
               }

@@ -73,7 +73,7 @@ export const ManageHeuristicsPage = memo(() => {
             onChange={v =>
               navigate
                 .here()
-                .update(s => ({ ...s, search: { ...s.search, ...ManageHeuristicsRoute.search.delta(v).toObject() } }))
+                .update(s => ({ ...s, search: { ...s.search, ...ManageHeuristicsRoute.search.full(v).toObject() } }))
             }
             paramDefaults={search.defaults().toObject()}
             searchInputProps={{ placeholder: t('filter'), options: suggestions }}

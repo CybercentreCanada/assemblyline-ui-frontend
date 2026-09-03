@@ -191,7 +191,7 @@ export const useOverrideTemplatePreferences = (): void => {
       if (autoHideAppbar !== undefined) s.template.autoHideAppbar = autoHideAppbar;
       if (density !== undefined) s.template.density = density;
       if (drawerOpen !== undefined) s.template.drawerOpen = drawerOpen;
-      if (lang !== undefined) s.template.lang = lang;
+      if (lang !== undefined) s.template.lang = lang as 'en' | 'fr';
       if (layout !== undefined) s.template.layout = layout;
       if (leftNavHover !== undefined) s.template.leftNavHover = leftNavHover;
 

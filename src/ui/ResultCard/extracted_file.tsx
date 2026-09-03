@@ -85,7 +85,7 @@ export const ExtractedFile: React.FC<ExtractedFileProps> = React.memo(({ file, d
           ) : (
             <AppLink
               nav={nav =>
-                nav.here().create({ route: '/file/detail/:id', path: { id: file.sha256 }, search: { name: file.name } })
+                nav.to().create({ route: '/file/detail/:id', path: { id: file.sha256 }, search: { name: file.name } })
               }
               navDeps={[file.sha256, file.name]}
             >

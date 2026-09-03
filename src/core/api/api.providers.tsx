@@ -3,16 +3,11 @@ import { keepPreviousData, QueryClient } from '@tanstack/react-query';
 import type { PersistedClient } from '@tanstack/react-query-persist-client';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import type { ApiQueryKey } from 'core/api/api.models';
-import { useAppInterfaceStore } from 'core/interface';
 import { useAppPreferenceStore } from 'core/preference';
+import { AppDebugLayout } from 'layout/debug';
 import { compress, decompress } from 'lz-string';
 import type { PropsWithChildren } from 'react';
-import { Activity, lazy, memo, Suspense, useEffect, useMemo } from 'react';
-
-const ReactQueryDevtoolsPanel = lazy(async () => {
-  const module = await import('@tanstack/react-query-devtools');
-  return { default: module.ReactQueryDevtoolsPanel };
-});
+import { memo, useEffect, useMemo } from 'react';
 
 //*****************************************************************************************
 // App API Debugger Layout
@@ -23,35 +18,7 @@ export type AppApiLayoutProps = {
   children: PropsWithChildren['children'];
 };
 
-export const AppApiLayout = memo(({ children }: AppApiLayoutProps) => {
-  const showDevtools = useAppInterfaceStore(s => s.api.showDevtools);
-
-  return (
-    <>
-      {children}
-
-      <Activity mode={showDevtools ? 'visible' : 'hidden'}>
-        <div
-          style={{
-            position: 'fixed',
-            right: 16,
-            bottom: 16,
-            width: 420,
-            height: 560,
-            zIndex: 9999,
-            background: '#fff'
-          }}
-        >
-          {showDevtools ? (
-            <Suspense fallback={null}>
-              <ReactQueryDevtoolsPanel client={queryClient} />
-            </Suspense>
-          ) : null}
-        </div>
-      </Activity>
-    </>
-  );
-});
+export const AppApiLayout = memo(({ children }: AppApiLayoutProps) => <AppDebugLayout>{children}</AppDebugLayout>);
 
 AppApiLayout.displayName = 'AppApiLayout';
 

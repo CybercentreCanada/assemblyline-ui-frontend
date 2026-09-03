@@ -81,7 +81,7 @@ const UserAvatar = memo(
 UserAvatar.displayName = 'UserAvatar';
 
 //*****************************************************************************************
-// AP Quota
+// UserQuota
 //*****************************************************************************************
 
 const QUOTA_COLOR_THRESHOLDS = {
@@ -372,6 +372,53 @@ export const UserTheme = memo(() => {
 UserTheme.displayName = 'UserTheme';
 
 //*****************************************************************************************
+// User Debug
+//*****************************************************************************************
+
+export const UserDebug = memo(() => {
+  const { t } = useTranslation();
+  const isAdmin = useAppConfigStore(s => s?.user?.is_admin || false);
+  const systemType = useAppConfigStore(s => s?.configuration?.system?.type);
+
+  const debugMode = useAppInterfaceStore(s => s.debug.mode);
+
+  const setInterfaceStore = useAppSetInterfaceStore();
+
+  return !isAdmin || !['development', 'staging'].includes(systemType) ? null : (
+    <>
+      <Divider />
+      <List dense subheader={<ListSubheader disableSticky>{t('debug')}</ListSubheader>}>
+        <ListItem
+          sx={{ justifyContent: 'space-between' }}
+          secondaryAction={
+            <Select
+              size="small"
+              displayEmpty
+              value={debugMode}
+              onChange={(event: SelectChangeEvent<AppInterfaceStore['debug']['mode']>) =>
+                setInterfaceStore(s => {
+                  s.debug.mode = event.target.value as AppInterfaceStore['debug']['mode'];
+                  s.usermenu.open = false;
+                  return s;
+                })
+              }
+            >
+              <MenuItem value={null}>{t('personalization.debug.menu.none')}</MenuItem>
+              <MenuItem value="api">{t('personalization.debug.menu.api')}</MenuItem>
+              <MenuItem value="store">{t('personalization.debug.menu.store')}</MenuItem>
+            </Select>
+          }
+        >
+          <ListItemText primary={t('personalization.debug.menu')} />
+        </ListItem>
+      </List>
+    </>
+  );
+});
+
+UserTheme.displayName = 'UserTheme';
+
+//*****************************************************************************************
 // User Menu
 //*****************************************************************************************
 const UserMenuHeader = memo(() => {
@@ -503,6 +550,7 @@ export const UserMenu = memo(() => {
       <UserLanguage />
       <UserPersonalization />
       <UserTheme />
+      <UserDebug />
     </Paper>
   );
 });

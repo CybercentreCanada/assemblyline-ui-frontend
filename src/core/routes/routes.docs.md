@@ -2,195 +2,234 @@
 
 ## 1. Purpose
 
-The route definition system that provides compile-time type safety for all navigation in the application. It defines every page route as a typed object with encoded path params, search params, and hash — so that navigating, reading params, and building URLs are all statically checked by TypeScript. If a route changes its params, every usage breaks at compile time rather than at runtime.
+`core/routes` is the typed route-definition and location-state layer for the application. It registers route factories, creates codecs for path/search/hash values, resolves stored pages to route locations, and exposes hooks for reading the current route context.
+
+The module works with `core/router`: the router owns page and panel navigation, while `core/routes` owns route definitions, parameter schemas, parsed location snapshots, and href construction.
 
 ## 2. Features
 
-- **Type-safe route factories** — Define routes with typed path params, search params, and hash via `createAppRoute`
-- **Param codecs** — Path params are parsed and stringified through codec functions, ensuring URL segments are always valid
-- **Search param engine** — Search params use a delta-based system that tracks only changed values, keeping URLs minimal
-- **Route guards** — Per-route `disabled` and `forbidden` boundaries with customizable fallback components
-- **Error boundaries** — Each route is wrapped in an `ErrorBoundary` that catches render errors without crashing the app
-- **Route metadata** — Optional `meta` field for title, breadcrumbs, icons, permissions
-- **Selector-based param access** — Hooks use selectors to subscribe to specific param slices, preventing unnecessary re-renders
+- Type-safe route definitions created with `createAppRoute`.
+- Path parameter codecs that parse and stringify values in route paths.
+- Search parameter engines with defaults, deltas, full snapshots, transient values, and ephemeral values.
+- Hash parameter codecs for typed hash fragments.
+- Route metadata resolvers for short names, full names, and icons.
+- Disabled and forbidden route boundaries with configurable route guards.
+- Per-page location snapshots keyed by router page keys.
+- Typed hooks for path parameters, search parameters, search snapshots, hashes, route definitions, and neighboring panels.
+- Route and location utilities for page resolution, route registration, URL serialization, and router synchronization.
 
 ## 3. Concepts
 
-### Route Factory
+### Route Definition
 
-`createAppRoute` takes a path string and optional param/search/hash definitions, then returns a route object containing:
+A route definition is created with `createAppRoute`. It combines a path pattern with optional parameter codecs, search schemas, hash schemas, presentation metadata, and guard callbacks. The resulting route includes an `element` wrapped by `AppErrorProvider`, `DisabledBoundary`, and `ForbiddenBoundary`.
 
-- The path pattern (e.g., `/alerts/:id`)
-- A `params` codec (parse URL segments → typed object, stringify typed object → URL segments)
-- A `search` engine (parse query string → typed snapshot, delta → minimal query string)
-- A `hash` codec (parse/stringify hash value)
-- An `element` — the route's component wrapped in ErrorBoundary → DisabledBoundary → ForbiddenBoundary → AppRouteProvider
+Route presentation callbacks are required:
 
-### Param Codecs
+- `shortname` — compact route name used by navigation and breadcrumbs.
+- `fullname` — full route name used for document titles and detailed labels.
+- `shorticon` — compact route icon.
+- `fullicon` — full route icon.
 
-Path params use blueprint-based codecs from `features/path-params`. Each param key in the path (`:id`, `:sha256`) is mapped to a codec that handles parsing from the URL and stringifying back. This means params are not just strings — they can be validated and transformed.
+Each callback receives a typed route location and the current `AppConfigStore`.
 
-### Search Param Engine
+### Path Parameters
 
-Search params use `features/search-params` which provides:
+Path parameters are declared from the keys in a route path, such as `:id` in `/submission/detail/:id`. `features/path-params` supplies the blueprint map and codec that parse URL segments into typed values and stringify values back into a pathname.
 
-- **Blueprints** — Define each param's type, default value, and serialization
-- **Delta** — Only non-default values are serialized to the URL, keeping it clean
-- **Snapshots** — A frozen object representing current search param state
-- **Location sync** — The engine reads from `location.search` and writes back via `toLocationSearch()` / `toLocationState()`
+### Search Parameters
 
-### Route Store
+Search parameters are declared with `features/search-params` blueprints. A route search engine can:
 
-Each mounted route gets its own scoped store (`AppRouteStore`) via `AppRouteProvider`. This store holds the current `params`, `search`, and `hash` parsed from the URL. Hooks read from this store using selectors, so components only re-render when their specific param changes.
+- parse serialized query values;
+- provide default values;
+- produce a full typed snapshot with `full()`;
+- produce a delta containing values that differ from defaults;
+- serialize values for location search, location state, or transient state.
 
-### Location State Handshake
+The current route hooks expose both parsed search values and a search snapshot. Use a snapshot when updating search through the router navigation API.
 
-The route system participates in the router's synchronization handshake via `location.state`. When a route is navigated to:
+### Hash Parameters
 
-- `syncStoreToLocation()` encodes all routes and panels into `location.state`
-- This state includes a `state.id` (UUID) that acts as a version token
-- `syncLocationToStore()` reads the incoming `state.id` and compares it against the current `store.id` to prevent re-processing
-- Route params, search params, and hash are decoded from the state in `location` and made available through the route's scoped store
+A route can declare a typed hash codec through the `hash` option. Hash values are parsed and normalized by `features/hash-params` and can be read with `useAppHashParams`.
 
-This ensures that navigating to a link and then navigating back returns you to the exact same route state (params, search, hash) because it's fully encoded in the URL.
+### Route and Location Stores
 
-### Route Key
+`AppLocationParamStore` contains two maps:
 
-Each route instance in the router system is identified by a UUID (`routeKey`). The `AppPageKeyProvider` makes this key available to the route's component tree, allowing it to identify which router store entry it belongs to.
+- `routes` — the canonical application route registry keyed by route path.
+- `locations` — parsed location snapshots keyed by router page key.
+
+`AppLocationParamProvider` registers the application routes and synchronizes page locations from the router. `AppPageKeyProvider` supplies the current page key to a rendered route tree.
+
+### Guards and Boundaries
+
+`disabled` and `forbidden` callbacks receive the current route location and app configuration. `DisabledBoundary` and `ForbiddenBoundary` subscribe to the current page location and render their fallback when the corresponding callback returns true.
 
 ## 4. Configuration
 
-### Defining Routes
+### Defining a Route
 
-Routes are defined in `app/app.routes.tsx` using the factory:
+Routes are normally declared in route modules under `src/routes` and collected in the application route registry:
 
-```typescript
+```tsx
 import { createAppRoute } from 'core/routes';
-import { AlertDetailPage } from 'pages/AlertDetail';
+import { memo } from 'react';
 
-export const APP_ROUTES = [
-  createAppRoute({
-    path: '/alerts/:id',
-    params: blueprints => ({ id: blueprints.string() }),
-    search: blueprints => ({ tab: blueprints.enum(['details', 'history']) }),
-    component: AlertDetailPage,
-    forbidden: () => !hasPermission('alert_view')
-  }),
+const SubmitPage = memo(() => <div>Submit</div>);
+SubmitPage.displayName = 'SubmitPage';
 
-  createAppRoute({
-    path: '/submit',
-    component: SubmitPage
-  })
-] as const;
+export const SubmitRoute = createAppRoute({
+  component: <SubmitPage />,
+  path: '/submit',
+  ancestor: null,
+  shortname: () => ['app_route.submit.shortname'],
+  fullname: () => ['app_route.submit.fullname'],
+  shorticon: () => null,
+  fullicon: () => null,
+  disabled: () => false,
+  forbidden: () => false
+});
 ```
 
-### Route Options
+A route with parameters and search values can define codecs through blueprint callbacks:
 
-| Option               | Purpose                                                  |
-| -------------------- | -------------------------------------------------------- |
-| `path`               | URL pattern with `:param` segments                       |
-| `params`             | Path param blueprints — defines codec for each `:param`  |
-| `search`             | Search param blueprints — defines typed query params     |
-| `hash`               | Hash codec function                                      |
-| `disabled`           | Boolean or function — shows disabled fallback when true  |
-| `forbidden`          | Boolean or function — shows forbidden fallback when true |
-| `loading`            | Boolean or function — shows loading fallback when true   |
-| `component`          | The page component to render                             |
-| `disabledComponent`  | Custom fallback for disabled state                       |
-| `forbiddenComponent` | Custom fallback for forbidden state                      |
-| `errorComponent`     | Custom fallback for render errors                        |
-| `meta`               | Metadata (title, breadcrumb, icon)                       |
+```tsx
+export const AlertRoute = createAppRoute({
+  component: <AlertDetailPage />,
+  path: '/alert/:id',
+  params: blueprints => ({ id: blueprints.string() }),
+  search: blueprints => ({ tab: blueprints.enum(['details', 'history'], 'details') }),
+  ancestor: '/alerts',
+  shortname: location => ['app_route.alert.shortname', { id: location.path.id }],
+  fullname: location => ['app_route.alert.fullname', { id: location.path.id }],
+  shorticon: () => <AlertIcon />,
+  fullicon: () => <AlertIcon />,
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.roles.includes('alert_view')
+});
+```
 
-## 5. Usage (Consumer API)
+`createAppRoute` also accepts `hash`, `ancestor`, `loader`, `disabled`, and `forbidden`. `loader` is retained in the route shape but is not currently executed by the route factory.
 
-### Reading Path Params
+### Provider Setup
 
-```typescript
+The application supplies the complete route registry to `AppLocationParamProvider` and wraps route rendering with `AppPageKeyProvider` and `AppRouteLayoutProvider` as required by the router layout:
+
+```tsx
+<AppLocationParamProvider routes={APP_ROUTES}>
+  <AppRouterProvider>
+    <AppLayout />
+  </AppRouterProvider>
+</AppLocationParamProvider>
+```
+
+The exact provider nesting is established by `src/app/app.tsx`; consumers should use the existing application composition rather than creating additional route stores.
+
+## 5. Usage
+
+### Reading Path Parameters
+
+```tsx
 import { useAppPathParams } from 'core/routes';
 
-// Selector-based — only re-renders when `id` changes
-const id = useAppPathParams('/alerts/:id', params => params.id);
+const path = useAppPathParams<'/alert/:id'>();
+const alertId = path?.id;
 ```
 
-### Reading Search Params
+`useAppPathParams` reads the current page context. It does not take a selector argument. Use `useAppLocation` when a selected value or a different panel target is needed.
 
-```typescript
-import { useAppSearchParams } from 'core/routes';
+### Reading Search Parameters
 
-// Selector-based — only re-renders when `tab` changes
-const tab = useAppSearchParams('/alerts/:id', search => search.tab);
+```tsx
+import { useAppSearchParams, useAppSearchSnapshot } from 'core/routes';
+
+const searchParams = useAppSearchParams<'/alerts'>();
+const filters = searchParams?.filters;
+
+const search = useAppSearchSnapshot<'/alerts'>();
+const query = search.get('query');
 ```
 
-### Reading Hash
+### Reading Hash and Location
 
-```typescript
-import { useAppHashParams } from 'core/routes';
+```tsx
+import { useAppHashParams, useAppLocation } from 'core/routes';
 
-const hash = useAppHashParams('/alerts/:id', hash => hash);
+const hash = useAppHashParams<'/file/detail/:id'>();
+const location = useAppLocation<'/alerts'>() ;
+const alertRoute = location(route => route.route);
 ```
 
-### Reading Multiple Params at Once
+`useAppLocation` and `useAppRoute` accept a panel target of `from`, `here`, `to`, or `at`. For `at`, pass the panel index as the second argument:
 
-```typescript
-import { useAppRoute } from 'core/routes';
-
-const { id, tab } = useAppRoute('/alerts/:id', store => ({
-  id: store.params.id,
-  tab: store.search.tab
-}));
+```tsx
+const neighboringLocation = useAppLocation<'/alerts'>('to');
+const panelLocation = useAppLocation<'/alerts'>('at', 1);
 ```
 
-### Getting the Current Route Key
+Both hooks return a selector function. The selector receives the resolved typed route or location object.
 
-```typescript
+### Reading the Current Page Key
+
+```tsx
 import { useAppPageKey } from 'core/routes';
 
-// Returns the UUID key for this route instance in the router store
 const pageKey = useAppPageKey();
 ```
 
-### Building Hrefs (in hooks/utils)
+The page key identifies the stored page instance in the router store. It is not the route path.
 
-```typescript
-import { buildLocationParam } from 'core/routes';
-import { APP_ROUTES } from 'app/app.routes';
+### Registering and Resolving Routes
 
-const { href, state } = buildLocationParam(APP_ROUTES, {
-  path: '/alerts/:id',
-  params: { id: '123' },
-  search: { tab: 'details' }
+Application route registration is normally performed by `AppLocationParamProvider`. Low-level utilities are available when integrating a route registry or resolving router pages:
+
+```tsx
+import { findAppRouteFromPath, getPageFromParam } from 'core/routes';
+
+const route = findAppRouteFromPath(locationStore, '/alerts');
+const page = getPageFromParam(locationStore, {
+  route: '/alerts',
+  search: { query: '' }
 });
-// href = "/alerts/123?tab=details"
 ```
 
-## 6. Codebase (Internals)
+Prefer `createAppRoute`, `AppLink`, and `useAppNavigate` for normal application navigation. Avoid constructing hrefs manually when a typed route descriptor can express the destination.
 
-### Key Files
+### Container-Scoped Media Queries
 
-| File                    | Role                                                                                             |
-| ----------------------- | ------------------------------------------------------------------------------------------------ |
-| `routes.models.ts`      | Type definitions: `AppRoute`, `CreatedAppRoute`, `CreatedAppRouteParamsMap`, `AppLocationParam`  |
-| `routes.factories.tsx`  | `createAppRoute` — builds a route object from path + options                                     |
-| `routes.hooks.tsx`      | `useAppPathParams`, `useAppSearchParams`, `useAppHashParams`, `useAppRoute`                      |
-| `routes.providers.tsx`  | `AppRouteProvider` (per-route store), `AppPageKeyProvider` (route identity)                      |
-| `routes.components.tsx` | `DisabledBoundary`, `ForbiddenBoundary` — route guard components                                 |
-| `routes.utils.tsx`      | `findAppRoute`, `buildRoutePathname`, `buildRouteSearch`, `buildRouteHash`, `buildLocationParam` |
-| `routes.utils.test.tsx` | Unit tests for route building utilities                                                          |
+```tsx
+import { useAppMediaQuery } from 'core/routes';
 
-### Utility Functions
+const isCompact = useAppMediaQuery(theme => theme.breakpoints.down('md'));
+```
 
-| Function             | Purpose                                                              |
-| -------------------- | -------------------------------------------------------------------- |
-| `findAppRoute`       | Finds a route definition matching a typed destination                |
-| `buildRoutePathname` | Resolves `:param` segments into actual values via codec              |
-| `buildRouteSearch`   | Serializes search params via delta (only non-default values)         |
-| `buildRouteHash`     | Normalizes hash value through codec                                  |
-| `buildRouteState`    | Builds `location.state` from search delta for state-based navigation |
-| `buildLocationParam` | Composes all of the above into a final `{ href, state }` payload     |
+`useAppMediaQuery` evaluates the query against the route layout container using `ResizeObserver`, rather than against the browser viewport.
 
-### Related Modules
+## 6. Codebase
 
-- `core/router/` — The navigation engine that uses these route definitions
-- `features/path-params/` — Path param codec system (blueprints, parsing, stringifying)
-- `features/search-params/` — Search param engine (blueprints, delta, snapshot, serialization)
-- `app/app.routes.tsx` — The route registry where all pages are declared
+### Route definitions and types
+
+- `routes.models.ts` — route, location, parameter, search, hash, and guard types.
+- `routes.factories.tsx` — `createAppRoute` and route element composition.
+- `routes.components.tsx` — `AppRouteName`, `DisabledBoundary`, and `ForbiddenBoundary`.
+
+### Providers and hooks
+
+- `routes.providers.tsx` — location-param store, route registry synchronization, and page-key provider.
+- `routes.hooks.tsx` — `useAppRoute`, `useAppLocation`, `useAppPathParams`, `useAppSearchParams`, `useAppSearchSnapshot`, `useAppHashParams`, and `useAppMediaQuery`.
+- `routes.layout.tsx` — `AppRouteLayoutProvider` and route layout context.
+
+### Utilities and tests
+
+- `routes.utils.tsx` — route registration, lookup, page resolution, location parsing, href generation, media-query parsing, and router synchronization.
+- `routes.utils.test.tsx` — tests for route registration, parameter resolution, location conversion, and utility behavior.
+- `index.ts` — explicit public exports for route components, factories, hooks, providers, models, and utilities.
+
+### Related modules
+
+- `core/router` — panel navigation, page/node stores, navigation operations, and router synchronization.
+- `features/path-params` — path parameter blueprints and codecs.
+- `features/search-params` — search blueprints, engines, deltas, and snapshots.
+- `features/hash-params` — hash codecs and values.
+- `app/app.routes.tsx` — application route registry where present in the current app composition.

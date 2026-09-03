@@ -1,6 +1,6 @@
 import type { AppPreferenceConfigs } from '@tui/core';
 import { getAppConfigStateFromApi, useAppConfigStoreApi } from 'core/config';
-import { getAppLocationParamStateFromApi, useAppLocationParamStoreApi } from 'core/routes';
+import { getAppLocationParamStateFromApi, useAppLocationParamStore, useAppLocationParamStoreApi } from 'core/routes';
 import type { AppLeftNavItem } from 'layout/left-nav/left-nav.models';
 import { getLeftNavMenuItem } from 'layout/left-nav/left-nav.utils';
 import { useCallback, useEffect, useState } from 'react';
@@ -19,6 +19,7 @@ export const useParseTemplateLeftNavMenu = (
 
   const configStoreApi = useAppConfigStoreApi();
   const locationParamStoreApi = useAppLocationParamStoreApi();
+  const routesLength = useAppLocationParamStore(s => Object.keys(s?.routes || {}).length);
 
   const buildMenu = useCallback((): AppPreferenceConfigs['leftnav']['menus'] => {
     const configState = getAppConfigStateFromApi(configStoreApi);
@@ -34,19 +35,16 @@ export const useParseTemplateLeftNavMenu = (
   const [menu, setMenu] = useState<AppPreferenceConfigs['leftnav']['menus']>(buildMenu);
 
   useEffect(() => {
-    const handleChange = () => setMenu(buildMenu());
-    const unsubscribeConfig = configStoreApi?.subscribe(handleChange);
-    const unsubscribeLocationParam = locationParamStoreApi?.subscribe(handleChange);
+    const unsubscribeConfig = configStoreApi?.subscribe(() => setMenu(buildMenu()));
 
     return () => {
       unsubscribeConfig?.();
-      unsubscribeLocationParam?.();
     };
-  }, [buildMenu, configStoreApi, locationParamStoreApi]);
+  }, [buildMenu, configStoreApi]);
 
   useEffect(() => {
     setMenu(buildMenu());
-  }, [buildMenu, i18n.language]);
+  }, [buildMenu, i18n.language, routesLength]);
 
   return menu;
 };

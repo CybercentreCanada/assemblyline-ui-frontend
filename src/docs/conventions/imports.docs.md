@@ -26,7 +26,7 @@ import { Badge, Drawer, styled, useTheme } from '@mui/material';
 
 // 3. Core/app modules (absolute)
 import { useAPIMutation } from 'core/api';
-import { useAppConfig, useAppSetConfig } from 'core/config';
+import { useAppConfigStore, useAppSetConfigStore } from 'core/config';
 import { useAppSnackbar } from 'core/snackbar';
 import type { SystemMessage } from 'models/ui/user';
 import { IconButton } from 'ui/buttons/IconButton';

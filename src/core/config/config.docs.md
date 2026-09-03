@@ -6,7 +6,7 @@ Application configuration store — **read-only after bootstrap**. Holds the `Ap
 
 | Layer                | Store               | Mutability                   | Persistence                  | Owner                             |
 | -------------------- | ------------------- | ---------------------------- | ---------------------------- | --------------------------------- |
-| **App Config**       | `useAppConfig`      | Read-only after auth sets it | None (from backend via auth) | Auth (populates), Config (stores) |
+| **App Config**       | `useAppConfigStore`      | Read-only after auth sets it | None (from backend via auth) | Auth (populates), Config (stores) |
 | **System Config**    | `useSystemConfig`   | Read-only after bootstrap    | None (from backend/env)      | Backend/Admin                     |
 | **User Preferences** | `usePreferences`    | User-writable                | Backend API + localStorage   | User                              |
 | **Session State**    | Module-owned stores | Ephemeral                    | None                         | Each module                       |
@@ -35,7 +35,7 @@ Examples: auth mode, current user, drawer open/closed, usermenu visibility, noti
 
 ## Key Files
 
-- `config.providers.tsx` — `useAppConfig`, `useAppSetConfig`, `useSystemConfig`, `useSetSystemConfig`, `AppConfigProvider`
+- `config.providers.tsx` — `useAppConfigStore`, `useAppSetConfigStore`, `useAppConfigStoreApi`, `AppConfigProvider`
 - `index.ts` — Public API barrel
 
 ## Data Flow
@@ -53,7 +53,7 @@ Examples: auth mode, current user, drawer open/closed, usermenu visibility, noti
 ### Reading
 
 ```typescript
-import { useAppConfig } from 'core/config';
+import { useAppConfigStore } from 'core/config';
 
 // Subscribe to a specific field
 const configuration = useAppConfigStore(s => s.configuration);
@@ -64,23 +64,24 @@ const c12nDef = useAppConfigStore(s => s.c12nDef);
 ### Writing (auth only)
 
 ```typescript
-import { useAppSetConfig } from 'core/config';
+import { useAppSetConfigStore } from 'core/config';
 
 const setConfigStore = useAppSetConfigStore();
 
 // Set after successful whoami
-setConfig(normalizedWhoAmI);
+setConfigStore(normalizedWhoAmI);
 
 // Partial update
-setConfig(prev => ({ ...prev, user: updatedUser }));
+setConfigStore(prev => ({ ...prev, user: updatedUser }));
 ```
 
 ### Outside React
 
 ```typescript
-import { getAppConfigState } from 'core/config';
+import { getAppConfigStateFromApi, useAppConfigStoreApi } from 'core/config';
+const configStoreApi = useAppConfigStoreApi();
 
-const current = getAppConfigState();
+const current = getAppConfigStateFromApi(configStoreApi);
 ```
 
 ## What NOT to Do

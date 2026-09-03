@@ -13,13 +13,11 @@ import {
   Badge,
   CircularProgress,
   Grid,
-  IconButton,
   Paper,
   Skeleton,
   SpeedDial,
   SpeedDialAction,
   SpeedDialIcon,
-  Tooltip,
   Typography,
   useMediaQuery,
   useTheme
@@ -41,6 +39,7 @@ import { AlertEventsTable } from 'routes/alerts/components/Components';
 import AlertFiltersSelected from 'routes/alerts/components/FiltersSelected';
 import { AlertWorkflowDrawer } from 'routes/alerts/components/Workflows';
 import { getValueFromPath } from 'shared/utils/utils';
+import { IconButton } from 'ui/buttons/IconButton';
 import ConfirmationDialog from 'ui/ConfirmationDialog';
 
 type AlertActionButtonProps = InferAppNavigationPropsFromPath<AppRoute['path']> & {
@@ -124,25 +123,22 @@ const AlertActionButton: React.FC<AlertActionButtonProps> = React.memo(
       );
     else
       return (
-        <Tooltip title={tooltipTitle}>
-          <span>
-            <IconButton
-              {...(!navProp ? null : { nav: navProp, navDeps: navDepsProp })}
-              disabled={disabled || loading}
-              size="large"
-              onClick={disabled || loading ? null : onClick}
-              sx={{
-                '&.Mui-disabled': {
-                  backgroundColor: 'initial'
-                }
-              }}
-              style={{ ...(loading ? { color: theme.palette.action.disabled } : color && { color: color }) }}
-            >
-              {icon}
-              {loading && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
-            </IconButton>
-          </span>
-        </Tooltip>
+        <IconButton
+          tooltip={tooltipTitle}
+          disabled={disabled || loading}
+          size="large"
+          {...(!navProp ? null : { nav: navProp, navDeps: navDepsProp })}
+          onClick={disabled || loading ? null : onClick}
+          sx={{
+            '&.Mui-disabled': {
+              backgroundColor: 'initial'
+            }
+          }}
+          style={{ ...(loading ? { color: theme.palette.action.disabled } : color && { color: color }) }}
+        >
+          {icon}
+          {loading && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
+        </IconButton>
       );
   }
 );

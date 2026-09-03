@@ -128,9 +128,10 @@ const SimilarItem: React.FC<SimilarItemProps> = ({ data, drawer }) => {
                 key={`${data.type}-${data.value}-${j}`}
                 hover
                 nav={nav =>
-                  item?.from_archive
-                    ? nav.to().create({ route: '/archive/:id', path: { id: item?.sha256 } })
-                    : nav.to().create({ route: '/file/detail/:id', path: { id: item?.sha256 } })
+                  nav.to().create({
+                    route: item?.from_archive ? '/archive/:id' : '/file/detail/:id',
+                    path: { id: item?.sha256 }
+                  })
                 }
                 navDeps={[item?.from_archive, item?.sha256]}
               >

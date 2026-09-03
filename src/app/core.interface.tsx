@@ -1,5 +1,7 @@
 import type { AppTheme } from '@tui/core';
 import type { AssistantInsightProps, ContextMessageProps } from 'layout/assistant';
+import type { AppDebugStoreHistory, AppDebugStoreName } from 'layout/debug';
+import { getDefaultAppDebugStoreHistory } from 'layout/debug/debug.models';
 import type { ExternalEnrichmentState } from 'layout/external-lookup';
 import type { JSONFeedItem } from 'layout/notifications';
 import type { QuickSearchItem } from 'layout/quick-search';
@@ -8,11 +10,6 @@ import type { SystemMessage } from 'models/api/user';
 declare global {
   /** Transient UI state managed by the interface store — nothing is persisted. */
   type AppInterfaceStore = {
-    /** API developer tools configuration. */
-    api: {
-      /** Whether to show React Query devtools panel. */
-      showDevtools: boolean;
-    };
     /** AI assistant panel state. */
     assistant: {
       /** Current context messages passed to the assistant. */
@@ -47,6 +44,19 @@ declare global {
       };
       /** Current authentication mode/page. */
       mode: 'app' | 'loading' | 'locked' | 'login' | 'logout' | 'quota' | 'tos';
+    };
+    /** Debug panel state. */
+    debug: {
+      /** Captured snapshot history per observed store. */
+      history: AppDebugStoreHistory;
+      /** Active debug panel, or null when the panel is closed. */
+      mode: null | 'api' | 'store';
+      /** Identifier handed to the next captured snapshot. */
+      nextSnapshotId: number;
+      /** Selected snapshot, or null to follow the latest one. */
+      snapshotId: number;
+      /** Store currently inspected in the debug panel. */
+      store: AppDebugStoreName;
     };
     /** Side drawer panel state. */
     drawer: {
@@ -135,9 +145,6 @@ declare global {
 }
 
 export const DEFAULT_APP_INTERFACE_STORE: AppInterfaceStore = {
-  api: {
-    showDevtools: false
-  },
   assistant: {
     currentContext: [],
     currentHistory: [],
@@ -156,6 +163,13 @@ export const DEFAULT_APP_INTERFACE_STORE: AppInterfaceStore = {
       oauth_providers: []
     },
     mode: 'loading'
+  },
+  debug: {
+    history: getDefaultAppDebugStoreHistory(),
+    mode: null,
+    nextSnapshotId: 0,
+    snapshotId: null,
+    store: 'Config'
   },
   drawer: {
     maximized: false

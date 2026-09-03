@@ -7,7 +7,7 @@ import { ALERT_STORAGE_KEY, AlertsRoute } from 'routes/alerts/alerts.route';
 
 export const AlertRedirectPage = memo(() => {
   const storageData = useMemo(() => new URLSearchParams(localStorage.getItem(ALERT_STORAGE_KEY) || ''), []);
-  const search = useMemo(() => AlertsRoute.search.delta(storageData), [storageData]);
+  const search = useMemo(() => AlertsRoute.search.full(storageData), [storageData]);
 
   if (!search)
     return (

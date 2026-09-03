@@ -108,6 +108,7 @@ const FileViewerPage = React.memo(() => {
         url: `/api/v4/submit/${submitType}/${sha256}/`,
         onSuccess: api_data => {
           showSuccessMessage(t('submit.success'));
+          setSubmitAnchor(null);
           setTimeout(() => {
             navigate.to().create({ route: '/submission/detail/:id', path: { id: api_data.api_response.sid } });
           }, 500);
@@ -134,6 +135,7 @@ const FileViewerPage = React.memo(() => {
         },
         onSuccess: api_data => {
           showSuccessMessage(t('submit.success'));
+          setSubmitAnchor(null);
           setTimeout(() => {
             navigate.to().create({ route: '/submission/detail/:id', path: { id: api_data.api_response.sid } });
           }, 500);
