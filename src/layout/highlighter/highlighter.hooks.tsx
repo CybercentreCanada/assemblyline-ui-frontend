@@ -6,7 +6,12 @@ import {
 } from 'core/interface';
 import type { HighlightMapProps } from 'layout/highlighter';
 import { getHighlighterKey, hasHighlighterKey, hasHighlighterKeys, toggleHighlighterKey } from 'layout/highlighter';
-import { useCallback } from 'react';
+import type { DependencyList } from 'react';
+import { useCallback, useMemo } from 'react';
+
+//*****************************************************************************************
+// useAppHighlighter
+//*****************************************************************************************
 
 /** Manages highlight state for tree/list components with high fan-out (1000+ consumers). */
 export type UseAppHighlighter = {
@@ -62,10 +67,26 @@ export const useAppHighlighter = (): UseAppHighlighter => {
   };
 };
 
-export const useAppIsHighlighted = function (key: string | (() => string)) {
-  return useAppInterfaceStore(s => hasHighlighterKey(typeof key === 'function' ? key() : key)(s));
+/**
+ * @name useAppIsHighlighted
+ * @description Subscribes to whether a highlight key is directly or indirectly highlighted.
+ * @returns Whether the resolved highlight key is active
+ */
+export const useAppIsHighlighted = (input: string | (() => string), dep: DependencyList = null): boolean => {
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const key = useMemo(() => (typeof input === 'function' ? input() : input), dep ?? [input]);
+
+  return useAppInterfaceStore(s => hasHighlighterKey(key)(s));
 };
 
-export const useAppHasHighlightedKeys = function (keyList: string[] | (() => string[])) {
-  return useAppInterfaceStore(s => hasHighlighterKeys(typeof keyList === 'function' ? keyList() : keyList)(s));
+/**
+ * @name useAppHasHighlightedKeys
+ * @description Subscribes to whether any resolved highlight key is directly or indirectly highlighted.
+ * @returns Whether any resolved highlight key is active
+ */
+export const useAppHasHighlightedKeys = (input: string[] | (() => string[]), dep: DependencyList = null): boolean => {
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const keyList = useMemo(() => (typeof input === 'function' ? input() : input), dep ?? [input]);
+
+  return useAppInterfaceStore(s => hasHighlighterKeys(keyList)(s));
 };

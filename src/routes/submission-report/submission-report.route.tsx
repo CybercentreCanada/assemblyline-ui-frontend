@@ -241,9 +241,8 @@ const SubmissionReportPage = memo(() => {
                     </NoPrintTooltip>
                     <Tooltip title={t('detail_view')}>
                       <IconButton
-                        onClick={() =>
-                          navigate.here().create({ route: '/submission/detail/:id', path: { id: report.sid } })
-                        }
+                        nav={nav => nav.here().create({ route: '/submission/detail/:id', path: { id: report.sid } })}
+                        navDeps={[report.sid]}
                         size="large"
                       >
                         <ListAltOutlinedIcon />

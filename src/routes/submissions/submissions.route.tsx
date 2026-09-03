@@ -96,7 +96,7 @@ const Submissions = memo(() => {
             onChange={v =>
               navigate
                 .here()
-                .update(s => ({ ...s, search: { ...s.search, ...SubmissionsRoute.search.delta(v).toObject() } }))
+                .update(s => ({ ...s, search: { ...s.search, ...SubmissionsRoute.search.full(v).toObject() } }))
             }
             paramDefaults={search.defaults().toObject()}
             searchInputProps={{ placeholder: t('filter'), options: suggestions }}

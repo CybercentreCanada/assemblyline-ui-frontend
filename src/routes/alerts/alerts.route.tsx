@@ -231,7 +231,7 @@ export const AlertsPage = memo(() => {
           defaultValue={{ rows: 25 }}
           paramKeys={{ query: 'q' }}
           onChange={v =>
-            navigate.here().update(s => ({ ...s, search: { ...s.search, ...AlertsRoute.search.delta(v).toObject() } }))
+            navigate.here().update(s => ({ ...s, search: { ...s.search, ...AlertsRoute.search.full(v).toObject() } }))
           }
           disableFilterList
           disablePagination

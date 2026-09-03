@@ -2,11 +2,11 @@ import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import { Box, Button, Collapse, Menu, MenuItem, Typography, useTheme } from '@mui/material';
 import useALContext from 'deprecated/hooks/useALContext';
-import useHighlighter from 'deprecated/hooks/useHighlighter';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import useSafeResults from 'deprecated/hooks/useSafeResults';
+import { useAppHasHighlightedKeys, useAppHighlighter } from 'layout/highlighter';
 import type { AlternateResult, FileResult } from 'models/base/result';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Classification from 'ui/Classification';
 import Moment from 'ui/Moment';
@@ -40,12 +40,12 @@ const WrappedResultCard: React.FC<Props> = ({ result, sid, alternates = null, fo
   const [render, setRender] = useState<boolean>(!empty && displayedResult.result.score >= settings.expand_min_score);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [selected, setSelected] = useState<string>(null);
-  const { getKey, hasHighlightedKeys } = useHighlighter();
+  const { getKey } = useAppHighlighter();
   const { showSafeResults } = useSafeResults();
   const menuOpen = Boolean(anchorEl);
 
-  const allTags = useMemo(() => {
-    const tagList = [];
+  const hasHighlightedKeys = useAppHasHighlightedKeys(() => {
+    const tagList: string[] = [];
     displayedResult.result.sections.forEach(section => {
       if (Array.isArray(section.tags)) {
         for (const tag of section.tags) {
@@ -70,12 +70,13 @@ const WrappedResultCard: React.FC<Props> = ({ result, sid, alternates = null, fo
       }
     });
     return tagList;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [displayedResult]);
 
   if (displayedResult.section_hierarchy === undefined) {
-    // eslint-disable-next-line no-console
-    console.log('[WARNING] Using old rendering method because the section hierarchy is missing...');
+    if (process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line no-console
+      console.warn('[WARNING] Using old rendering method because the section hierarchy is missing...');
+    }
   }
 
   const handleClick = () => {
@@ -157,7 +158,7 @@ const WrappedResultCard: React.FC<Props> = ({ result, sid, alternates = null, fo
           }
         }}
         style={{
-          backgroundColor: hasHighlightedKeys(allTags) ? (theme.palette.mode === 'dark' ? '#343a44' : '#d8e3ea') : null
+          backgroundColor: hasHighlightedKeys ? (theme.palette.mode === 'dark' ? '#343a44' : '#d8e3ea') : null
         }}
       >
         {c12nDef.enforce && <Classification c12n={displayedResult.classification} type="text" />}

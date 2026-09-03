@@ -207,7 +207,7 @@ export const RetrohuntPage = memo(() => {
             onChange={v =>
               navigate
                 .here()
-                .update(s => ({ ...s, search: { ...s.search, ...RetrohuntRoute.search.delta(v).toObject() } }))
+                .update(s => ({ ...s, search: { ...s.search, ...RetrohuntRoute.search.full(v).toObject() } }))
             }
             paramDefaults={search.defaults().toObject()}
             searchInputProps={{ placeholder: t('filter'), options: suggestions }}

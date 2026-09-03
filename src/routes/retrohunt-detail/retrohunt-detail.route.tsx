@@ -473,7 +473,7 @@ export const RetrohuntDetailPage = memo(() => {
                               onChange={v =>
                                 navigate.here().update(s => ({
                                   ...s,
-                                  search: { ...s.search, ...RetrohuntDetailRoute.search.delta(v).toObject() }
+                                  search: { ...s.search, ...RetrohuntDetailRoute.search.full(v).toObject() }
                                 }))
                               }
                               paramDefaults={search.defaults().toObject()}

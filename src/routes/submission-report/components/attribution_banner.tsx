@@ -107,7 +107,7 @@ export function WrappedAttributionBanner({ report }: Props) {
         <Grid className="print-only" style={{ color: textColor }}>
           {icon}
         </Grid>
-        <Grid style={{ flexGrow: 10 }}>
+        <Grid style={{ flex: 1 }}>
           <Box
             sx={{
               fontWeight: 500,

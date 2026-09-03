@@ -274,7 +274,7 @@ function WrappedGeneralInformation({ report }: Props) {
                           textDecoration: 'line-through',
                           color: theme.palette.text.disabled
                         }}
-                      >{`${report.file_info.type}`}</span>
+                      >{`${report?.file_info?.type}`}</span>
                     </>
                   ) : (
                     report?.file_info?.type

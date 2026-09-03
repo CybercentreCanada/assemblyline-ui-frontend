@@ -164,8 +164,8 @@ const Info = styled('div')(({ theme }) => ({
     duration: theme.transitions.duration.shortest
   }),
   '&:hover>div': { whiteSpace: 'wrap !important' },
-  '&>div:nth-child(2n+1)': { fontWeight: 500 },
-  '&>div:nth-child(2n)': {
+  '&>div:nth-of-type(2n+1)': { fontWeight: 500 },
+  '&>div:nth-of-type(2n)': {
     fontWeight: 400,
     overflowX: 'hidden',
     whiteSpace: 'nowrap',

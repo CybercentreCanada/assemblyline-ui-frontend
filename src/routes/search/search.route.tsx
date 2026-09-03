@@ -47,21 +47,21 @@ export const SEARCH_INDICES = ['submission', 'file', 'result', 'signature', 'ale
 export type SearchIndex = (typeof SEARCH_INDICES)[number];
 
 export const SEARCH_PERMISSION_MAP: Record<SearchIndex, Role> = {
-  alert: 'alert_view',
+  submission: 'submission_view',
   file: 'submission_view',
   result: 'submission_view',
-  retrohunt: 'retrohunt_view',
   signature: 'signature_view',
-  submission: 'submission_view'
+  alert: 'alert_view',
+  retrohunt: 'retrohunt_view'
 } as const;
 
 export const SEARCH_SORTING_MAP: Record<SearchIndex, string> = {
-  alert: AlertsRoute.search.getDefaultValues().get('sort'),
+  submission: SubmissionsRoute.search.getDefaultValues().get('sort'),
   file: 'seen.last desc',
   result: 'created desc',
-  retrohunt: RetrohuntRoute.search.getDefaultValues().get('sort'),
   signature: ManageSignaturesRoute.search.getDefaultValues().get('sort'),
-  submission: SubmissionsRoute.search.getDefaultValues().get('sort')
+  alert: AlertsRoute.search.getDefaultValues().get('sort'),
+  retrohunt: RetrohuntRoute.search.getDefaultValues().get('sort')
 } as const;
 
 //*****************************************************************************************

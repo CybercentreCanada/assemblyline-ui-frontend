@@ -121,7 +121,7 @@ export const ManageSafelistsPage = memo(() => {
             onChange={v =>
               navigate
                 .here()
-                .update(s => ({ ...s, search: { ...s.search, ...ManageSafelistsRoute.search.delta(v).toObject() } }))
+                .update(s => ({ ...s, search: { ...s.search, ...ManageSafelistsRoute.search.full(v).toObject() } }))
             }
             paramDefaults={search.defaults().toObject()}
             searchInputProps={{ placeholder: t('filter'), options: suggestions }}
