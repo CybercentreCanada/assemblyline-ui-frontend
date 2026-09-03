@@ -547,7 +547,7 @@ const SubmissionDetail = memo(() => {
           setSummary(null);
           setTree(null);
           setTimeout(() => {
-            navigate.to().create({ route: '/submission/detail/:id', path: { id: api_data.api_response.sid } });
+            navigate.here().update({ route: '/submission/detail/:id', path: { id: api_data.api_response.sid } });
           }, 500);
         }
       });
@@ -569,7 +569,7 @@ const SubmissionDetail = memo(() => {
             setSummary(null);
             setTree(null);
             setTimeout(() => {
-              navigate.to().create({ route: '/submission/detail/:id', path: { id: api_data.api_response.sid } });
+              navigate.here().update({ route: '/submission/detail/:id', path: { id: api_data.api_response.sid } });
             }, 500);
           }
         });
@@ -603,7 +603,7 @@ const SubmissionDetail = memo(() => {
           showSuccessMessage(t('delete.success'));
           setDeleteDialog(false);
           setTimeout(() => {
-            navigate.here().create({ route: '/submissions' });
+            navigate.here().closePanel({ route: '/submissions' });
           }, 500);
         },
         onEnter: () => setWaitingDialog(true),
@@ -1302,7 +1302,7 @@ const SubmissionDetail = memo(() => {
                 ? { loading: true }
                 : {
                     preventRender: submission.state !== 'completed',
-                    nav: nav => nav.here().create({ route: '/submission/report/:id', path: { id: submission.sid } })
+                    nav: nav => nav.here().update({ route: '/submission/report/:id', path: { id: submission.sid } })
                   })}
             >
               <ChromeReaderModeOutlinedIcon />
