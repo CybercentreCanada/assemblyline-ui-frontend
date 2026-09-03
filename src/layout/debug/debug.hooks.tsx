@@ -9,7 +9,8 @@ import { getAppPreferenceStateFromApi, useAppPreferenceStoreApi } from 'core/pre
 import { useAppNavigationStoreApi, useAppRouterStoreApi } from 'core/router';
 import { useAppLocationParamStoreApi } from 'core/routes';
 import type { AppDebugStoreHistory, AppDebugStoreName } from 'layout/debug';
-import { getDefaultAppDebugStoreHistory, serializeAppDebugState } from 'layout/debug';
+import { getDefaultAppDebugStoreHistory } from 'layout/debug/debug.models';
+import { serializeAppDebugState } from 'layout/debug/debug.utils';
 import { useEffect, useMemo } from 'react';
 
 //*****************************************************************************************

@@ -1,7 +1,7 @@
 import type { AppTheme } from '@tui/core';
 import type { AssistantInsightProps, ContextMessageProps } from 'layout/assistant';
 import type { AppDebugStoreHistory, AppDebugStoreName } from 'layout/debug';
-import { getDefaultAppDebugStoreHistory } from 'layout/debug';
+import { getDefaultAppDebugStoreHistory } from 'layout/debug/debug.models';
 import type { ExternalEnrichmentState } from 'layout/external-lookup';
 import type { JSONFeedItem } from 'layout/notifications';
 import type { QuickSearchItem } from 'layout/quick-search';

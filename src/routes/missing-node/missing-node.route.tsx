@@ -1,7 +1,7 @@
 import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined';
 import LinkOffIcon from '@mui/icons-material/LinkOff';
 import { Typography, useMediaQuery, useTheme } from '@mui/material';
-import { createAppRoute } from 'core/routes';
+import { createAppRoute } from 'core/routes/routes.factories';
 import { AppPageCenter } from 'core/template';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
