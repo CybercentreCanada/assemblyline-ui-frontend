@@ -99,7 +99,7 @@ const QuickSearchEmpty = memo(() => {
         alignItems: 'center',
         padding: theme.spacing(2),
         margin: theme.spacing(1),
-        borderRadius: theme.shape.borderRadius * 2,
+        borderRadius: theme.spacing(1),
         backgroundColor: bgColor,
         color
       }}
