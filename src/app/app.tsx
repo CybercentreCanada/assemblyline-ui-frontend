@@ -25,6 +25,7 @@ import { AppAssistantLayout, AppAssistantProvider } from 'layout/assistant';
 import { AppAuthLayout } from 'layout/auth';
 import { AppCarouselProvider } from 'layout/carousel';
 import { AppClueProvider } from 'layout/clue';
+import { AppDebugLayout } from 'layout/debug';
 import { AppDrawerLayout } from 'layout/drawer';
 import { AppSystemVersionLayout } from 'layout/system-version';
 import type { PropsWithChildren } from 'react';
@@ -134,15 +135,17 @@ export const AppLayout = memo(() => {
   return (
     <AppAuthLayout>
       <AppAssistantLayout>
-        <AppRouterLayout>
-          <AppDrawerLayout content={<AppRouterPanelLayout panelKey={1} />}>
-            <AppTemplateLayout preferences={preferences} router={router} user={user}>
-              <AppSystemVersionLayout>
-                <AppRouterPanelLayout panelKey={0} />
-              </AppSystemVersionLayout>
-            </AppTemplateLayout>
-          </AppDrawerLayout>
-        </AppRouterLayout>
+        <AppDebugLayout>
+          <AppRouterLayout>
+            <AppDrawerLayout content={<AppRouterPanelLayout panelKey={1} />}>
+              <AppTemplateLayout preferences={preferences} router={router} user={user}>
+                <AppSystemVersionLayout>
+                  <AppRouterPanelLayout panelKey={0} />
+                </AppSystemVersionLayout>
+              </AppTemplateLayout>
+            </AppDrawerLayout>
+          </AppRouterLayout>
+        </AppDebugLayout>
       </AppAssistantLayout>
     </AppAuthLayout>
   );
