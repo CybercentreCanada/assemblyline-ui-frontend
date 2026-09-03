@@ -106,16 +106,6 @@ export const ArchivesPage = memo(() => {
     [handleClear, navigate]
   );
 
-  const handleRowClick = useCallback(
-    (_event: React.MouseEvent<HTMLElement>, file: FileIndexed) => {
-      navigate.to().create(s => ({
-        route: '/archive/:id',
-        path: { id: file.sha256, tab: s.route === '/archive/:id/:tab' ? s.path.tab : null }
-      }));
-    },
-    [navigate]
-  );
-
   const handleLabelClick = useCallback(
     (_event: React.MouseEvent<HTMLDivElement, MouseEvent>, label: string) => {
       if (!searching) handleToggleFilter(`labels:${safeFieldValue(label)}`);
@@ -420,7 +410,7 @@ export const ArchivesPage = memo(() => {
           paddingRight: theme.spacing(0.5)
         }}
       >
-        <ArchivesTable fileResults={fileResults} onLabelClick={handleLabelClick} onRowClick={handleRowClick} />
+        <ArchivesTable fileResults={fileResults} onLabelClick={handleLabelClick} />
       </div>
     </AppPageFullWidth>
   );

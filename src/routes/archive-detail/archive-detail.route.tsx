@@ -300,6 +300,9 @@ export const ArchiveDetailRoute = createAppRoute({
     id: s.string(),
     tab: s.enum(TAB_OPTIONS, DEFAULT_TAB)
   }),
+  search: s => ({
+    name: s.string(null).nullable()
+  }),
 
   ancestor: '/archives',
   shortname: location => ['app_route.archive_detail_id_tab.shortname', { ns: 'archive', id: location.path.id }],

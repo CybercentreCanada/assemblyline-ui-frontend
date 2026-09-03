@@ -212,7 +212,7 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
       onSuccess: api_data => {
         showSuccessMessage(t('resubmit.success'));
         setTimeout(() => {
-          navigate.to().create({ route: '/submission/detail/:id', path: { id: api_data.api_response.sid } });
+          navigate.here().update({ route: '/submission/detail/:id', path: { id: api_data.api_response.sid } });
         }, 500);
       }
     });
