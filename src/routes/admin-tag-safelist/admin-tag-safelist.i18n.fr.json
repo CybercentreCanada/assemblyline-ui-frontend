@@ -1,0 +1,12 @@
+{
+  "app_route.admin_tag_safelist.fullname": "Administration de la Liste sûre système",
+  "app_route.admin_tag_safelist.shortname": "Liste sûre système",
+  "loading": "Chargement de l'éditeur de liste sûre...",
+  "reset": "Réinitialiser",
+  "save": "Sauvegarder les modifications",
+  "save.acceptText": "Oui, appliquez-les !",
+  "save.cancelText": "Annuler",
+  "save.success": "La liste sûre système a bien été enregistrée",
+  "save.title": "Voici les modifications qui seront appliquées :",
+  "title": "Liste sûre système"
+}

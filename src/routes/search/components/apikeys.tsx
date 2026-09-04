@@ -1,0 +1,142 @@
+import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
+import { AlertTitle, IconButton, Skeleton } from '@mui/material';
+import Paper from '@mui/material/Paper';
+import TableContainer from '@mui/material/TableContainer';
+import type { SearchResult } from 'models/api/search';
+import type { ApiKey, Role } from 'models/base/user';
+import { memo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import CustomChip from 'ui/CustomChip';
+import {
+  DivTable,
+  DivTableBody,
+  DivTableCell,
+  DivTableHead,
+  DivTableRow,
+  LinkRow,
+  SortableHeaderCell
+} from 'ui/DivTable';
+import InformativeAlert from 'ui/InformativeAlert';
+import Moment from 'ui/Moment';
+
+const MAX_DISPLAY_ROLES = 5;
+
+type RolesChipProps = {
+  roles: Role[];
+};
+
+const RolesCustomChips = memo(({ roles }: RolesChipProps) => {
+  const { t } = useTranslation(['adminAPIkeys']);
+
+  const [showMore, setShowMore] = useState<boolean>(false);
+
+  return (
+    <div>
+      {roles
+        .filter((role, i) => showMore || i < MAX_DISPLAY_ROLES)
+        .map((role, i) => (
+          <CustomChip key={`${role}-${i}`} type="rounded" label={t(`role.${role}`)} size="tiny" color="primary" />
+        ))}
+      {showMore ? null : (
+        <IconButton
+          size="small"
+          style={{ padding: 0 }}
+          onClick={event => {
+            event.preventDefault();
+            event.stopPropagation();
+            setShowMore(true);
+          }}
+        >
+          <MoreHorizOutlinedIcon />
+        </IconButton>
+      )}
+    </div>
+  );
+});
+
+export type ApiTableProps = {
+  apikeySearchResults: SearchResult<ApiKey>;
+  allowSort?: boolean;
+  onRowClick?: (event: React.MouseEvent<HTMLElement>, apikey: ApiKey) => void;
+};
+
+export const ApikeysTable = memo(
+  ({ apikeySearchResults, allowSort = true, onRowClick = () => null }: ApiTableProps) => {
+    const { t } = useTranslation(['adminAPIkeys']);
+
+    return !apikeySearchResults ? (
+      <Skeleton variant="rectangular" sx={{ height: '6rem', borderRadius: '4px' }} />
+    ) : !apikeySearchResults?.total ? (
+      <div style={{ width: '100%' }}>
+        <InformativeAlert>
+          <AlertTitle>{t('no_apikey_title')}</AlertTitle>
+          {t('no_results_desc')}
+        </InformativeAlert>
+      </div>
+    ) : (
+      <TableContainer component={Paper}>
+        <DivTable size="small">
+          <DivTableHead>
+            <DivTableRow style={{ whiteSpace: 'nowrap' }}>
+              <SortableHeaderCell sortField="uname" allowSort={allowSort}>
+                {t('username')}
+              </SortableHeaderCell>
+              <SortableHeaderCell sortField="key_name" allowSort={allowSort}>
+                {t('apikey')}
+              </SortableHeaderCell>
+              <SortableHeaderCell sortField="creation_date" allowSort={allowSort}>
+                {t('creation_date')}
+              </SortableHeaderCell>
+              <SortableHeaderCell sortField="expiry_ts" allowSort={allowSort}>
+                {t('expiration_date')}
+              </SortableHeaderCell>
+              <SortableHeaderCell sortField="last_used" allowSort={allowSort}>
+                {t('last_used')}
+              </SortableHeaderCell>
+              <SortableHeaderCell sortField="acl" allowSort={allowSort}>
+                {t('acl')}
+              </SortableHeaderCell>
+              <SortableHeaderCell sortField="roles" allowSort={allowSort}>
+                {t('roles')}
+              </SortableHeaderCell>
+            </DivTableRow>
+          </DivTableHead>
+
+          <DivTableBody>
+            {apikeySearchResults.items.map((userApikey, i) => (
+              <LinkRow
+                key={`${userApikey.id}-${i}`}
+                hover
+                nav={nav => nav.to().create({ route: '/admin/apikeys/:id', path: { id: userApikey.id } })}
+                navDeps={[userApikey.id]}
+                onClick={event => onRowClick(event, userApikey)}
+                sx={{ textDecoration: 'none' }}
+              >
+                <DivTableCell>{userApikey.uname}</DivTableCell>
+                <DivTableCell>{userApikey.key_name}</DivTableCell>
+
+                <DivTableCell>
+                  {!userApikey.creation_date ? null : <Moment variant="fromNow">{userApikey.creation_date}</Moment>}
+                </DivTableCell>
+                <DivTableCell>
+                  {!userApikey.expiry_ts ? null : <Moment variant="fromNow">{userApikey.expiry_ts}</Moment>}
+                </DivTableCell>
+                <DivTableCell>
+                  {!userApikey.last_used ? null : <Moment format="YYYY-MM-DD">{userApikey.last_used}</Moment>}
+                </DivTableCell>
+                <DivTableCell>
+                  {userApikey.acl.sort().map(e => (
+                    <CustomChip key={e} type="rounded" label={e} size="tiny" color="primary" />
+                  ))}
+                </DivTableCell>
+                <DivTableCell>
+                  <RolesCustomChips roles={userApikey.roles} />
+                </DivTableCell>
+              </LinkRow>
+            ))}
+          </DivTableBody>
+        </DivTable>
+      </TableContainer>
+    );
+  }
+);

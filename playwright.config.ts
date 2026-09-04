@@ -64,15 +64,16 @@ const baseUseConfig: PlaywrightTestConfig['use'] = {
 export default defineConfig({
   forbidOnly: !!process.env.CI,
   fullyParallel: true,
-  globalTeardown: path.resolve(__dirname, './src/e2e/shared/teardown.ts'),
+  globalTeardown: path.resolve(__dirname, './src/core/e2e/e2e.teardown.ts'),
   outputDir: `${RESULTS_DIR}/results`,
+  snapshotPathTemplate: `${RESULTS_DIR}/smoke-test-screenshots/{testFilePath}/{arg}{ext}`,
   reporter: [
     ['list'],
     ['html', { open: 'always', outputFolder: `${RESULTS_DIR}/html-report` }],
     ['junit', { outputFile: `${RESULTS_DIR}/junit-results.xml` }]
   ],
   retries: process.env.CI ? 1 : 0,
-  testDir: './src/e2e',
+  testDir: './src',
   testMatch: /.*\.spec\.tsx?$/,
   timeout: 120_000,
   use: baseUseConfig,
@@ -85,7 +86,7 @@ export default defineConfig({
         ...device,
         ...baseUseConfig
       },
-      testDir: path.resolve(__dirname, './src/e2e'),
+      testDir: path.resolve(__dirname, './src'),
       testMatch: /setup\.ts$/
     },
     // Main test projects

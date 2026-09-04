@@ -9,3 +9,5 @@ node_modules
 npm-debug.log
 pipelines
 playwright-report
+**/*.docs.md
+**/docs/

@@ -1,0 +1,11 @@
+{
+  "router_blocker_blocked_pages_heading": "Raisons du blocage de la navigation :",
+  "router_blocker_reason_data_loss_on_leave": "Quitter la page {{page}} supprimera les données saisies sur cette page.",
+  "router_blocker_reason_external_leave_risk": "Vous allez quitter Assemblyline et ouvrir une destination externe.",
+  "router_blocker_reason_state_or_transient_loss_on_new_tab": "Ouvrir la page {{page}} dans un nouvel onglet ne conservera pas son état actuel.",
+  "router_blocker_reason_unsaved_changes": "La page {{page}} contient des modifications non enregistrées.",
+  "router_prompt_accept": "Continuer",
+  "router_prompt_cancel": "Rester",
+  "router_prompt_text": "Si vous continuez, des informations peuvent être perdues.",
+  "router_prompt_title": "Quitter cette page ?"
+}

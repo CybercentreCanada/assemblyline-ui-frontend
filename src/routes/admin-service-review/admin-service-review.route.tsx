@@ -1,0 +1,379 @@
+import ArrowDownwardOutlinedIcon from '@mui/icons-material/ArrowDownwardOutlined';
+import ArrowUpwardOutlinedIcon from '@mui/icons-material/ArrowUpwardOutlined';
+import CompareArrowsOutlinedIcon from '@mui/icons-material/CompareArrowsOutlined';
+import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
+import type { TypographyProps } from '@mui/material';
+import { Grid, MenuItem, Select, Skeleton, Typography, useTheme } from '@mui/material';
+import FormControl from '@mui/material/FormControl';
+import { createAppRoute, useAppSearchSnapshot } from 'core/routes';
+import { AppPageFullWidth } from 'core/template';
+import useALContext from 'deprecated/hooks/useALContext';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
+import type { ServiceStats as ServiceStatsData } from 'models/api/service';
+import type { Service as ServiceData } from 'models/base/service';
+import type { Dispatch, SetStateAction } from 'react';
+import { memo, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { getVersionQuery } from 'shared/utils/utils';
+import { IconButton } from 'ui/buttons/IconButton';
+import LineGraph from 'ui/LineGraph';
+
+// TODO: version doesn't seem to be set correctly
+type ServiceStats = ServiceStatsData & { version: string };
+
+function getDescendantProp(obj, desc) {
+  if (obj == null) return null;
+
+  const arr = desc.split('.');
+  while (arr.length && (obj = obj[arr.shift()]));
+  return obj;
+}
+
+type DiffNumberProps = {
+  stats: ServiceStats;
+  comp: ServiceStats;
+  field: string;
+  variant?: TypographyProps['variant'];
+};
+
+function DiffNumber({ stats, comp, field, variant = 'h4' as const }: DiffNumberProps) {
+  const prop1 = getDescendantProp(stats, field);
+  const prop2 = getDescendantProp(comp, field);
+  const v1 = Math.round(prop1);
+  const v2 = Math.round(prop2);
+
+  return (
+    <Typography variant={variant} align="center">
+      {prop1 != null ? v1 : <Skeleton width="4rem" style={{ display: 'inline-block' }} />}
+      {prop1 != null && prop2 != null ? (
+        v1 > v2 ? (
+          <ArrowUpwardOutlinedIcon style={{ verticalAlign: 'middle' }} />
+        ) : v2 > v1 ? (
+          <ArrowDownwardOutlinedIcon style={{ verticalAlign: 'middle' }} />
+        ) : null
+      ) : null}
+    </Typography>
+  );
+}
+
+type CounterProps = {
+  stats: ServiceStats;
+  comp: ServiceStats;
+  field: string;
+  titleVariant?: TypographyProps['variant'];
+  numberVariant?: TypographyProps['variant'];
+};
+
+function Counter({ stats, comp, field, titleVariant = 'h6' as const, numberVariant = 'h4' as const }: CounterProps) {
+  const { t } = useTranslation(['adminServiceReview']);
+  const theme = useTheme();
+  return (
+    <div style={{ marginBottom: theme.spacing(1) }}>
+      <Typography variant={titleVariant} align="center">
+        {t(field)}
+      </Typography>
+      <DiffNumber stats={stats} comp={comp} field={field} variant={numberVariant} />
+    </div>
+  );
+}
+
+type ServiceDetailProps = {
+  stats: ServiceStats;
+  comp: ServiceStats;
+  show?: boolean;
+};
+
+function ServiceDetail({ stats, comp, show }: ServiceDetailProps) {
+  const { t } = useTranslation(['adminServiceReview']);
+  const theme = useTheme();
+  return (
+    show && (
+      <div style={{ marginTop: theme.spacing(4), marginBottom: theme.spacing(4) }}>
+        <Typography variant="h3" align="center" gutterBottom>
+          {stats ? stats.service.version : <Skeleton width="10rem" style={{ display: 'inline-block' }} />}
+        </Typography>
+        <Counter stats={stats} comp={comp} field="result.count" />
+        <Counter stats={stats} comp={comp} field="result.score.avg" />
+        <div style={{ marginBottom: theme.spacing(2) }}>
+          <LineGraph
+            dataset={stats && stats.result.score.distribution}
+            datatype={stats && stats.version}
+            height="200px"
+            title={t('result.score.distribution')}
+            titleSize={20}
+          />
+        </div>
+        <Counter stats={stats} comp={comp} field="file.extracted.avg" />
+        <Counter stats={stats} comp={comp} field="file.supplementary.avg" />
+        <div style={{ marginBottom: theme.spacing(2) }}>
+          <LineGraph
+            dataset={stats && stats.heuristic}
+            datatype={stats && stats.version}
+            sorter={(a, b) => parseInt(a.split('.', 2)[1]) - parseInt(b.split('.', 2)[1])}
+            height="250px"
+            title={t('heuristic')}
+            titleSize={20}
+          />
+        </div>
+        <div style={{ marginBottom: theme.spacing(2), display: 'flex', flexDirection: 'column' }}>
+          {stats ? (
+            <div style={{ alignSelf: 'self-end' }}>
+              <IconButton
+                tooltip={t('errors')}
+                nav={nav =>
+                  nav.here().create({
+                    route: '/admin/errors',
+                    search: {
+                      start: 'now-1y/d',
+                      gap: '30d',
+                      filters: [`response.service_name:${stats.service.name}`, getVersionQuery(stats.service.version)]
+                    }
+                  })
+                }
+                navDeps={[stats.service.name, stats.service.version]}
+                style={{ color: theme.palette.action.active }}
+                size="large"
+              >
+                <ErrorOutlineOutlinedIcon />
+              </IconButton>
+            </div>
+          ) : (
+            <Skeleton
+              component="div"
+              variant="circular"
+              height="2.5rem"
+              width="2.5rem"
+              style={{ margin: theme.spacing(0.5), alignSelf: 'self-end' }}
+            />
+          )}
+          <LineGraph
+            dataset={stats && stats.error}
+            datatype={stats && stats.version}
+            height="250px"
+            title={t('error')}
+            titleSize={20}
+          />
+        </div>
+      </div>
+    )
+  );
+}
+
+type VersionSelectorProps = {
+  possibleVersions: string[];
+  selectedService: string;
+  version: string;
+  setVersion: Dispatch<SetStateAction<string>>;
+  except: string;
+};
+
+function VersionSelector({ possibleVersions, selectedService, version, setVersion, except }: VersionSelectorProps) {
+  const theme = useTheme();
+  const { t } = useTranslation(['adminServiceReview']);
+  return selectedService && possibleVersions ? (
+    <FormControl size="small" fullWidth>
+      <Select
+        fullWidth
+        value={version}
+        onChange={event => setVersion(event.target.value)}
+        displayEmpty
+        variant="outlined"
+        style={{ minWidth: theme.spacing(30), color: version === '' ? theme.palette.text.disabled : null }}
+      >
+        <MenuItem value="" disabled>
+          {t('service.version')}
+        </MenuItem>
+        {possibleVersions
+          .filter(item => item !== except)
+          .map((v, id) => (
+            <MenuItem key={id} value={v}>
+              {`${selectedService}: ${v}`}
+            </MenuItem>
+          ))}
+      </Select>
+    </FormControl>
+  ) : (
+    <Skeleton variant="rectangular" height={theme.spacing(5)} width="100%" />
+  );
+}
+
+export const AdminServiceReviewPage = memo(() => {
+  const { t } = useTranslation(['adminServiceReview']);
+  const theme = useTheme();
+  const search = useAppSearchSnapshot<'/admin/service_review'>();
+
+  const defaultSelectedService = search.get('service');
+  const defaultVersion1 = search.get('v1');
+  const defaultVersion2 = search.get('v2');
+
+  const [services, setServices] = useState<ServiceData['name'][]>(null);
+  const [selectedService, setSelectedService] = useState<string>(defaultSelectedService);
+  const [possibleVersions, setPossibleVersions] = useState<string[]>(null);
+  const [version1, setVersion1] = useState<string>(defaultVersion1);
+  const [version2, setVersion2] = useState<string>(defaultVersion2);
+  const [stats1, setStats1] = useState<ServiceStats>(null);
+  const [stats2, setStats2] = useState<ServiceStats>(null);
+
+  const { apiCall } = useMyAPI();
+  const { user: currentUser } = useALContext();
+
+  const handleServiceChange = event => {
+    setVersion1('');
+    setVersion2('');
+    setSelectedService(event.target.value);
+  };
+
+  useEffect(() => {
+    if (selectedService !== '' && version1) {
+      setStats1(null);
+      apiCall<ServiceStats>({
+        url: `/api/v4/service/stats/${selectedService}/?version=${version1}`,
+        onSuccess: api_data => {
+          setStats1(api_data.api_response);
+        }
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [version1]);
+
+  useEffect(() => {
+    if (selectedService !== '' && version2) {
+      setStats2(null);
+      apiCall<ServiceStats>({
+        url: `/api/v4/service/stats/${selectedService}/?version=${version2}`,
+        onSuccess: api_data => {
+          setStats2(api_data.api_response);
+        }
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [version2]);
+
+  useEffect(() => {
+    if (selectedService !== '') {
+      apiCall<string[]>({
+        url: `/api/v4/service/versions/${selectedService}/`,
+        onSuccess: api_data => {
+          setPossibleVersions(api_data.api_response);
+        }
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedService]);
+
+  useEffect(() => {
+    if (currentUser.is_admin) {
+      apiCall<ServiceData[]>({
+        url: '/api/v4/service/all/',
+        onSuccess: api_data => {
+          setServices(api_data.api_response.map(srv => srv.name));
+        }
+      });
+    }
+  }, []);
+
+  return (
+    <AppPageFullWidth>
+      <Grid
+        container
+        alignItems="center"
+        justifyContent="space-between"
+        spacing={3}
+        style={{ paddingBottom: theme.spacing(2) }}
+      >
+        <Grid size={{ xs: 12, md: 'grow' }}>
+          <Typography variant="h4">{t('title')}</Typography>
+          <Typography variant="subtitle1">{t('subtitle')}</Typography>
+        </Grid>
+        <Grid size={{ xs: 12, md: 'auto' }} style={{ flexGrow: 0 }}>
+          {services ? (
+            <>
+              <div style={{ display: 'flex', marginBottom: theme.spacing(1), justifyContent: 'flex-end' }}>
+                <FormControl size="small" fullWidth>
+                  <Select
+                    id="channel"
+                    fullWidth
+                    value={selectedService}
+                    onChange={handleServiceChange}
+                    displayEmpty
+                    variant="outlined"
+                    style={{
+                      minWidth: theme.spacing(30),
+                      color: selectedService === '' ? theme.palette.text.disabled : null
+                    }}
+                  >
+                    <MenuItem value="" disabled>
+                      {t('service.selection')}
+                    </MenuItem>
+                    {services.map((srv, id) => (
+                      <MenuItem key={id} value={srv}>
+                        {srv}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </div>
+            </>
+          ) : (
+            <Skeleton variant="rectangular" height={theme.spacing(5)} width={theme.spacing(30)} />
+          )}
+        </Grid>
+      </Grid>
+
+      {selectedService && selectedService !== '' && (
+        <>
+          <Typography variant="h3" align="center" gutterBottom style={{ marginTop: theme.spacing(2) }}>
+            {selectedService}
+          </Typography>
+          <Grid
+            container
+            justifyContent="space-between"
+            spacing={3}
+            style={{ paddingTop: theme.spacing(2), paddingBottom: theme.spacing(2) }}
+          >
+            <Grid size={{ xs: 12, md: 6 }}>
+              <VersionSelector
+                possibleVersions={possibleVersions}
+                selectedService={selectedService}
+                version={version1}
+                except={version2}
+                setVersion={setVersion1}
+              />
+              <ServiceDetail stats={stats1} comp={stats2} show={version1 !== ''} />
+            </Grid>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <VersionSelector
+                possibleVersions={possibleVersions}
+                selectedService={selectedService}
+                version={version2}
+                except={version1}
+                setVersion={setVersion2}
+              />
+              <ServiceDetail stats={stats2} comp={stats1} show={version2 !== ''} />
+            </Grid>
+          </Grid>
+        </>
+      )}
+    </AppPageFullWidth>
+  );
+});
+
+export const AdminServiceReviewRoute = createAppRoute({
+  component: AdminServiceReviewPage,
+
+  path: '/admin/service_review',
+  search: s => ({
+    service: s.string(''),
+    v1: s.string(''),
+    v2: s.string('')
+  }),
+
+  ancestor: '/admin',
+  shortname: () => ['app_route.admin_service_review.shortname', { ns: 'adminServiceReview' }],
+  fullname: () => ['app_route.admin_service_review.fullname', { ns: 'adminServiceReview' }],
+  shorticon: () => <CompareArrowsOutlinedIcon />,
+  fullicon: () => <CompareArrowsOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.is_admin
+});
