@@ -73,8 +73,12 @@ export const useAppHighlighter = (): UseAppHighlighter => {
  * @returns Whether the resolved highlight key is active
  */
 export const useAppIsHighlighted = (input: string | (() => string), dep: DependencyList = null): boolean => {
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const key = useMemo(() => (typeof input === 'function' ? input() : input), dep ?? [input]);
+  const resolvedKey = typeof input === 'function' ? input() : input;
+  const key = useMemo<string>(
+    () => resolvedKey,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    dep ?? [resolvedKey]
+  );
 
   return useAppInterfaceStore(s => hasHighlighterKey(key)(s));
 };
@@ -85,8 +89,28 @@ export const useAppIsHighlighted = (input: string | (() => string), dep: Depende
  * @returns Whether any resolved highlight key is active
  */
 export const useAppHasHighlightedKeys = (input: string[] | (() => string[]), dep: DependencyList = null): boolean => {
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const keyList = useMemo(() => (typeof input === 'function' ? input() : input), dep ?? [input]);
+  const resolvedKeyList = typeof input === 'function' ? input() : input;
+  const keyList = useMemo<string[]>(
+    () => resolvedKeyList,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    dep ?? [...(resolvedKeyList || [])]
+  );
 
   return useAppInterfaceStore(s => hasHighlighterKeys(keyList)(s));
+};
+
+/**
+ * @name useAppAreKeysHighlighted
+ * @description Subscribes to whether each resolved highlight key is directly or indirectly highlighted.
+ * @returns Highlight state for each resolved key in input order
+ */
+export const useAppAreKeysHighlighted = (input: string[] | (() => string[]), dep: DependencyList = null): boolean[] => {
+  const resolvedKeyList = typeof input === 'function' ? input() : input;
+  const keyList = useMemo<string[]>(
+    () => resolvedKeyList,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    dep ?? [...(resolvedKeyList || [])]
+  );
+
+  return useAppInterfaceStore(s => keyList.map(key => hasHighlighterKey(key)(s)));
 };
