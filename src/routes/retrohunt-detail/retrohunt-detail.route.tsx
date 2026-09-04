@@ -163,7 +163,7 @@ export const RetrohuntDetailPage = memo(() => {
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [currentUser.roles, configuration?.retrohunt?.enabled, paramKey, navigate]
+    [currentUser.roles, configuration?.retrohunt?.enabled, paramKey]
   );
 
   const handleRepeat = useCallback(

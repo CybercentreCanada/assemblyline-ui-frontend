@@ -5,22 +5,15 @@ import ExpandMore from '@mui/icons-material/ExpandMore';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { Box, Button, Collapse, Divider, IconButton, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
 import { AppLink } from 'core/router';
-import useHighlighter from 'deprecated/hooks/useHighlighter';
 import useSafeResults from 'deprecated/hooks/useSafeResults';
+import { useAppAreKeysHighlighted } from 'layout/highlighter';
 import type { SubmissionTree, Tree } from 'models/api/submission';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { getFileTreeKeys, isFileTreeItemVisible } from 'routes/submission-detail/submission-detail.utils';
 import Verdict from 'ui/Verdict';
 
 const MAX_FILE_COUNT = 500;
-
-const isVisible = (curItem, forcedShown, isHighlighted, showSafeResults) =>
-  (curItem.score < 0 && !showSafeResults) ||
-  curItem.score > 0 ||
-  forcedShown.includes(curItem.sha256) ||
-  isHighlighted(curItem.sha256) ||
-  (curItem.children &&
-    Object.values(curItem.children).some(c => isVisible(c, forcedShown, isHighlighted, showSafeResults)));
 
 type FileTreeSectionProps = {
   tree: SubmissionTree['tree'];
@@ -112,11 +105,20 @@ const WrappedFileTree: React.FC<FileTreeProps> = ({
 }) => {
   const { t } = useTranslation(['submissionDetail']);
   const theme = useTheme();
-  const { isHighlighted } = useHighlighter();
   const { showSafeResults } = useSafeResults();
 
   const [forcedShown, setForcedShown] = useState<string[]>([...defaultForceShown]);
   const [maxChildCount, setMaxChildCount] = useState<number>(MAX_FILE_COUNT);
+
+  const fileKeys = useMemo<string[]>(() => getFileTreeKeys(tree), [tree]);
+
+  const highlighted = useAppAreKeysHighlighted(fileKeys);
+
+  const highlightedKeys = useMemo<Set<string>>(
+    () => new Set(fileKeys.filter((_key, index) => highlighted[index])),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [...(fileKeys || []), ...(highlighted || [])]
+  );
 
   const files = useMemo<[string, Tree][]>(
     () =>
@@ -124,14 +126,14 @@ const WrappedFileTree: React.FC<FileTreeProps> = ({
         .sort((a: [string, Tree], b: [string, Tree]) => (a[1].name.join() > b[1].name.join() ? 1 : -1))
         .reduce(
           (prev, [sha256, item]: [string, Tree]) =>
-            !isVisible(tree[sha256], defaultForceShown, isHighlighted, showSafeResults) ||
+            !isFileTreeItemVisible(tree[sha256], defaultForceShown, highlightedKeys, showSafeResults) ||
             (item.score < 0 && !showSafeResults && !force) ||
             prev.length > maxChildCount
               ? [...prev]
               : [...prev, [sha256, item]],
           [] as [string, Tree][]
         ),
-    [defaultForceShown, force, isHighlighted, maxChildCount, showSafeResults, tree]
+    [defaultForceShown, force, highlightedKeys, maxChildCount, showSafeResults, tree]
   );
 
   return (
@@ -140,7 +142,9 @@ const WrappedFileTree: React.FC<FileTreeProps> = ({
         <div key={i}>
           <div style={{ display: 'flex', width: '100%', alignItems: 'flex-start' }}>
             {item.children &&
-            Object.values(item.children).some(c => !isVisible(c, forcedShown, isHighlighted, showSafeResults)) ? (
+            Object.values(item.children).some(
+              c => !isFileTreeItemVisible(c, forcedShown, highlightedKeys, showSafeResults)
+            ) ? (
               <Tooltip title={t('tree_more')}>
                 <IconButton
                   size="small"
@@ -187,7 +191,11 @@ const WrappedFileTree: React.FC<FileTreeProps> = ({
                 color: 'inherit',
                 textDecoration: 'none',
                 wordBreak: 'break-word',
-                backgroundColor: isHighlighted(sha256) ? (theme.palette.mode === 'dark' ? '#343a44' : '#d8e3ea') : null,
+                backgroundColor: highlightedKeys.has(sha256)
+                  ? theme.palette.mode === 'dark'
+                    ? '#343a44'
+                    : '#d8e3ea'
+                  : null,
                 '&:hover, &:focus': {
                   backgroundColor: theme.palette.action.hover
                 }

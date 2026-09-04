@@ -16,7 +16,8 @@ export const serializeAppDebugState = (state: unknown): string => {
           if (typeof value === 'function') return '[Function]';
           if (typeof value === 'bigint') return value.toString();
           if (typeof value === 'symbol') return value.toString();
-          if (value instanceof Node) return '[DOM Node]';
+          if (typeof Node !== 'undefined' && value instanceof Node) return '[DOM Node]';
+          if (value instanceof Set) return [...(value as Set<unknown>)];
 
           if (value && typeof value === 'object') {
             if (seen.has(value)) return '[Circular]';

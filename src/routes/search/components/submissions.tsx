@@ -84,15 +84,18 @@ export const SubmissionsTable = memo(
               <LinkRow
                 key={`${submission.id}-${id}`}
                 nav={nav =>
-                  nav
-                    .to()
-                    .create(s =>
-                      submission.state !== 'completed' ||
-                      s?.route === '/submission/detail/:id' ||
-                      submissionView === 'details'
-                        ? { route: '/submission/detail/:id', path: { id: submission.id } }
-                        : { route: '/submission/report/:id', path: { id: submission.id } }
-                    )
+                  nav.to().create(s => {
+                    const route =
+                      submission.state !== 'completed'
+                        ? '/submission/detail/:id'
+                        : s?.route === '/submission/detail/:id' || s?.route === '/submission/report/:id'
+                          ? s.route
+                          : submissionView === 'report'
+                            ? '/submission/report/:id'
+                            : '/submission/detail/:id';
+
+                    return { route, path: { id: submission.id } };
+                  })
                 }
                 navDeps={[submission.state, submissionView, submission.id]}
                 onClick={event => onRowClick(event, submission)}
