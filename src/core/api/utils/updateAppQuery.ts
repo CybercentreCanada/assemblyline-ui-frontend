@@ -1,5 +1,5 @@
 import type { ApiQueryKey, ApiRequest, ApiResponse } from 'core/api/api.models';
-import { queryClient } from 'core/api/api.providers';
+import { QUERY_CLIENT } from 'core/api/api.providers';
 
 /**
  * @name isObject
@@ -20,7 +20,7 @@ export const updateAppQuery = <Request extends ApiRequests>(
   request: Partial<Request>,
   updater: (prev: ApiResponses<Request>) => ApiResponses<Request>
 ) =>
-  queryClient.setQueriesData<ApiResponse<ApiResponses<Request>>>(
+  QUERY_CLIENT.setQueriesData<ApiResponse<ApiResponses<Request>>>(
     {
       predicate: ({ queryKey }) => {
         try {

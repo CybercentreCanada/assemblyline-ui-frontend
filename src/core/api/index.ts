@@ -7,14 +7,15 @@ export type {
   Method,
   RequestBuilder
 } from './api.models';
-export { AppApiLayout, AppApiProvider } from './api.providers';
-export type { AppApiLayoutProps } from './api.providers';
+export { AppApiProvider } from './api.providers';
 export { getApiResponse, getBlobResponse, getValue, isApiData, stableStringify } from './api.utils';
 export { useApiCallFn } from './hooks/useApiCallFn';
 export type { UseApiCallFnProps } from './hooks/useApiCallFn';
 export { useApiMutation } from './hooks/useApiMutation';
 export { useApiQuery } from './hooks/useApiQuery';
 export type { UseApiQueryProps } from './hooks/useApiQuery';
+export { useAppImageFetch } from './hooks/useAppImageFetch';
+export type { UseImageFetchProps } from './hooks/useAppImageFetch';
 export { useAppMutation } from './hooks/useAppMutation';
 export { useAppQuery } from './hooks/useAppQuery';
 export type { UseAppQueryProps } from './hooks/useAppQuery';

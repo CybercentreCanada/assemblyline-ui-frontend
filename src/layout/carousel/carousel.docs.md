@@ -15,7 +15,7 @@ Full-screen image carousel/lightbox modal. Supports multi-image navigation, zoom
 ## Key Files
 
 - `carousel.providers.tsx` — `AppCarouselProvider`, `AppCarouselContext`, `useAppCarousel` context setup
-- `carousel.hooks.tsx` — `useAppCarouselState` (open/close, index, images), `useBackgroundMode` (mode cycling), `useCarouselKeyboard` (key bindings), `useImageFetch` (lazy API loading)
+- `carousel.hooks.tsx` — `useAppCarouselState` (open/close, index, images), `useBackgroundMode` (mode cycling), `useAppCarouselKeyboard` (key bindings), `useAppImageFetch` (lazy API loading)
 - `carousel.models.ts` — Type definitions (`AppCarouselContextProps`, `BackgroundMode`, `CarouselContainerProps`, `CarouselItemProps`, `Dragging`)
 - `carousel.components.tsx` — UI components (`CarouselContainer`, `CarouselItem`)
 - `index.ts` — Public API barrel exports

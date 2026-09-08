@@ -394,16 +394,16 @@ export const UserDebug = memo(() => {
             <Select
               size="small"
               displayEmpty
-              value={debugMode}
-              onChange={(event: SelectChangeEvent<AppInterfaceStore['debug']['mode']>) =>
+              value={debugMode ?? ''}
+              onChange={(event: SelectChangeEvent<string>) =>
                 setInterfaceStore(s => {
-                  s.debug.mode = event.target.value as AppInterfaceStore['debug']['mode'];
+                  s.debug.mode = (event.target.value || null) as AppInterfaceStore['debug']['mode'];
                   s.usermenu.open = false;
                   return s;
                 })
               }
             >
-              <MenuItem value={null}>{t('personalization.debug.menu.none')}</MenuItem>
+              <MenuItem value="">{t('personalization.debug.menu.none')}</MenuItem>
               <MenuItem value="api">{t('personalization.debug.menu.api')}</MenuItem>
               <MenuItem value="store">{t('personalization.debug.menu.store')}</MenuItem>
             </Select>
@@ -416,7 +416,7 @@ export const UserDebug = memo(() => {
   );
 });
 
-UserTheme.displayName = 'UserTheme';
+UserDebug.displayName = 'UserDebug';
 
 //*****************************************************************************************
 // User Menu

@@ -3,7 +3,7 @@ import { boolean as zBoolean, enum as zEnum, number as zNumber, object as zObjec
 
 export const APP_PREFERENCE_STORAGE_KEY = 'Assemblyline.preferences';
 
-const DAY_IN_MS: number = 24 * 60 * 60 * 1000;
+export const DAY_IN_MS: number = 24 * 60 * 60 * 1000;
 
 /** React Query cache timing settings. */
 const API_PREFERENCE_SCHEMA = zObject({

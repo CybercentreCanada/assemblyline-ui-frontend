@@ -1,9 +1,9 @@
 import BrokenImageOutlinedIcon from '@mui/icons-material/BrokenImageOutlined';
 import { Badge, CircularProgress, Tooltip, useTheme } from '@mui/material';
-import useCarousel from 'deprecated/hooks/useCarousel';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
+import { useAppImageFetch } from 'core/api';
+import { useAppSetInterfaceStore } from 'core/interface';
 import type { Image, ImageBody } from 'models/base/result_body';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Button } from 'ui/buttons/Button';
 
 type ImageInlineBodyProps = {
@@ -40,7 +40,18 @@ type ImageInlineProps = {
 };
 
 const WrappedImageInline = ({ data, printable = false, size = 'medium' }: ImageInlineProps) => {
-  const { openCarousel } = useCarousel();
+  const setInterfaceStore = useAppSetInterfaceStore();
+
+  const handleImageClick = useCallback(
+    (_event: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>, index: number) =>
+      setInterfaceStore(store => {
+        store.carousel.index = index;
+        store.carousel.images = data;
+        store.carousel.open = true;
+        return store;
+      }),
+    [data, setInterfaceStore]
+  );
 
   return data && data.length > 0 ? (
     <div style={{ ...(printable && { flexWrap: 'wrap' }) }}>
@@ -51,7 +62,7 @@ const WrappedImageInline = ({ data, printable = false, size = 'medium' }: ImageI
         to={data[0].img}
         count={data.length}
         size={size}
-        onImageClick={(e, index) => openCarousel(index, data)}
+        onImageClick={handleImageClick}
       />
     </div>
   ) : null;
@@ -77,28 +88,12 @@ const WrappedImageItem = ({
   onImageClick = () => null
 }: ImageItemProps) => {
   const theme = useTheme();
-  const { apiCall } = useMyAPI();
-
-  const [image, setImage] = useState<string>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-
-  useEffect(() => {
-    apiCall<string>({
-      url: `/api/v4/file/image/${src}/`,
-      allowCache: true,
-      onSuccess: api_data => setImage(api_data.api_response),
-      onFailure: () => setImage(null),
-      onEnter: () => setLoading(false),
-      onExit: () => setLoading(false)
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [alt, src]);
+  const { data: image, isLoading: loading } = useAppImageFetch({ src, alt });
 
   return (
     <div>
       <Tooltip title={alt}>
         <Button
-          // TODO: this will open the nav since the onClick doesn't prevent the navigation
           nav={nav => nav.to().create({ route: '/file/viewer/:id/:tab', path: { id: to, tab: 'image' } })}
           color="secondary"
           onClick={event => {

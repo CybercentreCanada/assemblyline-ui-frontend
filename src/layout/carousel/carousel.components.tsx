@@ -7,18 +7,25 @@ import PageviewOutlinedIcon from '@mui/icons-material/PageviewOutlined';
 import RemoveIcon from '@mui/icons-material/Remove';
 import ZoomInIcon from '@mui/icons-material/ZoomIn';
 import ZoomOutIcon from '@mui/icons-material/ZoomOut';
-import type { Theme } from '@mui/material';
-import { alpha, Button, CircularProgress, Modal, Skeleton, Slider, styled, Tooltip, useTheme } from '@mui/material';
-import { useBackgroundMode, useCarouselKeyboard, useImageFetch } from 'layout/carousel/carousel.hooks';
-import type {
-  BackgroundMode,
-  CarouselContainerProps,
-  CarouselItemProps,
-  Dragging
-} from 'layout/carousel/carousel.models';
-import { IMAGE_SIZE, MIN_IMAGE_SIZE_REM, NAV_BAR_HEIGHT, ZOOM_CLASS } from 'layout/carousel/carousel.models';
+import { alpha, Button, CircularProgress, Modal, Slider, styled, Tooltip, useTheme } from '@mui/material';
+import { useAppImageFetch } from 'core/api';
+import { useAppInterfaceStore, useAppSetInterfaceStore } from 'core/interface';
+import { useAppLocation } from 'core/routes';
+import type { AppCarouselDragging } from 'layout/carousel';
+import {
+  APP_CAROUSEL_IMAGE_SIZE,
+  APP_CAROUSEL_MIN_IMAGE_SIZE_REM,
+  APP_CAROUSEL_NAV_BAR_HEIGHT,
+  APP_CAROUSEL_ZOOM_CLASS,
+  cycleAppCarouselBackgroundMode,
+  getAppCarouselBackgroundColor,
+  resetAppCarouselState,
+  toggleAppCarouselZoom,
+  updateAppCarouselIndex,
+  updateAppCarouselZoom
+} from 'layout/carousel';
 import type { Image } from 'models/base/result_body';
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IconButton } from 'ui/buttons/IconButton';
 
@@ -30,7 +37,7 @@ const ImageContainer = styled('div')(({ theme }) => ({
   position: 'absolute',
   width: '100%',
   top: '64px',
-  bottom: NAV_BAR_HEIGHT,
+  bottom: APP_CAROUSEL_NAV_BAR_HEIGHT,
   display: 'grid',
   placeItems: 'center',
   overflow: 'scroll',
@@ -41,7 +48,7 @@ const ImageContainer = styled('div')(({ theme }) => ({
     easing: theme.transitions.easing.easeInOut,
     duration: theme.transitions.duration.shortest
   }),
-  [`&.${ZOOM_CLASS}`]: { top: 0, bottom: 0, left: 0, right: 0 }
+  [`&.${APP_CAROUSEL_ZOOM_CLASS}`]: { top: 0, bottom: 0, left: 0, right: 0 }
 }));
 
 ImageContainer.displayName = 'ImageContainer';
@@ -52,7 +59,7 @@ const NavOverlayContainer = styled('div')(() => ({
   cursor: 'pointer',
   position: 'absolute',
   zIndex: '1',
-  [`&.${ZOOM_CLASS}`]: { width: '0%' },
+  [`&.${APP_CAROUSEL_ZOOM_CLASS}`]: { width: '0%' },
   '&:hover>div': { display: 'flex' }
 }));
 
@@ -76,21 +83,21 @@ NavButtonWrapper.displayName = 'NavButtonWrapper';
 const Img = styled('img')(({ theme }) => ({
   height: 'auto',
   width: 'auto',
-  minHeight: IMAGE_SIZE,
-  minWidth: IMAGE_SIZE,
+  minHeight: APP_CAROUSEL_IMAGE_SIZE,
+  minWidth: APP_CAROUSEL_IMAGE_SIZE,
   maxWidth: '100vw',
-  maxHeight: `calc(100vh - 64px - ${NAV_BAR_HEIGHT})`,
+  maxHeight: `calc(100vh - 64px - ${APP_CAROUSEL_NAV_BAR_HEIGHT})`,
   transition: theme.transitions.create(['all'], {
     easing: theme.transitions.easing.easeInOut,
     duration: theme.transitions.duration.shortest
   }),
-  [`&.${ZOOM_CLASS}`]: { maxHeight: 'none', maxWidth: 'none' }
+  [`&.${APP_CAROUSEL_ZOOM_CLASS}`]: { maxHeight: 'none', maxWidth: 'none' }
 }));
 
 Img.displayName = 'Img';
 
 const LoadingContainer = styled('div')(({ theme }) => ({
-  height: `calc(2 * ${NAV_BAR_HEIGHT})`,
+  height: `calc(2 * ${APP_CAROUSEL_NAV_BAR_HEIGHT})`,
   aspectRatio: '4 / 3',
   display: 'grid',
   placeItems: 'center',
@@ -129,7 +136,7 @@ const ZoomAttributes = styled('div')(({ theme }) => ({
     easing: theme.transitions.easing.easeInOut,
     duration: theme.transitions.duration.shortest
   }),
-  [`&.${ZOOM_CLASS}`]: { paddingBottom: theme.spacing(1), height: '200px', opacity: 1 }
+  [`&.${APP_CAROUSEL_ZOOM_CLASS}`]: { paddingBottom: theme.spacing(1), height: '200px', opacity: 1 }
 }));
 
 ZoomAttributes.displayName = 'ZoomAttributes';
@@ -148,7 +155,7 @@ const MenuPane = styled('div')(({ theme }) => ({
     easing: theme.transitions.easing.easeInOut,
     duration: theme.transitions.duration.shortest
   }),
-  [`&.${ZOOM_CLASS}`]: { marginTop: '-64px' }
+  [`&.${APP_CAROUSEL_ZOOM_CLASS}`]: { marginTop: '-64px' }
 }));
 
 MenuPane.displayName = 'MenuPane';
@@ -179,7 +186,7 @@ const NavBarContainer = styled('div')(({ theme }) => ({
   position: 'absolute',
   bottom: 0,
   width: '100%',
-  height: NAV_BAR_HEIGHT,
+  height: APP_CAROUSEL_NAV_BAR_HEIGHT,
   overflow: 'scroll',
   userSelect: 'none',
   scrollbarWidth: 'none',
@@ -188,7 +195,7 @@ const NavBarContainer = styled('div')(({ theme }) => ({
     easing: theme.transitions.easing.easeInOut,
     duration: theme.transitions.duration.shortest
   }),
-  [`&.${ZOOM_CLASS}`]: { bottom: `calc(0px - ${NAV_BAR_HEIGHT})` }
+  [`&.${APP_CAROUSEL_ZOOM_CLASS}`]: { bottom: `calc(0px - ${APP_CAROUSEL_NAV_BAR_HEIGHT})` }
 }));
 
 NavBarContainer.displayName = 'NavBarContainer';
@@ -223,42 +230,37 @@ const ThumbImg = styled('img')(({ theme }) => ({
 ThumbImg.displayName = 'ThumbImg';
 
 //*****************************************************************************************
-// Utilities
-//*****************************************************************************************
-
-const getBackgroundColor = (mode: BackgroundMode, theme: Theme): string => {
-  switch (mode) {
-    case 'light':
-      return theme.palette.grey[100];
-    case 'dark':
-      return theme.palette.grey[900];
-    default:
-      return 'transparent';
-  }
-};
-
-//*****************************************************************************************
 // CarouselItem
 //*****************************************************************************************
 
-export const CarouselItem = memo(({ alt, backgroundMode, onClick, selected, src }: CarouselItemProps) => {
+/** Props for a single carousel thumbnail item. */
+export type AppCarouselItemProps = {
+  /** Alt text for the image. */
+  alt: string;
+  /** Position of the image in the carousel. */
+  index: number;
+  /** Image source hash/identifier. */
+  src: string;
+};
+
+export const AppCarouselItem = memo(({ alt, index, src }: AppCarouselItemProps) => {
   const theme = useTheme();
-  const { data, fetchImage, loading } = useImageFetch();
+
+  const backgroundMode = useAppInterfaceStore(s => s.carousel.backgroundMode);
+  const selected = useAppInterfaceStore(s => s.carousel.index === index);
+
+  const { data: image, isLoading: loading } = useAppImageFetch({ src, alt });
 
   const augmentedPaper = useMemo(
     () => theme.palette.augmentColor({ color: { main: theme.palette.background.default } }),
     [theme.palette]
   );
 
-  useEffect(() => {
-    fetchImage(src);
-  }, [fetchImage, src]);
-
   return (
     <Tooltip title={alt} placement="top">
       <Button
         className="carousel-thumb"
-        onMouseUp={onClick}
+        data-carousel-index={index}
         sx={{
           height: '100%',
           aspectRatio: '1 / 1',
@@ -275,14 +277,13 @@ export const CarouselItem = memo(({ alt, backgroundMode, onClick, selected, src 
           })
         }}
       >
-        {data ? (
+        {image ? (
           <ThumbImg
-            src={data}
+            src={image}
             alt={alt}
             draggable={false}
             style={{
-              backgroundColor:
-                backgroundMode === 'transparent' ? 'transparent' : getBackgroundColor(backgroundMode, theme)
+              backgroundColor: getAppCarouselBackgroundColor(backgroundMode, theme)
             }}
           />
         ) : loading ? (
@@ -295,29 +296,197 @@ export const CarouselItem = memo(({ alt, backgroundMode, onClick, selected, src 
   );
 });
 
-CarouselItem.displayName = 'CarouselItem';
+AppCarouselItem.displayName = 'AppCarouselItem';
 
 //*****************************************************************************************
-// CarouselContainer
+// AppCarouselNavigation
 //*****************************************************************************************
 
-export const CarouselContainer = memo(({ images, index, onClose, open, setIndex }: CarouselContainerProps) => {
-  const { t } = useTranslation(['carousel']);
-  const theme = useTheme();
+const AppCarouselNavigation = memo(() => {
+  const setInterfaceStore = useAppSetInterfaceStore();
 
-  const { data: thumbData, fetchImage: fetchThumb } = useImageFetch();
-  const { data: imgData, fetchImage: fetchImg, loading } = useImageFetch();
-
-  const [isZooming, setIsZooming] = useState<boolean>(false);
-  const [zoom, setZoom] = useState<number>(100);
-  const [imageRendering, setImageRendering] = useState<'auto' | 'pixelated'>('auto');
-  const { backgroundMode, toggleBackgroundMode } = useBackgroundMode();
+  const images = useAppInterfaceStore(s => s.carousel.images);
+  const index = useAppInterfaceStore(s => s.carousel.index);
+  const isZooming = useAppInterfaceStore(s => s.carousel.isZooming);
 
   const navbarRef = useRef<HTMLDivElement>(null);
-  const navbarScroll = useRef<Dragging>({ isDown: false, isDragging: false, scrollLeft: 0, startX: 0 });
+  const navbarScroll = useRef<AppCarouselDragging>({
+    isDown: false,
+    isDragging: false,
+    scrollLeft: 0,
+    startX: 0
+  });
+
+  const handleNavbarDown = useCallback((event: React.MouseEvent<HTMLDivElement>) => {
+    if (event.button !== 0) return;
+    navbarScroll.current = {
+      isDown: true,
+      isDragging: false,
+      startX: event.pageX - navbarRef.current.offsetLeft,
+      scrollLeft: navbarRef.current.scrollLeft
+    };
+  }, []);
+
+  const handleNavbarUp = useCallback(
+    (event: React.MouseEvent<HTMLDivElement>) => {
+      if (event.button !== 0) return;
+
+      const target = event.target as HTMLElement;
+      const thumbnail = target.closest<HTMLElement>('.carousel-thumb');
+      const nextIndex = Number(thumbnail?.dataset.carouselIndex);
+      if (!navbarScroll.current.isDragging && Number.isInteger(nextIndex)) {
+        setInterfaceStore(store => {
+          store.carousel.index = nextIndex;
+          return store;
+        });
+      }
+
+      navbarScroll.current = { isDown: false, isDragging: false, scrollLeft: 0, startX: 0 };
+    },
+    [setInterfaceStore]
+  );
+
+  const handleNavbarLeave = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    if (event.button !== 0) return;
+    navbarScroll.current = { isDown: false, isDragging: false, scrollLeft: 0, startX: 0 };
+  }, []);
+
+  const handleNavbarMove = useCallback((event: React.MouseEvent<HTMLDivElement>) => {
+    if (!navbarScroll.current.isDown || event.button !== 0) return;
+    event.preventDefault();
+    const x = event.pageX - navbarRef.current.offsetLeft;
+    const walkX = x - navbarScroll.current.startX;
+    navbarRef.current.scrollLeft = navbarScroll.current.scrollLeft - walkX;
+    navbarScroll.current.isDragging = Math.abs(walkX) > 20;
+  }, []);
+
+  useEffect(() => {
+    navbarRef.current?.querySelectorAll<HTMLElement>('.carousel-thumb')[index]?.scrollIntoView({
+      inline: 'center',
+      behavior: 'smooth'
+    });
+  }, [index]);
+
+  return (
+    <NavBarContainer
+      id="carousel-navbar"
+      ref={navbarRef}
+      className={isZooming ? APP_CAROUSEL_ZOOM_CLASS : null}
+      onMouseDown={handleNavbarDown}
+      onMouseLeave={handleNavbarLeave}
+      onMouseUp={handleNavbarUp}
+      onMouseMove={handleNavbarMove}
+    >
+      <NavBar>
+        {images.map((image, imageIndex) => (
+          <AppCarouselItem key={`${image.thumb}-${imageIndex}`} alt={image.name} index={imageIndex} src={image.thumb} />
+        ))}
+      </NavBar>
+    </NavBarContainer>
+  );
+});
+
+AppCarouselNavigation.displayName = 'AppCarouselNavigation';
+
+//*****************************************************************************************
+// AppCarouselCloseButton
+//*****************************************************************************************
+
+const AppCarouselCloseButton = memo(() => {
+  const theme = useTheme();
+  const setInterfaceStore = useAppSetInterfaceStore();
+
+  const handleClose = useCallback(() => {
+    setInterfaceStore(store => resetAppCarouselState(store));
+  }, [setInterfaceStore]);
+
+  return (
+    <div
+      style={{
+        margin: theme.spacing(1),
+        borderRadius: theme.spacing(3),
+        backgroundColor: alpha(theme.palette.background.paper, 0.7)
+      }}
+    >
+      <Tooltip title="Close" placement="right">
+        <IconButton onClick={handleClose} size="large">
+          <CloseIcon />
+        </IconButton>
+      </Tooltip>
+    </div>
+  );
+});
+
+AppCarouselCloseButton.displayName = 'AppCarouselCloseButton';
+
+//*****************************************************************************************
+// AppCarouselImageNavigation
+//*****************************************************************************************
+
+type AppCarouselImageNavigationProps = {
+  direction: -1 | 1;
+};
+
+const AppCarouselImageNavigation = memo(({ direction }: AppCarouselImageNavigationProps) => {
+  const { t } = useTranslation(['carousel']);
+  const setInterfaceStore = useAppSetInterfaceStore();
+
+  const images = useAppInterfaceStore(s => s.carousel.images);
+  const isZooming = useAppInterfaceStore(s => s.carousel.isZooming);
+
+  const handleImageChange = useCallback(
+    (event?: React.MouseEvent) => {
+      event?.stopPropagation();
+      if (!images || images.length <= 1 || isZooming) return;
+      setInterfaceStore(store => updateAppCarouselIndex(store, direction));
+    },
+    [direction, images, isZooming, setInterfaceStore]
+  );
+
+  const isPrevious = direction === -1;
+
+  return (
+    <NavOverlayContainer
+      className={isZooming ? APP_CAROUSEL_ZOOM_CLASS : null}
+      onClick={handleImageChange}
+      style={isPrevious ? { left: '0' } : { right: '0' }}
+    >
+      <NavButtonWrapper style={isPrevious ? undefined : { right: 0 }}>
+        <Tooltip title={t(isPrevious ? 'prev' : 'next')} placement={isPrevious ? 'right' : 'left'}>
+          <IconButton component="div" size="large" onClick={handleImageChange}>
+            {isPrevious ? <ChevronLeftOutlinedIcon /> : <ChevronRightOutlinedIcon />}
+          </IconButton>
+        </Tooltip>
+      </NavButtonWrapper>
+    </NavOverlayContainer>
+  );
+});
+
+AppCarouselImageNavigation.displayName = 'AppCarouselImageNavigation';
+
+//*****************************************************************************************
+// AppCarouselImage
+//*****************************************************************************************
+
+const AppCarouselImage = memo(() => {
+  const theme = useTheme();
+  const setInterfaceStore = useAppSetInterfaceStore();
+
+  const backgroundMode = useAppInterfaceStore(s => s.carousel.backgroundMode);
+  const imageRendering = useAppInterfaceStore(s => s.carousel.imageRendering);
+  const images = useAppInterfaceStore(s => s.carousel.images);
+  const index = useAppInterfaceStore(s => s.carousel.index);
+  const isZooming = useAppInterfaceStore(s => s.carousel.isZooming);
+  const zoom = useAppInterfaceStore(s => s.carousel.zoom);
+
+  const currentImage = useMemo<Image | null>(() => images[index] ?? null, [images, index]);
+
+  const { data: thumbData } = useAppImageFetch({ src: currentImage?.thumb ?? null });
+  const { data: imgData, isLoading: loading } = useAppImageFetch({ src: currentImage?.img ?? null });
+
   const containerRef = useRef<HTMLDivElement>(null);
   const imgRef = useRef<HTMLImageElement>(null);
-  const imageDrag = useRef<Dragging>({
+  const imageDrag = useRef<AppCarouselDragging>({
     isDown: false,
     isDragging: false,
     scrollLeft: 0,
@@ -325,25 +494,15 @@ export const CarouselContainer = memo(({ images, index, onClose, open, setIndex 
     startX: 0,
     startY: 0
   });
+
   const zoomTimer = useRef<number>(null);
   const dragTimer = useRef<number>(null);
 
-  const zoomClass = useMemo<string | null>(() => (isZooming ? ZOOM_CLASS : null), [isZooming]);
-  const currentImage = useMemo<Image | null>(() => (images ? images[index] : null), [images, index]);
+  const zoomClass = isZooming ? APP_CAROUSEL_ZOOM_CLASS : null;
 
   const handleClose = useCallback(() => {
-    setIsZooming(false);
-    onClose();
-  }, [onClose]);
-
-  const handleImageChange = useCallback(
-    (value: number) => (event?: React.MouseEvent) => {
-      event?.stopPropagation();
-      if (!images || images.length <= 1 || isZooming) return;
-      setIndex(i => (i + value + images.length) % images.length);
-    },
-    [images, isZooming, setIndex]
-  );
+    setInterfaceStore(store => resetAppCarouselState(store));
+  }, [setInterfaceStore]);
 
   const handleZoomDown = useCallback((event: React.MouseEvent<HTMLDivElement>) => {
     event.stopPropagation();
@@ -383,10 +542,13 @@ export const CarouselContainer = memo(({ images, index, onClose, open, setIndex 
     imageDrag.current = { isDown: false, scrollLeft: 0, scrollTop: 0, startX: 0, startY: 0 };
   }, []);
 
-  const handleZoomWheel = useCallback((event: React.WheelEvent<HTMLDivElement>) => {
-    event.stopPropagation();
-    setZoom(z => Math.round(Math.min(Math.max(z - event.deltaY / 10, 10), 500)));
-  }, []);
+  const handleZoomWheel = useCallback(
+    (event: React.WheelEvent<HTMLDivElement>) => {
+      event.stopPropagation();
+      setInterfaceStore(store => updateAppCarouselZoom(store, store.carousel.zoom - event.deltaY / 10));
+    },
+    [setInterfaceStore]
+  );
 
   const handleZoomMove = useCallback((event: React.MouseEvent<HTMLDivElement>) => {
     if (!imageDrag.current.isDown || event.button !== 0) return;
@@ -397,79 +559,254 @@ export const CarouselContainer = memo(({ images, index, onClose, open, setIndex 
     containerRef.current.scrollTop = imageDrag.current.scrollTop - (y - imageDrag.current.startY);
   }, []);
 
-  const handleNavbarDown = useCallback((event: React.MouseEvent<HTMLDivElement>) => {
-    if (event.button !== 0) return;
-    navbarScroll.current = {
-      isDown: true,
-      isDragging: false,
-      startX: event.pageX - navbarRef.current.offsetLeft,
-      scrollLeft: navbarRef.current.scrollLeft
-    };
-  }, []);
-
-  const handleNavbarStop = useCallback((event: React.MouseEvent<HTMLDivElement>) => {
-    if (event.button !== 0) return;
-    navbarScroll.current = { isDown: false, isDragging: false, scrollLeft: 0, startX: 0 };
-  }, []);
-
-  const handleNavbarMove = useCallback((event: React.MouseEvent<HTMLDivElement>) => {
-    if (!navbarScroll.current.isDown || event.button !== 0) return;
-    event.preventDefault();
-    const x = event.pageX - navbarRef.current.offsetLeft;
-    const walkX = x - navbarScroll.current.startX;
-    navbarRef.current.scrollLeft = navbarScroll.current.scrollLeft - walkX;
-    navbarScroll.current.isDragging = Math.abs(walkX) > 20;
-  }, []);
-
-  const handleZoomChange = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation();
-    event.preventDefault();
-    setIsZooming(z => !z);
-    setZoom(100);
-  }, []);
-
-  const handleZoomClick = useCallback((event: React.MouseEvent<HTMLDivElement>) => {
-    event.stopPropagation();
-    event.preventDefault();
-    if (event.button !== 0) return;
-    const now = Date.now();
-    if (now - zoomTimer.current < 200) {
-      setIsZooming(z => !z);
-      setZoom(100);
-    }
-    zoomTimer.current = now;
-  }, []);
-
-  const { onKeyDown } = useCarouselKeyboard(
-    !isZooming ? handleImageChange(-1) : null,
-    !isZooming ? handleImageChange(1) : null
+  const handleZoomClick = useCallback(
+    (event: React.MouseEvent<HTMLDivElement>) => {
+      event.stopPropagation();
+      event.preventDefault();
+      if (event.button !== 0) return;
+      const now = Date.now();
+      if (now - zoomTimer.current < 200) {
+        setInterfaceStore(store => toggleAppCarouselZoom(store));
+      }
+      zoomTimer.current = now;
+    },
+    [setInterfaceStore]
   );
-
-  useEffect(() => {
-    if (!currentImage) return;
-    fetchThumb(currentImage.thumb);
-    fetchImg(currentImage.img);
-  }, [currentImage, fetchImg, fetchThumb]);
-
-  useEffect(() => {
-    const thumbs = document.getElementById('carousel')?.querySelectorAll('.carousel-thumb');
-    if (!thumbs || index < 0 || index >= thumbs?.length) return;
-    thumbs[index]?.scrollIntoView({ inline: 'center', behavior: 'smooth' });
-  }, [imgData, index]);
 
   useEffect(() => {
     if (!imgData) return;
     const i = new Image();
     i.onload = () => {
-      setImageRendering(i.width <= 128 || i.height <= 128 ? 'pixelated' : 'auto');
+      setInterfaceStore(store => {
+        store.carousel.imageRendering = i.width <= 128 || i.height <= 128 ? 'pixelated' : 'auto';
+        return store;
+      });
     };
     i.src = imgData;
-  }, [imgData]);
+  }, [imgData, setInterfaceStore]);
 
-  return images?.length > 0 ? (
+  return (
+    <ImageContainer
+      ref={containerRef}
+      className={zoomClass}
+      onClick={!isZooming ? handleClose : undefined}
+      onMouseDown={isZooming ? handleZoomDown : undefined}
+      onMouseUp={isZooming ? handleZoomStop : undefined}
+      onMouseLeave={isZooming ? handleZoomStop : undefined}
+      onMouseMove={isZooming ? handleZoomMove : undefined}
+      onWheel={isZooming ? handleZoomWheel : undefined}
+    >
+      <AppCarouselImageNavigation direction={-1} />
+      {imgData ? (
+        <Img
+          ref={imgRef}
+          className={zoomClass}
+          src={imgData}
+          alt={currentImage?.name}
+          draggable={false}
+          style={{
+            backgroundColor: getAppCarouselBackgroundColor(backgroundMode, theme),
+            imageRendering,
+            ...(isZooming &&
+              imgRef.current && {
+                width:
+                  imgRef.current.naturalWidth > 128
+                    ? `calc(${zoom / 100} * ${imgRef.current.naturalWidth}px)`
+                    : `calc(${zoom / 100} * ${APP_CAROUSEL_MIN_IMAGE_SIZE_REM}rem)`,
+                height:
+                  imgRef.current.naturalHeight > 128
+                    ? `calc(${zoom / 100} * ${imgRef.current.naturalHeight}px)`
+                    : `calc(${zoom / 100} * ${APP_CAROUSEL_MIN_IMAGE_SIZE_REM}rem)`,
+                minWidth: 0,
+                minHeight: 0
+              })
+          }}
+          onClick={handleZoomClick}
+        />
+      ) : (
+        <LoadingContainer style={thumbData ? { backgroundImage: `url(${thumbData})` } : undefined}>
+          {loading ? (
+            <CircularProgress color="primary" />
+          ) : (
+            <BrokenImageOutlinedIcon color="primary" fontSize="large" />
+          )}
+        </LoadingContainer>
+      )}
+      <AppCarouselImageNavigation direction={1} />
+    </ImageContainer>
+  );
+});
+
+AppCarouselImage.displayName = 'AppCarouselImage';
+
+//*****************************************************************************************
+// AppCarouselZoomControls
+//*****************************************************************************************
+
+const AppCarouselZoomControls = memo(() => {
+  const { t } = useTranslation(['carousel']);
+  const theme = useTheme();
+  const setInterfaceStore = useAppSetInterfaceStore();
+
+  const isZooming = useAppInterfaceStore(s => s.carousel.isZooming);
+  const zoom = useAppInterfaceStore(s => s.carousel.zoom);
+
+  const zoomClass = isZooming ? APP_CAROUSEL_ZOOM_CLASS : null;
+
+  const handleToggleZoom = useCallback(
+    () => setInterfaceStore(store => toggleAppCarouselZoom(store)),
+    [setInterfaceStore]
+  );
+  const handleZoomChange = useCallback(
+    (_event: Event, value: number | number[]) =>
+      setInterfaceStore(store => updateAppCarouselZoom(store, Array.isArray(value) ? value[0] : value)),
+    [setInterfaceStore]
+  );
+
+  return (
+    <div
+      className={zoomClass}
+      style={{
+        backgroundColor: alpha(theme.palette.background.paper, 0.7),
+        borderRadius: theme.spacing(3),
+        position: 'fixed',
+        top: theme.spacing(1),
+        right: theme.spacing(1)
+      }}
+    >
+      <Tooltip title={t('zoom')} placement="left">
+        <div>
+          <IconButton onClick={handleToggleZoom} size="large">
+            {isZooming ? <ZoomOutIcon /> : <ZoomInIcon />}
+          </IconButton>
+        </div>
+      </Tooltip>
+      <ZoomAttributes className={zoomClass}>
+        <div style={{ textAlign: 'end', minWidth: '35px' }}>{`${zoom}%`}</div>
+        <IconButton
+          size="small"
+          onClick={() => setInterfaceStore(store => updateAppCarouselZoom(store, store.carousel.zoom + 10))}
+        >
+          <AddIcon fontSize="small" />
+        </IconButton>
+        <Slider
+          value={zoom}
+          step={10}
+          min={10}
+          max={500}
+          size="small"
+          onChange={handleZoomChange}
+          orientation="vertical"
+          sx={{ '& .MuiSlider-thumb': { boxShadow: 'none' } }}
+        />
+        <IconButton
+          size="small"
+          onClick={() => setInterfaceStore(store => updateAppCarouselZoom(store, store.carousel.zoom - 10))}
+        >
+          <RemoveIcon fontSize="small" />
+        </IconButton>
+      </ZoomAttributes>
+    </div>
+  );
+});
+
+AppCarouselZoomControls.displayName = 'AppCarouselZoomControls';
+
+//*****************************************************************************************
+// AppCarouselDetails
+//*****************************************************************************************
+
+const AppCarouselDetails = memo(() => {
+  const { t } = useTranslation(['carousel']);
+  const theme = useTheme();
+  const setInterfaceStore = useAppSetInterfaceStore();
+
+  const isFileViewer = useAppLocation('at', 1)(s => s?.route?.startsWith('/file/viewer'));
+
+  const backgroundMode = useAppInterfaceStore(s => s.carousel.backgroundMode);
+  const images = useAppInterfaceStore(s => s.carousel.images);
+  const index = useAppInterfaceStore(s => s.carousel.index);
+
+  const currentImage = useMemo<Image | null>(() => images[index] ?? null, [images, index]);
+
+  const handleClose = useCallback(() => {
+    setInterfaceStore(store => resetAppCarouselState(store));
+  }, [setInterfaceStore]);
+
+  const handleBackgroundModeChange = useCallback(() => {
+    setInterfaceStore(store => cycleAppCarouselBackgroundMode(store));
+  }, [setInterfaceStore]);
+
+  return (
+    <MenuPane>
+      <Info>
+        <div>{t('name')}</div>
+        <div>{currentImage?.name ?? null}</div>
+        <div>{t('description')}</div>
+        <div>{currentImage?.description ?? null}</div>
+      </Info>
+      <Tooltip title={t('view_file')} placement="bottom">
+        <IconButton
+          nav={nav =>
+            isFileViewer
+              ? nav.at(1).create({ route: '/file/viewer/:id/:tab', path: { id: currentImage?.img, tab: 'image' } })
+              : nav
+                  .at(Infinity)
+                  .create({ route: '/file/viewer/:id/:tab', path: { id: currentImage?.img, tab: 'image' } })
+          }
+          color="inherit"
+          style={{ marginLeft: '8px' }}
+          onClick={handleClose}
+        >
+          <PageviewOutlinedIcon />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title={t('change_background_color')} placement="bottom">
+        <IconButton color="inherit" style={{ marginLeft: '8px' }} onClick={handleBackgroundModeChange}>
+          <div
+            style={{
+              height: theme.spacing(2),
+              width: theme.spacing(2),
+              borderRadius: theme.spacing(0.5),
+              backgroundColor:
+                backgroundMode === 'transparent'
+                  ? theme.palette.grey[500]
+                  : getAppCarouselBackgroundColor(backgroundMode, theme)
+            }}
+          />
+        </IconButton>
+      </Tooltip>
+    </MenuPane>
+  );
+});
+
+AppCarouselDetails.displayName = 'AppCarouselDetails';
+
+//*****************************************************************************************
+// AppCarouselContainer
+//*****************************************************************************************
+
+export const AppCarouselContainer = memo(() => {
+  const setInterfaceStore = useAppSetInterfaceStore();
+
+  const open = useAppInterfaceStore(s => s.carousel.open);
+  const hasImages = useAppInterfaceStore(s => s.carousel.images.length > 0);
+
+  const handleKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLDivElement>) => {
+      event.preventDefault();
+
+      if (event.key === 'ArrowLeft' || event.key === 'ArrowUp')
+        setInterfaceStore(store => updateAppCarouselIndex(store, -1));
+      if (event.key === 'ArrowRight' || event.key === 'ArrowDown')
+        setInterfaceStore(store => updateAppCarouselIndex(store, 1));
+    },
+    [setInterfaceStore]
+  );
+
+  return !hasImages ? null : (
     <Modal
       open={open}
-      onClose={handleClose}
       sx={{
         outline: 'none',
         backdropFilter: 'blur(2px)',
@@ -478,189 +815,28 @@ export const CarouselContainer = memo(({ images, index, onClose, open, setIndex 
         '&:focus-visible': { outline: 'none' }
       }}
     >
-      <div id="carousel" tabIndex={-1} onKeyDown={onKeyDown} style={{ height: '100%', width: '100%', outline: 'none' }}>
-        <ImageContainer
-          ref={containerRef}
-          className={zoomClass}
-          onClick={!isZooming ? handleClose : undefined}
-          onMouseDown={isZooming ? handleZoomDown : undefined}
-          onMouseUp={isZooming ? handleZoomStop : undefined}
-          onMouseLeave={isZooming ? handleZoomStop : undefined}
-          onMouseMove={isZooming ? handleZoomMove : undefined}
-          onWheel={isZooming ? handleZoomWheel : undefined}
-        >
-          <NavOverlayContainer className={zoomClass} onClick={handleImageChange(-1)} style={{ left: '0' }}>
-            <NavButtonWrapper>
-              <Tooltip title={t('prev')} placement="right">
-                <IconButton component="div" size="large" onClick={handleImageChange(-1)}>
-                  <ChevronLeftOutlinedIcon />
-                </IconButton>
-              </Tooltip>
-            </NavButtonWrapper>
-          </NavOverlayContainer>
-
-          {imgData ? (
-            <Img
-              ref={imgRef}
-              className={zoomClass}
-              src={imgData}
-              alt={currentImage?.name}
-              draggable={false}
-              style={{
-                backgroundColor: getBackgroundColor(backgroundMode, theme),
-                imageRendering,
-                ...(isZooming &&
-                  imgRef.current && {
-                    width:
-                      imgRef.current.naturalWidth > 128
-                        ? `calc(${zoom / 100} * ${imgRef.current.naturalWidth}px)`
-                        : `calc(${zoom / 100} * ${MIN_IMAGE_SIZE_REM}rem)`,
-                    height:
-                      imgRef.current.naturalHeight > 128
-                        ? `calc(${zoom / 100} * ${imgRef.current.naturalHeight}px)`
-                        : `calc(${zoom / 100} * ${MIN_IMAGE_SIZE_REM}rem)`,
-                    minWidth: 0,
-                    minHeight: 0
-                  })
-              }}
-              onClick={handleZoomClick}
-            />
-          ) : (
-            <LoadingContainer style={thumbData ? { backgroundImage: `url(${thumbData})` } : undefined}>
-              {loading ? (
-                <CircularProgress color="primary" />
-              ) : (
-                <BrokenImageOutlinedIcon color="primary" fontSize="large" />
-              )}
-            </LoadingContainer>
-          )}
-
-          <NavOverlayContainer className={zoomClass} onClick={handleImageChange(1)} style={{ right: '0' }}>
-            <NavButtonWrapper style={{ right: 0 }}>
-              <Tooltip title={t('next')} placement="left">
-                <IconButton component="div" size="large" onClick={handleImageChange(1)}>
-                  <ChevronRightOutlinedIcon />
-                </IconButton>
-              </Tooltip>
-            </NavButtonWrapper>
-          </NavOverlayContainer>
-        </ImageContainer>
-
+      <div
+        id="carousel"
+        role="region"
+        aria-label="Image carousel"
+        tabIndex={0}
+        onKeyDown={handleKeyDown}
+        style={{
+          height: '100%',
+          outline: 'none',
+          width: '100%'
+        }}
+      >
+        <AppCarouselImage />
         <Menu id="carousel-menu">
-          <div
-            style={{
-              margin: theme.spacing(1),
-              borderRadius: theme.spacing(3),
-              backgroundColor: alpha(theme.palette.background.paper, 0.7)
-            }}
-          >
-            <Tooltip title={t('close')} placement="right">
-              <IconButton onClick={handleClose} size="large">
-                <CloseIcon />
-              </IconButton>
-            </Tooltip>
-          </div>
-
-          <div
-            className={zoomClass}
-            style={{
-              backgroundColor: alpha(theme.palette.background.paper, 0.7),
-              borderRadius: theme.spacing(3),
-              position: 'fixed',
-              top: theme.spacing(1),
-              right: theme.spacing(1)
-            }}
-          >
-            <Tooltip title={t('zoom')} placement="left">
-              <div>
-                <IconButton onClick={imgData ? handleZoomChange : undefined} size="large" disabled={!imgData}>
-                  {isZooming ? <ZoomOutIcon /> : <ZoomInIcon />}
-                </IconButton>
-              </div>
-            </Tooltip>
-            <ZoomAttributes className={zoomClass}>
-              <div style={{ textAlign: 'end', minWidth: '35px' }}>{`${zoom}%`}</div>
-              <IconButton size="small" onClick={() => setZoom(z => Math.min(500, z + 10))}>
-                <AddIcon fontSize="small" />
-              </IconButton>
-              <Slider
-                value={zoom}
-                step={10}
-                min={10}
-                max={500}
-                size="small"
-                onChange={(_, newValue) => setZoom(Math.floor(newValue))}
-                orientation="vertical"
-                sx={{ '& .MuiSlider-thumb': { boxShadow: 'none' } }}
-              />
-              <IconButton size="small" onClick={() => setZoom(z => Math.max(10, z - 10))}>
-                <RemoveIcon fontSize="small" />
-              </IconButton>
-            </ZoomAttributes>
-          </div>
-
-          <MenuPane className={zoomClass}>
-            <Info>
-              <div>{t('name')}</div>
-              <div>{currentImage ? currentImage.name : loading ? <Skeleton variant="rounded" /> : null}</div>
-              <div>{t('description')}</div>
-              <div>{currentImage ? currentImage.description : loading ? <Skeleton variant="rounded" /> : null}</div>
-            </Info>
-            <Tooltip title={t('view_file')} placement="bottom">
-              <IconButton
-                nav={nav =>
-                  nav.to().create({ route: '/file/viewer/:id/:tab', path: { id: currentImage?.img, tab: 'image' } })
-                }
-                color="inherit"
-                style={{ marginLeft: '8px' }}
-                onClick={handleClose}
-              >
-                <PageviewOutlinedIcon />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title={t('change_background_color')} placement="bottom">
-              <IconButton color="inherit" style={{ marginLeft: '8px' }} onClick={toggleBackgroundMode}>
-                <div
-                  style={{
-                    height: theme.spacing(2),
-                    width: theme.spacing(2),
-                    borderRadius: theme.spacing(0.5),
-                    backgroundColor:
-                      backgroundMode === 'transparent'
-                        ? theme.palette.grey[500]
-                        : getBackgroundColor(backgroundMode, theme)
-                  }}
-                />
-              </IconButton>
-            </Tooltip>
-          </MenuPane>
+          <AppCarouselCloseButton />
+          <AppCarouselDetails />
+          <AppCarouselZoomControls />
         </Menu>
-
-        <NavBarContainer
-          id="carousel-navbar"
-          ref={navbarRef}
-          className={zoomClass}
-          onMouseDown={handleNavbarDown}
-          onMouseLeave={handleNavbarStop}
-          onMouseUp={handleNavbarStop}
-          onMouseMove={handleNavbarMove}
-        >
-          <NavBar>
-            {images.map((image, i) => (
-              <CarouselItem
-                key={`thumb-${i}`}
-                alt={image.name}
-                src={image.thumb}
-                selected={index === i}
-                backgroundMode={backgroundMode}
-                onClick={() => !navbarScroll.current.isDragging && setIndex(i)}
-              />
-            ))}
-          </NavBar>
-        </NavBarContainer>
+        <AppCarouselNavigation />
       </div>
     </Modal>
-  ) : null;
+  );
 });
 
-CarouselContainer.displayName = 'CarouselContainer';
+AppCarouselContainer.displayName = 'AppCarouselContainer';

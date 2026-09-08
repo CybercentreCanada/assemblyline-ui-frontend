@@ -1,4 +1,4 @@
-import { queryClient } from 'core/api/api.providers';
+import { QUERY_CLIENT } from 'core/api/api.providers';
 import { updateApiQuery } from 'core/api/utils/updateApiQuery';
 import { describe, expect, it } from 'vitest';
 
@@ -7,31 +7,31 @@ import { describe, expect, it } from 'vitest';
 //*****************************************************************************************
 describe('updateApiQuery', () => {
   it('updates the api_response of queries matching the filter', () => {
-    queryClient.clear();
-    queryClient.setQueryData(['/api/foo', 'GET', 'null', true], { api_response: 1 });
+    QUERY_CLIENT.clear();
+    QUERY_CLIENT.setQueryData(['/api/foo', 'GET', 'null', true], { api_response: 1 });
 
     updateApiQuery<number>(
       req => req.url === '/api/foo',
       prev => prev + 1
     );
 
-    expect(queryClient.getQueryData(['/api/foo', 'GET', 'null', true])).toEqual({ api_response: 2 });
+    expect(QUERY_CLIENT.getQueryData(['/api/foo', 'GET', 'null', true])).toEqual({ api_response: 2 });
   });
 
   it('leaves non-matching queries untouched', () => {
-    queryClient.clear();
-    queryClient.setQueryData(['/api/bar', 'GET', 'null', true], { api_response: 1 });
+    QUERY_CLIENT.clear();
+    QUERY_CLIENT.setQueryData(['/api/bar', 'GET', 'null', true], { api_response: 1 });
 
     updateApiQuery<number>(
       req => req.url === '/api/foo',
       prev => prev + 1
     );
 
-    expect(queryClient.getQueryData(['/api/bar', 'GET', 'null', true])).toEqual({ api_response: 1 });
+    expect(QUERY_CLIENT.getQueryData(['/api/bar', 'GET', 'null', true])).toEqual({ api_response: 1 });
   });
 
   it('does nothing when there is no previous cached data', () => {
-    queryClient.clear();
+    QUERY_CLIENT.clear();
 
     expect(() =>
       updateApiQuery<number>(
@@ -42,8 +42,8 @@ describe('updateApiQuery', () => {
   });
 
   it('parses a JSON string body before passing it to the filter', () => {
-    queryClient.clear();
-    queryClient.setQueryData(['/api/foo', 'POST', JSON.stringify({ id: 1 }), true], { api_response: 'x' });
+    QUERY_CLIENT.clear();
+    QUERY_CLIENT.setQueryData(['/api/foo', 'POST', JSON.stringify({ id: 1 }), true], { api_response: 'x' });
 
     let capturedBody: unknown;
     updateApiQuery<string>(
@@ -58,8 +58,8 @@ describe('updateApiQuery', () => {
   });
 
   it('swallows errors from malformed query keys without throwing', () => {
-    queryClient.clear();
-    queryClient.setQueryData(['weird-key'], {});
+    QUERY_CLIENT.clear();
+    QUERY_CLIENT.setQueryData(['weird-key'], {});
 
     expect(() =>
       updateApiQuery(

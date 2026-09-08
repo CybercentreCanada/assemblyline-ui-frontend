@@ -115,7 +115,7 @@ export const useAppLocation = function <const Origin extends AppRoute['path']>(
   const preferences = useAppPreferenceStore(s => (target === 'from' || target === 'to' ? s : null));
 
   const targetRouteKey = useAppRouterStore(s => {
-    if (!pageKey) return null;
+    if (!pageKey && target !== 'at') return null;
 
     let nextPanelKey: number = null;
 

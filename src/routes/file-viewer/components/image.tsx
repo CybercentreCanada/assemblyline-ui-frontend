@@ -1,8 +1,8 @@
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import { Alert, alpha, IconButton, LinearProgress, Slider, styled } from '@mui/material';
+import { useAppImageFetch } from 'core/api';
 import useALContext from 'deprecated/hooks/useALContext';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ForbiddenPage } from 'routes/forbidden/forbidden';
 
@@ -95,11 +95,9 @@ type Props = {
 };
 
 const WrappedImageSection = ({ name = null, sha256 = null }: Props) => {
-  const { apiCall } = useMyAPI();
   const { user: currentUser } = useALContext();
+  const { data: src, error } = useAppImageFetch({ src: sha256 });
 
-  const [src, setSrc] = useState<string>(null);
-  const [error, setError] = useState<string>(null);
   const [zoom, setZoom] = useState<number>(MIN);
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
   const [isZooming, setIsZooming] = useState<boolean>(false);
@@ -353,21 +351,6 @@ const WrappedImageSection = ({ name = null, sha256 = null }: Props) => {
     },
     [calculate, isLoaded, resize]
   );
-
-  useEffect(() => {
-    if (!sha256) return;
-    apiCall({
-      allowCache: true,
-      url: `/api/v4/file/image/${sha256}/`,
-      onEnter: () => {
-        setError(null);
-        setSrc(null);
-      },
-      onSuccess: api_data => setSrc(api_data.api_response),
-      onFailure: api_data => setError(api_data.api_error_message)
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sha256]);
 
   useEffect(() => {
     if (!isLoaded) return;
