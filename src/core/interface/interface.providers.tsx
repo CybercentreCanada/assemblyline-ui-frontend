@@ -1,5 +1,5 @@
 import { DEFAULT_APP_INTERFACE_STORE } from 'app/core.interface';
-import { createAppStore } from 'features/store/createAppStore';
+import { createAppStore } from 'features/store';
 import type { StoreApi } from 'zustand';
 
 //*****************************************************************************************

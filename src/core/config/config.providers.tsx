@@ -1,4 +1,4 @@
-import { createAppStore } from 'features/store/createAppStore';
+import { createAppStore } from 'features/store';
 import type { StoreApi } from 'zustand';
 
 //*****************************************************************************************

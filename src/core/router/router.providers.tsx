@@ -1,7 +1,7 @@
 import type { AppNavigationStore, AppRouterStore } from 'core/router';
 import { useAppSyncNavigationStoreFromLocation, useAppSyncRouterStoreFromNavigation } from 'core/router';
 import { AppNavigationBlocker } from 'core/router/router.components';
-import { createAppStore } from 'features/store/createAppStore';
+import { createAppStore } from 'features/store';
 import type { PropsWithChildren } from 'react';
 import { memo } from 'react';
 import { BrowserRouter } from 'react-router';
