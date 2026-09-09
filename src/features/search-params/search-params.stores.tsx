@@ -1,4 +1,4 @@
-import { shallowEqual } from 'features/prop-provider/props.utils';
+import { shallowEqual } from 'features/prop-provider';
 import type { InferSearchParamValueMapFromBlueprintMap, SearchParamBlueprintMap } from 'features/search-params';
 import { SearchParamEngine, SearchParamSnapshot } from 'features/search-params';
 import type { SetStateAction } from 'react';

@@ -6,7 +6,7 @@ import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import type { InputAdornmentProps } from '@mui/material';
 import { CircularProgress, InputAdornment, Tooltip, useTheme } from '@mui/material';
-import { usePropStore } from 'features/prop-provider/PropProvider';
+import { usePropStore } from 'features/prop-provider';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { ButtonProps } from 'ui/buttons/Button';

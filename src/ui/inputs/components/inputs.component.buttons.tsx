@@ -1,7 +1,7 @@
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import type { ButtonProps, FormControlLabelProps, TypographyProps } from '@mui/material';
 import { Button, FormControlLabel, Skeleton, Typography, useTheme } from '@mui/material';
-import { usePropStore } from 'features/prop-provider/PropProvider';
+import { usePropStore } from 'features/prop-provider';
 import React, { useMemo } from 'react';
 import type { TooltipProps } from 'ui/Tooltip';
 import { Tooltip } from 'ui/Tooltip';

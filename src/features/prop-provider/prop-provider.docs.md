@@ -1,45 +1,90 @@
-# features/prop-provider
+# Features/Prop-Provider
 
-Store-based prop distribution pattern that allows parent-to-child prop passing through an external store, enabling granular subscriptions per prop key without re-rendering the entire subtree when a single prop changes.
+## 1. Purpose
 
-## Responsibilities
+Provides a typed provider and external store for distributing object props through a component tree. Consumers subscribe to individual keys so unrelated prop changes do not re-render every consumer.
 
-- `PropProvider` — Wraps children with an external prop store; syncs incoming props reactively
-- `usePropStore` — Hook that returns a per-key selector and setter, powered by `useSyncExternalStore`
-- Shallow reconciliation — Only notifies subscribers when prop values actually change
+## 2. Features
 
-## Key Files
+- **Typed prop store** - Stores values from a generic object type
+- **Key-level subscriptions** - Reads one prop key through `useSyncExternalStore`
+- **Reactive synchronization** - Reconciles incoming provider props when they change
+- **Local updates** - Exposes a setter for partial prop updates
+- **Validation helpers** - Checks values and numeric ranges
+- **Reconciliation helpers** - Combines incoming, previous, existing, and initial values
 
-- `PropProvider.tsx` — `createPropStore`, `PropProvider`, `usePropStore`
-- `props.utils.ts` — `shallowEqual`, `shallowReconcile` utilities
-- `props.utils.test.ts` — Unit tests for shallow utilities
+## 3. Concepts
 
-## Usage
+### PropProvider
 
-```typescript
+`PropProvider<Props>` creates the store and provides it to descendants. It accepts `initialProps` for the initial state and `props` for values synchronized from the parent.
+
+### usePropStore
+
+`usePropStore<Props>()` returns a tuple containing a key-level selector hook and the store setter:
+
+- `useStore(key, isEqual?)` subscribes to one key and returns its current value.
+- `set(partial)` applies a partial object or derives one from the current state.
+
+### Reconciliation
+
+`shallowReconcile` preserves existing values that are not replaced by current incoming props, while `deepReconcile` uses initial values as fallbacks for missing keys. `shallowEqual` prevents notifications when values did not change.
+
+## 4. Configuration
+
+| Prop | Required | Behavior |
+| --- | --- | --- |
+| `initialProps` | Yes | Values used to initialize the store |
+| `props` | Yes | Values or updater function synchronized into the store |
+| `children` | Yes | Descendant elements that receive the store |
+
+The utility helpers accept optional numeric `min` and `max` bounds through `isValidNumber`.
+
+## 5. Usage
+
+```tsx
+import { memo } from 'react';
 import { PropProvider, usePropStore } from 'features/prop-provider';
 
-type RowProps = { selected: boolean; index: number; data: RowData };
+type RowProps = {
+  data: { name: string };
+  index: number;
+  selected: boolean;
+};
 
-// Parent provides props via the store
-<PropProvider<RowProps> initialProps={{ selected: false, index: 0, data: null }} props={rowProps}>
-  <RowContent />
-</PropProvider>
-
-// Child subscribes to a single key (re-renders only when that key changes)
 const RowContent = memo(() => {
-  const [useStore, setStore] = usePropStore<RowProps>();
+  const [useStore] = usePropStore<RowProps>();
   const selected = useStore('selected');
   const data = useStore('data');
 
   return <div className={selected ? 'active' : ''}>{data.name}</div>;
 });
+
+const Row = (props: RowProps) => (
+  <PropProvider<RowProps> initialProps={props} props={props}>
+    <RowContent />
+  </PropProvider>
+);
 ```
 
-## How It Works
+The provider and hook must be used within the same provider tree. Calling `usePropStore` without a matching `PropProvider` throws an error.
 
-1. `PropProvider` creates an internal store on mount with `initialProps`
-2. When `props` change, the store calls `reset()` which shallow-reconciles incoming vs previous props — only changed keys trigger subscriber notifications
-3. `usePropStore` returns a `[useStore, set]` tuple:
-   - `useStore(key)` — subscribes to a single prop key via `useSyncExternalStore`
-   - `set(partial)` — imperatively update the store (useful for local overrides)
+## 6. Codebase (Internals)
+
+### Key Files
+
+| File | Role |
+| --- | --- |
+| `prop-provider.providers.tsx` | `PropProvider` and `usePropStore` implementation |
+| `prop-provider.utils.ts` | Validation, equality, and reconciliation utilities |
+| `prop-provider.utils.test.ts` | Unit tests for the utilities |
+| `index.ts` | Explicit public exports |
+
+### Data Flow And Boundaries
+
+The provider receives the initial and parent-supplied props, creates one store instance, and synchronizes new `props` values in an effect. Subscribers select a key from that store. Equality checks suppress emissions when the selected value is unchanged.
+
+## 7. Related Modules
+
+- `ui/inputs/` - Uses the provider for input controller props
+- `features/search-params/` - Reuses `shallowEqual` for parameter state comparisons

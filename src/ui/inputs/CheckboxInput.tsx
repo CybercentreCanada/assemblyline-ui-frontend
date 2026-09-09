@@ -1,6 +1,6 @@
 import type { CheckboxProps } from '@mui/material';
 import { Checkbox } from '@mui/material';
-import { PropProvider, usePropStore } from 'features/prop-provider/PropProvider';
+import { PropProvider, usePropStore } from 'features/prop-provider';
 import React from 'react';
 import {
   ExpandInputAdornment,

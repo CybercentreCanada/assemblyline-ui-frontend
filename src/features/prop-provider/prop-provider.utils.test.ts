@@ -4,7 +4,7 @@ import {
   isValidValue,
   shallowEqual,
   shallowReconcile
-} from 'features/prop-provider/props.utils';
+} from 'features/prop-provider/prop-provider.utils';
 import { describe, expect, it } from 'vitest';
 
 describe('isValidValue', () => {

@@ -1,23 +1,25 @@
-import { shallowEqual, shallowReconcile } from 'features/prop-provider/props.utils';
-import React, { createContext, useContext, useEffect, useRef, useSyncExternalStore } from 'react';
+import { shallowEqual, shallowReconcile } from 'features/prop-provider/prop-provider.utils';
+import type { PropsWithChildren, ReactElement } from 'react';
+import { createContext, memo, useContext, useEffect, useRef, useSyncExternalStore } from 'react';
 
-//**************************************************************
-//  createPropStore
-//**************************************************************
+//*****************************************************************************************
+// Prop Store
+//*****************************************************************************************
+
 type Subscriber = () => void;
 
-function createPropStore<Props extends object>(initialProps: Props) {
+const createPropStore = <Props extends object>(initialProps: Props) => {
   let state: Props = { ...initialProps };
   let prevProps: Props = initialProps;
   const subscribers = new Set<Subscriber>();
 
-  const emit = () => {
+  const emit = (): void => {
     subscribers.forEach(fn => fn());
   };
 
   const get = <K extends keyof Props = keyof Props>(key: K): Props[K] => state[key] ?? initialProps[key];
 
-  const reset = (incoming: Props | ((prev: Props, state: Props) => Props)) => {
+  const reset = (incoming: Props | ((prev: Props, state: Props) => Props)): void => {
     const incomingProps = typeof incoming === 'function' ? incoming(prevProps, state) : incoming;
     if (shallowEqual(incomingProps, prevProps)) return;
     state = shallowReconcile(incomingProps, prevProps, state) as Props;
@@ -25,7 +27,7 @@ function createPropStore<Props extends object>(initialProps: Props) {
     emit();
   };
 
-  const set = (partial: Partial<Props> | ((prev: Props) => Partial<Props>)) => {
+  const set = (partial: Partial<Props> | ((prev: Props) => Partial<Props>)): void => {
     const nextPartial = typeof partial === 'function' ? partial(state) : partial;
     const nextState = { ...state, ...nextPartial };
     if (shallowEqual(state, nextState)) return;
@@ -33,32 +35,32 @@ function createPropStore<Props extends object>(initialProps: Props) {
     emit();
   };
 
-  const subscribe = (fn: Subscriber) => {
+  const subscribe = (fn: Subscriber): (() => boolean) => {
     subscribers.add(fn);
     return () => subscribers.delete(fn);
   };
 
-  const getState = () => state;
-
-  return { get, set, reset, subscribe, getState };
-}
-
-//**************************************************************
-//  PropProvider
-//**************************************************************
-const PropContext = createContext<ReturnType<typeof createPropStore<object>> | null>(null);
-
-type PropProviderProps<Props extends object> = {
-  children: React.ReactNode;
-  initialProps: Props;
-  props: Props | ((prev: Props, state: Props) => Props);
+  return { get, set, reset, subscribe };
 };
 
-const WrappedPropProvider = <Props extends object>({
+//*****************************************************************************************
+// Prop Provider
+//*****************************************************************************************
+
+const PropContext = createContext<ReturnType<typeof createPropStore<object>> | null>(null);
+
+export type PropProviderProps<Props extends object> = PropsWithChildren<{
+  /** Values used to initialize the store. */
+  initialProps: Props;
+  /** Values or an updater synchronized into the store. */
+  props: Props | ((prev: Props, state: Props) => Props);
+}>;
+
+export const PropProvider = memo(function <const Props extends object>({
   children,
   initialProps = {} as Props,
   props = {} as Props
-}: PropProviderProps<Props>) => {
+}: PropProviderProps<Props>) {
   const storeRef = useRef<ReturnType<typeof createPropStore<Props>>>(null);
 
   if (!storeRef.current) {
@@ -71,14 +73,15 @@ const WrappedPropProvider = <Props extends object>({
   }, [props]);
 
   return <PropContext.Provider value={storeRef.current}>{children}</PropContext.Provider>;
-};
+}) as <const Props extends object>(props: PropProviderProps<Props>) => ReactElement | null;
 
-export const PropProvider = React.memo(WrappedPropProvider) as typeof WrappedPropProvider;
+(PropProvider as unknown as { displayName: string }).displayName = 'PropProvider';
 
-//**************************************************************
-//  usePropStore
-//**************************************************************
-export const usePropStore = <Props extends object>() => {
+//*****************************************************************************************
+// Use Prop Store
+//*****************************************************************************************
+
+export const usePropStore = function <const Props extends object>() {
   const store = useContext(PropContext) as ReturnType<typeof createPropStore<Props>> | null;
 
   if (!store) throw new Error('PropStore not found');

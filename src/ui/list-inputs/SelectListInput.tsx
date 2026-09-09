@@ -1,6 +1,6 @@
 import type { MenuItemProps, SelectProps } from '@mui/material';
 import { ListItemText, MenuItem, Select, useTheme } from '@mui/material';
-import { PropProvider, usePropStore } from 'features/prop-provider/PropProvider';
+import { PropProvider, usePropStore } from 'features/prop-provider';
 import React from 'react';
 import {
   HelpInputAdornment,
