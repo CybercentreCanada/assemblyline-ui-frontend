@@ -1,4 +1,4 @@
-import { shallowEqual, shallowReconcile } from 'features/prop-provider/prop-provider.utils';
+import { shallowEqual, shallowReconcile } from 'features/prop-provider';
 import type { PropsWithChildren, ReactElement } from 'react';
 import { createContext, memo, useContext, useEffect, useRef, useSyncExternalStore } from 'react';
 
