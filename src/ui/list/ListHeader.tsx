@@ -1,7 +1,8 @@
 import type { CheckboxProps } from '@mui/material';
 import { Checkbox, ListItemIcon } from '@mui/material';
 import { PropProvider, usePropStore } from 'features/prop-provider';
-import { Anchor, type AnchorProps } from 'features/table-of-content/Anchor';
+import type { AnchorProps } from 'features/table-of-content';
+import { Anchor } from 'features/table-of-content';
 import React from 'react';
 import { ResetInputAdornment } from 'ui/inputs/components/inputs.component.adornment';
 import { InputCircularSkeleton } from 'ui/inputs/components/inputs.component.buttons';

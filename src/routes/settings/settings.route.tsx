@@ -1,7 +1,7 @@
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import { useAppConfigStore } from 'core/config';
 import { createAppRoute, useAppPathParams } from 'core/routes';
-import { TableOfContentProvider, useTableOfContent } from 'features/table-of-content/TableOfContent';
+import { TableOfContentLayout, useTableOfContent } from 'features/table-of-content';
 import { memo, useCallback, useEffect } from 'react';
 import { DefaultMetadataSection } from 'routes/settings/components/DefaultMetadata';
 import { ExternalSourcesSection } from 'routes/settings/components/ExternalSources';
@@ -88,11 +88,11 @@ const WrappedSettingsPage = memo(() => {
 WrappedSettingsPage.displayName = 'WrappedSettingsPage';
 
 const SettingsPage = memo(() => (
-  <TableOfContentProvider>
+  <TableOfContentLayout>
     <FormProvider>
       <WrappedSettingsPage />
     </FormProvider>
-  </TableOfContentProvider>
+  </TableOfContentLayout>
 ));
 SettingsPage.displayName = 'SettingsPage';
 
