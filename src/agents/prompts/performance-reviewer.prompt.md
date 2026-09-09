@@ -25,5 +25,5 @@ Assume this code must support large applications: hundreds of components, thousa
 - Do NOT suggest behaviour changes or API redesigns.
 - Do NOT flag issues that only matter at small scale (< 10 items, < 5 components).
 - Do NOT rewrite code — describe the problem and the concrete impact.
-- Reference the project performance rules in `src/agents/conventions/performance.agent.md` where relevant.
+- Reference the project performance rules in `src/agents/rules/conventions/performance.agent.md` where relevant.
 - Report each issue as a numbered finding with: **location**, **what the performance cost is**, and **at what scale it becomes measurable**.

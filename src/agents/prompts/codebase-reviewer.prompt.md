@@ -12,10 +12,10 @@ Ignore individual line-level implementation details unless they are evidence of 
 
 ## Focus Areas
 
-- **Architecture drift** — compare actual module dependencies against the rules in `src/agents/architecture.agent.md` and flag any layer importing from a layer it should not depend on.
-- **File structure violations** — check files against the conventions in `src/agents/file-structure.agent.md` and its subfiles (components, hooks, models, utils, i18n) and flag misplaced or misnamed files.
+- **Architecture drift** — compare actual module dependencies against the rules in `src/agents/rules/architecture.agent.md` and flag any layer importing from a layer it should not depend on.
+- **File structure violations** — check files against the conventions in `src/agents/rules/file-structure.agent.md` and its subfiles (components, hooks, models, utils, i18n) and flag misplaced or misnamed files.
 - **Duplicated patterns** — identify logic, hooks, or components reimplemented in multiple places that should be a single shared module.
-- **Inconsistent conventions** — find modules that diverge from the documented conventions in `src/agents/conventions/` (imports, styling, performance, accessibility, react usage) without a stated reason.
+- **Inconsistent conventions** — find modules that diverge from the documented conventions in `src/agents/rules/conventions/` (imports, styling, performance, accessibility, react usage) without a stated reason.
 - **Dead or orphaned code** — flag exported symbols, files, or modules that appear unused across the codebase.
 - **Boundary leaks** — call out cases where a low-level module (e.g. `core/`, `features/`) imports from a high-level module (e.g. `routes/`, `layout/`), inverting the intended dependency direction.
 - **Inconsistent state ownership** — identify state that is duplicated across stores/contexts or owned at the wrong layer (e.g. global store holding component-local UI state).
