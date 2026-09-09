@@ -1,6 +1,6 @@
 import type { Method } from 'models/utils/request';
 import type { Request } from 'routes/development-api/development-api.models';
-import type { PossibleColor } from 'shared/models/colors';
+import type { PossibleColor } from 'shared/utils/colors';
 
 export const METHOD_COLOR_MAP: Record<Method, PossibleColor> = {
   GET: 'success',

@@ -13,7 +13,7 @@ import type { TimelineBody as TimelineData } from 'models/base/result_body';
 import React, { useMemo } from 'react';
 import { AiOutlineFile, AiOutlineFileImage, AiOutlineFileUnknown, AiOutlineFileZip } from 'react-icons/ai';
 import { BsFileEarmarkCode, BsFileLock, BsFileText, BsGlobe2, BsHddNetwork, BsTerminal } from 'react-icons/bs';
-import type { PossibleColor } from 'shared/models/colors';
+import type { PossibleColor } from 'shared/utils/colors';
 import { verdictToColor } from 'shared/utils/utils';
 
 const TYPE_ICON: Record<string, React.ReactNode> = {

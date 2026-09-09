@@ -5,7 +5,7 @@ import type {
   SandboxProcessItem,
   SandboxSignatureItem
 } from 'models/base/result_body';
-import type { PossibleColor } from 'shared/models/colors';
+import type { PossibleColor } from 'shared/utils/colors';
 
 export const INTEGRITY_LEVEL_COLOR_MAP: Record<string, PossibleColor> = {
   system: 'primary',

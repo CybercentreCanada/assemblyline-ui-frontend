@@ -3,7 +3,7 @@ import useHighlighter from 'deprecated/hooks/useHighlighter';
 import useSafeResults from 'deprecated/hooks/useSafeResults';
 import { useAppIsHighlighted } from 'layout/highlighter/highlighter.hooks';
 import React, { useCallback, useState } from 'react';
-import type { PossibleColor } from 'shared/models/colors';
+import type { PossibleColor } from 'shared/utils/colors';
 import ActionMenu from 'ui/ActionMenu';
 import CustomChip from 'ui/CustomChip';
 
