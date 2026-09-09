@@ -8,6 +8,11 @@ import {
 } from 'core/preference';
 import { useCallback } from 'react';
 
+/**
+ * @name useAppSavePreference
+ * @description Persists the current preference state from the app store to localStorage.
+ * @returns A callback that saves the current preference state.
+ */
 export const useAppSavePreference = () => {
   const preferenceStoreApi = useAppPreferenceStoreApi();
 
@@ -21,6 +26,11 @@ export const useAppSavePreference = () => {
   }, [preferenceStoreApi]);
 };
 
+/**
+ * @name useAppLoadPreference
+ * @description Loads persisted preferences from localStorage and merges them into the app store.
+ * @returns A callback that restores the stored preference state.
+ */
 export const useAppLoadPreference = () => {
   const setPreferenceStore = useAppSetPreferenceStore();
 

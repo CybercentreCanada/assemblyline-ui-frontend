@@ -9,10 +9,6 @@ import { compress, decompress } from 'lz-string';
 import type { PropsWithChildren } from 'react';
 import { memo, useEffect } from 'react';
 
-//*****************************************************************************************
-// App API Provider
-//*****************************************************************************************
-
 export const QUERY_CLIENT = new QueryClient({
   defaultOptions: {
     queries: {
@@ -55,6 +51,10 @@ export const QUERY_PERSIST_OPTIONS: OmitKeyof<PersistQueryClientOptions, 'queryC
   maxAge: Infinity,
   persister: QUERY_PERSISTER
 };
+
+//*****************************************************************************************
+// App API Provider
+//*****************************************************************************************
 
 export const AppApiProvider = memo(({ children }: PropsWithChildren) => {
   const gcTime = useAppPreferenceStore(s => s?.api?.gcTime);
