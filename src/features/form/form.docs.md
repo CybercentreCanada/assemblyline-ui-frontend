@@ -1,20 +1,21 @@
 # features/form
 
-Form context factory built on TanStack React Form. Creates typed form contexts with providers and hooks for managing complex form state across component trees.
+Typed form context utilities built on TanStack React Form. Creates form providers and hooks for managing form state across component trees.
 
 ## Responsibilities
 
-- `createFormContext` — factory for creating typed form context providers (wraps `@tanstack/react-form`)
-- Form field type utilities for dynamic field generation
-- Validation logic integration (sync + async validators via TanStack Form)
-- Form state management across component trees
+- `createFormContext` — factory for creating typed form providers and hooks
+- Nested form type utilities for typed field paths and values
+- Form value helpers for reading, updating, and constructing nested data
+- Validation integration through TanStack React Form options
 
 ## Key Files
 
-- `createFormContext.tsx` — Form context factory with typed provider and hooks
-- `form.models.ts` — Form field type definitions and utility types
-- `form.utils.ts` — Form value manipulation and validation utilities
+- `form.factories.tsx` — Form context factory with the provider and form hook
+- `form.models.ts` — Nested form type definitions and utility types
+- `form.utils.ts` — Nested form value and path utilities
 - `form.utils.test.ts` — Unit tests for form utilities
+- `index.ts` — Public module exports
 
 ## Usage
 
@@ -30,11 +31,11 @@ const { FormProvider, useForm } = createFormContext<AlertForm>({
   }
 });
 
-// Wrap form components
+// Wrap form components with the provider
 <FormProvider>
   <AlertFormFields />
 </FormProvider>
 
-// Access form instance in children
+// Access the typed form instance in a child component
 const form = useForm();
 ```

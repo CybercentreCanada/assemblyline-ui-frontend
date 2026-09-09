@@ -1,4 +1,4 @@
-import { buildPath, getValueFromPath, isObject, setValue, setValueFromPath } from 'features/form/form.utils';
+import { buildPath, getValueFromPath, isObject, setValue, setValueFromPath } from 'features/form';
 import { expect } from 'vitest';
 
 describe('Test `Form Utilities`', () => {

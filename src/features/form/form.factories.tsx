@@ -1,8 +1,9 @@
 import type { FormAsyncValidateOrFn, FormOptions, FormValidateOrFn, ReactFormExtendedApi } from '@tanstack/react-form';
 import { useForm as useTanStackForm } from '@tanstack/react-form';
-import React, { createContext, useContext } from 'react';
+import type { ReactElement, ReactNode } from 'react';
+import { createContext, useContext } from 'react';
 
-export function createFormContext<
+export const createFormContext = <
   TFormData,
   TOnMount extends FormValidateOrFn<TFormData> = FormValidateOrFn<TFormData>,
   TOnChange extends FormValidateOrFn<TFormData> = FormValidateOrFn<TFormData>,
@@ -28,7 +29,23 @@ export function createFormContext<
     TOnDynamicAsync,
     TOnServer
   >
-) {
+): {
+  FormProvider: ({ children }: { children: ReactNode }) => ReactElement;
+  useForm: () => ReactFormExtendedApi<
+    TFormData,
+    TOnMount,
+    TOnChange,
+    TOnChangeAsync,
+    TOnBlur,
+    TOnBlurAsync,
+    TOnSubmit,
+    TOnSubmitAsync,
+    TOnDynamic,
+    TOnDynamicAsync,
+    TOnServer,
+    never
+  >;
+} => {
   type FormContextProps = ReactFormExtendedApi<
     TFormData,
     TOnMount,
@@ -46,9 +63,7 @@ export function createFormContext<
 
   const FormContext = createContext<FormContextProps>(null);
 
-  type FormProviderProps = {
-    children: React.ReactNode;
-  };
+  type FormProviderProps = { children: ReactNode };
 
   const FormProvider = ({ children }: FormProviderProps) => {
     const form = useTanStackForm(options);
@@ -65,4 +80,4 @@ export function createFormContext<
   };
 
   return { FormProvider, useForm };
-}
+};
