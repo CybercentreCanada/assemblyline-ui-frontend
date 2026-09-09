@@ -85,13 +85,18 @@ export const TabContainer = React.memo(function <const T extends TabElements>({
   const [tabState, setTabState] = useState<keyof T>(defaultTab);
 
   const activeTab = useMemo<keyof T>(
-    () => (valueProp && valueProp in tabs && !tabs[valueProp]?.disabled ? valueProp : tabState),
-    [tabState, tabs, valueProp]
+    () =>
+      valueProp && valueProp in tabs && !tabs[valueProp]?.disabled && !tabs[valueProp]?.preventRender
+        ? valueProp
+        : tabState in tabs && !tabs[tabState]?.disabled && !tabs[tabState]?.preventRender
+          ? tabState
+          : defaultTab,
+    [defaultTab, tabState, tabs, valueProp]
   );
 
   const handleChange = useCallback(
     (prev: keyof T) => (_: React.SyntheticEvent, next: keyof T) => {
-      const value = next in tabs && !tabs[next]?.disabled ? next : prev;
+      const value = next in tabs && !tabs[next]?.disabled && !tabs[next]?.preventRender ? next : prev;
       onChangeProp ? onChangeProp(_, value) : setTabState(value);
     },
     [onChangeProp, tabs]
@@ -99,7 +104,7 @@ export const TabContainer = React.memo(function <const T extends TabElements>({
 
   const onTabChange = useCallback(
     (value: keyof T) => {
-      const next = value in tabs && !tabs[value]?.disabled ? value : defaultTab;
+      const next = value in tabs && !tabs[value]?.disabled && !tabs[value]?.preventRender ? value : defaultTab;
       onChangeProp ? onChangeProp(null, next) : setTabState(next);
     },
     [defaultTab, onChangeProp, tabs]

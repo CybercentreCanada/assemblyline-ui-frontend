@@ -23,7 +23,7 @@ import { AppSnackbarProvider } from 'core/snackbar';
 import { AppTemplateLayout, AppTemplateProvider } from 'core/template';
 import { AppAssistantLayout, AppAssistantProvider } from 'layout/assistant';
 import { AppAuthLayout } from 'layout/auth';
-import { AppCarouselProvider } from 'layout/carousel';
+import { AppCarouselLayout } from 'layout/carousel';
 import { AppClueProvider } from 'layout/clue';
 import { AppDebugLayout } from 'layout/debug';
 import { AppDrawerLayout } from 'layout/drawer';
@@ -134,19 +134,21 @@ export const AppLayout = memo(() => {
 
   return (
     <AppAuthLayout>
-      <AppAssistantLayout>
-        <AppDebugLayout>
-          <AppRouterLayout>
-            <AppDrawerLayout content={<AppRouterPanelLayout panelKey={1} />}>
-              <AppTemplateLayout preferences={preferences} router={router} user={user}>
-                <AppSystemVersionLayout>
-                  <AppRouterPanelLayout panelKey={0} />
-                </AppSystemVersionLayout>
-              </AppTemplateLayout>
-            </AppDrawerLayout>
-          </AppRouterLayout>
-        </AppDebugLayout>
-      </AppAssistantLayout>
+      <AppCarouselLayout>
+        <AppAssistantLayout>
+          <AppDebugLayout>
+            <AppRouterLayout>
+              <AppDrawerLayout content={<AppRouterPanelLayout panelKey={1} />}>
+                <AppTemplateLayout preferences={preferences} router={router} user={user}>
+                  <AppSystemVersionLayout>
+                    <AppRouterPanelLayout panelKey={0} />
+                  </AppSystemVersionLayout>
+                </AppTemplateLayout>
+              </AppDrawerLayout>
+            </AppRouterLayout>
+          </AppDebugLayout>
+        </AppAssistantLayout>
+      </AppCarouselLayout>
     </AppAuthLayout>
   );
 });
@@ -172,11 +174,7 @@ const AppProviders = memo(({ children }: PropsWithChildren) => {
                   <AppRouterProvider>
                     <AppNavigationProvider>
                       <AppLocationParamProvider routes={routes}>
-                        <AppClueProvider>
-                          <AppCarouselProvider>
-                            <>{children}</>
-                          </AppCarouselProvider>
-                        </AppClueProvider>
+                        <AppClueProvider>{children}</AppClueProvider>
                       </AppLocationParamProvider>
                     </AppNavigationProvider>
                   </AppRouterProvider>

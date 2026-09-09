@@ -1,4 +1,3 @@
-export { createStateParamBlueprint, createStateParamCodec } from './state-params.codec';
 export type {
   InferStateParamBlueprintFromValue,
   InferStateParamCodecFromBlueprint,
@@ -12,6 +11,8 @@ export {
   areStateParamValuesEqual,
   cloneStateParamValue,
   createDefaultStateParamBlueprint,
+  createStateParamBlueprint,
+  createStateParamCodec,
   getStateParamDeltaValue,
   getStateParamDeltaValues,
   isStateParamRecord,

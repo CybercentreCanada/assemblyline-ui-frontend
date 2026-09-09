@@ -9,10 +9,6 @@ import type { ApiResponse, BlobResponse } from 'core/api/api.models';
 export const isObject = (variable: unknown) =>
   variable !== null && typeof variable === 'object' && !Array.isArray(variable);
 
-//*****************************************************************************************
-// isAPIData
-//*****************************************************************************************
-
 /**
  * @name isAPIData
  * @description Type guard that checks whether a value conforms to the APIResponse shape.
@@ -27,10 +23,6 @@ export const isApiData = (value: object): value is ApiResponse =>
   'api_server_version' in value &&
   'api_status_code' in value;
 
-//*****************************************************************************************
-// getValue
-//*****************************************************************************************
-
 /**
  * @name getValue
  * @description Extracts the first non-falsy value for a given key across multiple response objects.
@@ -41,10 +33,6 @@ export const isApiData = (value: object): value is ApiResponse =>
 
 export const getValue = (key: string, ...responses: Record<string, unknown>[]): unknown =>
   responses?.find(r => !!r?.[key])?.[key] || null;
-
-//*****************************************************************************************
-// getAPIResponse
-//*****************************************************************************************
 
 /**
  * @name getAPIResponse
@@ -60,10 +48,6 @@ export const getApiResponse = <R, E>(data: ApiResponse<R>, error: ApiResponse<E>
   data: getValue('api_response', data, error, failureReason) as R,
   error: getValue('api_error_message', data, error, failureReason) as E
 });
-
-//*****************************************************************************************
-// getBlobResponse
-//*****************************************************************************************
 
 /**
  * @name getBlobResponse
@@ -82,10 +66,6 @@ export const getBlobResponse = <R, E>(data: BlobResponse, error: ApiResponse<E>,
   size: getValue('size', data, error, failureReason) as number,
   type: getValue('type', data, error, failureReason) as string
 });
-
-//*****************************************************************************************
-// stableStringify
-//*****************************************************************************************
 
 /**
  * @name stableStringify

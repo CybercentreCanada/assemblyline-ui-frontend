@@ -52,7 +52,7 @@ export const useInfiniteApiQuery = <
   >(
     {
       queryKey: [base?.url, base?.method ?? 'GET', stableStringify(base?.body ?? null), allowCache],
-      queryFn: async ({ signal, pageParam }) => apiCallFn({ ...getParams(pageParam), signal }),
+      queryFn: async ({ pageParam }) => apiCallFn(getParams(pageParam)),
       initialPageParam: initialOffset,
       getPreviousPageParam: (firstPage, allPages, firstPageParam, allPageParams) =>
         getPreviousOffset(firstPage, allPages, firstPageParam, allPageParams),

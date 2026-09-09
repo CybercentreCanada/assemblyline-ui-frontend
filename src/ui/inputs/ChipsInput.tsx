@@ -1,6 +1,6 @@
 import type { AutocompleteProps, TextFieldProps } from '@mui/material';
 import { Autocomplete } from '@mui/material';
-import { PropProvider, usePropStore } from 'features/prop-provider/PropProvider';
+import { PropProvider, usePropStore } from 'features/prop-provider';
 import type { ElementType } from 'react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';

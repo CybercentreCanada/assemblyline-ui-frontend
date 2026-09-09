@@ -1,7 +1,7 @@
 import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
 import { useAppNavigate } from 'core/router';
 import { createAppRoute, useAppSearchSnapshot } from 'core/routes';
-import { TableOfContentProvider, useTableOfContent } from 'features/table-of-content/TableOfContent';
+import { TableOfContentLayout, useTableOfContent } from 'features/table-of-content';
 import type { ReactNode } from 'react';
 import { memo, useCallback, useMemo } from 'react';
 import { FormProvider, useForm } from 'routes/development-library/contexts/form';
@@ -103,11 +103,11 @@ export const DevelopmentLibraryContent = memo(() => {
 });
 
 export const DevelopmentLibraryPage = memo(() => (
-  <TableOfContentProvider>
+  <TableOfContentLayout>
     <FormProvider>
       <DevelopmentLibraryContent />
     </FormProvider>
-  </TableOfContentProvider>
+  </TableOfContentLayout>
 ));
 
 export const DevelopmentLibraryRoute = createAppRoute({

@@ -1,4 +1,4 @@
-import { PropProvider, usePropStore } from 'features/prop-provider/PropProvider';
+import { PropProvider, usePropStore } from 'features/prop-provider';
 import React from 'react';
 import type { ClassificationProps } from 'ui/Classification';
 import Classification from 'ui/Classification';

@@ -1,6 +1,6 @@
-import { createFormContext } from 'features/form/createFormContext';
+import { createFormContext } from 'features/form';
 import type { UserSettings } from 'models/base/user_settings';
-import type { ProfileSettings } from './settings.utils';
+import type { ProfileSettings } from 'routes/settings/settings.utils.ts';
 
 /**
  * Store structure for the Settings page form.

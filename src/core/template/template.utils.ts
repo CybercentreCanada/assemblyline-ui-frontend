@@ -109,10 +109,6 @@ const BASE_THEME_CONFIG: Partial<ThemeOptions> & { cssVariables?: boolean } = {
   cssVariables: true
 };
 
-//*****************************************************************************************
-// Theme Configs
-//*****************************************************************************************
-
 /**
  * @name parseAppThemeFromLegacy
  * @description Converts a legacy `AppLegacyTheme` (mode-split palette/appbar, mode-agnostic

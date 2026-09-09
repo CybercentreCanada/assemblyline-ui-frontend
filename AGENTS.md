@@ -6,27 +6,27 @@ Before generating or modifying code, read and follow the AI rules in `src/agents
 
 ## Architecture & File Structure
 
-- `src/agents/architecture.agent.md` — Layer dependencies, forbidden/required patterns
-- `src/agents/file-structure.agent.md` — Where to put files, naming conventions
+- `src/agents/rules/architecture.agent.md` — Layer dependencies, forbidden/required patterns
+- `src/agents/rules/file-structure.agent.md` — Where to put files, naming conventions
 
 ## File Types
 
-- `src/agents/file-structure/components.agent.md` — How to write React components
-- `src/agents/file-structure/hooks.agent.md` — Hook ordering, when to extract hooks
-- `src/agents/file-structure/models.agent.md` — Type declarations, defaults, enums
-- `src/agents/file-structure/i18n.agent.md` — Translation key conventions
-- `src/agents/file-structure/utils.agent.md` — Utility function patterns
-- `src/agents/file-structure/utils.test.agent.md` — Unit test patterns for utilities
-- `src/agents/file-structure/pom.agent.md` — Page Object Model for E2E tests
-- `src/agents/file-structure/spec.agent.md` — Playwright E2E spec files
+- `src/agents/rules/file-structure/components.agent.md` — How to write React components
+- `src/agents/rules/file-structure/hooks.agent.md` — Hook ordering, when to extract hooks
+- `src/agents/rules/file-structure/models.agent.md` — Type declarations, defaults, enums
+- `src/agents/rules/file-structure/i18n.agent.md` — Translation key conventions
+- `src/agents/rules/file-structure/utils.agent.md` — Utility function patterns
+- `src/agents/rules/file-structure/utils.test.agent.md` — Unit test patterns for utilities
+- `src/agents/rules/file-structure/pom.agent.md` — Page Object Model for E2E tests
+- `src/agents/rules/file-structure/spec.agent.md` — Playwright E2E spec files
 
 ## Conventions
 
-- `src/agents/conventions/imports.agent.md` — Import ordering and syntax
-- `src/agents/conventions/styling.agent.md` — Styling approach (styled, raw HTML, theme)
-- `src/agents/conventions/performance.agent.md` — Memoization, stable references, selectors
-- `src/agents/conventions/accessibility.agent.md` — ARIA, semantic HTML, keyboard, E2E locators
-- `src/agents/conventions/react.agent.md` — React hooks and components usage guide
+- `src/agents/rules/conventions/imports.agent.md` — Import ordering and syntax
+- `src/agents/rules/conventions/styling.agent.md` — Styling approach (styled, raw HTML, theme)
+- `src/agents/rules/conventions/performance.agent.md` — Memoization, stable references, selectors
+- `src/agents/rules/conventions/accessibility.agent.md` — ARIA, semantic HTML, keyboard, E2E locators
+- `src/agents/rules/conventions/react.agent.md` — React hooks and components usage guide
 
 ## Git Commit Messages
 

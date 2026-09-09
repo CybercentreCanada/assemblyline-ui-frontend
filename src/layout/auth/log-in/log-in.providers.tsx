@@ -1,4 +1,4 @@
-import { createFormContext } from 'features/form/createFormContext';
+import { createFormContext } from 'features/form';
 import type { LoginFormStore } from 'layout/auth/log-in/log-in.models';
 import { DEFAULT_LOGIN_FORM_STORE } from 'layout/auth/log-in/log-in.models';
 

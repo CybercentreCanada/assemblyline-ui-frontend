@@ -2,7 +2,7 @@ import type { ChipProps } from '@mui/material';
 import type { RuleStatus } from 'models/base/signature';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import type { PossibleColor } from 'shared/models/colors';
+import type { PossibleColor } from 'shared/utils/colors';
 import CustomChip from 'ui/CustomChip';
 
 const COLOR_MAP: Record<RuleStatus, PossibleColor> = {

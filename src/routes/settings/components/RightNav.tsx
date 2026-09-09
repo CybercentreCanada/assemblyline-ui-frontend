@@ -1,5 +1,5 @@
 import { useAppConfigStore } from 'core/config';
-import { useTableOfContent } from 'features/table-of-content/TableOfContent';
+import { useTableOfContent } from 'features/table-of-content';
 import { memo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'routes/settings/settings.form';

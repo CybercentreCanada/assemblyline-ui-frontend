@@ -2,7 +2,7 @@ import type { AppRouterStore } from 'core/router';
 import { useAppRouterStoreApi } from 'core/router';
 import type { AppLocationParamStore } from 'core/routes';
 import { setAppRouteFromAppRoutes, syncRouteParamsFromRouter } from 'core/routes';
-import { createAppStore } from 'features/store/createAppStore';
+import { createAppStore } from 'features/store';
 import type { ReactNode } from 'react';
 import { memo, useCallback, useEffect } from 'react';
 

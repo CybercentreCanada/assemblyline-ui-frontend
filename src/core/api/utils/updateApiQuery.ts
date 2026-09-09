@@ -1,5 +1,5 @@
 import type { ApiQueryKey, ApiRequest, ApiResponse } from 'core/api/api.models';
-import { queryClient } from 'core/api/api.providers';
+import { QUERY_CLIENT } from 'core/api/api.providers';
 
 /**
  * @name updateAPIQuery
@@ -13,7 +13,7 @@ export const updateApiQuery = <T extends unknown = unknown>(
   filter: (key: ApiRequest) => boolean,
   update: (prev: T) => T
 ) =>
-  queryClient.setQueriesData<ApiResponse<T>>(
+  QUERY_CLIENT.setQueriesData<ApiResponse<T>>(
     {
       predicate: ({ queryKey }) => {
         try {

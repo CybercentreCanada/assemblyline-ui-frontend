@@ -3,10 +3,6 @@ import type { OptionsObject, SnackbarMessage } from 'notistack';
 import { useSnackbar } from 'notistack';
 import { useCallback } from 'react';
 
-//*****************************************************************************************
-// useAppSnackbar
-//*****************************************************************************************
-
 /**
  * @name useAppSnackbar
  * @description Provides variant-specific show methods and closeSnackbar.

@@ -1,7 +1,7 @@
 import { Box, useTheme } from '@mui/material';
-import useCarousel from 'deprecated/hooks/useCarousel';
+import { useAppSetInterfaceStore } from 'core/interface';
 import type { Image, ImageBody as ImageData } from 'models/base/result_body';
-import { default as React, useEffect, useState } from 'react';
+import { default as React, useCallback, useEffect, useState } from 'react';
 import { ImageItem } from 'ui/image_inline';
 
 type Props = {
@@ -12,8 +12,20 @@ type Props = {
 
 const WrappedImageBody = ({ body, printable = false }: Props) => {
   const theme = useTheme();
-  const { openCarousel } = useCarousel();
+  const setInterfaceStore = useAppSetInterfaceStore();
+
   const [data, setData] = useState<Image[]>([]);
+
+  const handleImageClick = useCallback(
+    (_event: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>, index: number) =>
+      setInterfaceStore(store => {
+        store.carousel.index = index;
+        store.carousel.images = data;
+        store.carousel.open = true;
+        return store;
+      }),
+    [data, setInterfaceStore]
+  );
 
   useEffect(() => {
     if (body === null || !Array.isArray(body)) return;
@@ -52,7 +64,7 @@ const WrappedImageBody = ({ body, printable = false }: Props) => {
           alt={element.name}
           to={element.img}
           index={index}
-          onImageClick={(e, i) => openCarousel(index, data)}
+          onImageClick={handleImageClick}
         />
       ))}
     </Box>

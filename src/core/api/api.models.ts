@@ -66,9 +66,4 @@ export type ApiReturn<Response = unknown> = {
 };
 
 /** Query key tuple for TanStack Query caching. */
-export type ApiQueryKey = [
-  string, // URL
-  Method, // Method
-  string, // Stringified Body
-  boolean // allowCache
-];
+export type ApiQueryKey = [url: string, method: Method, body: string, allowCache: boolean];

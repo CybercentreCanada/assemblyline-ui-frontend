@@ -3,7 +3,7 @@ import type {
   InferPathParamBlueprintMapFromPath,
   InferPathParamValuesFromBlueprintMap,
   RoutePath
-} from 'features/path-params/path-params.models';
+} from 'features/path-params';
 import type { Location } from 'react-router';
 
 //*****************************************************************************************

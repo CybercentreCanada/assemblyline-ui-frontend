@@ -33,7 +33,7 @@ import type { LabelCategories } from 'models/base/file';
 import { DEFAULT_LABELS, LABELS_COLOR_MAP } from 'models/base/file';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { PossibleColor } from 'shared/models/colors';
+import type { PossibleColor } from 'shared/utils/colors';
 import { ChipList } from 'ui/ChipList';
 import CustomChip from 'ui/CustomChip';
 import { useDebounce } from 'ui/HexViewer';

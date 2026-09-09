@@ -1,11 +1,13 @@
 import type { AppTheme } from '@tui/core';
 import type { AssistantInsightProps, ContextMessageProps } from 'layout/assistant';
+import type { AppCarouselBackgroundMode } from 'layout/carousel';
 import type { AppDebugStoreHistory, AppDebugStoreName } from 'layout/debug';
 import { getDefaultAppDebugStoreHistory } from 'layout/debug/debug.models';
 import type { ExternalEnrichmentState } from 'layout/external-lookup';
 import type { JSONFeedItem } from 'layout/notifications';
 import type { QuickSearchItem } from 'layout/quick-search';
 import type { SystemMessage } from 'models/api/user';
+import type { Image } from 'models/base/result_body';
 
 declare global {
   /** Transient UI state managed by the interface store — nothing is persisted. */
@@ -44,6 +46,23 @@ declare global {
       };
       /** Current authentication mode/page. */
       mode: 'app' | 'loading' | 'locked' | 'login' | 'logout' | 'quota' | 'tos';
+    };
+    /** Image carousel state. */
+    carousel: {
+      /** Background color mode for the displayed image. */
+      backgroundMode: AppCarouselBackgroundMode;
+      /** Rendering mode for the displayed image. */
+      imageRendering: 'auto' | 'pixelated';
+      /** Images currently displayed by the carousel. */
+      images: Image[];
+      /** Selected image index. */
+      index: number;
+      /** Whether the displayed image is being zoomed. */
+      isZooming: boolean;
+      /** Whether the carousel modal is open. */
+      open: boolean;
+      /** Current image zoom percentage. */
+      zoom: number;
     };
     /** Debug panel state. */
     debug: {
@@ -163,6 +182,15 @@ export const DEFAULT_APP_INTERFACE_STORE: AppInterfaceStore = {
       oauth_providers: []
     },
     mode: 'loading'
+  },
+  carousel: {
+    backgroundMode: 'transparent',
+    imageRendering: 'auto',
+    images: [],
+    index: 0,
+    isZooming: false,
+    open: false,
+    zoom: 100
   },
   debug: {
     history: getDefaultAppDebugStoreHistory(),

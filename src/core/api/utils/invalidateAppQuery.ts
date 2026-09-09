@@ -1,6 +1,6 @@
 import { DEFAULT_APP_PREFERENCE_STORE } from 'app/core.preference';
 import type { ApiQueryKey, ApiRequest } from 'core/api/api.models';
-import { queryClient } from 'core/api/api.providers';
+import { QUERY_CLIENT } from 'core/api/api.providers';
 import { isObject } from 'core/api/api.utils';
 
 /**
@@ -15,7 +15,7 @@ export const invalidateAppQuery = <Request extends ApiRequests>(
   delay: number = DEFAULT_APP_PREFERENCE_STORE.api.invalidateDelay
 ) =>
   setTimeout(async () => {
-    await queryClient.invalidateQueries({
+    await QUERY_CLIENT.invalidateQueries({
       predicate: ({ queryKey }) => {
         try {
           const [url, method, bodyStr] = queryKey as unknown as ApiQueryKey;

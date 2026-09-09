@@ -30,7 +30,7 @@ import {
 } from 'models/base/badlist';
 import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { HASH_MAP, MD5_REGEX, SHA1_REGEX, SHA256_REGEX, SSDEEP_REGEX, TLSH_REGEX } from 'shared/utils/constant';
+import { HASH_MAP, MD5_REGEX, SHA1_REGEX, SHA256_REGEX, SSDEEP_REGEX, TLSH_REGEX } from 'shared/utils/constants';
 import Classification from 'ui/Classification';
 import DatePicker from 'ui/DatePicker';
 

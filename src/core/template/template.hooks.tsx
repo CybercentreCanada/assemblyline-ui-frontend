@@ -5,10 +5,6 @@ import { useAppPreferenceStore, useAppSetPreferenceStore } from 'core/preference
 import { parseAppThemeFromLegacy } from 'core/template';
 import { useEffect, useLayoutEffect, useMemo } from 'react';
 
-//*****************************************************************************************
-// App Template Theme Initializer
-//*****************************************************************************************
-
 /**
  * @name useAppTemplateThemeInitializer
  * @description Fetches `/theme.json`, converts it from its legacy shape, and stores the
@@ -39,10 +35,6 @@ export const useAppTemplateThemeInitializer = (): void => {
   }, [setInterfaceStore]);
 };
 
-//*****************************************************************************************
-// App Template Theme Mode
-//*****************************************************************************************
-
 /**
  * @name useAppTemplateThemeMode
  * @description Resolves the requested layout mode to a concrete 'light'/'dark' value,
@@ -59,10 +51,6 @@ export const useAppTemplateThemeMode = (): TuiCookies['mode'] => {
     [requestedMode, prefersDarkMode]
   );
 };
-
-//*****************************************************************************************
-// App Template Theme Patcher
-//*****************************************************************************************
 
 /**
  * @name useAppTemplateThemePatcher
@@ -117,10 +105,6 @@ export const useAppTemplateThemePatcher = (): void => {
 
 export const APPBAR_READY_EVENT = 'tui.event.appbar.ready';
 
-//*****************************************************************************************
-// App Template Bar Height Updater
-//*****************************************************************************************
-
 /**
  * @name useAppBarHeight
  * @description Tracks the current `#appbar` height and persists it to the interface store
@@ -166,10 +150,6 @@ export const useAppTemplateBarHeight = (): number => {
 
   return height;
 };
-
-//*****************************************************************************************
-// App Template Preference Overrider
-//*****************************************************************************************
 
 /**
  * @name useOverrideTemplatePreferences

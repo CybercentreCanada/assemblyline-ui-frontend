@@ -1,76 +1,67 @@
 import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
+import type { OmitKeyof } from '@tanstack/react-query';
 import { keepPreviousData, QueryClient } from '@tanstack/react-query';
-import type { PersistedClient } from '@tanstack/react-query-persist-client';
+import type { PersistedClient, PersistQueryClientOptions } from '@tanstack/react-query-persist-client';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
-import type { ApiQueryKey } from 'core/api/api.models';
+import type { ApiQueryKey } from 'core/api';
 import { useAppPreferenceStore } from 'core/preference';
-import { AppDebugLayout } from 'layout/debug';
 import { compress, decompress } from 'lz-string';
 import type { PropsWithChildren } from 'react';
-import { memo, useEffect, useMemo } from 'react';
+import { memo, useEffect } from 'react';
 
-//*****************************************************************************************
-// App API Debugger Layout
-//*****************************************************************************************
-
-export type AppApiLayoutProps = {
-  /** Provider children. */
-  children: PropsWithChildren['children'];
-};
-
-export const AppApiLayout = memo(({ children }: AppApiLayoutProps) => <AppDebugLayout>{children}</AppDebugLayout>);
-
-AppApiLayout.displayName = 'AppApiLayout';
-
-//*****************************************************************************************
-// App API Provider
-//*****************************************************************************************
-
-export const queryClient = new QueryClient({
+export const QUERY_CLIENT = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
+      staleTime: Infinity,
+      gcTime: Infinity,
       placeholderData: keepPreviousData
     }
   }
 });
 
+export const QUERY_PERSISTER = createSyncStoragePersister({
+  storage: window.sessionStorage,
+  throttleTime: 1_000,
+  serialize: data =>
+    compress(
+      JSON.stringify({
+        ...data,
+        clientState: {
+          mutations: [],
+          queries: data.clientState.queries.filter(q => (q.queryKey as ApiQueryKey)[3])
+        }
+      })
+    ),
+  deserialize: data => {
+    const decompressed = decompress(data);
+    if (!decompressed) {
+      return {
+        buster: '',
+        timestamp: 0,
+        clientState: { mutations: [], queries: [] }
+      } satisfies PersistedClient;
+    }
+
+    return JSON.parse(decompressed) as PersistedClient;
+  }
+});
+
+export const QUERY_PERSIST_OPTIONS: OmitKeyof<PersistQueryClientOptions, 'queryClient'> = {
+  maxAge: Infinity,
+  persister: QUERY_PERSISTER
+};
+
+//*****************************************************************************************
+// App API Provider
+//*****************************************************************************************
+
 export const AppApiProvider = memo(({ children }: PropsWithChildren) => {
   const gcTime = useAppPreferenceStore(s => s?.api?.gcTime);
   const staleTime = useAppPreferenceStore(s => s?.api?.staleTime);
 
-  const persister = useMemo(
-    () =>
-      createSyncStoragePersister({
-        storage: window.sessionStorage,
-        serialize: data =>
-          compress(
-            JSON.stringify({
-              ...data,
-              clientState: {
-                mutations: [],
-                queries: data.clientState.queries.filter(q => (q.queryKey as ApiQueryKey)[3])
-              }
-            })
-          ),
-        deserialize: data => {
-          const decompressed = decompress(data);
-          if (!decompressed) {
-            return {
-              buster: '',
-              timestamp: 0,
-              clientState: { mutations: [], queries: [] }
-            } satisfies PersistedClient;
-          }
-
-          return JSON.parse(decompressed) as PersistedClient;
-        }
-      }),
-    []
-  );
-
   useEffect(() => {
-    queryClient.setDefaultOptions({
+    QUERY_CLIENT.setDefaultOptions({
       queries: {
         refetchOnWindowFocus: false,
         staleTime,
@@ -78,10 +69,10 @@ export const AppApiProvider = memo(({ children }: PropsWithChildren) => {
         placeholderData: keepPreviousData
       }
     });
-  }, [gcTime, queryClient, staleTime]);
+  }, [gcTime, staleTime]);
 
   return (
-    <PersistQueryClientProvider client={queryClient} persistOptions={{ persister }}>
+    <PersistQueryClientProvider client={QUERY_CLIENT} persistOptions={QUERY_PERSIST_OPTIONS}>
       {children}
     </PersistQueryClientProvider>
   );

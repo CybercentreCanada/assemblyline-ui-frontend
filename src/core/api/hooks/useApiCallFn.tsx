@@ -18,7 +18,6 @@ export type UseApiCallFnProps<
     disabled?: boolean;
     reloadOnUnauthorize?: boolean;
     retryAfter?: number;
-    signal?: AbortSignal;
     onSuccess?: (data: Response) => void;
     onFailure?: (error: Error) => void;
     onEnter?: () => void;
@@ -45,7 +44,6 @@ export const useApiCallFn = <
       method = 'GET',
       reloadOnUnauthorize = true,
       retryAfter = DEFAULT_APP_PREFERENCE_STORE.api.retryTime,
-      signal,
       url,
       onSuccess,
       onFailure,
@@ -70,8 +68,7 @@ export const useApiCallFn = <
           body: body == null ? null : contentType === 'application/json' ? JSON.stringify(body) : (body as BodyInit),
           credentials,
           headers: { ...headers, 'Content-Type': contentType, 'X-XSRF-TOKEN': getXSRFCookie() },
-          method,
-          signal
+          method
         });
 
         // Setting the API quota

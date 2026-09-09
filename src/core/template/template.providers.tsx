@@ -41,34 +41,12 @@ const Inner = ({ children }: PropsWithChildren) => {
 export type AppTemplateLayoutProps = PropsWithChildren<{
   preferences?: AppPreferenceConfigs;
   router: AppRouterAdapter;
-  // search?: AppSearchService;
   user?: AppUserService<unknown>;
 }>;
 
 export const AppTemplateLayout = memo(({ children, preferences, router, user }: AppTemplateLayoutProps) => {
-  // const cookies = parseTuiClientCookies();
-
-  // const myPreferences: AppPreferenceConfigs = useMyPreferences();
-  // const myUser: AppUserService<User> = useMyUser();
-  // const myAccessibility = useMyAccessibility();
-  // const myNotification = useMyNotification();
-  // const myApps = useMyApps();
-
   return (
-    <AppProvider
-      preferences={preferences}
-      router={router}
-      user={user}
-      // preferences={null}
-      // sitemap={{}}
-      // theme={{}}
-      // user={null}
-
-      // preferences={myPreferences}
-      // theme={myTheme}
-      // sitemap={mySitemap}
-      // user={myUser}
-    >
+    <AppProvider preferences={preferences} router={router} user={user}>
       <Inner>{children}</Inner>
     </AppProvider>
   );

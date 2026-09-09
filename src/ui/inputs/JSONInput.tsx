@@ -1,7 +1,7 @@
 import type { ThemeObject } from '@microlink/react-json-view';
 import ReactJson from '@microlink/react-json-view';
 import { useTheme } from '@mui/material';
-import { PropProvider, usePropStore } from 'features/prop-provider/PropProvider';
+import { PropProvider, usePropStore } from 'features/prop-provider';
 import React, { useMemo } from 'react';
 import {
   HelpInputAdornment,

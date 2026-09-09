@@ -4,7 +4,7 @@ import { Popover, useTheme } from '@mui/material';
 import { DigitalClock, LocalizationProvider, DateTimePicker as MuiDateTimePicker } from '@mui/x-date-pickers';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
-import { PropProvider, usePropStore } from 'features/prop-provider/PropProvider';
+import { PropProvider, usePropStore } from 'features/prop-provider';
 import type { Moment } from 'moment';
 import moment from 'moment';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';

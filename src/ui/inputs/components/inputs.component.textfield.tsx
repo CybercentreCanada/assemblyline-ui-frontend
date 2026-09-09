@@ -1,6 +1,6 @@
 import type { AutocompleteProps, AutocompleteRenderInputParams, TextFieldProps } from '@mui/material';
 import { Autocomplete, InputAdornment, TextField, useTheme } from '@mui/material';
-import { usePropStore } from 'features/prop-provider/PropProvider';
+import { usePropStore } from 'features/prop-provider';
 import React, { useMemo } from 'react';
 import type { CustomChipProps } from 'ui/CustomChip';
 import { CustomChip } from 'ui/CustomChip';

@@ -13,7 +13,7 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
-import { usePropStore } from 'features/prop-provider/PropProvider';
+import { usePropStore } from 'features/prop-provider';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { IconButton } from 'ui/buttons/IconButton';

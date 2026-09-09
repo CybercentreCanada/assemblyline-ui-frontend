@@ -1,5 +1,5 @@
 import Flow from '@flowjs/flow.js';
-import { createFormContext } from 'features/form/createFormContext';
+import { createFormContext } from 'features/form';
 import type { HashPatternMap } from 'models/base/config';
 import type { ProfileSettings } from 'routes/settings/settings.utils';
 import { generateSubmitUUID } from 'routes/submit/submit.utils';

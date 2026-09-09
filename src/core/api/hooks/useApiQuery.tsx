@@ -16,7 +16,7 @@ export type UseApiQueryProps<Response = unknown, Request extends ApiRequest = Ap
   delay?: number;
   disabled?: boolean;
   retryAfter?: number;
-} & Omit<UseApiCallFnProps<ApiResponse<Response>, Request, ApiResponse<Error>>, 'signal' | 'disabled' | 'retryAfter'>;
+} & Omit<UseApiCallFnProps<ApiResponse<Response>, Request, ApiResponse<Error>>, 'disabled' | 'retryAfter'>;
 
 export const useApiQuery = <
   Response = unknown,
@@ -43,7 +43,7 @@ export const useApiQuery = <
       ...queryProps,
       enabled: !disabled && !isDebouncing,
       queryKey: [url, method ?? 'GET', stableStringify(body), allowCache],
-      queryFn: async ({ signal }) => apiCallFn({ url, method, body, signal, enabled: !disabled, ...params }),
+      queryFn: async () => apiCallFn({ url, method, body, enabled: !disabled, ...params }),
       retry: (failureCount, error) => failureCount < 3 && error?.api_status_code === 502,
       retryDelay: failureCount => Math.min(retryAfter * (failureCount + 1), 10000)
     },

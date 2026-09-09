@@ -1,5 +1,5 @@
 import type { TextFieldProps } from '@mui/material';
-import { PropProvider, usePropStore } from 'features/prop-provider/PropProvider';
+import { PropProvider, usePropStore } from 'features/prop-provider';
 import React, { useCallback, useEffect, useRef } from 'react';
 import {
   HelpInputAdornment,

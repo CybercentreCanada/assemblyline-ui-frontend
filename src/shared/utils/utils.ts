@@ -2,7 +2,7 @@ import type { Configuration, FileSource, HashPatternMap } from 'models/base/conf
 import type { ReactNode } from 'react';
 import { Children, isValidElement } from 'react';
 import type { PossibleColor } from 'shared/utils/colors';
-import { LOWERCASE_HASH, URL_REGEX } from 'shared/utils/constant';
+import { LOWERCASE_HASH, URL_REGEX } from 'shared/utils/constants';
 
 /**
  * @name toTitleCase
