@@ -22,17 +22,17 @@ import type {
   ClassificationSubGroup,
   ClassificationValidator,
   FormatProp
-} from 'features/classification/classificationParser';
+} from 'features/classification';
 import {
   applyAliases,
   applyClassificationRules,
-  defaultClassificationValidator,
-  defaultDisabled,
-  defaultParts,
+  DEFAULT_CLASSIFICATION_PARTS,
+  DEFAULT_CLASSIFICATION_VALIDATOR,
+  DEFAULT_DISABLED_CONTROLS,
   getLevelText,
   getParts,
   normalizedClassification
-} from 'features/classification/classificationParser';
+} from 'features/classification';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { PossibleColor } from 'shared/utils/colors';
@@ -99,8 +99,8 @@ export const Classification = React.memo(
     const { user: currentUser, c12nDef, classificationAliases } = useALContext();
 
     const [showPicker, setShowPicker] = useState<boolean>(false);
-    const [uParts, setUserParts] = useState<ClassificationParts>(defaultParts);
-    const [validated, setValidated] = useState<ClassificationValidator>(defaultClassificationValidator);
+    const [uParts, setUserParts] = useState<ClassificationParts>(DEFAULT_CLASSIFICATION_PARTS);
+    const [validated, setValidated] = useState<ClassificationValidator>(DEFAULT_CLASSIFICATION_VALIDATOR);
 
     const sp2 = theme.spacing(2);
     const isPhone = useMediaQuery(theme.breakpoints.only('xs'));
@@ -237,7 +237,7 @@ export const Classification = React.memo(
           setValidated(applyClassificationRules(parts, c12nDef, format, isMobile, isUser));
         } else {
           setValidated({
-            disabled: defaultDisabled,
+            disabled: DEFAULT_DISABLED_CONTROLS,
             parts
           });
         }

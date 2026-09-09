@@ -1,5 +1,5 @@
 import type { AppUser } from '@tui/core';
-import type { ClassificationDefinition } from 'features/classification/classificationParser';
+import type { ClassificationDefinition } from 'features/classification';
 import type { Configuration } from 'models/base/config';
 import type { Role, Type, User } from 'models/base/user';
 import type { UserSettings } from 'models/base/user_settings';

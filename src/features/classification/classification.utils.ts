@@ -1,4 +1,10 @@
-import type { ClassificationAliases } from 'features/classification/classificationParser';
+import type {
+  ClassificationAliases,
+  ClassificationDefinition,
+  ClassificationParts,
+  ClassificationValidator,
+  FormatProp
+} from 'features/classification';
 
 /**
  * Classification related utils.
@@ -7,159 +13,14 @@ import type { ClassificationAliases } from 'features/classification/classificati
  * Actual classification enforcement is handled server side. These utils are convenience functions mostly used for
  * display purposes. They and are not expected to be used for critical access control enforcement. As such, error
  * conditions are not raised and suitable default values are returned.
- *
  */
-export type FormatProp = 'long' | 'short';
 
-export type LevelStylesheet = {
-  banner?: string;
-  label?: string;
-  text?: string;
-  color?: string;
-};
-
-export type ClassificationLevel = {
-  aliases: string[];
-  css: LevelStylesheet;
-  description: string;
-  lvl: number;
-  name: string;
-  short_name: string;
-  is_hidden?: boolean;
-};
-
-export type ClassificationRequired = {
-  aliases: string[];
-  description: string;
-  name: string;
-  is_required_group?: boolean;
-  require_lvl?: number;
-  short_name: string;
-  is_hidden?: boolean;
-};
-
-export type ClassificationGroup = {
-  aliases: string[];
-  auto_select?: boolean;
-  description: string;
-  name: string;
-  short_name: string;
-  solitary_display_name?: string;
-  is_hidden?: boolean;
-};
-
-export type ClassificationSubGroup = {
-  aliases: string[];
-  auto_select?: boolean;
-  description: string;
-  limited_to_group?: string;
-  name: string;
-  require_group?: string;
-  short_name: string;
-  solitary_display_name?: string;
-  is_hidden?: boolean;
-};
-
-export type ClassificationYAMLDefinition = {
-  dynamic_groups: boolean;
-  dynamic_groups_type: string;
-  enforce: boolean;
-  groups: ClassificationGroup[];
-  levels: ClassificationLevel[];
-  required: ClassificationRequired[];
-  restricted: string;
-  subgroups: ClassificationSubGroup[];
-  unrestricted: string;
-};
-
-type StringMap = Record<string, string>;
-
-type StringMapArray = Record<string, string[]>;
-
-type StylesheetMap = Record<string, LevelStylesheet>;
-
-type ParamsMap = Record<
-  string,
-  {
-    is_required_group?: boolean;
-    solitary_display_name?: string;
-    require_lvl?: number;
-    require_group?: string;
-    limited_to_group?: string;
-    is_hidden?: boolean;
-  }
->;
-
-export type ClassificationDefinition = {
-  RESTRICTED: string;
-  UNRESTRICTED: string;
-  access_req_aliases: StringMapArray;
-  access_req_map_lts: StringMap;
-  access_req_map_stl: StringMap;
-  description: StringMap;
-  dynamic_groups: boolean;
-  dynamic_groups_type: 'email' | 'group' | 'all';
-  enforce: boolean;
-  groups_aliases: StringMapArray;
-  groups_auto_select: string[];
-  groups_auto_select_short: string[];
-  groups_map_lts: StringMap;
-  groups_map_stl: StringMap;
-  invalid_mode: boolean;
-  levels_aliases: StringMap;
-  levels_map: StringMap;
-  levels_map_lts: StringMap;
-  levels_map_stl: StringMap;
-  levels_styles_map: StylesheetMap;
-  original_definition: ClassificationYAMLDefinition;
-  params_map: ParamsMap;
-  subgroups_aliases: StringMapArray;
-  subgroups_auto_select: string[];
-  subgroups_auto_select_short: string[];
-  subgroups_map_lts: StringMap;
-  subgroups_map_stl: StringMap;
-};
-
-export type ClassificationParts = {
-  lvlIdx: number;
-  lvl: string;
-  req: string[];
-  groups: string[];
-  subgroups: string[];
-};
-
-type ClassificationGroups = {
-  groups: string[];
-  subgroups: string[];
-  others: string[];
-};
-
-export const defaultParts: ClassificationParts = {
-  lvlIdx: 0,
-  lvl: '',
-  req: [],
-  groups: [],
-  subgroups: []
-};
-
-type DisabledControls = {
-  levels: string[];
-  groups: string[];
-};
-
-export const defaultDisabled: DisabledControls = {
-  groups: [],
-  levels: []
-};
-
-export class InvalidClassification extends Error {}
-
-export function getLevelText(
+export const getLevelText = (
   lvl: number,
   c12nDef: ClassificationDefinition,
   format: FormatProp,
   isMobile: boolean
-): string {
+): string => {
   let text: string = null;
   if (c12nDef != null && lvl != null) {
     text = c12nDef.levels_map[lvl.toString()];
@@ -180,9 +41,9 @@ export function getLevelText(
   }
 
   return text;
-}
+};
 
-function getLevelIndex(c12n: string, c12nDef: ClassificationDefinition): [number, string] {
+const getLevelIndex = (c12n: string, c12nDef: ClassificationDefinition): [number, string] => {
   // assumes c12nDef is coming from the Assemblyline API and all values will be in UPPER case
   let retIndex = null;
   // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
@@ -206,14 +67,14 @@ function getLevelIndex(c12n: string, c12nDef: ClassificationDefinition): [number
   }
 
   return [retIndex, unused];
-}
+};
 
-function getRequired(
+const getRequired = (
   c12n: string,
   c12nDef: ClassificationDefinition,
   format: FormatProp,
   isMobile: boolean
-): [string[], string[]] {
+): [string[], string[]] => {
   const returnSet: string[] = [];
   const unused: string[] = [];
   if (!c12n) {
@@ -244,15 +105,15 @@ function getRequired(
   }
 
   return [returnSet.sort(), unused];
-}
+};
 
-function getGroups(
+const getGroups = (
   groupParts: string[],
   c12nDef: ClassificationDefinition,
   format: FormatProp,
   isMobile: boolean,
   autoSelect: boolean = false
-): ClassificationGroups {
+): { groups: string[]; subgroups: string[]; others: string[] } => {
   // Note: this function assumes c12nDef is coming from the Assemblyline API and all values will be in UPPER case
   // and that this function is called AFTER getLevelIndex and getRequired functions with the used values passed in.
   let g1Set = new Set<string>();
@@ -390,14 +251,14 @@ function getGroups(
     return { groups: g1Out.sort(), subgroups: g2Out.sort(), others: Array.from(others).sort() };
   }
   return { groups: Array.from(g1Set).sort(), subgroups: Array.from(g2Set).sort(), others: Array.from(others).sort() };
-}
+};
 
-export function getParts(
+export const getParts = (
   c12n: string,
   c12nDef: ClassificationDefinition,
   format: FormatProp,
   isMobile: boolean
-): ClassificationParts {
+): ClassificationParts => {
   const [lvlIdx, unused] = getLevelIndex(c12n, c12nDef);
   const [req, unusedParts] = getRequired(unused, c12nDef, format, isMobile);
   const { groups, subgroups, others } = getGroups(unusedParts, c12nDef, format, isMobile);
@@ -417,13 +278,13 @@ export function getParts(
     groups: groups,
     subgroups: subgroups
   };
-}
+};
 
-export function canSeeRequired(user_req: string[], req: string[]) {
+export const canSeeRequired = (userReq: string[], req: string[]): boolean => {
   // user's require values must be a superset of given require values
   // (ie. user must have all of the required values)
   if (req.length <= 0) return true;
-  const userSet = new Set(user_req);
+  const userSet = new Set(userReq);
   const reqSet = new Set(req);
 
   for (const elem of reqSet) {
@@ -432,14 +293,14 @@ export function canSeeRequired(user_req: string[], req: string[]) {
     }
   }
   return true;
-}
+};
 
-export function canSeeGroups(user_groups: string[], groups: string[]) {
+export const canSeeGroups = (userGroups: string[], groups: string[]): boolean => {
   // user's groups must have an intersection between required groups
   // (ie. user must have at least one of the given groups)
   if (groups.length === 0) return true;
   const groupSet = new Set(groups);
-  const userSet = new Set(user_groups);
+  const userSet = new Set(userGroups);
 
   for (const elem of groupSet) {
     if (userSet.has(elem)) {
@@ -447,9 +308,9 @@ export function canSeeGroups(user_groups: string[], groups: string[]) {
     }
   }
   return false;
-}
+};
 
-export function applyAliases(c12n: string, classificationAliases: ClassificationAliases, format: string) {
+export const applyAliases = (c12n: string, classificationAliases: ClassificationAliases, format: string): string => {
   let out = c12n;
   for (const alias in classificationAliases) {
     if ({}.hasOwnProperty.call(classificationAliases, alias)) {
@@ -461,7 +322,7 @@ export function applyAliases(c12n: string, classificationAliases: Classification
     }
   }
   return out;
-}
+};
 
 /**
  * Normalize a given classification by applying the rules defined in the classification definition.
@@ -480,14 +341,14 @@ export function applyAliases(c12n: string, classificationAliases: Classification
  * @returns A normalized version of the original classification
  *
  */
-export function normalizedClassification(
+export const normalizedClassification = (
   parts: ClassificationParts,
   c12nDef: ClassificationDefinition,
   format: FormatProp,
   isMobile: boolean,
   skipAutoSelect: boolean = false,
   classificationAliases: ClassificationAliases = {}
-): string {
+): string => {
   if (!c12nDef.enforce || !!c12nDef.invalid_mode) return c12nDef.UNRESTRICTED;
 
   const longFormat = format === 'short' || !!isMobile ? false : true;
@@ -621,9 +482,9 @@ export function normalizedClassification(
     out += tempSubGroups.sort().join('/');
   }
   return applyAliases(out, classificationAliases, format);
-}
+};
 
-function levelList(c12nDef: ClassificationDefinition) {
+const levelList = (c12nDef: ClassificationDefinition): string[] => {
   const out: string[] = [];
   for (const i in c12nDef.levels_map) {
     if (!isNaN(parseInt(i))) {
@@ -631,16 +492,6 @@ function levelList(c12nDef: ClassificationDefinition) {
     }
   }
   return out;
-}
-
-export type ClassificationValidator = {
-  disabled: DisabledControls;
-  parts: ClassificationParts;
-};
-
-export const defaultClassificationValidator: ClassificationValidator = {
-  disabled: defaultDisabled,
-  parts: defaultParts
 };
 
 /**
@@ -655,13 +506,13 @@ export const defaultClassificationValidator: ClassificationValidator = {
  * @returns The most restrictive classification that we could create out of the two
  *
  */
-export function applyClassificationRules(
+export const applyClassificationRules = (
   parts: ClassificationParts,
   c12nDef: ClassificationDefinition,
   format: FormatProp,
   isMobile: boolean,
   userClassification: boolean = false
-): ClassificationValidator {
+): ClassificationValidator => {
   const longFormat = format === 'short' || !!isMobile ? false : true;
   const requireLvl = {};
   const limitedToGroup = {};
@@ -796,18 +647,9 @@ export function applyClassificationRules(
     disabled: disabledList,
     parts: retParts
   };
-}
+};
 
-/**
- * Combines groups to find the maximum
- *
- * @param grps1 - First groups
- * @param grps2 - Second groups
- *
- * @returns The a combination of the given groups
- *
- */
-function getMaxGroups(grps1: string[], grps2: string[]): string[] {
+const getMaxGroups = (grps1: string[], grps2: string[]): string[] => {
   let groups = new Set<string>();
   if (grps1.length > 0 && grps2.length > 0) {
     // intersect sets
@@ -828,7 +670,7 @@ function getMaxGroups(grps1: string[], grps2: string[]): string[] {
     /* eslint-enable no-console */
   }
   return Array.from(groups);
-}
+};
 
 /**
  * Mixes two classifications and returns to most restrictive form for them
@@ -842,13 +684,13 @@ function getMaxGroups(grps1: string[], grps2: string[]): string[] {
  * @returns The most restrictive classification that we could create out of the two
  *
  */
-export function getMaxClassification(
+export const getMaxClassification = (
   c12n_1: string,
   c12n_2: string,
   c12nDef: ClassificationDefinition,
   format: FormatProp,
   isMobile: boolean
-) {
+): string => {
   if (!c12nDef.enforce || !!c12nDef.invalid_mode) {
     const noEnforceParts = getParts(c12nDef.UNRESTRICTED, c12nDef, format, isMobile);
     return normalizedClassification(noEnforceParts, c12nDef, format, isMobile);
@@ -877,7 +719,9 @@ export function getMaxClassification(
   };
 
   return normalizedClassification(out, c12nDef, format, isMobile);
-}
+};
+
+export class InvalidClassification extends Error {}
 
 /**
  *
@@ -892,13 +736,13 @@ export function getMaxClassification(
  * @returns True is the user can see the classification
  *
  */
-export function isAccessible(
+export const isAccessible = (
   user_c12n: string,
   c12n: string,
   c12nDef: ClassificationDefinition,
   enforce: boolean = false,
   ignoreInvalid: boolean = true
-) {
+): boolean => {
   if (!!c12nDef.invalid_mode) return false;
   if (!enforce) return true;
   if (!c12n) return true;
@@ -922,4 +766,4 @@ export function isAccessible(
     }
     throw e;
   }
-}
+};

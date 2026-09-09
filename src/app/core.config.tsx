@@ -1,6 +1,7 @@
 import type { AppUser } from '@tui/core';
 import type { SystemMessage } from '@tui/notis';
-import type { ClassificationAliases, ClassificationDefinition } from 'features/classification/classificationParser';
+import type { ClassificationAliases, ClassificationDefinition } from 'features/classification';
+import { DEFAULT_CLASSIFICATION_ALIASES, DEFAULT_CLASSIFICATION_DEFINITION } from 'features/classification';
 import type { Indexes } from 'models/api/user';
 import { CONFIGURATION, type Configuration } from 'models/base/config';
 import type { User } from 'models/base/user';
@@ -24,49 +25,6 @@ declare global {
     user?: CustomUser;
   };
 }
-
-// Empty maps/arrays, invalid_mode disables enforcement until real data loads
-const DEFAULT_CLASSIFICATION_DEFINITION: ClassificationDefinition = {
-  RESTRICTED: '',
-  UNRESTRICTED: '',
-  access_req_aliases: {},
-  access_req_map_lts: {},
-  access_req_map_stl: {},
-  description: {},
-  dynamic_groups: false,
-  dynamic_groups_type: 'email',
-  enforce: false,
-  groups_aliases: {},
-  groups_auto_select: [],
-  groups_auto_select_short: [],
-  groups_map_lts: {},
-  groups_map_stl: {},
-  invalid_mode: true,
-  levels_aliases: {},
-  levels_map: {},
-  levels_map_lts: {},
-  levels_map_stl: {},
-  levels_styles_map: {},
-  original_definition: {
-    dynamic_groups: false,
-    dynamic_groups_type: '',
-    enforce: false,
-    groups: [],
-    levels: [],
-    required: [],
-    restricted: '',
-    subgroups: [],
-    unrestricted: ''
-  },
-  params_map: {},
-  subgroups_aliases: {},
-  subgroups_auto_select: [],
-  subgroups_auto_select_short: [],
-  subgroups_map_lts: {},
-  subgroups_map_stl: {}
-};
-
-const DEFAULT_CLASSIFICATION_ALIASES: ClassificationAliases = {};
 
 const DEFAULT_INDEXES: Indexes = {
   alert: {},

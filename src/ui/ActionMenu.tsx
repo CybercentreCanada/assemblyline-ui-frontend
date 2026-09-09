@@ -14,7 +14,7 @@ import useExternalLookup from 'deprecated/hooks/useExternalLookup';
 import useHighlighter from 'deprecated/hooks/useHighlighter';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import useMySnackbar from 'deprecated/hooks/useMySnackbar';
-import { isAccessible } from 'features/classification/classificationParser';
+import { isAccessible } from 'features/classification';
 import type { ExternalEnrichmentResults } from 'layout/external-lookup';
 import type { Badlist } from 'models/base/badlist';
 import type { ExternalLink, ExternalLinkType, HashPatternMap } from 'models/base/config';

@@ -24,7 +24,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Tooltip from '@mui/material/Tooltip';
 import useALContext from 'deprecated/hooks/useALContext';
 import useExternalLookup from 'deprecated/hooks/useExternalLookup';
-import { getMaxClassification } from 'features/classification/classificationParser';
+import { getMaxClassification } from 'features/classification';
 import type { ExternalEnrichmentResult } from 'layout/external-lookup';
 import type { DetailedItem } from 'models/base/alert';
 import React, { useRef, useState } from 'react';
