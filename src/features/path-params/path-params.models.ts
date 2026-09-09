@@ -1,4 +1,4 @@
-import type { createPathParamsCodec } from 'features/path-params/path-params.codec';
+import type { createPathParamsCodec } from 'features/path-params';
 import type { RouteProps } from 'react-router';
 
 //*****************************************************************************************

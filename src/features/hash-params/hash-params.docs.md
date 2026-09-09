@@ -1,141 +1,142 @@
-# Hash Params
+# Features/Hash-Params
 
-Parse and serialize hash fragments to enable navigation to specific anchors within a page (e.g., `#introduction`, `#api-section`, etc.).
+## 1. Purpose
 
-## Overview
+Typed parsing and serialization for a single value in a URL hash fragment. The module defines hash blueprints, creates codecs for reading and writing hash values, and integrates with application routes through `core/routes`.
 
-The hash params codec allows routes to declare which hash fragments (anchor IDs) they accept. Unlike path params which return an object of typed values, hash params return a **single enum value** or `undefined`. This is primarily used for scrolling to and deep-linking to specific sections within a page.
+## 2. Features
 
-### Key Characteristics
+- **Single value** - Resolves one string, number, or boolean value rather than an object of values
+- **Blueprint-based parsing** - Supports unrestricted strings and fixed enum values
+- **URL encoding** - Decodes hash values during parsing and encodes them during serialization
+- **Optional defaults** - Returns a configured default or `undefined` for missing and unmatched values
+- **Route integration** - Provides the codec consumed by `createAppRoute`
 
-- **Single value**: Returns `Value | undefined`, not an object
-- **Enum-based**: Only predefined hash values are accepted
-- **Optional**: If no hash blueprint is defined, the route accepts no hash params
-- **URL-encoded**: Automatically encodes/decodes hash values
-- **Deep-linkable**: URLs with hashes can be bookmarked and shared to jump directly to a section
+## 3. Concepts
 
-## API
+### Blueprint
 
-### Define Hash Params in a Route
+`InferHashParamBlueprintFromValue<Value>` defines how one hash value is handled:
 
-```tsx
-export const MyPageRoute = createAppRoute({
-  component: MyPage,
-  route: '/my-page',
-  hash: s => s(['introduction', 'api', 'examples', 'faq'])
-});
-```
+- `type` is a representative value used for type inference.
+- `parse(value)` converts a decoded hash value into the typed value.
+- `stringify(value)` converts the typed value into a hash fragment value.
 
-The `hash` function receives a factory object with methods to create blueprints:
+### Codec
 
-- `blueprint.enum(values, defaultValue?)` — accepts one of the provided values
+`InferHashParamCodecFromBlueprint<Blueprint>` describes the codec returned by `createHashParamCodec`. The runtime codec contains:
 
-### Using Hash Params in Components
+- `blueprint` - The configured hash blueprint
+- `type` - A typed value used for inference
+- `parse(location)` - Reads and converts `location.hash`
+- `stringify(value)` - Produces an encoded hash beginning with `#`
 
-```tsx
-const hashValue = useAppHashParams<'/my-page'>();
-// hashValue: 'introduction' | 'api' | 'examples' | 'faq' | undefined
+### Hash Value
 
-useEffect(() => {
-  if (hashValue) {
-    const element = document.getElementById(hashValue);
-    element?.scrollIntoView({ behavior: 'smooth' });
-  }
-}, [hashValue]);
-```
+`HashParamValue` allows string, number, and boolean enum values.
 
-### Creating a Codec Manually
+## 4. Configuration
 
-```tsx
+### Available Blueprint Types
+
+| Blueprint | Default | Behavior |
+| --- | --- | --- |
+| `string(defaultValue?)` | `''` | Returns the hash value or the default when the hash is missing |
+| `enum(values, defaultValue?)` | `undefined` | Returns a matching value or the default |
+
+### Creating A Codec
+
+```typescript
 import { createHashParamCodec } from 'features/hash-params';
 
-const hashCodec = createHashParamCodec()(blueprint => blueprint.enum(['introduction', 'api', 'examples', 'faq']));
-
-const value = hashCodec.parse(location);
-// value: 'introduction' | 'api' | 'examples' | 'faq' | undefined
-
-const hash = hashCodec.stringify(value);
-// hash: '#api' or '#faq' or ''
+const codec = createHashParamCodec()(({ enum: createEnum }) =>
+  createEnum(['overview', 'installation', 'usage'])
+);
 ```
 
-## Examples
+The callback receives `HASH_PARAM_BLUEPRINTS`, which exposes the `string` and `enum` blueprint factories.
 
-### Scrolling to Sections
+## 5. Usage
 
-The primary use case: automatically scroll to a section when the hash changes.
+Codecs accept a React Router `Location` and return one parsed value:
 
-```tsx
-export const DocumentationRoute = createAppRoute({
-  component: DocumentationPage,
-  route: '/docs',
-  hash: s => s(['overview', 'installation', 'usage', 'api-reference', 'faq'])
+```typescript
+import type { Location } from 'react-router';
+
+const location: Location = {
+  hash: '#usage',
+  key: 'default',
+  pathname: '/docs',
+  search: '',
+  state: null
+};
+
+const value = codec.parse(location);
+// value: 'overview' | 'installation' | 'usage' | undefined
+
+const hash = codec.stringify(value);
+// hash: '#usage'
+```
+
+In the application, `createAppRoute` creates and owns the codec from its `path` and `hash` options. Route components read the parsed value through `useAppHashParams`:
+
+```typescript
+import { useAppHashParams } from 'core/routes';
+import { HASH_PARAM_BLUEPRINTS } from 'features/hash-params';
+
+const documentationHash = (blueprints: typeof HASH_PARAM_BLUEPRINTS) =>
+  blueprints.enum(['overview', 'installation', 'usage']);
+
+// Passed to createAppRoute({ path: '/docs', hash: documentationHash, ... })
+
+const DocumentationPage = () => {
+  const section = useAppHashParams<'/docs'>();
+  return <div>{section}</div>;
+};
+```
+
+The route definition must also provide its component, labels, icons, and other required route options:
+
+```typescript
+import { createAppRoute } from 'core/routes';
+
+const DocumentationRoute = createAppRoute({
+  component: <DocumentationPage />,
+  hash: documentationHash,
+  path: '/docs',
+  shortname: () => ['app_route.docs.shortname'],
+  fullname: () => ['app_route.docs.fullname'],
+  shorticon: () => <span />,
+  fullicon: () => <span />
 });
-
-function DocumentationPage() {
-  const hashValue = useAppHashParams<'/docs'>();
-
-  useEffect(() => {
-    if (hashValue) {
-      const element = document.getElementById(hashValue);
-      element?.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [hashValue]);
-
-  return (
-    <div>
-      <section id="overview">...</section>
-      <section id="installation">...</section>
-      <section id="usage">...</section>
-      <section id="api-reference">...</section>
-      <section id="faq">...</section>
-    </div>
-  );
-}
 ```
 
-Users can now:
+## 6. Codebase (Internals)
 
-- Visit `/docs#usage` to jump directly to the usage section
-- Bookmark `/docs#api-reference` to return to that section later
-- Share `/docs#faq` to link others to the FAQ
+### Key Files
 
-## Type Inference
+| File | Role |
+| --- | --- |
+| `hash-params.models.ts` | Public hash value, blueprint, and codec types |
+| `hash-params.utils.ts` | Blueprint factories, default blueprint, and codec creation |
+| `hash-params.utils.test.ts` | Unit tests for parsing and serialization |
+| `index.ts` | Explicit public exports |
 
-The hash param type is automatically inferred from the enum values:
+### Type Utilities
 
-```tsx
-const codec = createHashParamCodec()(blueprint => blueprint.enum(['overview', 'installation', 'usage'] as const));
+| Type | Purpose |
+| --- | --- |
+| `HashParamValue` | Allowed string, number, and boolean values |
+| `InferHashParamBlueprintFromValue<Value>` | Defines one hash blueprint |
+| `InferHashParamFromBlueprint<Blueprint>` | Resolves a blueprint to its value type or `undefined` |
+| `InferHashParamCodecFromBlueprint<Blueprint>` | Describes the inferred codec type |
 
-// codec.parse() returns: 'overview' | 'installation' | 'usage' | undefined
-// codec.type is: 'overview'
-```
+### Data Flow And Boundaries
 
-TypeScript enforces that only declared hash values are allowed:
+The input boundary is a route `Location` and its hash. The codec removes the leading `#`, decodes the value, and passes it to the blueprint parser. Serialization runs the blueprint serializer and encodes the result. Missing, unmatched, or invalid values use the blueprint default or resolve to `undefined`; empty serialized values return an empty string.
 
-```tsx
-// ✅ Valid
-navigate.to().create({ route: '/docs', hash: 'api' });
+## 7. Related Modules
 
-// ❌ TypeScript error — 'invalid' not in enum
-navigate.to().create({ route: '/docs', hash: 'invalid' });
-```
-
-## Encoding
-
-Hash values are automatically URL-encoded when stringified and decoded when parsed:
-
-```tsx
-const codec = createHashParamCodec()(blueprint => blueprint.enum(['api-overview', 'getting-started']));
-
-codec.stringify('api-overview'); // '#api-overview'
-// For special characters: '#my%20section' for 'my section'
-```
-
-## Design Notes
-
-- **Single responsibility** — hash params handle only hash fragment navigation, not scroll position management
-- **No default export** — use named exports for composition
-- **No implicit defaults** — pass defaults explicitly to `.enum()`
-- **Composable** — codecs are pure functions without side effects
-- **Browser-compatible** — uses standard `location.hash` and `encodeURIComponent`
-- **Type-safe** — only declared hash values are permitted at compile time
+- `core/routes/` - Creates hash codecs for application routes and exposes parsed values through route hooks
+- `features/path-params/` - Provides the parallel typed codec system for path parameters
+- `features/search-params/` - Provides the parallel typed codec system for query parameters
