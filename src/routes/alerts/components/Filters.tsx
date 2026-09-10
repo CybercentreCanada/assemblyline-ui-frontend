@@ -19,8 +19,7 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import { useAppNavigate } from 'core/router';
-import { useAppSearchSnapshot } from 'core/routes';
+import { useAppNavigate, useAppSearchSnapshot } from 'core/router';
 import useALContext from 'deprecated/hooks/useALContext';
 import useClipboard from 'deprecated/hooks/useClipboard';
 import useMyAPI from 'deprecated/hooks/useMyAPI';

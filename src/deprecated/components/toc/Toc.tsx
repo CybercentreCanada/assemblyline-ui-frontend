@@ -1,7 +1,6 @@
 import { styled, useTheme } from '@mui/material';
 import { useAppPreferenceStore } from 'core/preference';
-import { AppLink } from 'core/router';
-import { useAppHashParams } from 'core/routes';
+import { AppLink, useAppHashParams } from 'core/router';
 import useALContext from 'deprecated/hooks/useALContext';
 import type { ReactNode } from 'react';
 import React, { useEffect, useMemo } from 'react';

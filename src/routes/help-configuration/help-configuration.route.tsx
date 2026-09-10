@@ -1,6 +1,6 @@
 import SettingsApplicationsOutlinedIcon from '@mui/icons-material/SettingsApplicationsOutlined';
 import { Grid, Skeleton, Typography, useTheme } from '@mui/material';
-import { createAppRoute } from 'core/routes';
+import { createAppRoute } from 'core/router';
 import { AppPageFullWidth } from 'core/template';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import { memo, useEffect, useState } from 'react';

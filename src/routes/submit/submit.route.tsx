@@ -1,7 +1,7 @@
 import PublishOutlinedIcon from '@mui/icons-material/PublishOutlined';
 import { Alert, Collapse, styled, useMediaQuery, useTheme } from '@mui/material';
 import { useAppConfigStore } from 'core/config';
-import { createAppRoute, useAppSearchSnapshot } from 'core/routes';
+import { createAppRoute, useAppSearchSnapshot } from 'core/router';
 import { useAppSnackbar } from 'core/snackbar';
 import { AppBanner, AppPageCenter } from 'core/template';
 import type { Metadata } from 'models/base/submission';

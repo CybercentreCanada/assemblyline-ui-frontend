@@ -1,7 +1,7 @@
 import PageviewOutlinedIcon from '@mui/icons-material/PageviewOutlined';
 import { alpha, styled, Tooltip, useTheme } from '@mui/material';
 import { useAppInterfaceStore, useAppSetInterfaceStore } from 'core/interface';
-import { useAppLocation } from 'core/routes';
+import { useAppLocation } from 'core/router';
 import {
   APP_CAROUSEL_ZOOM_CLASS,
   cycleAppCarouselBackgroundMode,

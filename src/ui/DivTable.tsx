@@ -10,8 +10,7 @@ import {
   TableSortLabel
 } from '@mui/material';
 import type { InferAppNavigationPropsFromPath } from 'core/router';
-import { AppLink, useAppNavigate } from 'core/router';
-import { useAppSearchSnapshot } from 'core/routes';
+import { AppLink, useAppNavigate, useAppSearchSnapshot } from 'core/router';
 import React, { memo } from 'react';
 import type SimpleSearchQuery from 'ui/SearchBar/simple-search-query';
 

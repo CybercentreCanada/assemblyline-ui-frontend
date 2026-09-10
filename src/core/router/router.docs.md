@@ -2,52 +2,59 @@
 
 ## 1. Purpose
 
-The router is the application's typed, multi-panel navigation layer. It sits on top of React Router and keeps the active page for each panel in Zustand stores. Pages can remain mounted through cached portal nodes, allowing navigation between panels without unnecessarily losing component state.
+`core/router` is the typed navigation and route-state layer for the application. It combines route definitions, path/search/hash codecs, parsed location snapshots, multi-panel navigation, blockers, cached page rendering, and browser URL synchronization.
 
-The route registry and route-parameter logic live in `core/routes`. The router owns page placement, navigation operations, blockers, node caching, URL synchronization, and browser document navigation.
+The application uses React Router for browser history and location changes, while this module owns the application-level route registry, page placement, navigation operations, and route context exposed to components.
 
 ## 2. Features
 
-- Typed route navigation with path parameters, search parameters, hash values, and navigation options.
-- Multiple visible panels with `from`, `here`, `to`, and `at` navigation targets.
-- Portal-backed page nodes that preserve mounted component trees while pages are cached.
-- Navigation blockers for unsaved changes, possible data loss, and external navigation risk.
-- URL and `location.state` synchronization with revision IDs to prevent processing the same navigation twice.
-- Automatic sanitization of orphaned pages, missing nodes, empty panels, and over-capacity node caches.
-- Browser-compatible links through `AppLink`, including external href generation and normal link behavior.
-- Document title generation from route metadata, including optional title overrides and truncation.
+- **Typed route definitions** - Creates routes with path, search, hash, metadata, and guard configuration.
+- **Typed parameters** - Parses and serializes path, search, and hash values through the feature codecs.
+- **Multi-panel navigation** - Supports `from`, `here`, `to`, and `at` navigation targets.
+- **Page persistence** - Keeps page component trees mounted through reverse-portal nodes.
+- **Navigation blockers** - Supports unsaved changes, data-loss risk, and external navigation blockers.
+- **Location synchronization** - Synchronizes navigation state with React Router and protects against duplicate processing with revision IDs.
+- **Route context hooks** - Exposes current route, path params, search values, search snapshots, hash values, and page keys.
+- **State sanitization** - Removes orphaned pages, missing nodes, empty panels, and entries over configured limits.
+- **Browser links** - Provides `AppLink` and `AppNavigate` for normal links and programmatic navigation.
+- **Document titles** - Derives titles from route metadata and supports overrides and truncation.
 
 ## 3. Concepts
 
+### Route Definition
+
+A route is created with `createAppRoute`. It combines a path pattern with optional `params`, `search`, and `hash` codecs, presentation metadata, and guard callbacks. Required presentation callbacks are `shortname`, `fullname`, `shorticon`, and `fullicon`.
+
+The route factory creates the rendered route element and wraps it with error, disabled, and forbidden boundaries.
+
+### Path, Search, And Hash Parameters
+
+- **Path parameters** are declared by `:param` segments and resolved through `features/path-params`.
+- **Search parameters** are declared with `features/search-params` blueprints and support defaults, snapshots, deltas, and serialization.
+- **Hash parameters** are declared with `features/hash-params` blueprints and resolve a single typed hash value.
+
 ### Page
 
-An `AppRouterPage` is a resolved location entry:
-
-- `href` — serialized pathname, search, and hash.
-- `state` — durable location state.
-- `transient` — transient location state.
-- `digest` — identity hash derived from the page location and state.
-- `age` — eviction priority, recomputed during sanitization.
-- `scroll` — saved scroll position.
-
-Pages are stored in `AppRouterStore.pages` and `AppNavigationStore.pages`, keyed by generated page keys.
+An `AppRouterPage` is a concrete stored page instance. It contains the serialized `href`, durable `state`, transient state, identity `digest`, eviction `age`, and saved `scroll` position. Page keys identify instances; route paths identify route definitions.
 
 ### Panel
 
-An `AppRouterPanel` contains the `pageKey` for its active page. Panel order determines the visible split layout: panel `0` is the primary panel and later panels are additional views.
+An `AppRouterPanel` identifies the active page in a visible panel. Panel `0` is the primary panel; additional panels display neighboring views according to router preferences.
 
 ### Node
 
-An `AppRouterNode` owns a reverse portal for a page. The node cache keeps page component trees mounted while they are not currently active. `sanitizeRouterStore` removes orphaned pages, creates missing nodes, and removes old nodes according to router preferences.
+An `AppRouterNode` owns a reverse portal for a page. Cached nodes preserve mounted component trees while their pages are inactive.
 
-### Router and Navigation Stores
+### Router And Navigation Stores
 
-The router uses two related stores:
+- `AppRouterStore` contains committed pages, panels, and nodes used for rendering.
+- `AppNavigationStore` contains staged navigation requests, options, and blockers.
 
-- `AppRouterStore` — committed router state used to render pages and nodes.
-- `AppNavigationStore` — staged navigation request, including blockers and navigation options.
+Navigation updates the navigation store first. Synchronization commits the request to React Router and reconciles the router store.
 
-Navigation operations update the navigation store first. Synchronization commits the request to React Router and reconciles the committed router store.
+### Location Snapshots
+
+`AppLocationParamStore` contains the canonical route registry and parsed location snapshots keyed by page key. These snapshots provide the resolved path, search, hash, and route values used by route hooks and metadata callbacks.
 
 ## 4. Configuration
 
@@ -61,39 +68,66 @@ type RouterPreferences = {
 };
 ```
 
-- `maxPanels` limits the number of visible panels.
-- `maxNodes` controls additional cached nodes.
-- `navigation: 'push'` advances to another panel.
+- `maxPanels` limits visible panels.
+- `maxNodes` limits cached page nodes.
+- `navigation: 'push'` advances into another panel.
 - `navigation: 'loop'` cycles through available panels.
 
 `AppNavigateOptions` controls individual navigations:
 
-- `replace` — replace the browser history entry.
-- `resetScroll` — reset the destination scroll position.
-- `ignoreBlocker` — bypass registered navigation blockers.
-- `reloadDocument` — perform a full document navigation.
-- `nextTitle` — override the next document title.
-- `hashScrollIntoView` — scroll to a matching hash element.
-- `viewTransition` — enable a browser view transition when supported.
+- `replace` - Replaces the current browser history entry.
+- `resetScroll` - Resets the destination scroll position.
+- `ignoreBlocker` - Bypasses registered blockers.
+- `reloadDocument` - Performs a full document navigation.
+- `nextTitle` - Overrides the next document title.
+- `hashScrollIntoView` - Scrolls to a matching hash element.
+- `viewTransition` - Enables a browser view transition when supported.
+
+### Defining A Route
+
+```tsx
+import { createAppRoute } from 'core/router';
+import { memo } from 'react';
+
+const SubmitPage = memo(() => <div>Submit</div>);
+SubmitPage.displayName = 'SubmitPage';
+
+export const SubmitRoute = createAppRoute({
+  component: <SubmitPage />,
+  path: '/submit',
+  ancestor: null,
+  shortname: () => ['app_route.submit.shortname'],
+  fullname: () => ['app_route.submit.fullname'],
+  shorticon: () => null,
+  fullicon: () => null,
+  disabled: () => false,
+  forbidden: () => false
+});
+```
+
+A parameterized route can define path and search codecs:
+
+```tsx
+export const AlertRoute = createAppRoute({
+  component: <AlertDetailPage />,
+  path: '/alert/:id',
+  params: blueprints => ({ id: blueprints.string() }),
+  search: blueprints => ({ tab: blueprints.enum(['details', 'history'], 'details') }),
+  ancestor: '/alerts',
+  shortname: location => ['app_route.alert.shortname', { id: location.path.id }],
+  fullname: location => ['app_route.alert.fullname', { id: location.path.id }],
+  shorticon: () => <AlertIcon />,
+  fullicon: () => <AlertIcon />,
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.roles.includes('alert_view')
+});
+```
 
 ## 5. Usage
 
 ### Navigation
 
-`useAppNavigate` returns four panel-targeting functions:
-
-- `from()` — target the previous panel according to the configured navigation mode.
-- `here()` — target the panel containing the requesting page.
-- `to()` — target the next panel according to the configured navigation mode.
-- `at(panelKey)` — target an explicit panel index.
-
-Each target returns these operations:
-
-- `create` — create a new page and assign it to the target panel.
-- `update` — update the existing target page.
-- `search` — update only the route's typed search snapshot.
-- `only` — create a page and make it the only visible panel.
-- `closePanel` — remove the target panel and create a fallback page when necessary.
+`useAppNavigate` provides `from()`, `here()`, `to()`, and `at(panelKey)` targets. Each target supports operations such as `create`, `update`, `search`, `only`, and `closePanel`.
 
 ```tsx
 const navigate = useAppNavigate<'/alerts'>();
@@ -107,13 +141,11 @@ navigate.here<'/alerts'>().update(state => ({
   ...state,
   search: { ...state.search, offset: 0 }
 }));
-
-navigate.at(0).only({ route: '/submit' });
 ```
 
 ### Links
 
-Use `AppLink` with a `nav` callback. It computes an external href for browser behavior such as opening a link in a new tab, while left-click navigation is routed through the panel engine. Pass `navDeps` when the callback closes over changing values:
+Use `AppLink` with a `nav` callback. Pass `navDeps` whenever the callback closes over changing values:
 
 ```tsx
 <AppLink
@@ -129,35 +161,30 @@ Use `AppLink` with a `nav` callback. It computes an external href for browser be
 </AppLink>
 ```
 
-Use `AppNavigate` when navigation should occur from a rendered component rather than a user link.
+Use `AppNavigate` for programmatic navigation rendered as a component.
 
-### Reading Route State
-
-Route definitions and typed parameter hooks are provided by `core/routes`:
+### Reading Route Values
 
 ```tsx
-import { useAppPathParams, useAppSearchSnapshot } from 'core/routes';
+import { useAppHashParams, useAppPathParams, useAppSearchSnapshot } from 'core/router';
 
 const { id } = useAppPathParams<'/submission/detail/:id'>();
+const hash = useAppHashParams<'/submission/detail/:id'>();
 const search = useAppSearchSnapshot<'/alerts'>();
 const offset = search.get('offset');
 ```
 
-Use `useAppSearchSnapshot` when reading or updating a route search schema through `useAppNavigate().here().search()` or `.update()`.
+Use `useAppLocation` when selecting a route location or targeting another panel. Use `useAppRoute` when the route definition itself is needed.
 
 ### Blockers
-
-Pages can register a navigation blocker with `useAppBlocker`:
 
 ```tsx
 useAppBlocker('unsaved_changes', [isDirty]);
 ```
 
-Supported reasons are `unsaved_changes`, `data_loss_on_leave`, and `external_leave_risk`. `useAppBlockNavigation` detects staged navigation while blockers differ from the committed router state and asks the user for confirmation.
+Supported reasons are `unsaved_changes`, `data_loss_on_leave`, and `external_leave_risk`. `useAppBlockNavigation` observes staged navigation while blockers differ from the committed router state.
 
 ### Store Access
-
-Read committed state with selectors:
 
 ```tsx
 import { useAppNavigationStore, useAppRouterStore } from 'core/router';
@@ -167,48 +194,87 @@ const pages = useAppRouterStore(state => state.pages);
 const pendingNavigationId = useAppNavigationStore(state => state.id);
 ```
 
-For non-React integrations, use the store API helpers:
+Most application code should use typed route hooks, `useAppNavigate`, and `AppLink` instead of mutating stores directly.
 
-```tsx
-import { getAppRouterStateFromApi, useAppRouterStoreApi } from 'core/router';
+## 6. Codebase (Internals)
 
-const routerStoreApi = useAppRouterStoreApi();
-const router = getAppRouterStateFromApi(routerStoreApi);
-```
+### Components
 
-Most application code should use `useAppNavigate`, `AppLink`, and typed `core/routes` hooks instead of mutating stores directly.
+- `components/AppLink.tsx` - Browser-compatible typed link.
+- `components/AppNavigate.tsx` - Programmatic navigation component.
+- `components/AppNavigationBlocker.tsx` - Blocker confirmation behavior.
+- `components/AppRouterLayout.tsx` - Page and node rendering layout.
+- `components/AppRouterPanelLayout.tsx` - Panel rendering layout.
+- `components/AppRouteLayout.tsx` - Route-level scroll and hash layout behavior.
+- `components/AppRouteName.tsx` - Localized route-name rendering.
 
-## 6. Codebase
+### Hooks
 
-### Providers and stores
+- `hooks/useAppNavigate.tsx` - Navigation targets and operations.
+- `hooks/useAppLocation.tsx` - Location snapshot selection.
+- `hooks/useAppRoute.tsx` - Route definition selection.
+- `hooks/useAppPathParams.tsx` - Current path parameter access.
+- `hooks/useAppSearchParams.tsx` - Current parsed search access.
+- `hooks/useAppSearchSnapshot.tsx` - Current search snapshot access.
+- `hooks/useAppHashParams.tsx` - Current hash access.
+- `hooks/useAppBlocker.tsx` and `hooks/useAppBlockNavigation.tsx` - Navigation blocking.
+- `hooks/useAppSyncNavigationStoreFromLocation.tsx` and `hooks/useAppSyncRouterStoreFromNavigation.tsx` - Location synchronization.
 
-- `router.providers.tsx` — Zustand providers, store APIs, defaults, and `AppRouterProvider`.
-- `router.models.tsx` — Router, navigation, page, panel, node, blocker, and operation types.
+### Models
 
-### Navigation and rendering
+- `models/router.models.ts` - Router pages, panels, nodes, and stores.
+- `models/navigation.models.ts` - Navigation options and operation types.
+- `models/location.models.ts` - Route and location inference types.
+- `models/react-router.models.ts` - React Router location state types.
+- `models/blocked-page.models.ts` - Blocked page types.
+- `models/not-found.models.ts` - Not-found diagnostics types.
+- `models/legacy.models.ts` - Legacy location resolution types.
 
-- `router.hooks.tsx` — `useAppNavigate`, external href generation, synchronization, and blocker hooks.
-- `router.components.tsx` — `AppLink`, `AppNavigate`, and `AppNavigationBlocker`.
-- `router.layout.tsx` — Router, panel, page, and node rendering layouts.
+### Providers
 
-### Utilities and related modules
+- `providers/AppRouterProvider.tsx` - Browser router and router store.
+- `providers/AppNavigationProvider.tsx` - Navigation store and synchronization hooks.
+- `providers/AppLocationParamProvider.tsx` - Route registry and location snapshot store.
+- `providers/AppPageKeyProvider.tsx` - Current page-key context.
+- `providers/AppRouteLayoutProvider.tsx` - Page scroll restoration and hash scrolling.
 
-- `router.utils.tsx` — Page, panel, node, blocker, sanitization, serialization, and document-title utilities.
-- `router.utils.test.tsx` — Unit tests for router utilities.
-- `core/routes` — Route factories, path parameters, search schemas, and location snapshots.
-- `features/portal` — Reverse portal implementation.
-- `layout/router` — Application-specific panel presentation.
+### Utilities And Tests
 
-### Synchronization flow
+- `utils/router-node.utils.ts` - Node lifecycle and sanitization.
+- `utils/router-page.utils.ts` - Page lifecycle, scroll state, and page sanitization.
+- `utils/router-panel.utils.ts` - Panel lifecycle and panel sanitization.
+- `utils/navigation.utils.ts` - Navigation intent and dispatch.
+- `utils/location.utils.ts` - Router/location state conversion.
+- `utils/routes.utils.ts` - Route registry, route lookup, and location conversion.
+- `utils/blocked-page.utils.ts` - Blocked-page state operations.
+- `utils/not-found.utils.ts` - Not-found page and diagnostic helpers.
+- `utils/legacy.utils.ts` - Legacy URL resolution.
+- `utils/media-query.utils.ts` - Container media-query parsing.
+- `tests/*.utils.test.ts` - Focused utility tests.
 
-`AppRouterProvider` composes the React Router provider and router store providers. `useAppSyncNavigationStoreFromLocation` reads locations and hydrates the navigation store from location state, the `/v1` hash, or legacy locations. `useAppSyncRouterStoreFromNavigation` writes `/v1` plus serialized panel fragments to React Router, updates the document title, and reconciles the committed router store.
+### Data Flow And Boundaries
 
-The location state carries an `id`, panel descriptors, and page location data. The revision ID prevents a location written by the router from being processed as a new navigation request when it returns through React Router.
+1. `AppRouterProvider` mounts React Router and the router store.
+2. `AppNavigationProvider` stages navigation requests and runs blocker/synchronization hooks.
+3. `AppLocationParamProvider` registers route definitions and synchronizes parsed location snapshots.
+4. Navigation codecs serialize typed path, search, and hash values into a browser location.
+5. `AppRouterStore` commits pages, panels, and nodes used by the rendering layout.
+6. Sanitization removes orphaned or over-capacity state while preserving active pages.
 
-### Maintenance rules
+## 7. Related Modules
 
-- Use route factories and typed route params rather than assembling href strings manually.
-- Use `navDeps` whenever a `nav` callback closes over changing values.
-- Preserve the revision-ID synchronization guard when changing location or navigation flow.
-- Run sanitization after direct page, panel, or node mutations.
-- Do not confuse page keys with route paths: page keys identify stored page instances, while route paths identify route definitions.
+- `features/path-params` - Path parameter codecs.
+- `features/search-params` - Search parameter engines and snapshots.
+- `features/hash-params` - Hash parameter codecs.
+- `features/portal` - Reverse portal nodes used for cached pages.
+- `core/config` - Application preferences and route guard configuration.
+- `src/app/core.routes.tsx` - Canonical application route registry.
+
+## Maintenance Rules
+
+- Use `createAppRoute` and typed codecs instead of assembling hrefs manually.
+- Use `navDeps` when a navigation callback closes over changing values.
+- Preserve revision-ID synchronization guards when changing navigation or location flow.
+- Sanitize after direct page, panel, or node mutations.
+- Keep page keys distinct from route paths: page keys identify instances, while route paths identify definitions.
+- Keep route-definition and location-snapshot logic in this merged module; do not reintroduce a parallel `core/routes` implementation.

@@ -1,6 +1,6 @@
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import { useAppConfigStore } from 'core/config';
-import { createAppRoute, useAppPathParams } from 'core/routes';
+import { createAppRoute, useAppPathParams } from 'core/router';
 import { TableOfContentLayout, useTableOfContent } from 'features/table-of-content';
 import { memo, useCallback, useEffect } from 'react';
 import { DefaultMetadataSection } from 'routes/settings/components/DefaultMetadata';

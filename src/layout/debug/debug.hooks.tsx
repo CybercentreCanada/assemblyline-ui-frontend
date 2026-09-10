@@ -6,8 +6,7 @@ import {
   useAppSetInterfaceStore
 } from 'core/interface';
 import { getAppPreferenceStateFromApi, useAppPreferenceStoreApi } from 'core/preference';
-import { useAppNavigationStoreApi, useAppRouterStoreApi } from 'core/router';
-import { useAppLocationParamStoreApi } from 'core/routes';
+import { useAppLocationParamStoreApi, useAppNavigationStoreApi, useAppRouterStoreApi } from 'core/router';
 import type { AppDebugStoreHistory, AppDebugStoreName } from 'layout/debug';
 import { getDefaultAppDebugStoreHistory } from 'layout/debug/debug.models';
 import { serializeAppDebugState } from 'layout/debug/debug.utils';

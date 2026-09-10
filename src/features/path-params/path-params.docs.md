@@ -87,7 +87,7 @@ const pathname = codec.stringify({ id: '456' });
 In the application, `createAppRoute` creates and owns the codec from its `path` and `params` options. Route components read the parsed values through `useAppPathParams`:
 
 ```typescript
-import { useAppPathParams } from 'core/routes';
+import { useAppPathParams } from 'core/router';
 import { PATH_PARAM_BLUEPRINTS_MAP } from 'features/path-params';
 
 const alertParams = (blueprints: typeof PATH_PARAM_BLUEPRINTS_MAP) => ({

@@ -15,7 +15,7 @@ import {
   useTheme
 } from '@mui/material';
 import Alert from '@mui/material/Alert';
-import { createAppRoute, useAppLocation, useAppPathParams, useAppSearchSnapshot } from 'core/routes';
+import { createAppRoute, useAppLocation, useAppPathParams, useAppSearchSnapshot } from 'core/router';
 import { AppPageFullWidth } from 'core/template';
 import ListCarousel from 'deprecated/components/lists/carousel/ListCarousel';
 import ListNavigator from 'deprecated/components/lists/navigator/ListNavigator';

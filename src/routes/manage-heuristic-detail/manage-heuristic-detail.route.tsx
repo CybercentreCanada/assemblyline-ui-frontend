@@ -2,7 +2,7 @@ import ListOutlinedIcon from '@mui/icons-material/ListOutlined';
 import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
 import type { PaperProps } from '@mui/material';
 import { Grid, Paper, Skeleton, styled, Typography, useTheme } from '@mui/material';
-import { createAppRoute, useAppPathParams } from 'core/routes';
+import { createAppRoute, useAppPathParams } from 'core/router';
 import { AppPageCenter } from 'core/template';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';

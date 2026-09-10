@@ -1,8 +1,7 @@
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import WrongLocationOutlinedIcon from '@mui/icons-material/WrongLocationOutlined';
 import { Button, Collapse, Paper, styled, SvgIcon, Typography, useMediaQuery, useTheme } from '@mui/material';
-import { getNotFoundDetails, getNotFoundPreviewHref } from 'core/router';
-import { useAppSearchParams } from 'core/routes';
+import { getNotFoundDetails, getNotFoundPreviewHref, useAppSearchParams } from 'core/router';
 import { AppPageCenter } from 'core/template';
 import { memo, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';

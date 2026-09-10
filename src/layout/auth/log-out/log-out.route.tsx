@@ -1,7 +1,7 @@
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import { CircularProgress, Typography, useTheme } from '@mui/material';
 import { invalidateApiQuery, useApiMutation } from 'core/api';
-import { createAppRoute } from 'core/routes';
+import { createAppRoute } from 'core/router';
 import { AppPageCardCentered, AppVerticalBanner } from 'core/template';
 import { memo, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';

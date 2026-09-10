@@ -11,6 +11,8 @@ import { AppErrorProvider } from 'core/error';
 import { AppInterfaceStoreProvider } from 'core/interface';
 import { AppPreferenceProvider, AppPreferenceStoreProvider } from 'core/preference';
 import {
+  AppLocationParamProvider,
+  AppLocationParamStoreProvider,
   AppNavigationProvider,
   AppNavigationStoreProvider,
   AppRouterLayout,
@@ -18,7 +20,6 @@ import {
   AppRouterProvider,
   AppRouterStoreProvider
 } from 'core/router';
-import { AppLocationParamProvider, AppLocationParamStoreProvider } from 'core/routes';
 import { AppSnackbarProvider } from 'core/snackbar';
 import { AppTemplateLayout, AppTemplateProvider } from 'core/template';
 import { AppAssistantLayout, AppAssistantProvider } from 'layout/assistant';

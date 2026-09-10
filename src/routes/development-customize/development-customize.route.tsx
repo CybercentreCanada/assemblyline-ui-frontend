@@ -1,6 +1,6 @@
 import DataObjectOutlinedIcon from '@mui/icons-material/DataObjectOutlined';
 import { Box, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, useTheme } from '@mui/material';
-import { createAppRoute } from 'core/routes';
+import { createAppRoute } from 'core/router';
 import { memo, Profiler } from 'react';
 import {
   Performance,

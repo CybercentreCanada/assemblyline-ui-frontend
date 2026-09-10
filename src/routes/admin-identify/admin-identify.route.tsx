@@ -1,8 +1,7 @@
 import { loader } from '@monaco-editor/react';
 import FindInPageOutlinedIcon from '@mui/icons-material/FindInPageOutlined';
 import { Alert, Box, Grid, Paper, styled, Tab, Tabs, Typography, useTheme } from '@mui/material';
-import { useAppBlocker } from 'core/router';
-import { createAppRoute } from 'core/routes';
+import { createAppRoute, useAppBlocker } from 'core/router';
 import { AppPageFullSize } from 'core/template';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import { memo, useEffect, useState } from 'react';

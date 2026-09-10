@@ -81,7 +81,7 @@ const hash = codec.stringify(value);
 In the application, `createAppRoute` creates and owns the codec from its `path` and `hash` options. Route components read the parsed value through `useAppHashParams`:
 
 ```typescript
-import { useAppHashParams } from 'core/routes';
+import { useAppHashParams } from 'core/router';
 import { HASH_PARAM_BLUEPRINTS } from 'features/hash-params';
 
 const documentationHash = (blueprints: typeof HASH_PARAM_BLUEPRINTS) =>
@@ -98,7 +98,7 @@ const DocumentationPage = () => {
 The route definition must also provide its component, labels, icons, and other required route options:
 
 ```typescript
-import { createAppRoute } from 'core/routes';
+import { createAppRoute } from 'core/router';
 
 const DocumentationRoute = createAppRoute({
   component: <DocumentationPage />,

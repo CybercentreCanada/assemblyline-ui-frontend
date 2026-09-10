@@ -4,7 +4,7 @@ import ApiIcon from '@mui/icons-material/Api';
 import { Button, Grid, Paper, Skeleton, Typography, useTheme } from '@mui/material';
 import type { Method } from 'core/api';
 import { useApiMutation, useAppQuery } from 'core/api';
-import { createAppRoute } from 'core/routes';
+import { createAppRoute } from 'core/router';
 import { AppPageFullSize } from 'core/template';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMySnackbar from 'deprecated/hooks/useMySnackbar';

@@ -13,7 +13,7 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
-import { useAppSearchSnapshot } from 'core/routes';
+import { useAppSearchSnapshot } from 'core/router';
 import useMySnackbar from 'deprecated/hooks/useMySnackbar';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';

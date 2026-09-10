@@ -1,5 +1,5 @@
-import type { AppLocationParamStore } from 'core/routes';
-import { findAppRouteFromPath } from 'core/routes';
+import type { AppLocationParamStore } from 'core/router';
+import { findAppRouteFromPath } from 'core/router';
 
 /**
  * @name getAncestorAppRoutes

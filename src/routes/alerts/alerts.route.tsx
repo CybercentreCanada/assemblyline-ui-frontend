@@ -1,8 +1,7 @@
 import AddIcon from '@mui/icons-material/Add';
 import NotificationImportantOutlinedIcon from '@mui/icons-material/NotificationImportantOutlined';
 import { AlertTitle, useMediaQuery, useTheme } from '@mui/material';
-import { useAppNavigate } from 'core/router';
-import { createAppRoute, useAppSearchSnapshot } from 'core/routes';
+import { createAppRoute, useAppNavigate, useAppSearchSnapshot } from 'core/router';
 import { AppPageFullWidth } from 'core/template';
 import SimpleList from 'deprecated/components/lists/simplelist/SimpleList';
 import useALContext from 'deprecated/hooks/useALContext';

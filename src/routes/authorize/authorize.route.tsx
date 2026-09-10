@@ -1,6 +1,6 @@
 import KeyOutlinedIcon from '@mui/icons-material/KeyOutlined';
 import { Backdrop, Button, Typography, useTheme } from '@mui/material';
-import { createAppRoute } from 'core/routes';
+import { createAppRoute } from 'core/router';
 import { AppPageCardCentered, AppVerticalBanner } from 'core/template';
 import useALContext from 'deprecated/hooks/useALContext';
 import useAppUser from 'deprecated/hooks/useAppUser';

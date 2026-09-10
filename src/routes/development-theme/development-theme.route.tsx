@@ -3,7 +3,7 @@ import FileOpenIcon from '@mui/icons-material/FileOpen';
 import PaletteIcon from '@mui/icons-material/Palette';
 import { Button, IconButton, Stack, Switch, useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
-import { createAppRoute } from 'core/routes';
+import { createAppRoute } from 'core/router';
 import { AppPageCenter } from 'core/template';
 import { memo } from 'react';
 import { AlertExtendedScan, AlertPriority, AlertStatus } from 'routes/alerts/components/Components';

@@ -1,8 +1,7 @@
 import Editor, { DiffEditor, loader } from '@monaco-editor/react';
 import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Skeleton, useTheme } from '@mui/material';
-import { useAppBlocker } from 'core/router';
-import { createAppRoute } from 'core/routes';
+import { createAppRoute, useAppBlocker } from 'core/router';
 import { AppPageFullSize, useAppTemplateThemeMode } from 'core/template';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';

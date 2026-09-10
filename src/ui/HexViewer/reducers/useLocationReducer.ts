@@ -1,4 +1,4 @@
-import { useAppPathParams, useAppSearchSnapshot } from 'core/routes';
+import { useAppPathParams, useAppSearchSnapshot } from 'core/router';
 import useClipboard from 'deprecated/hooks/useClipboard';
 import { useCallback } from 'react';
 import type { LocationParam, ReducerHandler, Reducers, Store, UseReducer } from '..';

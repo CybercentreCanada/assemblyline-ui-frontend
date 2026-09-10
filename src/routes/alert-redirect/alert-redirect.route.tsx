@@ -1,7 +1,6 @@
 import NotificationImportantOutlinedIcon from '@mui/icons-material/NotificationImportantOutlined';
 import { CircularProgress } from '@mui/material';
-import { AppNavigate } from 'core/router';
-import { createAppRoute } from 'core/routes';
+import { AppNavigate, createAppRoute } from 'core/router';
 import { memo, useMemo } from 'react';
 import { ALERT_STORAGE_KEY, AlertsRoute } from 'routes/alerts/alerts.route';
 

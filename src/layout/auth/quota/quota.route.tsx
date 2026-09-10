@@ -1,7 +1,7 @@
 import SpeedOutlinedIcon from '@mui/icons-material/SpeedOutlined';
 import { Typography, useMediaQuery, useTheme } from '@mui/material';
 import { useAppSetInterfaceStore } from 'core/interface';
-import { createAppRoute } from 'core/routes';
+import { createAppRoute } from 'core/router';
 import { AppPageCenter } from 'core/template';
 import { memo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';

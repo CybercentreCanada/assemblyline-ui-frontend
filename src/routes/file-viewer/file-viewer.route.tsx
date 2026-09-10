@@ -26,8 +26,14 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import { AppLink, AppNavigate, useAppNavigate } from 'core/router';
-import { createAppRoute, useAppPathParams, useAppSearchParams } from 'core/routes';
+import {
+  AppLink,
+  AppNavigate,
+  createAppRoute,
+  useAppNavigate,
+  useAppPathParams,
+  useAppSearchParams
+} from 'core/router';
 import { AppPageFullSize } from 'core/template';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
