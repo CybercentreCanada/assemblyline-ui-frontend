@@ -3,6 +3,7 @@ import { getRouteParamFromKey, useAppLocationParamStore, useAppPageKey } from 'c
 import type { ComponentType, MemoExoticComponent, PropsWithChildren, ReactNode } from 'react';
 import { memo } from 'react';
 import { ForbiddenPage } from 'routes/forbidden/forbidden';
+import { toElement } from 'shared/utils/app.utils';
 
 export type DisabledBoundaryProps = PropsWithChildren<{
   /** Condition or callback to determine disabled state. */
@@ -16,7 +17,7 @@ export const DisabledBoundary = memo(
     const pageKey = useAppPageKey();
     const params = useAppLocationParamStore(s => getRouteParamFromKey(s, pageKey));
     const isDisabled = useAppConfigStore(s => disabled(params, s));
-    return isDisabled ? <>{FallbackComponent}</> : <>{children}</>;
+    return isDisabled ? <>{toElement(FallbackComponent)}</> : <>{children}</>;
   }
 );
 

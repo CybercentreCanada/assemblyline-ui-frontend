@@ -32,6 +32,11 @@ import { useCallback } from 'react';
 import type { NavigateOptions } from 'react-router';
 import { generateRandomUUID } from 'shared/utils/app.utils';
 
+/**
+ * @name useAppNavigate
+ * @description Returns typed navigation operations for the current router page.
+ * @returns Navigation targets and operations for creating, updating, searching, or closing panels.
+ */
 export function useAppNavigate<const Origin extends AppRoute['path']>() {
   const pageKey = useAppPageKey();
   const locationParamStoreApi = useAppLocationParamStoreApi();

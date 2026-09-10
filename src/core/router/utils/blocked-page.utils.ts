@@ -38,6 +38,14 @@ export const removeBlockedPage = (
   return store;
 };
 
+/**
+ * @name setBlockedPage
+ * @description Sets or removes a page navigation block according to the supplied reason.
+ * @param store - Navigation store to update.
+ * @param pageKey - Page key whose block should change.
+ * @param reason - Block reason, or a falsy value to remove the block.
+ * @returns The updated navigation store.
+ */
 export const setBlockedPage = (
   store: AppNavigationStore,
   pageKey: keyof AppNavigationStore['pages'],
@@ -47,10 +55,22 @@ export const setBlockedPage = (
   else return removeBlockedPage(store, pageKey);
 };
 
-export const getBlockedPages = (store: AppNavigationStore) => {
+/**
+ * @name getBlockedPages
+ * @description Returns all page keys and reasons currently recorded as blocked.
+ * @param store - Navigation store to inspect.
+ * @returns Blocked page entries as key-reason tuples.
+ */
+export const getBlockedPages = (store: AppNavigationStore): [string, AppRouterBlockedReason][] => {
   return !Object.keys(store.blockedPages || {}).length ? [] : Object.entries(store.blockedPages);
 };
 
+/**
+ * @name clearBlockedPages
+ * @description Removes every navigation block from the store.
+ * @param store - Navigation store to update.
+ * @returns The updated navigation store.
+ */
 export const clearBlockedPages = (store: AppNavigationStore): AppNavigationStore => {
   store.blockedPages = {};
   return store;

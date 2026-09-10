@@ -34,6 +34,12 @@ const getAttemptedHrefFromInput = (input: unknown): AppRouterPage['href'] => {
   return null;
 };
 
+/**
+ * @name isNotFoundRouterPage
+ * @description Checks whether a page is marked as a not-found page.
+ * @param page - Page to inspect.
+ * @returns True when the page carries the not-found marker.
+ */
 export const isNotFoundRouterPage = function (page: Partial<AppRouterPage> = null): boolean {
   if (!page) return false;
   if (page.digest === 'not-found') return true;
@@ -42,6 +48,13 @@ export const isNotFoundRouterPage = function (page: Partial<AppRouterPage> = nul
   return transient?.__notFound === true;
 };
 
+/**
+ * @name getNotFoundRouterPage
+ * @description Creates a router page containing not-found diagnostics.
+ * @param values - Diagnostic values to store on the page.
+ * @param href - Href associated with the failed navigation.
+ * @returns A marked not-found router page.
+ */
 export const getNotFoundRouterPage = function (
   values: object = null,
   href: AppRouterPage['href'] = '/not-found'
@@ -59,6 +72,14 @@ export const getNotFoundRouterPage = function (
   };
 };
 
+/**
+ * @name resolveNotFoundPage
+ * @description Replaces an empty page with a diagnostic not-found page.
+ * @param page - Candidate page to validate.
+ * @param attemptedInput - Input that produced the candidate page.
+ * @param context - Navigation context to include in diagnostics.
+ * @returns The original page when valid, otherwise a diagnostic page.
+ */
 export const resolveNotFoundPage = (
   page: AppRouterPage,
   attemptedInput: unknown,
@@ -92,6 +113,13 @@ const getAttemptedPageFromDiagnostics = (
   return diagnostics.attemptedPage as Record<string, unknown>;
 };
 
+/**
+ * @name formatNotFoundDiagnosticValue
+ * @description Converts a diagnostic value into displayable text.
+ * @param value - Value to format.
+ * @param unserializableValue - Fallback text for values that cannot be serialized.
+ * @returns Formatted diagnostic text, or null for empty values.
+ */
 export const formatNotFoundDiagnosticValue = (value: unknown, unserializableValue: string): string | null => {
   if (value == null) return null;
   if (typeof value === 'string') return value;
@@ -104,6 +132,12 @@ export const formatNotFoundDiagnosticValue = (value: unknown, unserializableValu
   }
 };
 
+/**
+ * @name getNotFoundPreviewHref
+ * @description Extracts the most useful attempted href from not-found diagnostics.
+ * @param diagnostics - Diagnostic payload to inspect.
+ * @returns Attempted href, or null when unavailable.
+ */
 export const getNotFoundPreviewHref = (diagnostics: Record<string, unknown> | null): AppRouterPage['href'] => {
   if (!diagnostics) return null;
 
@@ -132,6 +166,14 @@ export const getNotFoundPreviewHref = (diagnostics: Record<string, unknown> | nu
   return null;
 };
 
+/**
+ * @name getNotFoundDetails
+ * @description Builds labeled display entries from not-found diagnostics.
+ * @param diagnostics - Diagnostic payload to inspect.
+ * @param labels - Labels for each diagnostic field.
+ * @param unserializableValue - Fallback text for values that cannot be serialized.
+ * @returns Display-ready diagnostic detail items.
+ */
 export const getNotFoundDetails = (
   diagnostics: Record<string, unknown> | null,
   labels: NotFoundDetailLabels,

@@ -24,6 +24,12 @@ import type { TFunction } from 'i18next';
 // Router Store
 //*****************************************************************************************
 
+/**
+ * @name getHashFragmentsFromRouter
+ * @description Collects route hash fragments from the active navigation panels.
+ * @param store - Navigation store to inspect.
+ * @returns Active hash fragments in panel order.
+ */
 export const getHashFragmentsFromRouter = function (store: AppNavigationStore): string[] {
   return store.panels
     .map(panel => {
@@ -45,6 +51,15 @@ export const getHashFragmentsFromRouter = function (store: AppNavigationStore): 
     .filter((f): f is string => f !== null);
 };
 
+/**
+ * @name getTitlesFromNavigation
+ * @description Resolves document titles for the active navigation pages.
+ * @param store - Navigation store to inspect.
+ * @param locationStore - Location parameter store used for route metadata.
+ * @param config - Application configuration used by title callbacks.
+ * @param translate - Translation function used by route labels.
+ * @returns Document title values in panel order.
+ */
 export const getTitlesFromNavigation = function (
   navigation: AppNavigationStore,
   locationParam: AppLocationParamStore,
@@ -76,6 +91,15 @@ export const getTitlesFromNavigation = function (
     .filter((title): title is string => Boolean(title));
 };
 
+/**
+ * @name setDocumentTitleFromNavigation
+ * @description Sets the document title from the active navigation pages.
+ * @param store - Navigation store to inspect.
+ * @param locationStore - Location parameter store used for route metadata.
+ * @param config - Application configuration used by title callbacks.
+ * @param translate - Translation function used by route labels.
+ * @returns No value; updates the browser document title.
+ */
 export const setDocumentTitleFromNavigation = function (
   navigation: AppNavigationStore,
   locationParam: AppLocationParamStore,
@@ -227,6 +251,12 @@ export const setDocumentTitleFromNavigation = function (
 // };
 
 //TODO: fix this so that it doesn't get the full content of the pages stored in the location
+/**
+ * @name getLocationStateFromRouter
+ * @description Converts navigation state into the browser location state payload.
+ * @param store - Navigation store to serialize.
+ * @returns Location state containing router identity, panels, and page data.
+ */
 export const getLocationStateFromRouter = function (store: AppNavigationStore): AppLocationState {
   return {
     id: store.id,
@@ -272,6 +302,13 @@ export const getLocationStateFromRouter = function (store: AppNavigationStore): 
 //   } as Store;
 // };
 
+/**
+ * @name reconcileRouterFromNavigation
+ * @description Applies navigation pages and panels to the router store.
+ * @param store - Router store to update.
+ * @param navigation - Navigation state to reconcile.
+ * @returns The updated router store.
+ */
 export const reconcileRouterFromNavigation = (
   router: AppRouterStore,
   navigation: AppNavigationStore
@@ -310,6 +347,13 @@ export const reconcileRouterFromNavigation = (
   return router;
 };
 
+/**
+ * @name sanitizeRouterStore
+ * @description Normalizes router panels, pages, and nodes using application preferences.
+ * @param store - Router store to sanitize.
+ * @param preferences - Preferences controlling router limits.
+ * @returns The sanitized router store.
+ */
 export const sanitizeRouterStore = function <const Store extends AppSharedRouterStore>(
   store: Store,
   preferences: AppPreferenceStore

@@ -19,7 +19,12 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { resetFavicon } from 'shared/utils/utils';
 
-export function useAppSyncRouterStoreFromNavigation() {
+/**
+ * @name useSyncRouterStoreFromNavigation
+ * @description Synchronizes router state, browser history, document title, and favicon from navigation state.
+ * @returns No value; subscribes the router store to navigation changes.
+ */
+export function useSyncRouterStoreFromNavigation() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const configStoreApi = useAppConfigStoreApi();

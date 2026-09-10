@@ -3,6 +3,7 @@ import { getRouteParamFromKey, useAppLocationParamStore, useAppPageKey } from 'c
 import type { ComponentType, MemoExoticComponent, PropsWithChildren, ReactNode } from 'react';
 import { memo } from 'react';
 import { ForbiddenPage } from 'routes/forbidden/forbidden';
+import { toElement } from 'shared/utils/app.utils';
 
 export type ForbiddenBoundaryProps = PropsWithChildren<{
   /** Condition or callback to determine forbidden state. */
@@ -16,7 +17,7 @@ export const ForbiddenBoundary = memo(
     const pageKey = useAppPageKey();
     const params = useAppLocationParamStore(s => getRouteParamFromKey(s, pageKey));
     const isForbidden = useAppConfigStore(s => forbidden(params, s));
-    return isForbidden ? <>{FallbackComponent}</> : <>{children}</>;
+    return isForbidden ? <>{toElement(FallbackComponent)}</> : <>{children}</>;
   }
 );
 

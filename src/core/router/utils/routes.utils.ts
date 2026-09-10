@@ -39,10 +39,22 @@ const DEFAULT_APP_ROUTE = {
   loader: false
 } as InferAppRouteFromPath<never>;
 
+/**
+ * @name getDefaultAppRoute
+ * @description Returns the fallback route definition for an unavailable route.
+ * @returns Default typed application route.
+ */
 export const getDefaultAppRoute = function <const Origin extends AppRoute['path']>(): InferAppRouteFromPath<Origin> {
   return DEFAULT_APP_ROUTE as InferAppRouteFromPath<Origin>;
 };
 
+/**
+ * @name findAppRouteFromPath
+ * @description Finds a registered route by its path.
+ * @param store - Location parameter store to inspect.
+ * @param path - Route path to resolve.
+ * @returns Matching route or the default route.
+ */
 export const findAppRouteFromPath = function <const Origin extends AppRoute['path']>(
   store: AppLocationParamStore,
   path: Origin
@@ -50,6 +62,13 @@ export const findAppRouteFromPath = function <const Origin extends AppRoute['pat
   return (store?.routes?.[path] as InferAppRouteFromPath<Origin>) ?? getDefaultAppRoute();
 };
 
+/**
+ * @name findAppRouteFromKey
+ * @description Finds the route associated with a router page key.
+ * @param store - Location parameter store to inspect.
+ * @param pageKey - Page key whose route should be resolved.
+ * @returns Matching route or the default route.
+ */
 export const findAppRouteFromKey = function <const Origin extends AppRoute['path']>(
   store: AppLocationParamStore,
   pageKey: keyof AppRouterState['pages']
@@ -58,6 +77,13 @@ export const findAppRouteFromKey = function <const Origin extends AppRoute['path
   return !location?.route ? getDefaultAppRoute() : findAppRouteFromPath(store, location.route as Origin);
 };
 
+/**
+ * @name findAppRouteFromPage
+ * @description Matches a router page href against registered route paths.
+ * @param store - Location parameter store to inspect.
+ * @param page - Router page to match.
+ * @returns Matching route or the default route.
+ */
 export const findAppRouteFromPage = function <const Origin extends AppRoute['path']>(
   store: AppLocationParamStore,
   page: AppRouterPage
@@ -68,13 +94,27 @@ export const findAppRouteFromPage = function <const Origin extends AppRoute['pat
   }
 
   if (!page?.href) return getDefaultAppRoute();
-  const { pathname } = new URL(page.href, 'http://localhost');
+
+  let pathname: string;
+  try {
+    pathname = new URL(page.href, 'http://localhost').pathname;
+  } catch {
+    return getDefaultAppRoute();
+  }
+
   const found = Object.values(store?.routes || {}).find(
     r => !!r?.path && !!matchPath({ path: r.path, end: true }, pathname)
   );
   return (found as InferAppRouteFromPath<Origin>) ?? getDefaultAppRoute();
 };
 
+/**
+ * @name findAppRouteFromParam
+ * @description Finds the route named by a parsed location parameter.
+ * @param store - Location parameter store to inspect.
+ * @param param - Parsed route location parameter.
+ * @returns Matching route or the default route.
+ */
 export const findAppRouteFromParam = function <const Origin extends AppRoute['path']>(
   store: AppLocationParamStore,
   param: InferAppLocationFromPath<Origin>
@@ -89,6 +129,13 @@ export const findAppRouteFromParam = function <const Origin extends AppRoute['pa
 //   return !values?.route ? getDefaultAppRoute() : findAppRouteFromPath(store, values.route as Origin);
 // };
 
+/**
+ * @name addAppRoute
+ * @description Adds a route to the registry when its path is not already registered.
+ * @param store - Location parameter store to update.
+ * @param route - Route definition to add.
+ * @returns The updated location parameter store.
+ */
 export const addAppRoute = function <const Origin extends AppRoute['path']>(
   store: AppLocationParamStore,
   route: InferAppRouteFromPath<Origin>
@@ -105,6 +152,13 @@ export const addAppRoute = function <const Origin extends AppRoute['path']>(
   return store;
 };
 
+/**
+ * @name updateAppRoute
+ * @description Updates the registered route fields for an existing path.
+ * @param store - Location parameter store to update.
+ * @param route - Route definition containing updated fields.
+ * @returns The updated location parameter store.
+ */
 export const updateAppRoute = function <const Origin extends AppRoute['path']>(
   store: AppLocationParamStore,
   route: InferAppRouteFromPath<Origin>
@@ -132,6 +186,13 @@ export const updateAppRoute = function <const Origin extends AppRoute['path']>(
   return store;
 };
 
+/**
+ * @name upsertAppRoute
+ * @description Updates a registered route or adds it when absent.
+ * @param store - Location parameter store to update.
+ * @param route - Route definition to add or update.
+ * @returns The updated location parameter store.
+ */
 export const upsertAppRoute = function <const Origin extends AppRoute['path']>(
   store: AppLocationParamStore,
   route: InferAppRouteFromPath<Origin>
@@ -174,6 +235,13 @@ export const removeAppRouteFromKey = function (
   return store;
 };
 
+/**
+ * @name setAppRouteFromAppRoutes
+ * @description Reconciles the route registry with the canonical application route list.
+ * @param store - Location parameter store to update.
+ * @param routes - Canonical application routes.
+ * @returns The updated location parameter store.
+ */
 export const setAppRouteFromAppRoutes = function (
   store: AppLocationParamStore,
   routes: AppRoutes
@@ -199,6 +267,13 @@ export const setAppRouteFromAppRoutes = function (
 // Router Page
 //*****************************************************************************************
 
+/**
+ * @name getLocationPathnameFromParam
+ * @description Serializes route path parameters into a pathname.
+ * @param route - Route definition containing the path codec.
+ * @param param - Parsed location parameter to serialize.
+ * @returns Serialized pathname.
+ */
 export const getLocationPathnameFromParam = function <const Origin extends AppRoute['path']>(
   route: InferAppRouteFromPath<Origin>,
   param: InferAppLocationFromPath<Origin>
@@ -220,6 +295,13 @@ export const getLocationPathnameFromParam = function <const Origin extends AppRo
   return param?.route;
 };
 
+/**
+ * @name getLocationSearchFromParam
+ * @description Serializes route search parameters into location values.
+ * @param route - Route definition containing the search engine.
+ * @param param - Parsed location parameter to serialize.
+ * @returns Search string, state values, and transient values.
+ */
 export const getLocationSearchFromParam = function <const Origin extends AppRoute['path']>(
   route: InferAppRouteFromPath<Origin>,
   param: InferAppLocationFromPath<Origin>
@@ -229,6 +311,13 @@ export const getLocationSearchFromParam = function <const Origin extends AppRout
   return !delta ? [null, null, null] : [delta.toLocationSearch(), delta.toLocationState(), delta.toLocationTransient()];
 };
 
+/**
+ * @name getLocationHashFromParam
+ * @description Serializes a route hash parameter.
+ * @param route - Route definition containing the hash codec.
+ * @param param - Parsed location parameter to serialize.
+ * @returns Hash value without a leading hash marker.
+ */
 export const getLocationHashFromParam = function <const Origin extends AppRoute['path']>(
   route: InferAppRouteFromPath<Origin>,
   param: InferAppLocationFromPath<Origin>
@@ -239,6 +328,13 @@ export const getLocationHashFromParam = function <const Origin extends AppRoute[
   return resolvedHash.startsWith('#') ? resolvedHash.slice(1) : resolvedHash;
 };
 
+/**
+ * @name getPageFromParam
+ * @description Builds a router page from parsed route parameters.
+ * @param store - Location parameter store used to resolve the route.
+ * @param param - Parsed location parameter to serialize.
+ * @returns Serialized router page.
+ */
 export const getPageFromParam = function <const Origin extends AppRoute['path']>(
   store: AppLocationParamStore,
   param: InferAppLocationFromPath<Origin>
@@ -262,6 +358,13 @@ export const getPageFromParam = function <const Origin extends AppRoute['path']>
   return page;
 };
 
+/**
+ * @name getPageFromLocation
+ * @description Builds a router page from a browser location object.
+ * @param store - Location parameter store used to resolve the route.
+ * @param location - Browser location to serialize.
+ * @returns Serialized router page.
+ */
 export const getPageFromLocation = function (
   store: AppLocationParamStore,
   location: ReactRouterLocation
@@ -277,6 +380,13 @@ export const getPageFromLocation = function (
   return page;
 };
 
+/**
+ * @name getPageFromURL
+ * @description Builds a router page from a URL string.
+ * @param store - Location parameter store used to resolve the route.
+ * @param url - URL string to parse.
+ * @returns Serialized router page or a default page for invalid input.
+ */
 export const getPageFromURL = function (store: AppLocationParamStore, url: string): AppRouterPage {
   if (!url?.trim()) return getDefaultRouterPage();
 
@@ -294,6 +404,12 @@ export const getPageFromURL = function (store: AppLocationParamStore, url: strin
   }
 };
 
+/**
+ * @name isNavigationInputRouteParam
+ * @description Checks whether navigation input is a parsed route parameter object.
+ * @param input - Navigation input to inspect.
+ * @returns Type guard result for route parameters.
+ */
 export const isNavigationInputRouteParam = function <const Origin extends AppRoute['path']>(
   input: InferAppNavigationInputFromPath<Origin>
 ): input is InferAppRouteParamFromPath<Origin> {
@@ -302,6 +418,12 @@ export const isNavigationInputRouteParam = function <const Origin extends AppRou
   return typeof input.route === 'string';
 };
 
+/**
+ * @name isNavigationInputLocation
+ * @description Checks whether navigation input is a browser location object.
+ * @param input - Navigation input to inspect.
+ * @returns Type guard result for browser locations.
+ */
 export const isNavigationInputLocation = function <const Origin extends AppRoute['path']>(
   input: InferAppNavigationInputFromPath<Origin>
 ): input is ReactRouterLocation {
@@ -310,12 +432,25 @@ export const isNavigationInputLocation = function <const Origin extends AppRoute
   return typeof input.pathname === 'string' && typeof input.search === 'string' && typeof input.hash === 'string';
 };
 
+/**
+ * @name isNavigationInputString
+ * @description Checks whether navigation input is a URL string.
+ * @param input - Navigation input to inspect.
+ * @returns Type guard result for URL strings.
+ */
 export const isNavigationInputString = function <const Origin extends AppRoute['path']>(
   input: InferAppNavigationInputFromPath<Origin>
 ): input is string {
   return typeof input === 'string';
 };
 
+/**
+ * @name getPageFromInput
+ * @description Converts supported navigation input into a router page.
+ * @param store - Location parameter store used to resolve the route.
+ * @param input - URL string, browser location, or parsed route parameter.
+ * @returns Serialized router page.
+ */
 export const getPageFromInput = function <const Origin extends AppRoute['path']>(
   store: AppLocationParamStore,
   input: InferAppNavigationInputFromPath<Origin>
@@ -346,6 +481,12 @@ export const getPageFromInput = function <const Origin extends AppRoute['path']>
 // Route Param
 //*****************************************************************************************
 
+/**
+ * @name getDefaultRouteParam
+ * @description Creates parsed route parameters populated with default values.
+ * @param param - Optional parameter fields that override the defaults.
+ * @returns Complete typed route parameters.
+ */
 export const getDefaultRouteParam = function <const Origin extends AppRoute['path']>(
   param: InferAppLocationFromPath<Origin> = null
 ): InferAppLocationFromPath<Origin> {
@@ -359,6 +500,12 @@ export const getDefaultRouteParam = function <const Origin extends AppRoute['pat
   };
 };
 
+/**
+ * @name getLocationFromPage
+ * @description Converts a router page href and state into a browser location.
+ * @param page - Router page to convert.
+ * @returns Browser location object.
+ */
 export const getLocationFromPage = function (page: AppRouterPage): Location {
   const url = new URL(page.href, 'http://localhost');
   return {
@@ -370,6 +517,13 @@ export const getLocationFromPage = function (page: AppRouterPage): Location {
   };
 };
 
+/**
+ * @name getPathParamFromLocation
+ * @description Parses path parameters from a browser location.
+ * @param route - Route definition containing the path codec.
+ * @param location - Browser location to parse.
+ * @returns Parsed path parameter values.
+ */
 export const getPathParamFromLocation = function <const Origin extends AppRoute['path']>(
   route: InferAppRouteFromPath<Origin>,
   location: Location
@@ -377,6 +531,13 @@ export const getPathParamFromLocation = function <const Origin extends AppRoute[
   return (!route?.params ? null : route.params.parse(location)) as InferAppLocationFromPath<Origin>['path'];
 };
 
+/**
+ * @name getSearchParamFromPage
+ * @description Parses search parameters from a router page.
+ * @param route - Route definition containing the search engine.
+ * @param page - Router page to parse.
+ * @returns Parsed search parameter values.
+ */
 export const getSearchParamFromPage = function <const Origin extends AppRoute['path']>(
   route: InferAppRouteFromPath<Origin>,
   { href, state, transient }: AppRouterPage
@@ -386,6 +547,13 @@ export const getSearchParamFromPage = function <const Origin extends AppRoute['p
     : (route.search.fromRoute(href, state, transient).toObject() as InferAppLocationFromPath<Origin>['search']);
 };
 
+/**
+ * @name getHashParamFromLocation
+ * @description Parses the route hash parameter from a browser location.
+ * @param route - Route definition containing the hash codec.
+ * @param location - Browser location to parse.
+ * @returns Parsed hash value.
+ */
 export const getHashParamFromLocation = function <const Origin extends AppRoute['path']>(
   route: InferAppRouteFromPath<Origin>,
   location: Location
@@ -393,6 +561,13 @@ export const getHashParamFromLocation = function <const Origin extends AppRoute[
   return !route?.hash ? null : (route.hash.parse(location) as InferAppLocationFromPath<Origin>['hash']);
 };
 
+/**
+ * @name getRouteParamFromPage
+ * @description Parses all route parameters from a router page.
+ * @param store - Location parameter store used to resolve the route.
+ * @param page - Router page to parse.
+ * @returns Parsed route, path, search, and hash parameters.
+ */
 export const getRouteParamFromPage = function <const Origin extends AppRoute['path']>(
   store: AppLocationParamStore,
   page: AppRouterPage
@@ -411,6 +586,13 @@ export const getRouteParamFromPage = function <const Origin extends AppRoute['pa
   };
 };
 
+/**
+ * @name sanitizePage
+ * @description Rebuilds a page from its registered route parameters.
+ * @param store - Location parameter store used to resolve the route.
+ * @param page - Router page to normalize.
+ * @returns Sanitized router page.
+ */
 export const sanitizePage = function (store: AppLocationParamStore, page: AppRouterPage): AppRouterPage {
   if (isNotFoundRouterPage(page)) {
     const nextPage = getDefaultRouterPage(page);
@@ -490,6 +672,13 @@ export const sanitizePage = function (store: AppLocationParamStore, page: AppRou
 //   return getRouteParamFromRoute(store, route);
 // };
 
+/**
+ * @name getRouteParamFromKey
+ * @description Returns parsed route parameters stored for a page key.
+ * @param store - Location parameter store to inspect.
+ * @param pageKey - Page key to resolve.
+ * @returns Stored route parameters or defaults.
+ */
 export const getRouteParamFromKey = function <const Origin extends AppRoute['path']>(
   store: AppLocationParamStore,
   pageKey: keyof AppRouterState['pages']
@@ -499,6 +688,14 @@ export const getRouteParamFromKey = function <const Origin extends AppRoute['pat
     : (store.locations[pageKey] as unknown as InferAppLocationFromPath<Origin>);
 };
 
+/**
+ * @name addRouteParam
+ * @description Adds parsed route parameters when the page key is not present.
+ * @param store - Location parameter store to update.
+ * @param pageKey - Page key for the parameters.
+ * @param param - Parsed route parameters to add.
+ * @returns The updated location parameter store.
+ */
 export const addRouteParam = function <const Origin extends AppRoute['path']>(
   store: AppLocationParamStore,
   pageKey: keyof AppLocationParamStore['locations'],
@@ -509,6 +706,14 @@ export const addRouteParam = function <const Origin extends AppRoute['path']>(
   return store;
 };
 
+/**
+ * @name addRouteParamFromPage
+ * @description Parses and adds route parameters derived from a router page.
+ * @param store - Location parameter store to update.
+ * @param pageKey - Page key for the parameters.
+ * @param page - Router page to parse.
+ * @returns The updated location parameter store.
+ */
 export const addRouteParamFromPage = function (
   store: AppLocationParamStore,
   pageKey: keyof AppRouterStore['pages'],
@@ -517,6 +722,14 @@ export const addRouteParamFromPage = function (
   return addRouteParam(store, pageKey, getRouteParamFromPage(store, page));
 };
 
+/**
+ * @name updateRouteParam
+ * @description Updates stored route parameters for an existing page key.
+ * @param store - Location parameter store to update.
+ * @param pageKey - Page key whose parameters should change.
+ * @param param - Parsed route parameters to apply.
+ * @returns The updated location parameter store.
+ */
 export const updateRouteParam = function <const Origin extends AppRoute['path']>(
   store: AppLocationParamStore,
   pageKey: keyof AppLocationParamStore['locations'],
@@ -533,6 +746,14 @@ export const updateRouteParam = function <const Origin extends AppRoute['path']>
   return store;
 };
 
+/**
+ * @name updateRouteParamFromPage
+ * @description Parses a page and updates its existing route parameter snapshot.
+ * @param store - Location parameter store to update.
+ * @param pageKey - Page key whose parameters should change.
+ * @param page - Router page to parse.
+ * @returns The updated location parameter store.
+ */
 export const updateRouteParamFromPage = function (
   store: AppLocationParamStore,
   pageKey: keyof AppRouterStore['pages'],
@@ -547,6 +768,14 @@ export const updateRouteParamFromPage = function (
   return updateRouteParam(store, pageKey, nextParam);
 };
 
+/**
+ * @name upsertRouteParam
+ * @description Updates route parameters when present or adds them when absent.
+ * @param store - Location parameter store to update.
+ * @param pageKey - Page key for the parameters.
+ * @param param - Parsed route parameters to store.
+ * @returns The updated location parameter store.
+ */
 export const upsertRouteParam = function <const Origin extends AppRoute['path']>(
   store: AppLocationParamStore,
   pageKey: keyof AppLocationParamStore['locations'],
@@ -556,6 +785,14 @@ export const upsertRouteParam = function <const Origin extends AppRoute['path']>
   else return addRouteParam(store, pageKey, param);
 };
 
+/**
+ * @name upsertRouteParamFromPage
+ * @description Parses a page and updates or adds its route parameter snapshot.
+ * @param store - Location parameter store to update.
+ * @param pageKey - Page key for the parameters.
+ * @param page - Router page to parse.
+ * @returns The updated location parameter store.
+ */
 export const upsertRouteParamFromPage = function (
   store: AppLocationParamStore,
   pageKey: keyof AppLocationParamStore['locations'],
@@ -565,6 +802,13 @@ export const upsertRouteParamFromPage = function (
   else return addRouteParamFromPage(store, pageKey, page);
 };
 
+/**
+ * @name removeRouteParamFromKey
+ * @description Removes the route parameter snapshot associated with a page key.
+ * @param store - Location parameter store to update.
+ * @param pageKey - Page key whose parameters should be removed.
+ * @returns The updated location parameter store.
+ */
 export const removeRouteParamFromKey = function (
   store: AppLocationParamStore,
   pageKey: keyof AppLocationParamStore['locations']

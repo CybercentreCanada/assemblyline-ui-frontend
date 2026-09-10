@@ -7,7 +7,12 @@ import {
 } from 'core/router';
 import { useCallback, useEffect } from 'react';
 
-export function useAppBlockUnloadEvent() {
+/**
+ * @name useBlockUnloadEvent
+ * @description Warns before the document unloads while navigation contains blocked pages.
+ * @returns No value; installs the browser beforeunload handler.
+ */
+export function useBlockUnloadEvent() {
   const navigationStoreApi = useAppNavigationStoreApi();
   const routerStoreApi = useAppRouterStoreApi();
 

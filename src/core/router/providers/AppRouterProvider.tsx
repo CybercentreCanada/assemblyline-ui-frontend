@@ -17,11 +17,11 @@ export const {
   useStoreApi: useAppRouterStoreApi
 } = createAppStore<AppRouterStore>(getDefaultRouterStore());
 
+AppRouterStoreProvider.displayName = 'AppRouterStoreProvider';
+
 export const getAppRouterStateFromApi = (api: StoreApi<AppRouterStore>): AppRouterStore => {
   return api?.getState() || getDefaultRouterStore();
 };
-
-AppRouterStoreProvider.displayName = 'AppRouterStoreProvider';
 
 export const AppRouterProvider = memo(({ children }: PropsWithChildren) => (
   <BrowserRouter basename="/">{children}</BrowserRouter>

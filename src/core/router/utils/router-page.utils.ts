@@ -5,6 +5,12 @@ import { generateRandomUUID, hashObjectKeyOrderIndependent } from 'shared/utils/
 // Page
 //*****************************************************************************************
 
+/**
+ * @name getDefaultRouterPage
+ * @description Creates a router page populated with default values.
+ * @param page - Optional page fields that override the defaults.
+ * @returns A complete router page.
+ */
 export const getDefaultRouterPage = function (page: Partial<AppRouterPage> = null): AppRouterPage {
   return {
     age: 0,
@@ -17,6 +23,12 @@ export const getDefaultRouterPage = function (page: Partial<AppRouterPage> = nul
   };
 };
 
+/**
+ * @name getPageDigestFromPage
+ * @description Computes the stable digest used to identify a page by its location and payload.
+ * @param page - Page fields used to compute the digest.
+ * @returns Page digest string.
+ */
 export const getPageDigestFromPage = function (
   page: Pick<AppRouterPage, 'href' | 'state' | 'transient'>
 ): AppRouterPage['digest'] {
@@ -27,6 +39,13 @@ export const getPageDigestFromPage = function (
   });
 };
 
+/**
+ * @name getPage
+ * @description Returns a page by key or a default page when the key is missing.
+ * @param store - Router-compatible store to inspect.
+ * @param pageKey - Page key to resolve.
+ * @returns Matching page or default router page.
+ */
 export const getPage = function <const Store extends AppSharedRouterStore>(
   store: Store,
   pageKey: PageKeyOf<Store>
@@ -48,6 +67,14 @@ export const getPage = function <const Store extends AppSharedRouterStore>(
 //   return store;
 // };
 
+/**
+ * @name shouldUpdatePage
+ * @description Checks whether a page is new or has a different digest from the stored page.
+ * @param store - Router store to inspect.
+ * @param pageKey - Page key to compare.
+ * @param page - Candidate page value.
+ * @returns True when the page should replace the stored value.
+ */
 export const shouldUpdatePage = function (
   store: AppRouterStore,
   pageKey: keyof AppRouterStore['pages'],
@@ -110,6 +137,12 @@ export const captureScrollPositions = (): number[] => {
   return positions;
 };
 
+/**
+ * @name setPageScrollPositions
+ * @description Stores current panel scroll positions on their active pages.
+ * @param store - Router-compatible store to update.
+ * @returns The updated router-compatible store.
+ */
 export const setPageScrollPositions = function <const Store extends AppSharedRouterStore>(store: Store): Store {
   const positions = captureScrollPositions();
 

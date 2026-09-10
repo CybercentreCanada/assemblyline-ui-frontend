@@ -23,6 +23,12 @@ import type { SetStateAction } from 'react';
 // Navigation
 //*****************************************************************************************
 
+/**
+ * @name getDefaultNavigateOptions
+ * @description Creates navigation options with the router defaults applied.
+ * @param options - Optional navigation values that override the defaults.
+ * @returns Complete navigation options.
+ */
 export const getDefaultNavigateOptions = function (options: Partial<AppNavigateOptions> = null): AppNavigateOptions {
   return {
     hashScrollIntoView: false,
@@ -36,6 +42,12 @@ export const getDefaultNavigateOptions = function (options: Partial<AppNavigateO
   };
 };
 
+/**
+ * @name resolveNavigationIntent
+ * @description Captures the target and operation selected by a navigation callback without dispatching it.
+ * @param nextNav - Optional navigation callback to inspect.
+ * @returns Captured navigation target, operation, options, and dispatch value.
+ */
 export const resolveNavigationIntent = function <const Origin extends AppRoute['path']>(
   nextNav: InferAppNavigationPropsFromPath<Origin>['nav']
 ): ExtractNavReturn<Origin> {
@@ -107,6 +119,13 @@ export const resolveNavigationIntent = function <const Origin extends AppRoute['
   return { target, panelKey, operation, options, dispatch };
 };
 
+/**
+ * @name applyNavigationDispatch
+ * @description Resolves a direct navigation value or updater callback against a previous value.
+ * @param dispatch - Direct value or updater callback.
+ * @param prevValue - Previous value passed to an updater callback.
+ * @returns Resolved navigation value.
+ */
 export const applyNavigationDispatch = function <const Value>(
   dispatch: SetStateAction<Value>,
   prevValue: Value
@@ -118,6 +137,13 @@ export const applyNavigationDispatch = function <const Value>(
 // Navigation Store
 //*****************************************************************************************
 
+/**
+ * @name applyDefaultNavigationStore
+ * @description Ensures a navigation store has an initial page and panel.
+ * @param store - Navigation store to normalize.
+ * @param preference - Preference state controlling panel limits.
+ * @returns The updated navigation store.
+ */
 export const applyDefaultNavigationStore = (
   store: AppNavigationStore,
   preference: AppPreferenceStore
@@ -130,6 +156,13 @@ export const applyDefaultNavigationStore = (
   return store;
 };
 
+/**
+ * @name getNavigationStoreFromRouter
+ * @description Reconciles navigation pages, panels, nodes, and identity from router state.
+ * @param store - Navigation store to update.
+ * @param router - Router store to copy from.
+ * @returns The updated navigation store.
+ */
 export const getNavigationStoreFromRouter = (store: AppNavigationStore, router: AppRouterStore): AppNavigationStore => {
   const clonePage = (page: AppRouterPage): AppNavigationStore['pages'][string] => {
     const nextPage = {
@@ -206,6 +239,12 @@ export const getNavigationStoreFromRouter = (store: AppNavigationStore, router: 
 //   return store;
 // };
 
+/**
+ * @name clearNavigationStore
+ * @description Removes all pages, panels, nodes, blockers, and options from navigation state.
+ * @param store - Navigation store to clear.
+ * @returns The cleared navigation store.
+ */
 export const clearNavigationStore = (store: AppNavigationStore): AppNavigationStore => {
   store.id = null;
   store.panels = [];

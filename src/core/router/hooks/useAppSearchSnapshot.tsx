@@ -12,11 +12,11 @@ import { useMemo } from 'react';
  * @name useAppSearchSnapshot
  * @description Returns a search snapshot resolved from the current route search values.
  * Uses the matched route search engine to reconstruct snapshot values from `param.search`.
- * @returns Current route search snapshot, or undefined when unavailable
+ * @returns Current route search snapshot, or null when unavailable
  */
 export function useAppSearchSnapshot<const Origin extends AppRoute['path']>(): InferSearchParamSnapshotFromEngine<
   InferAppRouteFromPath<Origin>['search']
-> {
+> | null {
   const pageKey = useAppPageKey();
 
   const searchParam = useAppLocationParamStore(s =>

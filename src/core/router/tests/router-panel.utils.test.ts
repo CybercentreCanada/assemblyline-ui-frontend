@@ -275,6 +275,13 @@ describe('insertLeftPanel', () => {
     expect(next.panels[0].pageKey).toBe('r0');
   });
 
+  it('returns index 0 when inserting into an empty panel list', () => {
+    const store = { ...getDefaultRouterStore(), panels: [] };
+    const [next, index] = insertLeftPanel(store, 0, { pageKey: 'r0' }, makePreferences({ maxPanels: 3 }));
+    expect(index).toBe(0);
+    expect(next.panels[0].pageKey).toBe('r0');
+  });
+
   it('trims overflow from the end when exceeding maxPanels', () => {
     const store = { ...getDefaultRouterStore(), panels: [{ pageKey: 'r1' }, { pageKey: 'r2' }] };
     const [next] = insertLeftPanel(store, 0, { pageKey: 'r0' }, makePreferences({ maxPanels: 2 }));

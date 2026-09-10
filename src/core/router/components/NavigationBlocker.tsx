@@ -19,7 +19,7 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from 'ui/buttons/Button';
 
-export const AppNavigationBlocker = memo(() => {
+export const NavigationBlocker = memo(() => {
   const { t } = useTranslation(['router']);
   const configStoreApi = useAppConfigStoreApi();
   const locationParamStoreApi = useAppLocationParamStoreApi();
@@ -149,4 +149,4 @@ export const AppNavigationBlocker = memo(() => {
   );
 });
 
-AppNavigationBlocker.displayName = 'AppNavigationBlocker';
+NavigationBlocker.displayName = 'NavigationBlocker';

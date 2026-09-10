@@ -5,6 +5,13 @@ import { getPageFromParam, removeRouteParamFromKey, sanitizePage, upsertRoutePar
 // External Href
 //*****************************************************************************************
 
+/**
+ * @name getExternalHrefFromPage
+ * @description Builds an external application href from a router page.
+ * @param store - Location parameter store used to resolve the page route.
+ * @param page - Router page to serialize.
+ * @returns Serialized external href, or null when the page cannot be resolved.
+ */
 export const getExternalHrefFromPage = function (
   store: AppLocationParamStore,
   page: AppRouterPage
@@ -13,6 +20,13 @@ export const getExternalHrefFromPage = function (
   return !next?.href ? null : `/v1#${next.href}`;
 };
 
+/**
+ * @name getExternalHrefFromParam
+ * @description Builds an external application href from typed route parameters.
+ * @param store - Location parameter store used to resolve the route.
+ * @param param - Typed route location parameters to serialize.
+ * @returns Serialized external href, or null when the parameters cannot be resolved.
+ */
 export const getExternalHrefFromParam = function <const Origin extends AppRoute['path']>(
   store: AppLocationParamStore,
   param: InferAppLocationFromPath<Origin>
@@ -90,6 +104,13 @@ export const getExternalHrefFromParam = function <const Origin extends AppRoute[
 // Location Store
 //*****************************************************************************************
 
+/**
+ * @name syncRouteParamsFromRouter
+ * @description Synchronizes route parameter snapshots with the pages in a router store.
+ * @param store - Location parameter store to update.
+ * @param router - Router store containing active pages.
+ * @returns The updated location parameter store.
+ */
 export const syncRouteParamsFromRouter = function (
   store: AppLocationParamStore,
   router: AppRouterStore

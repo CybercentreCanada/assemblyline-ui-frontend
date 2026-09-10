@@ -6,6 +6,12 @@ import { generateRandomUUID } from 'shared/utils/app.utils';
 // Node
 //*****************************************************************************************
 
+/**
+ * @name getDefaultRouterNode
+ * @description Creates a router node with a new portal and optional overrides.
+ * @param node - Optional node fields that override the defaults.
+ * @returns A complete router node.
+ */
 export const getDefaultRouterNode = function (node: Partial<AppRouterNode> = null): AppRouterNode {
   return {
     portal: createReversePortalNode(),
@@ -68,6 +74,13 @@ export const findNode = (store: AppRouterStore, partialNode: Partial<AppRouterNo
   return store.nodes?.[nodeKey] ?? null;
 };
 
+/**
+ * @name findNodeFromKey
+ * @description Finds a router node by its key.
+ * @param store - Router store to inspect.
+ * @param nodeKey - Node key to resolve.
+ * @returns Matching node or a default router node.
+ */
 export const findNodeFromKey = (store: AppRouterStore, nodeKey: string): AppRouterNode => {
   if (nodeKey in (store?.nodes || {})) return store.nodes[nodeKey];
   return getDefaultRouterNode();

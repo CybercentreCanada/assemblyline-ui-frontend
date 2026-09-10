@@ -9,7 +9,12 @@ import {
 } from 'core/router';
 import { useCallback, useEffect, useRef } from 'react';
 
-export function useAppBlockNavigation() {
+/**
+ * @name useBlockNavigation
+ * @description Watches pending navigation and confirms when blocked pages have unsaved changes.
+ * @returns No value; installs the in-app navigation blocker subscription.
+ */
+export function useBlockNavigation() {
   const navigationStoreApi = useAppNavigationStoreApi();
   const routerStoreApi = useAppRouterStoreApi();
   const setNavigationStore = useAppSetNavigationStore();

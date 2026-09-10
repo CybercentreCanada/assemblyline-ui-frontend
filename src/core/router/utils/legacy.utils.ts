@@ -196,6 +196,14 @@ const interpolateTemplate = (template: string, params: Record<string, string>): 
  * Maps an old location to new panel hrefs. Search parameters remain on panel 0;
  * query strings embedded in the old hash remain on panel 1.
  */
+/**
+ * @name resolveLegacyLocation
+ * @description Resolves a legacy location into the current panel hrefs.
+ * @param pathname - Legacy pathname to match.
+ * @param search - Legacy query string.
+ * @param hash - Legacy hash fragment.
+ * @returns Replacement panel hrefs, or null when no legacy rule matches.
+ */
 export const resolveLegacyLocation = (pathname: string, search: string, hash: string): LegacyResolution | null => {
   const hashValue = hash.startsWith('#') ? hash.slice(1) : hash;
   const hashQueryIndex = hashValue.indexOf('?');

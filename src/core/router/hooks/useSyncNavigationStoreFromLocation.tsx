@@ -26,7 +26,12 @@ import type { Location } from 'react-router';
 import { useLocation } from 'react-router';
 import { generateRandomUUID } from 'shared/utils/app.utils';
 
-export function useAppSyncNavigationStoreFromLocation() {
+/**
+ * @name useSyncNavigationStoreFromLocation
+ * @description Synchronizes navigation state from the current browser location.
+ * @returns No value; subscribes the navigation store to location changes.
+ */
+export function useSyncNavigationStoreFromLocation() {
   const location = useLocation() as Location<AppLocationState>;
   const preferenceStoreApi = useAppPreferenceStoreApi();
   const routerStoreApi = useAppRouterStoreApi();

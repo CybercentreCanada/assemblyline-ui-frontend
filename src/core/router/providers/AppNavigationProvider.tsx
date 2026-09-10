@@ -1,14 +1,10 @@
 import type { AppNavigationStore } from 'core/router';
-import {
-  AppNavigationBlocker,
-  useAppSyncNavigationStoreFromLocation,
-  useAppSyncRouterStoreFromNavigation
-} from 'core/router';
+import { NavigationBlocker, useSyncNavigationStoreFromLocation, useSyncRouterStoreFromNavigation } from 'core/router';
 import { createAppStore } from 'features/store';
 import type { PropsWithChildren } from 'react';
 import { memo } from 'react';
 import { generateRandomUUID } from 'shared/utils/app.utils';
-import type { StoreApi } from 'zustand';
+import type { StoreApi } from 'zustand/vanilla';
 
 export const getDefaultNavigationStore = (store: Partial<AppNavigationStore> = null): AppNavigationStore => {
   return {
@@ -38,19 +34,19 @@ export const {
   useStoreApi: useAppNavigationStoreApi
 } = createAppStore<AppNavigationStore>(getDefaultNavigationStore());
 
+AppNavigationStoreProvider.displayName = 'AppNavigationStoreProvider';
+
 export const getAppNavigationStateFromApi = (api: StoreApi<AppNavigationStore>): AppNavigationStore => {
   return api?.getState() || getDefaultNavigationStore();
 };
 
-AppNavigationStoreProvider.displayName = 'AppNavigationStoreProvider';
-
 export const AppNavigationProvider = memo(({ children }: PropsWithChildren) => {
-  useAppSyncNavigationStoreFromLocation();
-  useAppSyncRouterStoreFromNavigation();
+  useSyncNavigationStoreFromLocation();
+  useSyncRouterStoreFromNavigation();
 
   return (
     <>
-      <AppNavigationBlocker />
+      <NavigationBlocker />
       {children}
     </>
   );

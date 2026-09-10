@@ -4,6 +4,12 @@ import type { AppRouterPanel, AppSharedRouterStore, PageKeyOf } from 'core/route
 // Panel
 //*****************************************************************************************
 
+/**
+ * @name getDefaultRouterPanel
+ * @description Creates a router panel populated with default values.
+ * @param panel - Optional panel fields that override the defaults.
+ * @returns A complete router panel.
+ */
 export const getDefaultRouterPanel = function (panel: Partial<AppRouterPanel> = null): AppRouterPanel {
   return {
     pageKey: null,
@@ -44,6 +50,13 @@ export const findPanelKey = function <const Store extends AppSharedRouterStore>(
   return -1;
 };
 
+/**
+ * @name findPanelKeyFromPageKey
+ * @description Finds the panel containing a page key.
+ * @param store - Router-compatible store to inspect.
+ * @param pageKey - Page key to locate.
+ * @returns Matching panel index, or -1 when not found.
+ */
 export const findPanelKeyFromPageKey = function <const Store extends AppSharedRouterStore>(
   store: Store,
   pageKey: PageKeyOf<Store>
@@ -128,6 +141,13 @@ export const findPanel = function <const Store extends AppSharedRouterStore>(
  * @param store - Router store
  * @param partialPanel - Partial panel matcher
  * @returns Matching panel, or null when not found
+ */
+/**
+ * @name getPanel
+ * @description Returns a panel by index or a default panel when the index is missing.
+ * @param store - Router-compatible store to inspect.
+ * @param panelKey - Panel index to resolve.
+ * @returns Matching panel or default router panel.
  */
 export const getPanel = function <const Store extends AppSharedRouterStore>(
   store: Store,
@@ -278,7 +298,8 @@ export const insertLeftPanel = function <const Store extends AppSharedRouterStor
 ): [Store, number] {
   if (preferences.router.maxPanels <= 0) return [store, null];
 
-  const panelIndex = Math.min(Math.max(0, Math.trunc(panelKey)), store.panels.length - 1);
+  const panelIndex =
+    store.panels.length === 0 ? 0 : Math.min(Math.max(0, Math.trunc(panelKey)), store.panels.length - 1);
   store.panels.splice(panelIndex, 0, { ...getDefaultRouterPanel(), ...partialPanel });
   if (store.panels.length > preferences.router.maxPanels) store.panels.splice(-1, 1);
   return [store, panelIndex];

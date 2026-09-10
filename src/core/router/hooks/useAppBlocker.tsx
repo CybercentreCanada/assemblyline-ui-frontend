@@ -10,6 +10,13 @@ import {
 import type { DependencyList } from 'react';
 import { useEffect } from 'react';
 
+/**
+ * @name useAppBlocker
+ * @description Registers or removes the current page's navigation blocker.
+ * @param shouldBlock - Block reason or callback that returns a block reason.
+ * @param dependencies - Values that should rerun blocker evaluation.
+ * @returns No value; blocker state is synchronized with the navigation store.
+ */
 export function useAppBlocker(
   shouldBlock: AppRouterBlockedReason | (() => AppRouterBlockedReason),
   dependencies: DependencyList = null

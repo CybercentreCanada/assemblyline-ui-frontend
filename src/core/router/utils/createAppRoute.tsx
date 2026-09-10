@@ -42,6 +42,12 @@ export type CreateAppRouteProps<
   forbidden?: (location: InferAppLocationFromParams<Path, Params, Search, Hash>, config: AppConfigStore) => boolean;
 };
 
+/**
+ * @name createAppRoute
+ * @description Creates a typed application route with codecs, metadata, guards, and rendered boundaries.
+ * @param props - Route path, parameter codecs, presentation metadata, and guard configuration.
+ * @returns A registered application route definition.
+ */
 export const createAppRoute = <
   const Route extends RoutePath,
   const Path extends InferPathParamBlueprintMapFromPath<Route>,
