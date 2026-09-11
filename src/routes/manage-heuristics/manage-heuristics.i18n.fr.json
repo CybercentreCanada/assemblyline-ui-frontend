@@ -1,0 +1,11 @@
+{
+  "app_route.manage_heuristics.fullname": "Gestion des Heuristiques",
+  "app_route.manage_heuristics.shortname": "Heuristiques",
+  "filter": "Filtrer les heuristiques ...",
+  "filtered": "heuristique correspondant au filtre",
+  "filtereds": "heuristiques correspondant au filtre",
+  "searching": "Recherche en cours...",
+  "title": "Heuristiques",
+  "total": "heuristique",
+  "totals": "heuristiques"
+}

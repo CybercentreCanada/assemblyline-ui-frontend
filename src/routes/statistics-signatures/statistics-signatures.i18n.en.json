@@ -1,0 +1,13 @@
+{
+  "app_route.statistics_signatures.fullname": "Signature Statistics",
+  "app_route.statistics_signatures.shortname": "Signature Statistics",
+  "avg": "Avg Score",
+  "classification": "Classification",
+  "count": "Count",
+  "max": "Max Score",
+  "min": "Min Score",
+  "name": "Name",
+  "source": "Source",
+  "title": "Signatures Statistics",
+  "type": "Type"
+}
