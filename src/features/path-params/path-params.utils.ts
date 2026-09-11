@@ -12,11 +12,13 @@ import type { Location } from 'react-router';
 export const PATH_PARAM_BLUEPRINTS_MAP = {
   string: (defaultValue = ''): InferPathParamBlueprintFromValue<string> => ({
     type: '',
+    kind: 'string',
     parse: value => (value == null ? defaultValue : value),
     stringify: value => String(value)
   }),
   number: (defaultValue = 0): InferPathParamBlueprintFromValue<number> => ({
     type: 0,
+    kind: 'number',
     parse: value => {
       if (value == null) return defaultValue;
       const parsed = Number(value);
@@ -26,6 +28,7 @@ export const PATH_PARAM_BLUEPRINTS_MAP = {
   }),
   boolean: (defaultValue = false): InferPathParamBlueprintFromValue<boolean> => ({
     type: false,
+    kind: 'boolean',
     parse: value => {
       if (value == null) return defaultValue;
       if (value === 'true' || value === '1') return true;
@@ -39,6 +42,8 @@ export const PATH_PARAM_BLUEPRINTS_MAP = {
     defaultValue: Values[number] = values[0]
   ): InferPathParamBlueprintFromValue<Values[number]> => ({
     type: defaultValue,
+    kind: 'enum',
+    options: values,
     parse: value => {
       if (value == null) return defaultValue;
       for (const candidate of values) {

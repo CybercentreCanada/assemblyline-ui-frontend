@@ -28,12 +28,21 @@ export type InferPathParamKeyFromPath<Path extends RoutePath> = string extends P
 //*****************************************************************************************
 
 /**
+ * Identifies which blueprint variant produced a parameter, independent of its runtime value type.
+ */
+export type PathParamBlueprintKind = 'string' | 'number' | 'boolean' | 'enum';
+
+/**
  * Defines how a single path parameter is parsed from and serialized to the URL.
  * The generic `Value` determines the runtime type of the resolved parameter.
  */
 export type InferPathParamBlueprintFromValue<Value extends PathParamValue = PathParamValue> = {
   /** Representative value used for type inference at compile time. */
   type: Value;
+  /** Identifies the blueprint variant (e.g. distinguishes `enum` from a plain `string`). */
+  kind: PathParamBlueprintKind;
+  /** Allowed values, present only for the `enum` blueprint. */
+  options?: readonly PathParamValue[];
   /** Deserializes a raw URL segment into the typed value. */
   parse: (value: string | undefined) => Value;
   /** Serializes the typed value back into a URL-safe string. */

@@ -158,6 +158,7 @@ export const useAppTemplateLeftNav = () =>
           { link: { route: '/development/api' } },
           { link: { route: '/development/customize' } },
           { link: { route: '/development/library' } },
+          { link: { route: '/development/routes' } },
           { link: { route: '/development/theme' } }
         ]
       }

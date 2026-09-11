@@ -7,6 +7,9 @@ import type { createHashParamCodec } from 'features/hash-params';
 /** The set of allowed hash fragment values (enum). */
 export type HashParamValue = string | number | boolean;
 
+/** Identifies which blueprint variant produced a hash parameter. */
+export type HashParamBlueprintKind = 'string' | 'enum';
+
 //*****************************************************************************************
 // Hash Params Blueprints
 //*****************************************************************************************
@@ -19,6 +22,10 @@ export type HashParamValue = string | number | boolean;
 export type InferHashParamBlueprintFromValue<Value extends HashParamValue = HashParamValue> = {
   /** Representative value used for type inference at compile time. */
   type: Value;
+  /** Identifies the blueprint variant (e.g. distinguishes `enum` from a plain `string`). */
+  kind: HashParamBlueprintKind;
+  /** Allowed values, present only for the `enum` blueprint. */
+  options?: readonly HashParamValue[];
   /** Deserializes a raw URL hash into the typed value. */
   parse: (value: string | undefined) => Value | undefined;
   /** Serializes the typed value back into a URL-safe hash string. */
