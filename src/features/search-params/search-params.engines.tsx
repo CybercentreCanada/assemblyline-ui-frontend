@@ -1,6 +1,7 @@
 import type {
   InferSearchParamRuntimeMapFromBlueprintMap,
   InferSearchParamValueMapFromBlueprintMap,
+  SearchParamBlueprintDescriptor,
   SearchParamBlueprintMap,
   SearchParamRuntime
 } from 'features/search-params';
@@ -66,6 +67,15 @@ export class SearchParamEngine<Blueprints extends SearchParamBlueprintMap> {
       (values as Record<string, unknown>)[key] = runtime.getDefaultValue();
     }
     return new SearchParamSnapshot<Blueprints>(this.runtimes, values);
+  }
+
+  /** Plain-object descriptors of every configured search param, for tooling/introspection. */
+  public describeParams(): Record<string, SearchParamBlueprintDescriptor> {
+    const descriptors: Record<string, SearchParamBlueprintDescriptor> = {};
+    for (const [key, runtime] of this.runtimeEntries()) {
+      descriptors[key] = runtime.describe();
+    }
+    return descriptors;
   }
 
   public setDefaultValues(values: URLSearchParams = new URLSearchParams()) {

@@ -1,4 +1,5 @@
 export type {
+  HashParamBlueprintKind,
   HashParamValue,
   InferHashParamBlueprintFromValue,
   InferHashParamCodecFromBlueprint,

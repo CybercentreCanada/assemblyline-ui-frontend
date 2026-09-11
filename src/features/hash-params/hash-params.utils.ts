@@ -16,6 +16,7 @@ export const HASH_PARAM_BLUEPRINTS = {
    */
   string: (defaultValue = ''): InferHashParamBlueprintFromValue<string> => ({
     type: '',
+    kind: 'string',
     parse: value => (value == null || value === '' ? defaultValue : value),
     stringify: value => {
       if (value == null || value === defaultValue) return '';
@@ -32,6 +33,8 @@ export const HASH_PARAM_BLUEPRINTS = {
     defaultValue?: Values[number]
   ): InferHashParamBlueprintFromValue<Values[number]> => ({
     type: values[0],
+    kind: 'enum',
+    options: values,
     parse: value => {
       if (value == null || value === '') return defaultValue;
       for (const candidate of values) {
@@ -56,6 +59,7 @@ export const getDefaultHashParamBlueprint = function <
 >(): InferHashParamBlueprintFromValue<Value> {
   return {
     type: '' as unknown as Value,
+    kind: 'string',
     parse: () => undefined,
     stringify: () => ''
   };

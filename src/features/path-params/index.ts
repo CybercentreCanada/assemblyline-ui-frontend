@@ -4,6 +4,7 @@ export type {
   InferPathParamCodecFromPath,
   InferPathParamKeyFromPath,
   InferPathParamValuesFromBlueprintMap,
+  PathParamBlueprintKind,
   PathParamValue,
   RoutePath
 } from './path-params.models';
