@@ -221,17 +221,63 @@ export const addMissingNodes = function <const Store extends AppSharedRouterStor
 };
 
 /**
+ * @name findOldestBackgroundNodeKey
+ * @description Finds the oldest node that is not attached to an active panel.
+ * @param store - Router-compatible store to inspect.
+ * @param activePageKeys - Page keys currently displayed by router panels.
+ * @returns Oldest background node key, or null when none is available.
+ */
+export const findOldestBackgroundNodeKey = <const Store extends AppSharedRouterStore>(
+  store: Store,
+  activePageKeys: ReadonlySet<keyof Store['pages']>
+): keyof Store['nodes'] => {
+  let oldestNodeKey: keyof Store['nodes'] = null;
+  let oldestAge = -Infinity;
+
+  for (const nodeKey in store.nodes) {
+    const node = store.nodes[nodeKey];
+    if (activePageKeys.has(node.pageKey) || !(node.pageKey in store.pages)) continue;
+
+    const age = store.pages[node.pageKey].age;
+    if (age > oldestAge) {
+      oldestAge = age;
+      oldestNodeKey = nodeKey;
+    }
+  }
+
+  return oldestNodeKey;
+};
+
+/**
+ * @name getBackgroundNodeCount
+ * @description Counts nodes that are not attached to an active panel.
+ * @param store - Router-compatible store to inspect.
+ * @param activePageKeys - Page keys currently displayed by router panels.
+ * @returns Number of background nodes.
+ */
+export const getBackgroundNodeCount = <const Store extends AppSharedRouterStore>(
+  store: Store,
+  activePageKeys: ReadonlySet<keyof Store['pages']>
+): number => {
+  return Object.values(store.nodes).filter(node => !activePageKeys.has(node.pageKey)).length;
+};
+
+/**
  * @name removeOldestNodes
- * @description Trims node count to `maxPanels + maxNodes` by removing oldest nodes.
+ * @description Trims background nodes to `maxExtraNodes` while preserving nodes for active panels.
  * @param store - Router store
+ * @param preferences - Preferences containing the background page cache limit.
  * @returns Updated router store
  */
 export const removeOldestNodes = function <const Store extends AppSharedRouterStore>(
   store: Store,
   preferences: AppPreferenceStore
 ): Store {
-  while (Object.keys(store.nodes).length > preferences.router.maxPanels + preferences.router.maxNodes) {
-    const nodeKey = findOldestNodeKey(store);
+  const activePageKeys = new Set(store.panels.map(panel => panel.pageKey).filter(Boolean));
+
+  while (getBackgroundNodeCount(store, activePageKeys) > preferences.router.maxExtraNodes) {
+    const nodeKey = findOldestBackgroundNodeKey(store, activePageKeys);
+    if (nodeKey === null) break;
     store = removeNode(store, nodeKey);
   }
 

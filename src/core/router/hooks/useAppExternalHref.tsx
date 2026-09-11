@@ -25,10 +25,6 @@ import {
 import type { DependencyList } from 'react';
 import { useMemo } from 'react';
 
-//*****************************************************************************************
-// useAppExternalHref
-//*****************************************************************************************
-
 /**
  * @name useAppExternalHref
  * @description Computes a shareable `/v1#…` href by dry-running a nav callback against

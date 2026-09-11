@@ -1,5 +1,5 @@
 import { getAppPreferenceStateFromApi, useAppPreferenceStoreApi } from 'core/preference';
-import type { AppLocationState } from 'core/router';
+import type { AppLocation } from 'core/router';
 import {
   addPage,
   applyDefaultNavigationStore,
@@ -22,7 +22,6 @@ import {
   useAppSetNavigationStore
 } from 'core/router';
 import { useCallback, useEffect } from 'react';
-import type { Location } from 'react-router';
 import { useLocation } from 'react-router';
 import { generateRandomUUID } from 'shared/utils/app.utils';
 
@@ -32,7 +31,7 @@ import { generateRandomUUID } from 'shared/utils/app.utils';
  * @returns No value; subscribes the navigation store to location changes.
  */
 export function useSyncNavigationStoreFromLocation() {
-  const location = useLocation() as Location<AppLocationState>;
+  const location = useLocation() as AppLocation;
   const preferenceStoreApi = useAppPreferenceStoreApi();
   const routerStoreApi = useAppRouterStoreApi();
   const locationParamStoreApi = useAppLocationParamStoreApi();

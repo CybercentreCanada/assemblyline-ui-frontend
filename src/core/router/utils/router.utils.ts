@@ -250,18 +250,19 @@ export const setDocumentTitleFromNavigation = function (
 //   };
 // };
 
-//TODO: fix this so that it doesn't get the full content of the pages stored in the location
 /**
  * @name getLocationStateFromRouter
- * @description Converts navigation state into the browser location state payload.
+ * @description Projects navigation state into the minimal browser location state payload.
  * @param store - Navigation store to serialize.
- * @returns Location state containing router identity, panels, and page data.
+ * @returns Location state containing only router identity, panel keys, and page location data.
  */
 export const getLocationStateFromRouter = function (store: AppNavigationStore): AppLocationState {
   return {
     id: store.id,
-    panels: store.panels,
-    pages: store.pages
+    panels: store.panels.map(({ pageKey }) => ({ pageKey })),
+    pages: Object.fromEntries(
+      Object.entries(store.pages).map(([pageKey, { href, state, scroll }]) => [pageKey, { href, state, scroll }])
+    )
   };
 };
 

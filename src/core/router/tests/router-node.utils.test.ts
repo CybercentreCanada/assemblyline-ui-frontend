@@ -6,7 +6,9 @@ import {
   findNode,
   findNodeFromKey,
   findNodeKey,
+  findOldestBackgroundNodeKey,
   findOldestNodeKey,
+  getBackgroundNodeCount,
   getDefaultRouterNode,
   getDefaultRouterStore,
   removeNode,
@@ -233,8 +235,38 @@ describe('addMissingNodes', () => {
   });
 });
 
+describe('background node helpers', () => {
+  it('finds the oldest node outside active panels', () => {
+    const store = {
+      ...getDefaultRouterStore(),
+      nodes: {
+        active: { portal: createReversePortalNode(), pageKey: 'r1' },
+        background: { portal: createReversePortalNode(), pageKey: 'r2' }
+      },
+      pages: { r1: makePage('/r1', { age: 10 }), r2: makePage('/r2', { age: 20 }) }
+    };
+    const activePageKeys = new Set<keyof typeof store.pages>(['r1']);
+
+    expect(findOldestBackgroundNodeKey(store, activePageKeys)).toBe('background');
+  });
+
+  it('counts only nodes outside active panels', () => {
+    const store = {
+      ...getDefaultRouterStore(),
+      panels: [{ pageKey: 'r1' }],
+      nodes: {
+        active: { portal: createReversePortalNode(), pageKey: 'r1' },
+        background: { portal: createReversePortalNode(), pageKey: 'r2' }
+      },
+      pages: { r1: makePage('/r1'), r2: makePage('/r2') }
+    };
+
+    expect(getBackgroundNodeCount(store, new Set(['r1']))).toBe(1);
+  });
+});
+
 describe('removeOldestNodes', () => {
-  it('trims nodes until within maxPanels + maxNodes', () => {
+  it('trims background nodes to maxExtraNodes', () => {
     const store = {
       ...getDefaultRouterStore(),
       panels: [],
@@ -245,8 +277,30 @@ describe('removeOldestNodes', () => {
       },
       pages: { r1: makePage('/r1', { age: 1 }), r2: makePage('/r2', { age: 2 }), r3: makePage('/r3', { age: 3 }) }
     };
-    const next = removeOldestNodes(store, makePreferences({ maxPanels: 0, maxNodes: 1 }));
+    const next = removeOldestNodes(store, makePreferences({ maxExtraNodes: 1 }));
     expect(Object.keys(next.nodes)).toHaveLength(1);
+  });
+
+  it('preserves active panel nodes and trims only background nodes', () => {
+    const store = {
+      ...getDefaultRouterStore(),
+      panels: [{ pageKey: 'r1' }],
+      nodes: {
+        active: { portal: createReversePortalNode(), pageKey: 'r1' },
+        backgroundOld: { portal: createReversePortalNode(), pageKey: 'r2' },
+        backgroundNew: { portal: createReversePortalNode(), pageKey: 'r3' }
+      },
+      pages: {
+        r1: makePage('/r1', { age: 0 }),
+        r2: makePage('/r2', { age: 5 }),
+        r3: makePage('/r3', { age: 1 })
+      }
+    };
+    const next = removeOldestNodes(store, makePreferences({ maxExtraNodes: 1 }));
+
+    expect(next.nodes.active.pageKey).toBe('r1');
+    expect(next.nodes.backgroundNew.pageKey).toBe('r3');
+    expect(next.nodes.backgroundOld).toBeUndefined();
   });
 
   it('does nothing when node count is within budget', () => {
@@ -255,7 +309,7 @@ describe('removeOldestNodes', () => {
       nodes: { n1: { portal: createReversePortalNode(), pageKey: 'r1' } },
       pages: { r1: makePage('/r1') }
     };
-    const next = removeOldestNodes(store, makePreferences({ maxPanels: 2, maxNodes: 2 }));
+    const next = removeOldestNodes(store, makePreferences({ maxExtraNodes: 2 }));
     expect(Object.keys(next.nodes)).toHaveLength(1);
   });
 });
@@ -268,7 +322,7 @@ describe('sanitizeNodes', () => {
       nodes: { orphan: { portal: createReversePortalNode(), pageKey: 'missing' } },
       pages: { r1: makePage('/r1') }
     };
-    const next = sanitizeNodes(store, makePreferences({ maxPanels: 2, maxNodes: 2 }));
+    const next = sanitizeNodes(store, makePreferences({ maxExtraNodes: 2 }));
     expect('orphan' in next.nodes).toBe(false);
     expect(Object.values(next.nodes).some(n => n.pageKey === 'r1')).toBe(true);
   });

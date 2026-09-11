@@ -158,9 +158,11 @@ describe('getLocationStateFromRouter', () => {
 
     expect(locationState.id).toBe('router-location-id');
     expect(locationState.panels[0].pageKey).toBe('r1');
+    expect(Object.keys(locationState.panels[0])).toEqual(['pageKey']);
     expect(locationState.pages.r1.href).toBe('/submit');
     expect(locationState.pages.r1.state).toEqual({ foo: 'bar' });
     expect(locationState.pages.r1.scroll).toBe(15);
+    expect(Object.keys(locationState.pages.r1)).toEqual(['href', 'state', 'scroll']);
   });
 });
 

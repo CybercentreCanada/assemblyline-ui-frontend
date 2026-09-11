@@ -34,7 +34,7 @@ const DEBUG_PREFERENCE_SCHEMA = zObject({
 /** Panel layout and navigation behaviour settings. */
 const ROUTER_PREFERENCE_SCHEMA = zObject({
   /** Maximum number of extra nodes. */
-  maxNodes: zNumber().min(0).catch(0),
+  maxExtraNodes: zNumber().min(0).catch(0),
   /** Maximum number of side-by-side panels allowed. */
   maxPanels: zNumber().min(1).catch(2),
   /** How navigation behaves when reaching the end of the stack. */
