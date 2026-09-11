@@ -23,8 +23,7 @@ import {
   useTheme
 } from '@mui/material';
 import type { InferAppNavigationPropsFromPath } from 'core/router';
-import { AppLink, useAppNavigate } from 'core/router';
-import { useAppSearchSnapshot } from 'core/routes';
+import { AppLink, useAppNavigate, useAppSearchSnapshot } from 'core/router';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import useMySnackbar from 'deprecated/hooks/useMySnackbar';

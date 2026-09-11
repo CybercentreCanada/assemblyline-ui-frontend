@@ -1,6 +1,6 @@
 import LabelOutlinedIcon from '@mui/icons-material/LabelOutlined';
 import { Skeleton, Typography, useTheme } from '@mui/material';
-import { createAppRoute } from 'core/routes';
+import { createAppRoute } from 'core/router';
 import { AppPageCenter } from 'core/template';
 import { useALContext } from 'deprecated/hooks/useALContext';
 import { memo, type ReactNode } from 'react';

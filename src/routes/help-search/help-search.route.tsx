@@ -13,7 +13,7 @@ import {
   useTheme
 } from '@mui/material';
 import { useAppPreferenceStore } from 'core/preference';
-import { createAppRoute } from 'core/routes';
+import { createAppRoute } from 'core/router';
 import { AppPageCenter } from 'core/template';
 import type { ContentWithTOCItemDef } from 'deprecated/components/toc/Toc';
 import ContentWithTOC from 'deprecated/components/toc/Toc';

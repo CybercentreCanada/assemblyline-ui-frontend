@@ -1,6 +1,6 @@
-import { createAppRoute } from 'core/routes';
-import { NotFoundPage } from 'routes/not-found/not-found';
 import LinkOffIcon from '@mui/icons-material/LinkOff';
+import { createAppRoute } from 'core/router';
+import { NotFoundPage } from 'routes/not-found/not-found';
 
 //*****************************************************************************************
 // NotFound Route

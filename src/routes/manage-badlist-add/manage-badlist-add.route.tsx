@@ -14,8 +14,7 @@ import {
   useTheme
 } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
-import { useAppBlocker, useAppNavigate } from 'core/router';
-import { createAppRoute } from 'core/routes';
+import { createAppRoute, useAppBlocker, useAppNavigate } from 'core/router';
 import { AppPageFullWidth } from 'core/template';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';

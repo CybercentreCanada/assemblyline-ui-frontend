@@ -1,7 +1,6 @@
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import { AlertTitle, useMediaQuery, useTheme } from '@mui/material';
-import { useAppNavigate } from 'core/router';
-import { createAppRoute, useAppPathParams } from 'core/routes';
+import { createAppRoute, useAppNavigate, useAppPathParams } from 'core/router';
 import { AppPageFullSize } from 'core/template';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';

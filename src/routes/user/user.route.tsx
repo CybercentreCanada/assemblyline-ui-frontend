@@ -26,8 +26,7 @@ import {
 import Autocomplete from '@mui/material/Autocomplete';
 import { red } from '@mui/material/colors';
 import Skeleton from '@mui/material/Skeleton';
-import { useAppBlocker, useAppNavigate } from 'core/router';
-import { createAppRoute, useAppPathParams } from 'core/routes';
+import { createAppRoute, useAppBlocker, useAppNavigate, useAppPathParams } from 'core/router';
 import { AppPageCenter } from 'core/template';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';

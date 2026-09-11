@@ -18,7 +18,7 @@ import {
   useTheme
 } from '@mui/material';
 import { invalidateApiQuery } from 'core/api';
-import { createAppRoute } from 'core/routes';
+import { createAppRoute } from 'core/router';
 import { AppPageFullWidth } from 'core/template';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';

@@ -1,9 +1,8 @@
 import type { ListItemIconProps, ListItemTextProps } from '@mui/material';
 import { ListItem, ListItemButton, ListItemIcon, ListItemText, useTheme } from '@mui/material';
 import { useAppLeftNav, type LeftNavChildRenderProps } from '@tui/core';
-import type { InferAppNavigationPropsFromPath } from 'core/router';
+import type { InferAppNavigationPropsFromPath, RouteName } from 'core/router';
 import { AppLink } from 'core/router';
-import type { RouteName } from 'core/routes';
 import type { JSX } from 'react';
 import { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';

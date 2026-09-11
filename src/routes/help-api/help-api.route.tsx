@@ -19,7 +19,7 @@ import {
 import type { SelectChangeEvent } from '@mui/material/Select';
 import { useApiQuery } from 'core/api';
 import { useAppConfigStore } from 'core/config';
-import { createAppRoute } from 'core/routes';
+import { createAppRoute } from 'core/router';
 import { AppPageFullWidth } from 'core/template';
 import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';

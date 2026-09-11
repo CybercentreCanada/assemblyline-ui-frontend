@@ -3,14 +3,14 @@ import LinkIcon from '@mui/icons-material/Link';
 import { Button, useTheme } from '@mui/material';
 import { useAppTemplateLeftNav } from 'app/core.template';
 import { getAppConfigStateFromApi, useAppConfigStoreApi } from 'core/config';
-import { AppLink } from 'core/router';
 import {
+  AppLink,
   AppRouteName,
   createAppRoute,
   findAppRouteFromPath,
   getAppLocationParamStateFromApi,
   useAppLocationParamStoreApi
-} from 'core/routes';
+} from 'core/router';
 import { AppPageCenter } from 'core/template';
 import React, { memo, useMemo } from 'react';
 

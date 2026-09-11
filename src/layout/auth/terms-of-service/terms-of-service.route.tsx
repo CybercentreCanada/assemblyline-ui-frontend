@@ -3,7 +3,7 @@ import { Link, Skeleton, Typography, styled, useTheme } from '@mui/material';
 import { useApiMutation, useApiQuery } from 'core/api';
 import { useAppConfigStore } from 'core/config';
 import { useAppSetInterfaceStore } from 'core/interface';
-import { createAppRoute } from 'core/routes';
+import { createAppRoute } from 'core/router';
 import { AppBanner, AppPageCenter } from 'core/template';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';

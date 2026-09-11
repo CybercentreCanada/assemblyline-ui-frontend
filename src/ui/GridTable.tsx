@@ -8,8 +8,7 @@ import type {
 } from '@mui/material';
 import { Paper, Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel, styled } from '@mui/material';
 import type { InferAppNavigationPropsFromPath } from 'core/router';
-import { AppLink, useAppNavigate } from 'core/router';
-import { useAppSearchSnapshot } from 'core/routes';
+import { AppLink, useAppNavigate, useAppSearchSnapshot } from 'core/router';
 import type { FC } from 'react';
 import React, { forwardRef, memo } from 'react';
 

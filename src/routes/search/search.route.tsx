@@ -8,8 +8,7 @@ import NotificationImportantOutlinedIcon from '@mui/icons-material/NotificationI
 import SearchIcon from '@mui/icons-material/Search';
 import { IconButton, Pagination, Paper, Tab, Tabs, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
 import { useApiQuery } from 'core/api';
-import { AppLink, useAppNavigate } from 'core/router';
-import { createAppRoute, useAppPathParams, useAppSearchSnapshot } from 'core/routes';
+import { AppLink, createAppRoute, useAppNavigate, useAppPathParams, useAppSearchSnapshot } from 'core/router';
 import { AppPageContainer, AppPageFullWidth } from 'core/template';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMySnackbar from 'deprecated/hooks/useMySnackbar';

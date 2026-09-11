@@ -6,7 +6,7 @@ import PanToolOutlinedIcon from '@mui/icons-material/PanToolOutlined';
 import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
 import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
 import { Card, Grid, styled, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
-import { createAppRoute, useAppPathParams } from 'core/routes';
+import { createAppRoute, useAppPathParams } from 'core/router';
 import { AppPageCenter } from 'core/template';
 import useALContext from 'deprecated/hooks/useALContext';
 import useClipboard from 'deprecated/hooks/useClipboard';

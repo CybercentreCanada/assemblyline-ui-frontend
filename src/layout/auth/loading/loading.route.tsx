@@ -1,6 +1,6 @@
 import PendingOutlinedIcon from '@mui/icons-material/PendingOutlined';
 import { CircularProgress, useTheme } from '@mui/material';
-import { createAppRoute } from 'core/routes';
+import { createAppRoute } from 'core/router';
 import { AppPageCardCentered, AppVerticalBanner } from 'core/template';
 import { memo } from 'react';
 

@@ -1,5 +1,5 @@
 import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
-import { createAppRoute } from 'core/routes';
+import { createAppRoute } from 'core/router';
 import { memo, useEffect } from 'react';
 
 export type CrashPageProps = {

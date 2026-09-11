@@ -1,5 +1,5 @@
 import BlockIcon from '@mui/icons-material/Block';
-import { createAppRoute } from 'core/routes';
+import { createAppRoute } from 'core/router';
 import { memo } from 'react';
 import { ForbiddenPage } from 'routes/forbidden/forbidden';
 

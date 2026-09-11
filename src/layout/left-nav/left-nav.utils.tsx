@@ -1,7 +1,7 @@
 import { Divider } from '@mui/material';
 import type { LeftNavMenuItem } from '@tui/core';
-import type { AppLocationParamStore } from 'core/routes';
-import { findAppRouteFromPath } from 'core/routes';
+import type { AppLocationParamStore } from 'core/router';
+import { findAppRouteFromPath } from 'core/router';
 import type { TFunction } from 'i18next';
 import { LeftNavRoute } from 'layout/left-nav/left-nav.components';
 import type { AppLeftNavItem } from 'layout/left-nav/left-nav.models';

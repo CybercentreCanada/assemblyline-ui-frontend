@@ -1,6 +1,5 @@
 import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
-import { useAppNavigate } from 'core/router';
-import { createAppRoute, useAppSearchSnapshot } from 'core/routes';
+import { createAppRoute, useAppNavigate, useAppSearchSnapshot } from 'core/router';
 import { TableOfContentLayout, useTableOfContent } from 'features/table-of-content';
 import type { ReactNode } from 'react';
 import { memo, useCallback, useMemo } from 'react';

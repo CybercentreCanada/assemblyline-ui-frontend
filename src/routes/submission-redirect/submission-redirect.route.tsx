@@ -1,6 +1,5 @@
 import ListAltOutlinedIcon from '@mui/icons-material/ListAltOutlined';
-import { AppNavigate } from 'core/router';
-import { createAppRoute } from 'core/routes';
+import { AppNavigate, createAppRoute } from 'core/router';
 import { useALContext } from 'deprecated/hooks/useALContext';
 import { memo } from 'react';
 

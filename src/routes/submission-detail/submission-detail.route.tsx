@@ -36,8 +36,7 @@ import {
   useTheme
 } from '@mui/material';
 import Typography from '@mui/material/Typography';
-import { AppLink, useAppNavigate } from 'core/router';
-import { createAppRoute, useAppLocation, useAppPathParams } from 'core/routes';
+import { AppLink, createAppRoute, useAppLocation, useAppNavigate, useAppPathParams } from 'core/router';
 import { AppPageCenter } from 'core/template';
 import useALContext from 'deprecated/hooks/useALContext';
 import type { HighlighMapProps } from 'deprecated/hooks/useHighlighter';
@@ -1080,6 +1079,7 @@ const SubmissionDetail = memo(() => {
           </>
         }
         waiting={waitingDialog}
+        waitingCancel={false}
         unacceptable={Object.keys(systemConfig.submission.metadata.archive)
           .filter(metakey => systemConfig.submission.metadata.archive[metakey].required)
           .some(metakey => !Object.keys(archivingMetadata).includes(metakey))}

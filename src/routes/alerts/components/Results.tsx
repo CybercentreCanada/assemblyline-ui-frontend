@@ -1,6 +1,5 @@
 import { Button, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
-import { useAppNavigate } from 'core/router';
-import { useAppSearchSnapshot } from 'core/routes';
+import { useAppNavigate, useAppSearchSnapshot } from 'core/router';
 import type { FC, ReactNode } from 'react';
 import React, { memo, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';

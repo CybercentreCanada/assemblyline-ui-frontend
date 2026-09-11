@@ -12,8 +12,7 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
-import { useAppBlocker, useAppNavigate } from 'core/router';
-import { createAppRoute } from 'core/routes';
+import { createAppRoute, useAppBlocker, useAppNavigate } from 'core/router';
 import { AppPageFullSize } from 'core/template';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';

@@ -3,15 +3,17 @@ import { Link, Breadcrumbs as MuiBreadcrumbs, Tooltip, Typography, useMediaQuery
 import { getAppConfigStateFromApi, useAppConfigStoreApi } from 'core/config';
 import { useAppPreferenceStore } from 'core/preference';
 import type { InferAppNavigationPropsFromPath } from 'core/router';
-import { AppLink, getPageFromPanelKey, useAppRouterStore } from 'core/router';
 import {
+  AppLink,
   AppRouteName,
   findAppRouteFromPage,
   getAppLocationParamStateFromApi,
+  getPageFromPanelKey,
   getRouteParamFromPage,
   useAppLocationParamStore,
-  useAppLocationParamStoreApi
-} from 'core/routes';
+  useAppLocationParamStoreApi,
+  useAppRouterStore
+} from 'core/router';
 import { getAncestorAppRoutes, splitItems } from 'layout/breadcrumbs/breadcrumbs.utils';
 import { memo, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';

@@ -1,6 +1,6 @@
 import type { AppPreferenceConfigs } from '@tui/core';
 import { getAppConfigStateFromApi, useAppConfigStoreApi } from 'core/config';
-import { getAppLocationParamStateFromApi, useAppLocationParamStore, useAppLocationParamStoreApi } from 'core/routes';
+import { getAppLocationParamStateFromApi, useAppLocationParamStore, useAppLocationParamStoreApi } from 'core/router';
 import type { AppLeftNavItem } from 'layout/left-nav/left-nav.models';
 import { getLeftNavMenuItem } from 'layout/left-nav/left-nav.utils';
 import { useCallback, useEffect, useState } from 'react';

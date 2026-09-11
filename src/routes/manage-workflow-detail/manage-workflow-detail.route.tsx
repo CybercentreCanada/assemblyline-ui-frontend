@@ -1,7 +1,7 @@
 import ListOutlinedIcon from '@mui/icons-material/ListOutlined';
 import { Grid, Skeleton, Typography, useTheme } from '@mui/material';
 import { useApiQuery } from 'core/api';
-import { createAppRoute, useAppPathParams } from 'core/routes';
+import { createAppRoute, useAppPathParams } from 'core/router';
 import { AppPageCenter } from 'core/template';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMySnackbar from 'deprecated/hooks/useMySnackbar';

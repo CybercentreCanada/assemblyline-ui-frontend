@@ -1,6 +1,6 @@
 import LoginOutlinedIcon from '@mui/icons-material/LoginOutlined';
 import { useTheme } from '@mui/material';
-import { createAppRoute } from 'core/routes';
+import { createAppRoute } from 'core/router';
 import { AppBanner, AppPageCardCentered, AppVerticalBanner } from 'core/template';
 import { OneTimePassword } from 'layout/auth/log-in/components/OneTimePassword';
 import {

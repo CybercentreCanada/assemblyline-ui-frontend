@@ -5,7 +5,7 @@ import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import type { TypographyProps } from '@mui/material';
 import { Grid, MenuItem, Select, Skeleton, Typography, useTheme } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
-import { createAppRoute, useAppSearchSnapshot } from 'core/routes';
+import { createAppRoute, useAppSearchSnapshot } from 'core/router';
 import { AppPageFullWidth } from 'core/template';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
