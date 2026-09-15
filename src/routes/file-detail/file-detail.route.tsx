@@ -59,14 +59,21 @@ const FileDetailPage = React.memo(() => {
   const [badlistReason, setBadlistReason] = useState<string>('');
   const [waitingDialog, setWaitingDialog] = useState<boolean>(false);
   const [resubmitAnchor, setResubmitAnchor] = useState(null);
-  const [promotedSections, setPromotedSections] = useState([]);
 
-  const filetypeOverride = useMemo(() => search?.get('filetypeOverride'), [search?.get('filetypeOverride')]);
+  const filetypeOverride = useMemo(
+    () => search?.get('filetypeOverride'),
+    [search?.get('filetypeOverride')?.toString()]
+  );
+
   const force = useMemo(() => search?.get('force'), [search?.get('force')]);
-  const liveErrors = useMemo(() => search?.get('liveErrors'), [search?.get('liveErrors')]);
-  const liveResultKeys = useMemo(() => search?.get('liveResultKeys'), [search?.get('liveResultKeys')]);
-  const metadata = useMemo(() => search?.get('metadata'), [search?.get('metadata')]);
-  const sid = useMemo(() => search?.get('sid'), [search?.get('sid')]);
+
+  const liveErrors = useMemo(() => search?.get('liveErrors'), [search?.get('liveErrors')?.toString()]);
+
+  const liveResultKeys = useMemo(() => search?.get('liveResultKeys'), [search?.get('liveResultKeys')?.toString()]);
+
+  const metadata = useMemo(() => search?.get('metadata'), [search?.get('metadata')?.toString()]);
+
+  const sid = useMemo(() => search?.get('sid'), [search?.get('sid')?.toString()]);
 
   const ref = useRef(null);
 
@@ -84,14 +91,27 @@ const FileDetailPage = React.memo(() => {
 
   const fileName = useMemo(() => (file ? search.get('name') || sha256 : null), [file, search?.toString(), sha256]);
 
-  const patchFileDetails = (data: File) => {
+  const patchFileDetails = useCallback((data: File) => {
+    const sortedResults = [...data.results].sort((a, b) =>
+      a.response.service_name > b.response.service_name ? 1 : -1
+    );
     const newData = { ...data };
-    newData.results.sort((a, b) => (a.response.service_name > b.response.service_name ? 1 : -1));
-    newData.emptys = data.results.filter(result => emptyResult(result));
-    newData.results = data.results.filter(result => !emptyResult(result));
+    newData.emptys = sortedResults.filter(result => emptyResult(result));
+    newData.results = sortedResults.filter(result => !emptyResult(result));
     newData.errors = liveErrors ? [...data.errors, ...liveErrors] : data.errors;
     return newData;
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const promotedSections = useMemo(
+    () =>
+      file
+        ? file.results
+            .map(serviceResult => serviceResult.result.sections.filter(section => section.promote_to !== null))
+            .flat()
+        : null,
+    [file]
+  );
 
   const resubmit = useCallback(
     (resubmit_type: string, isProfile: boolean) => {
@@ -245,18 +265,6 @@ const FileDetailPage = React.memo(() => {
     };
     // eslint-disable-next-line
   }, [sha256, sid]);
-
-  useEffect(() => {
-    if (file === null) {
-      setPromotedSections(null);
-    } else {
-      setPromotedSections(
-        file.results
-          .map(serviceResult => serviceResult.result.sections.filter(section => section.promote_to !== null))
-          .flat()
-      );
-    }
-  }, [file]);
 
   useEffect(() => {
     addInsight({ type: 'file', value: sha256 });

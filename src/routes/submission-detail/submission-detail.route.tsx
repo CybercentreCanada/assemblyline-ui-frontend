@@ -313,19 +313,21 @@ const SubmissionDetail = memo(() => {
   const updateLiveFileTree = useCallback(
     (results: Record<string, Result>) => {
       const tempTree = tree !== null ? { ...tree } : {};
+      const nodesBySHA256 = new Map<string, Tree[]>();
 
-      const searchFileTree = (sha256: string, currentTree: SubmissionTree['tree']): Tree[] => {
-        let output: Tree[] = [];
+      const indexFileTree = (currentTree: SubmissionTree['tree']) => {
         Object.entries(currentTree).forEach(([key, val]) => {
+          const nodes = nodesBySHA256.get(key) ?? [];
+          nodes.push(val);
+          nodesBySHA256.set(key, nodes);
+
           if (Object.keys(val.children).length !== 0) {
-            output = [...output, ...searchFileTree(sha256, val.children)];
-          }
-          if (key === sha256) {
-            output.push(val);
+            indexFileTree(val.children);
           }
         });
-        return output;
       };
+
+      indexFileTree(tempTree);
 
       const getFilenameFromSHA256 = (sha256: string) => {
         if (submission !== null) {
@@ -341,7 +343,7 @@ const SubmissionDetail = memo(() => {
       Object.entries(results).forEach(([resultKey, result]) => {
         const key = resultKey.substr(0, 64);
 
-        const toUpdate = searchFileTree(key, tempTree);
+        const toUpdate = nodesBySHA256.get(key) ?? [];
 
         if (toUpdate.length === 0) {
           const fname = getFilenameFromSHA256(key);
@@ -349,6 +351,7 @@ const SubmissionDetail = memo(() => {
           if (fname != null) {
             tempTree[key] = { children: {}, name: [fname], score: 0, sha256: key, type: 'N/A' };
             toUpdate.push(tempTree[key]);
+            nodesBySHA256.set(key, toUpdate);
           } else {
             if (!Object.hasOwnProperty.call(tempTree, 'TBD')) {
               tempTree.TBD = { children: {}, name: ['Undetermined Parent'], score: 0, type: 'N/A' };
@@ -356,6 +359,7 @@ const SubmissionDetail = memo(() => {
 
             tempTree.TBD.children[key] = { children: {}, name: [key], score: 0, sha256: key, type: 'N/A' };
             toUpdate.push(tempTree.TBD.children[key]);
+            nodesBySHA256.set(key, toUpdate);
           }
         }
         const toDelTDB = [];
@@ -380,6 +384,9 @@ const SubmissionDetail = memo(() => {
                     if (toDelTDB.indexOf(sha256) === -1) toDelTDB.push(sha256);
                   } else {
                     item.children[sha256] = { children: {}, name: [name], score: 0, sha256, type: 'N/A' };
+                    const nodes = nodesBySHA256.get(sha256) ?? [];
+                    nodes.push(item.children[sha256]);
+                    nodesBySHA256.set(sha256, nodes);
                   }
                 } else {
                   item.children[sha256].name.push(name);
@@ -481,6 +488,11 @@ const SubmissionDetail = memo(() => {
   );
 
   const resetLiveMode = useCallback(() => {
+    if (loadInterval) {
+      clearInterval(loadInterval);
+      setLoadInterval(null);
+    }
+
     if (socket) {
       // Disconnect socket
       socket.disconnect();
@@ -498,7 +510,7 @@ const SubmissionDetail = memo(() => {
       setLastSuccessfulTrigger(0);
       setWatchQueue(null);
     }
-  }, [socket]);
+  }, [loadInterval, socket]);
 
   const archive = useCallback(
     (
@@ -666,21 +678,26 @@ const SubmissionDetail = memo(() => {
   };
 
   useEffect(() => {
+    let active = true;
+
     if (currentUser.roles.includes('submission_view')) {
       apiCall<Configuration>({
         url: '/api/v4/help/configuration/',
         onSuccess: api_data => {
+          if (!active) return;
           setConfiguration(api_data.api_response);
         }
       });
       apiCall<Submission>({
         url: `/api/v4/submission/${id}/`,
         onSuccess: api_data => {
+          if (!active) return;
           setSubmission(parseSubmissionErrors(api_data.api_response));
         }
       });
     }
     return () => {
+      active = false;
       setSubmission(null);
       setSummary(null);
       setTree(null);
@@ -707,6 +724,8 @@ const SubmissionDetail = memo(() => {
   }, [id]);
 
   useEffect(() => {
+    let active = true;
+
     if (submission) {
       if (submission.state === 'completed') {
         if (socket) setNotifyFavicon();
@@ -714,6 +733,7 @@ const SubmissionDetail = memo(() => {
         apiCall<SubmissionSummary>({
           url: `/api/v4/submission/summary/${id}/`,
           onSuccess: summ_data => {
+            if (!active) return;
             setHighlightMap(summ_data.api_response.map);
             setSummary(summ_data.api_response);
             if (summ_data.api_response.filtered) {
@@ -727,6 +747,7 @@ const SubmissionDetail = memo(() => {
         apiCall<SubmissionTree>({
           url: `/api/v4/submission/tree/${id}/`,
           onSuccess: tree_data => {
+            if (!active) return;
             setTree(tree_data.api_response.tree);
             if (tree_data.api_response.filtered) {
               setFiltered(true);
@@ -759,6 +780,10 @@ const SubmissionDetail = memo(() => {
       }
       setBaseFiles(submission.files.map(f => f.sha256));
     }
+
+    return () => {
+      active = false;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [submission, systemConfig]);
 
@@ -1086,11 +1111,11 @@ const SubmissionDetail = memo(() => {
       />
 
       <div ref={anchorRef} style={{ width: '100%' }} />
-      {outstandingOpen && outstanding && Object.keys(outstanding).length > 0 && (
+      {outstandingOpen && submission && submission.state !== 'completed' && (
         <Popper
           anchorEl={anchorRef.current}
           placement="bottom-end"
-          open={outstanding !== null}
+          open={outstandingOpen}
           disablePortal
           style={{ zIndex: 100 }}
           modifiers={[
@@ -1118,23 +1143,29 @@ const SubmissionDetail = memo(() => {
               </IconButton>
             }
           >
-            <span style={{ fontWeight: 500, textAlign: 'left' }}>{t('outstanding.title')}</span>
-            <Grid container style={{ marginTop: theme.spacing(1) }}>
-              <Grid size={{ xs: 6 }}>
-                <b>{t('outstanding.services')}</b>
-              </Grid>
-              <Grid size={{ xs: 6 }}>
-                <b>{t('outstanding.files')}</b>
-              </Grid>
-            </Grid>
-            {Object.keys(outstanding).map(service => (
-              <Grid key={service} container>
-                <Grid size={{ xs: 6 }}>
-                  <b>{service}</b>
+            {outstanding && Object.keys(outstanding).length > 0 ? (
+              <>
+                <span style={{ fontWeight: 500, textAlign: 'left' }}>{t('outstanding.title')}</span>
+                <Grid container style={{ marginTop: theme.spacing(1) }}>
+                  <Grid size={{ xs: 6 }}>
+                    <b>{t('outstanding.services')}</b>
+                  </Grid>
+                  <Grid size={{ xs: 6 }}>
+                    <b>{t('outstanding.files')}</b>
+                  </Grid>
                 </Grid>
-                <Grid size={{ xs: 6 }}>{outstanding[service]}</Grid>
-              </Grid>
-            ))}
+                {Object.keys(outstanding).map(service => (
+                  <Grid key={service} container>
+                    <Grid size={{ xs: 6 }}>
+                      <b>{service}</b>
+                    </Grid>
+                    <Grid size={{ xs: 6 }}>{outstanding[service]}</Grid>
+                  </Grid>
+                ))}
+              </>
+            ) : (
+              <span style={{ fontWeight: 500, textAlign: 'left' }}>{t('outstanding.empty')}</span>
+            )}
           </Alert>
         </Popper>
       )}
@@ -1327,7 +1358,7 @@ const SubmissionDetail = memo(() => {
                 </i>
               </Typography>
             )}
-            {socket && (
+            {submission && submission.state !== 'completed' && (
               <div
                 style={{
                   width: '100%',
@@ -1338,7 +1369,6 @@ const SubmissionDetail = memo(() => {
                 }}
               >
                 <Button
-                  disabled
                   sx={{
                     color: `${theme.palette.mode === 'dark' ? theme.palette.primary.light : theme.palette.primary.dark} !important`,
                     display: 'flex',
@@ -1348,12 +1378,8 @@ const SubmissionDetail = memo(() => {
                     textTransform: 'none',
                     width: '100%'
                   }}
-                  {...(outstanding &&
-                    Object.keys(outstanding).length > 0 && {
-                      disabled: false,
-                      tooltip: t('outstanding_services.show'),
-                      onClick: () => setOutstandingOpen(true)
-                    })}
+                  tooltip={t('outstanding_services.show')}
+                  onClick={() => setOutstandingOpen(true)}
                 >
                   {liveStatus === 'processing' ? (
                     <PlayCircleOutlineIcon
