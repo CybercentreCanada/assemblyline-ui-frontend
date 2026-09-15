@@ -134,6 +134,7 @@ const Errors = ({ sid = null, service = null, errors = [] }: ErrorsProps) => {
               color={theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark}
               nav={nav => nav.to().create({ route: '/file/detail/:id', path: { id: getHashFromKey(errors[0]) } })}
               navDeps={[errors[0]]}
+              sx={{ textAlign: 'left' }}
             >
               {getHashFromKey(errors[0])}
             </MaterialLink>
@@ -178,6 +179,7 @@ const Errors = ({ sid = null, service = null, errors = [] }: ErrorsProps) => {
                         color={theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark}
                         nav={nav => nav.to().create({ route: '/file/detail/:id', path: { id: getHashFromKey(error) } })}
                         navDeps={[error]}
+                        sx={{ textAlign: 'left' }}
                       >
                         {getHashFromKey(error)}
                       </MaterialLink>
