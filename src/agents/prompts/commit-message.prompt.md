@@ -8,7 +8,9 @@ description: >
 
 # Commit Message Writer
 
-Write a git commit message based on the currently staged changes.
+Write a git commit message based on the currently staged changes. This prompt is
+read-only: inspect the staged changes and return the message, but never modify
+the index or working tree and never create a commit.
 
 ## Required Workflow
 
@@ -17,6 +19,10 @@ Write a git commit message based on the currently staged changes.
    - `git diff --cached`
 2. Infer the logical changes from the staged diff, not from user summaries alone.
 3. Return only the commit message content inside a markdown code block.
+
+Do not run `git add`, `git reset`, `git commit`, `git checkout`, `git restore`,
+or any other command that changes staged files, unstaged files, or repository
+history.
 
 ## Output Format
 
@@ -35,6 +41,7 @@ Write a git commit message based on the currently staged changes.
 - Do not mention unstaged changes.
 - Do not invent changes that are not present in the staged diff.
 - Prefer 2 to 5 bullets unless the staged diff clearly requires more.
+- Do not commit, stage, unstage, amend, or otherwise modify any changes.
 
 ## Example Shape
 

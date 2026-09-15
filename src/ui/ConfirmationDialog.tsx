@@ -33,7 +33,7 @@ const ConfirmationDialog = ({
   cancelText,
   acceptText,
   waiting = false,
-  waitingCancel = false,
+  waitingCancel = true,
   unacceptable = false,
   text = null,
   children = null,
@@ -55,7 +55,7 @@ const ConfirmationDialog = ({
       </DialogContent>
     )}
     <DialogActions>
-      <Button onClick={handleCancel || handleClose} color="secondary" disabled={waitingCancel || unacceptable}>
+      <Button onClick={handleCancel || handleClose} color="secondary" disabled={waitingCancel && unacceptable}>
         {cancelText}
         {waitingCancel && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
       </Button>
