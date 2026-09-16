@@ -22,6 +22,7 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
+import { useAppConfigStore } from 'core/config';
 import type { InferAppNavigationPropsFromPath } from 'core/router';
 import { AppLink, useAppNavigate, useAppSearchSnapshot } from 'core/router';
 import useALContext from 'deprecated/hooks/useALContext';
@@ -395,11 +396,23 @@ export const AlertSubmission: React.FC<AlertActionProps> = React.memo(
     const { t } = useTranslation(['alerts']);
     const theme = useTheme();
     const { user: currentUser } = useALContext();
+    const submissionView = useAppConfigStore(s => s.settings.submission_view);
 
     return (
       <AlertActionButton
         tooltipTitle={t('submission')}
-        nav={nav => nav.to().create({ route: '/submission/:id', path: { id: alert?.sid } })}
+        nav={nav =>
+          nav.to().create(s => {
+            const route =
+              s?.route === '/submission/detail/:id' || s?.route === '/submission/report/:id'
+                ? s.route
+                : submissionView === 'report'
+                  ? '/submission/report/:id'
+                  : '/submission/detail/:id';
+
+            return { route, path: { id: alert?.sid } };
+          })
+        }
         navDeps={[alert?.sid]}
         open={open}
         vertical={vertical}

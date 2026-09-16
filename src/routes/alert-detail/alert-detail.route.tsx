@@ -1027,7 +1027,13 @@ export const AlertDetailRoute = createAppRoute({
     alert: s
       .object(null as AlertItem)
       .nullable()
-      .source('transient')
+      .source('state'),
+
+    q: s.string('').source('state'),
+    fq: s.filters([]).source('state'),
+    group_by: s.string('file.sha256').source('state'),
+    tc_start: s.string('').source('state').ephemeral(),
+    tc: s.string('4d').source('state')
   }),
 
   ancestor: '/alerts',

@@ -931,8 +931,7 @@ const SubmissionDetail = memo(() => {
         }));
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fid, submission]);
+  }, [fid, liveResultKeys, liveResults, navigate, submission]);
 
   useEffect(() => {
     if (loadTrigger === 0) return;
@@ -1104,7 +1103,6 @@ const SubmissionDetail = memo(() => {
           </>
         }
         waiting={waitingDialog}
-        waitingCancel={false}
         unacceptable={Object.keys(systemConfig.submission.metadata.archive)
           .filter(metakey => systemConfig.submission.metadata.archive[metakey].required)
           .some(metakey => !Object.keys(archivingMetadata).includes(metakey))}

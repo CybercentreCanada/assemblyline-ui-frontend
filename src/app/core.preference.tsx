@@ -31,12 +31,14 @@ const DEBUG_PREFERENCE_SCHEMA = zObject({
   maxSnapshots: zNumber().min(1).max(50).catch(10)
 });
 
+// TODO: remove the max value on the maxExtraNodes and maxPanels
+
 /** Panel layout and navigation behaviour settings. */
 const ROUTER_PREFERENCE_SCHEMA = zObject({
   /** Maximum number of extra nodes. */
-  maxExtraNodes: zNumber().min(0).catch(0),
+  maxExtraNodes: zNumber().min(0).max(0).catch(0),
   /** Maximum number of side-by-side panels allowed. */
-  maxPanels: zNumber().min(1).catch(2),
+  maxPanels: zNumber().min(1).max(2).catch(2),
   /** How navigation behaves when reaching the end of the stack. */
   navigation: zEnum(['push', 'loop']).catch('push')
 });
