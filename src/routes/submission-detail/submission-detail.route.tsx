@@ -49,7 +49,7 @@ import type { MultipleKeys } from 'models/api/result';
 import type { SubmissionSummary, SubmissionTags, SubmissionTree, Tree } from 'models/api/submission';
 import type { Verdict } from 'models/base/alert';
 import type { ArchiverMetadata, Configuration, TagTypes } from 'models/base/config';
-import type { ParsedErrors } from 'models/base/error';
+import type { Error, ParsedErrors } from 'models/base/error';
 import type { Result } from 'models/base/result';
 import type { ParsedSubmission, Submission } from 'models/base/submission';
 import type { Attack, Tag } from 'models/base/tagging';
@@ -895,16 +895,11 @@ const SubmissionDetail = memo(() => {
   useEffect(() => {
     if (fid) {
       if (liveResults) {
-        const curFileLiveResults = [];
-        const curFileLiveErrors = [];
-        Object.entries(liveResults.result).forEach(([resultKey, result]) => {
-          if (resultKey.startsWith(fid)) {
-            curFileLiveResults.push(result);
-          }
-        });
+        const curFileLiveResultKeys = (liveResultKeys ?? []).filter(resultKey => resultKey.startsWith(fid));
+        const curFileLiveErrors: Error[] = [];
         Object.entries(liveResults.error).forEach(([errorKey, error]) => {
           if (errorKey.startsWith(fid)) {
-            curFileLiveErrors.push(error);
+            curFileLiveErrors.push(error as Error);
           }
         });
 
@@ -912,8 +907,9 @@ const SubmissionDetail = memo(() => {
           ...s,
           search: {
             name: s?.search?.name ?? null,
+            sid: submission?.sid ?? null,
             metadata: submission?.metadata,
-            liveResultKeys: liveResultKeys,
+            liveResultKeys: curFileLiveResultKeys,
             liveErrors: curFileLiveErrors,
             force: submission && submission.max_score < 0,
             filetypeOverride: submission?.files?.[0]?.sha256 !== fid ? null : submission?.params?.filetype_override
@@ -924,6 +920,7 @@ const SubmissionDetail = memo(() => {
           ...s,
           search: {
             name: s?.search?.name ?? null,
+            sid: submission?.sid ?? null,
             metadata: submission?.metadata,
             force: submission && submission.max_score < 0,
             filetypeOverride: submission?.files?.[0]?.sha256 !== fid ? null : submission?.params?.filetype_override
