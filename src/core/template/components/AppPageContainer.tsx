@@ -43,17 +43,14 @@ export const AppPageContainer = memo(
     const appBarAutoHides = useAppPreferenceStore(s => s.template.layout !== 'top' && s.template.autoHideAppbar);
     const appBarHeight = useAppInterfaceStore(s => s.template.appBarHeight);
 
-    const computedTop = top !== null ? top : isSticky ? (appBarAutoHides ? 0 : appBarHeight) : null;
-
     return (
       <AppBar
         id="header1"
         position={isSticky ? 'sticky' : 'relative'}
-        sx={{
-          top: computedTop,
+        style={{
+          top: top !== null ? top : isSticky ? (appBarAutoHides ? 0 : appBarHeight) : null,
           backgroundColor: backgroundColor || theme.palette.background.default,
-          zIndex: !isSticky ? theme.zIndex.appBar - 100 : undefined,
-          borderBottom: `1px solid ${theme.palette.divider}`
+          zIndex: !isSticky ? theme.zIndex.appBar - 100 : null
         }}
         className={className}
         elevation={elevation}
@@ -61,30 +58,25 @@ export const AppPageContainer = memo(
       >
         {children}
         {(left || right || actions) && (
-          <Toolbar
-            disableGutters
-            sx={{
-              minHeight: 48,
-              px: 2,
-              gap: 2
-            }}
-          >
-            <div style={{ flexGrow: 1, display: 'flex', alignItems: 'center', minWidth: 0 }}>{left}</div>
-            <div style={{ display: 'flex', alignItems: 'center' }}>
+          <Toolbar disableGutters style={{ minHeight: 0 }}>
+            <div style={{ flexGrow: 1 }}>{left}</div>
+            <div>
               {actions &&
                 actions.map((a, i) => {
                   let act = null;
                   const key = a.key ?? `ph-action-${i}`;
                   const ariaLabel = a.tooltip || a.title || `action-${i + 1}`;
+
                   if (a.title) {
                     act = (
                       <Button
                         key={key}
+                        aria-label={ariaLabel}
                         startIcon={a.icon}
                         color={a.color}
                         onClick={a.action}
                         {...(a.btnProp as ButtonProps)}
-                        sx={{ marginRight: 1 }}
+                        sx={{ marginRight: theme.spacing(1) }}
                       >
                         {a.title}
                       </Button>
@@ -93,12 +85,12 @@ export const AppPageContainer = memo(
                     act = (
                       <IconButton
                         key={key}
+                        aria-label={ariaLabel}
                         color={a.color}
                         onClick={a.action}
                         {...(a.btnProp as IconButtonProps)}
-                        sx={{ marginRight: 1 }}
-                        aria-label={ariaLabel}
                         size="large"
+                        sx={{ marginRight: theme.spacing(1) }}
                       >
                         {a.icon}
                       </IconButton>
@@ -113,7 +105,7 @@ export const AppPageContainer = memo(
                   );
                 })}
             </div>
-            <div style={{ display: 'flex', alignItems: 'center' }}>{right}</div>
+            <div>{right}</div>
           </Toolbar>
         )}
       </AppBar>

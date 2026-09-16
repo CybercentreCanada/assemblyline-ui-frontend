@@ -126,9 +126,13 @@ export const AlertsPage = memo(() => {
     (item: Alert) => {
       if (!item) return;
       if (isLGDown) document.getElementById(ALERT_SIMPLELIST_ID).blur();
-      navigate.to().create({ route: '/alert/:id', path: { id: item.alert_id }, search: { alert: item as never } });
+      navigate.to().create({
+        route: '/alert/:id',
+        path: { id: item.alert_id },
+        search: { ...search.toObject(), alert: item as never }
+      });
     },
-    [isLGDown, navigate]
+    [isLGDown, navigate, search?.toString()]
   );
 
   const handleCreateWorkflow = useCallback(() => {
