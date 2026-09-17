@@ -12,7 +12,6 @@ import { List, ListItemButton, ListItemIcon, ListItemText, Popover, useTheme } f
 import { AppLink, createAppRoute, useAppNavigate, useAppPathParams, useAppSearchSnapshot } from 'core/router';
 import { AppPageCenter } from 'core/template';
 import useALContext from 'deprecated/hooks/useALContext';
-import type { APIResponseProps } from 'deprecated/hooks/useMyAPI';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import useMySnackbar from 'deprecated/hooks/useMySnackbar';
 import { useAssistant } from 'layout/assistant';
@@ -42,19 +41,6 @@ import InputDialog from 'ui/InputDialog';
 import { PageHeader } from 'ui/layouts/PageHeader';
 import { emptyResult } from 'ui/ResultCard';
 
-const uniqueBy = <T,>(items: T[], key: (item: T) => string): T[] =>
-  Array.from(new Map(items.map(item => [key(item), item])).values());
-
-const mergeFileData = (current: File | null, incoming: File, pendingErrors: Error[]): File => ({
-  ...current,
-  ...incoming,
-  errors: uniqueBy([...(current?.errors ?? []), ...incoming.errors, ...pendingErrors], error => error.id),
-  results: uniqueBy(
-    [...(current?.emptys ?? []), ...(current?.results ?? []), ...incoming.results],
-    result => result.response.service_name
-  )
-});
-
 const FileDetailPage = React.memo(() => {
   const { t } = useTranslation(['fileDetail']);
   const theme = useTheme();
@@ -73,26 +59,16 @@ const FileDetailPage = React.memo(() => {
   const [badlistReason, setBadlistReason] = useState<string>('');
   const [waitingDialog, setWaitingDialog] = useState<boolean>(false);
   const [resubmitAnchor, setResubmitAnchor] = useState(null);
+  const [promotedSections, setPromotedSections] = useState([]);
 
-  const filetypeOverride = useMemo(
-    () => search?.get('filetypeOverride'),
-    [search?.get('filetypeOverride')?.toString()]
-  );
-
+  const filetypeOverride = useMemo(() => search?.get('filetypeOverride'), [search?.get('filetypeOverride')]);
   const force = useMemo(() => search?.get('force'), [search?.get('force')]);
+  const liveErrors = useMemo(() => search?.get('liveErrors'), [search?.get('liveErrors')]);
+  const liveResultKeys = useMemo(() => search?.get('liveResultKeys'), [search?.get('liveResultKeys')]);
+  const metadata = useMemo(() => search?.get('metadata'), [search?.get('metadata')]);
+  const sid = useMemo(() => search?.get('sid'), [search?.get('sid')]);
 
-  const liveErrors = useMemo(() => search?.get('liveErrors'), [search?.get('liveErrors')?.toString()]);
-
-  const liveResultKeys = useMemo(() => search?.get('liveResultKeys'), [search?.get('liveResultKeys')?.toString()]);
-
-  const metadata = useMemo(() => search?.get('metadata'), [search?.get('metadata')?.toString()]);
-
-  const sid = useMemo(() => search?.get('sid'), [search?.get('sid')?.toString()]);
-
-  const ref = useRef<HTMLDivElement>(null);
-  const loadedResultKeys = useRef<Set<string>>(new Set());
-  const loadedErrorKeys = useRef<Set<string>>(new Set());
-  const pendingLiveErrors = useRef<Error[]>([]);
+  const ref = useRef(null);
 
   const sp2 = useMemo(() => theme.spacing(2), [theme]);
 
@@ -108,33 +84,14 @@ const FileDetailPage = React.memo(() => {
 
   const fileName = useMemo(() => (file ? search.get('name') || sha256 : null), [file, search?.toString(), sha256]);
 
-  const patchFileDetails = useCallback((data: File) => {
-    const sortedResults = [...data.results].sort((a, b) =>
-      a.response.service_name > b.response.service_name ? 1 : -1
-    );
+  const patchFileDetails = (data: File) => {
     const newData = { ...data };
-    newData.emptys = sortedResults.filter(result => emptyResult(result));
-    newData.results = sortedResults.filter(result => !emptyResult(result));
+    newData.results.sort((a, b) => (a.response.service_name > b.response.service_name ? 1 : -1));
+    newData.emptys = data.results.filter(result => emptyResult(result));
+    newData.results = data.results.filter(result => !emptyResult(result));
+    newData.errors = liveErrors ? [...data.errors, ...liveErrors] : data.errors;
     return newData;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const promotedSections = useMemo(
-    () =>
-      file
-        ? file.results
-            .map(serviceResult => serviceResult.result.sections.filter(section => section.promote_to !== null))
-            .flat()
-        : null,
-    [file]
-  );
-
-  useEffect(() => {
-    loadedResultKeys.current.clear();
-    loadedErrorKeys.current.clear();
-    pendingLiveErrors.current = [];
-    setFile(null);
-  }, [sha256, sid]);
+  };
 
   const resubmit = useCallback(
     (resubmit_type: string, isProfile: boolean) => {
@@ -258,68 +215,48 @@ const FileDetailPage = React.memo(() => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sha256, badlistReason, file]);
 
-  const applyFileResponse = useCallback(
-    (apiData: APIResponseProps<File>) => {
-      setFile(current => {
-        const nextFile = patchFileDetails(mergeFileData(current, apiData.api_response, pendingLiveErrors.current));
-        pendingLiveErrors.current = [];
-        return nextFile;
-      });
-    },
-    [patchFileDetails]
-  );
-
   useEffect(() => {
-    if (!sha256) return;
-
     let active = true;
 
-    apiCall<File>({
-      url: sid ? `/api/v4/submission/${sid}/file/${sha256}/` : `/api/v4/file/result/${sha256}/`,
-      onSuccess: apiData => active && applyFileResponse(apiData)
-    });
+    setFile(null);
 
-    return () => {
-      active = false;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [applyFileResponse, sha256, sid]);
-
-  useEffect(() => {
-    if (!sid || !sha256) return;
-
-    const resultKeys = (liveResultKeys ?? []).filter(key => !loadedResultKeys.current.has(key));
-    const newErrors = uniqueBy(
-      (liveErrors ?? []).filter(error => !loadedErrorKeys.current.has(error.id)),
-      error => error.id
-    );
-
-    newErrors.forEach(error => loadedErrorKeys.current.add(error.id));
-    pendingLiveErrors.current = uniqueBy([...pendingLiveErrors.current, ...newErrors], error => error.id);
-    if (newErrors.length > 0) {
-      setFile(current => {
-        if (!current) return current;
-        return { ...current, errors: uniqueBy([...current.errors, ...newErrors], error => error.id) };
+    if (sid && sha256) {
+      apiCall<File>({
+        method: liveResultKeys ? 'POST' : 'GET',
+        url: `/api/v4/submission/${sid}/file/${sha256}/`,
+        body: liveResultKeys ? { extra_result_keys: liveResultKeys } : null,
+        onSuccess: api_data => {
+          if (!active) return;
+          setFile(patchFileDetails(api_data.api_response));
+        }
+      });
+    } else if (sha256) {
+      apiCall<File>({
+        url: `/api/v4/file/result/${sha256}/`,
+        onSuccess: api_data => {
+          if (!active) return;
+          setFile(patchFileDetails(api_data.api_response));
+        }
       });
     }
 
-    if (resultKeys.length === 0) return;
-
-    let active = true;
-    resultKeys.forEach(key => loadedResultKeys.current.add(key));
-
-    apiCall<File>({
-      method: 'POST',
-      url: `/api/v4/submission/${sid}/file/${sha256}/`,
-      body: { extra_result_keys: resultKeys },
-      onSuccess: apiData => active && applyFileResponse(apiData)
-    });
-
     return () => {
       active = false;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [applyFileResponse, liveErrors, liveResultKeys, sha256, sid]);
+    // eslint-disable-next-line
+  }, [sha256, sid]);
+
+  useEffect(() => {
+    if (file === null) {
+      setPromotedSections(null);
+    } else {
+      setPromotedSections(
+        file.results
+          .map(serviceResult => serviceResult.result.sections.filter(section => section.promote_to !== null))
+          .flat()
+      );
+    }
+  }, [file]);
 
   useEffect(() => {
     addInsight({ type: 'file', value: sha256 });

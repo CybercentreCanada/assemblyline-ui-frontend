@@ -49,7 +49,7 @@ import type { MultipleKeys } from 'models/api/result';
 import type { SubmissionSummary, SubmissionTags, SubmissionTree, Tree } from 'models/api/submission';
 import type { Verdict } from 'models/base/alert';
 import type { ArchiverMetadata, Configuration, TagTypes } from 'models/base/config';
-import type { Error, ParsedErrors } from 'models/base/error';
+import type { ParsedErrors } from 'models/base/error';
 import type { Result } from 'models/base/result';
 import type { ParsedSubmission, Submission } from 'models/base/submission';
 import type { Attack, Tag } from 'models/base/tagging';
@@ -313,21 +313,19 @@ const SubmissionDetail = memo(() => {
   const updateLiveFileTree = useCallback(
     (results: Record<string, Result>) => {
       const tempTree = tree !== null ? { ...tree } : {};
-      const nodesBySHA256 = new Map<string, Tree[]>();
 
-      const indexFileTree = (currentTree: SubmissionTree['tree']) => {
+      const searchFileTree = (sha256: string, currentTree: SubmissionTree['tree']): Tree[] => {
+        let output: Tree[] = [];
         Object.entries(currentTree).forEach(([key, val]) => {
-          const nodes = nodesBySHA256.get(key) ?? [];
-          nodes.push(val);
-          nodesBySHA256.set(key, nodes);
-
           if (Object.keys(val.children).length !== 0) {
-            indexFileTree(val.children);
+            output = [...output, ...searchFileTree(sha256, val.children)];
+          }
+          if (key === sha256) {
+            output.push(val);
           }
         });
+        return output;
       };
-
-      indexFileTree(tempTree);
 
       const getFilenameFromSHA256 = (sha256: string) => {
         if (submission !== null) {
@@ -343,7 +341,7 @@ const SubmissionDetail = memo(() => {
       Object.entries(results).forEach(([resultKey, result]) => {
         const key = resultKey.substr(0, 64);
 
-        const toUpdate = nodesBySHA256.get(key) ?? [];
+        const toUpdate = searchFileTree(key, tempTree);
 
         if (toUpdate.length === 0) {
           const fname = getFilenameFromSHA256(key);
@@ -351,7 +349,6 @@ const SubmissionDetail = memo(() => {
           if (fname != null) {
             tempTree[key] = { children: {}, name: [fname], score: 0, sha256: key, type: 'N/A' };
             toUpdate.push(tempTree[key]);
-            nodesBySHA256.set(key, toUpdate);
           } else {
             if (!Object.hasOwnProperty.call(tempTree, 'TBD')) {
               tempTree.TBD = { children: {}, name: ['Undetermined Parent'], score: 0, type: 'N/A' };
@@ -359,7 +356,6 @@ const SubmissionDetail = memo(() => {
 
             tempTree.TBD.children[key] = { children: {}, name: [key], score: 0, sha256: key, type: 'N/A' };
             toUpdate.push(tempTree.TBD.children[key]);
-            nodesBySHA256.set(key, toUpdate);
           }
         }
         const toDelTDB = [];
@@ -384,9 +380,6 @@ const SubmissionDetail = memo(() => {
                     if (toDelTDB.indexOf(sha256) === -1) toDelTDB.push(sha256);
                   } else {
                     item.children[sha256] = { children: {}, name: [name], score: 0, sha256, type: 'N/A' };
-                    const nodes = nodesBySHA256.get(sha256) ?? [];
-                    nodes.push(item.children[sha256]);
-                    nodesBySHA256.set(sha256, nodes);
                   }
                 } else {
                   item.children[sha256].name.push(name);
@@ -895,11 +888,16 @@ const SubmissionDetail = memo(() => {
   useEffect(() => {
     if (fid) {
       if (liveResults) {
-        const curFileLiveResultKeys = (liveResultKeys ?? []).filter(resultKey => resultKey.startsWith(fid));
-        const curFileLiveErrors: Error[] = [];
+        const curFileLiveResults = [];
+        const curFileLiveErrors = [];
+        Object.entries(liveResults.result).forEach(([resultKey, result]) => {
+          if (resultKey.startsWith(fid)) {
+            curFileLiveResults.push(result);
+          }
+        });
         Object.entries(liveResults.error).forEach(([errorKey, error]) => {
           if (errorKey.startsWith(fid)) {
-            curFileLiveErrors.push(error as Error);
+            curFileLiveErrors.push(error);
           }
         });
 
@@ -909,7 +907,7 @@ const SubmissionDetail = memo(() => {
             name: s?.search?.name ?? null,
             sid: submission?.sid ?? null,
             metadata: submission?.metadata,
-            liveResultKeys: curFileLiveResultKeys,
+            liveResultKeys: liveResultKeys,
             liveErrors: curFileLiveErrors,
             force: submission && submission.max_score < 0,
             filetypeOverride: submission?.files?.[0]?.sha256 !== fid ? null : submission?.params?.filetype_override
@@ -928,7 +926,8 @@ const SubmissionDetail = memo(() => {
         }));
       }
     }
-  }, [fid, liveResultKeys, liveResults, navigate, submission]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fid, submission]);
 
   useEffect(() => {
     if (loadTrigger === 0) return;
