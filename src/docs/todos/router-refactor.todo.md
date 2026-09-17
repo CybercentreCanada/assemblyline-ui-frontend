@@ -29,9 +29,9 @@ Status legend:
 - 🟡 Verify that pending navigations remain in the Navigation Store until accepted or cancelled, including risk metadata.
 - ✅ Support navigation with raw string destinations in addition to app route values (for `create`/`update` flows).
 - ✅ Support passing React Router `Location` objects to `navigate.create/update` and parse them into app route values (legacy fallback, lower type safety).
-- 🟡 Implement and verify all `AppNavigateOptions` fields end-to-end (`hashScrollIntoView`, `href`, `ignoreBlocker`, `reloadDocument`, `replace`, `resetScroll`, `viewTransition`).
-- 🟡 Extend navigation options so callers can explicitly bypass selected risk guards when consequences are understood (for example `ignoreRisk` by reason and `forceProceed`).
-- 🟡 Add route-level loader execution in `createAppRoute` at navigation start (before page render) to prefetch API data with TanStack Query so data is available earlier in the pipeline.
+- ✅ Implement and verify all `AppNavigateOptions` fields end-to-end (`hashScrollIntoView`, `href`, `ignoreBlocker`, `reloadDocument`, `replace`, `resetScroll`, `viewTransition`).
+- ✅ Extend navigation options so callers can explicitly bypass selected risk guards when consequences are understood (for example `ignoreRisk` by reason and `forceProceed`).
+- ✅ Add route-level loader execution in `createAppRoute` at navigation start (before page render) to prefetch API data with TanStack Query so data is available earlier in the pipeline.
 - ⬜ Refactor `<AppNavigate />` to render through React Router `<Navigate />` under the hood instead of triggering navigation from `useLayoutEffect`.
 - ⬜ Add external-link safety prompt for unsafe destinations: show a confirmation dialog before leaving the app instance (e.g. "You are leaving this app and navigating to an unsafe link. Are you sure you want to proceed?").
 - ⬜ Add an unsaved-changes warning dialog for refresh/close/navigation-away requests that explains data will be lost unless the user confirms.
@@ -79,10 +79,10 @@ Status legend:
 
 ## 🔔 Priority 3 – Alerts Page
 
-- ⬜ Complete the Alerts page migration.
-- ⬜ Validate redirects.
-- ⬜ Verify interaction with the simplified search parameter engine.
-- ⬜ Explore page-to-page communication using TanStack Query or the router.
+- ✅ Complete the Alerts page migration.
+- ✅ Validate redirects.
+- ✅ Verify interaction with the simplified search parameter engine.
+- ✅ Explore page-to-page communication using TanStack Query or the router.
 
 ## 🧩 Priority 4 – Hash Parameter Support
 
@@ -96,8 +96,8 @@ Status legend:
 - ✅ Add a function that updates `document.title` from the active route spec's `title`.
 - ✅ Add browser/document title support.
 - ✅ Add page icons.
-- ⬜ Add i18n identifiers for page names.
-- ⬜ Define how page labels are presented throughout the application.
+- ✅ Add i18n identifiers for page names.
+- ✅ Define how page labels are presented throughout the application.
 
 ## 🔐 Priority 6 – Page Accessibility
 
@@ -110,7 +110,7 @@ Status legend:
 - ✅ Start setting the `forbidden` parameter in `createAppRoute` on pages and continue rolling it out across the remaining routes.
 - ✅ Show the Not Found route when no route matches during route resolution.
 - ✅ Show the Not Found page when an invalid page is calculated during routing, instead of filtering that page out.
-- ⬜ Define page accessibility requirements.
+- ✅ Define page accessibility requirements.
 - ✅ Add fallback page handling when an invalid page is provided (or define and implement all potential fallback pages).
 - ⬜ In AppLocationParamProvider, add configurable fallback overrides for Not Found and Forbidden pages.
 - ✅ Add blocked-page reason support so the UI can explain why access/navigation was blocked.
@@ -118,8 +118,8 @@ Status legend:
 
 ## ⚙️ Priority 7 – Search Parameter Defaults
 
-- ⬜ Verify pages can define default search parameter values.
-- ⬜ Ensure defaults can be updated dynamically where appropriate.
+- ✅ Verify pages can define default search parameter values.
+- ✅ Ensure defaults can be updated dynamically where appropriate.
 
 ## 🧪 Priority 8 – Codec Improvements
 
@@ -144,7 +144,7 @@ Status legend:
 - ⬜ Consider `401 Unauthorized` and `500 Error` handling if not already covered.
 - ⬜ Add search codec support for arrays.
 - ⬜ Allow each search blueprint to define its own encode/decode behavior.
-- ⬜ Remove scroll position from persisted route state.
+- ✅ Remove scroll position from persisted route state.
 - ⬜ Treat scroll as transient UI state.
 - ⬜ Apply scroll behavior independently instead of serializing it into route data.
 - ⬜ Keep `hash` only for in-page anchors/sections.
