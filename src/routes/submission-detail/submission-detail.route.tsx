@@ -907,7 +907,7 @@ const SubmissionDetail = memo(() => {
             name: s?.search?.name ?? null,
             sid: submission?.sid ?? null,
             metadata: submission?.metadata,
-            liveResultKeys: curFileLiveResults,
+            liveResultKeys: liveResultKeys,
             liveErrors: curFileLiveErrors,
             force: submission && submission.max_score < 0,
             filetypeOverride: submission?.files?.[0]?.sha256 !== fid ? null : submission?.params?.filetype_override
@@ -926,7 +926,8 @@ const SubmissionDetail = memo(() => {
         }));
       }
     }
-  }, [fid, liveResultKeys, liveResults, navigate, submission]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fid, submission]);
 
   useEffect(() => {
     if (loadTrigger === 0) return;
