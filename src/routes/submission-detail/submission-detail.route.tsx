@@ -927,7 +927,7 @@ const SubmissionDetail = memo(() => {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fid, submission]);
+  }, [fid, submission, liveResults, liveResultKeys]);
 
   useEffect(() => {
     if (loadTrigger === 0) return;

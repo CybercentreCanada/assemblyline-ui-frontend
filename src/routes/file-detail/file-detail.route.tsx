@@ -32,6 +32,7 @@ import ParentSection from 'routes/file-detail/components/parents';
 import ResultSection from 'routes/file-detail/components/results';
 import TagSection from 'routes/file-detail/components/tags';
 import URIIdentificationSection from 'routes/file-detail/components/uriIdent';
+import { patchFileDetails } from 'routes/file-detail/file-detail.utils';
 import { ForbiddenPage } from 'routes/forbidden/forbidden';
 import AISummarySection from 'routes/submission-detail/components/ai_summary';
 import { FileDownloader } from 'ui/buttons/FileDownloader';
@@ -39,7 +40,6 @@ import { IconButton } from 'ui/buttons/IconButton';
 import Classification from 'ui/Classification';
 import InputDialog from 'ui/InputDialog';
 import { PageHeader } from 'ui/layouts/PageHeader';
-import { emptyResult } from 'ui/ResultCard';
 
 const FileDetailPage = React.memo(() => {
   const { t } = useTranslation(['fileDetail']);
@@ -61,12 +61,19 @@ const FileDetailPage = React.memo(() => {
   const [resubmitAnchor, setResubmitAnchor] = useState(null);
   const [promotedSections, setPromotedSections] = useState([]);
 
-  const filetypeOverride = useMemo(() => search?.get('filetypeOverride'), [search?.get('filetypeOverride')]);
-  const force = useMemo(() => search?.get('force'), [search?.get('force')]);
-  const liveErrors = useMemo(() => search?.get('liveErrors'), [search?.get('liveErrors')]);
-  const liveResultKeys = useMemo(() => search?.get('liveResultKeys'), [search?.get('liveResultKeys')]);
-  const metadata = useMemo(() => search?.get('metadata'), [search?.get('metadata')]);
-  const sid = useMemo(() => search?.get('sid'), [search?.get('sid')]);
+  const filetypeOverride = useMemo(
+    () => search?.get('filetypeOverride'),
+    [search?.get('filetypeOverride')?.toString()]
+  );
+  const force = useMemo(() => search?.get('force'), [search?.get('force')?.toString()]);
+
+  const liveErrors = useMemo(() => search?.get('liveErrors'), [search?.get('liveErrors')?.toString()]);
+
+  const liveResultKeys = useMemo(() => search?.get('liveResultKeys'), [search?.get('liveResultKeys')?.toString()]);
+
+  const metadata = useMemo(() => search?.get('metadata'), [search?.get('metadata')?.toString()]);
+
+  const sid = useMemo(() => search?.get('sid'), [search?.get('sid')?.toString()]);
 
   const ref = useRef(null);
 
@@ -83,15 +90,6 @@ const FileDetailPage = React.memo(() => {
   }, [configuration]);
 
   const fileName = useMemo(() => (file ? search.get('name') || sha256 : null), [file, search?.toString(), sha256]);
-
-  const patchFileDetails = (data: File) => {
-    const newData = { ...data };
-    newData.results.sort((a, b) => (a.response.service_name > b.response.service_name ? 1 : -1));
-    newData.emptys = data.results.filter(result => emptyResult(result));
-    newData.results = data.results.filter(result => !emptyResult(result));
-    newData.errors = liveErrors ? [...data.errors, ...liveErrors] : data.errors;
-    return newData;
-  };
 
   const resubmit = useCallback(
     (resubmit_type: string, isProfile: boolean) => {
@@ -216,35 +214,32 @@ const FileDetailPage = React.memo(() => {
   }, [sha256, badlistReason, file]);
 
   useEffect(() => {
-    let active = true;
-
     setFile(null);
+  }, [sha256, sid]);
 
+  useEffect(() => {
     if (sid && sha256) {
       apiCall<File>({
         method: liveResultKeys ? 'POST' : 'GET',
         url: `/api/v4/submission/${sid}/file/${sha256}/`,
         body: liveResultKeys ? { extra_result_keys: liveResultKeys } : null,
-        onSuccess: api_data => {
-          if (!active) return;
-          setFile(patchFileDetails(api_data.api_response));
-        }
+        onSuccess: api_data => setFile(prev => patchFileDetails(prev, api_data.api_response, liveErrors))
       });
     } else if (sha256) {
       apiCall<File>({
         url: `/api/v4/file/result/${sha256}/`,
-        onSuccess: api_data => {
-          if (!active) return;
-          setFile(patchFileDetails(api_data.api_response));
-        }
+        onSuccess: api_data => setFile(prev => patchFileDetails(prev, api_data.api_response, liveErrors))
       });
     }
 
-    return () => {
-      active = false;
-    };
     // eslint-disable-next-line
-  }, [sha256, sid]);
+  }, [sha256, sid, liveResultKeys]);
+
+  useEffect(() => {
+    if (liveErrors) {
+      setFile(prev => (prev ? patchFileDetails(prev, prev, liveErrors) : prev));
+    }
+  }, [liveErrors]);
 
   useEffect(() => {
     if (file === null) {
