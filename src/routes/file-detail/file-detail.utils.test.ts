@@ -104,4 +104,21 @@ describe('patchFileDetails', () => {
     expect(patched.errors.map(error => error.response.service_name)).toEqual(['error-service']);
     expect(patched.emptys.map(result => result.response.service_name)).toEqual(['empty-service']);
   });
+
+  it('deduplicates services from categorized empty results', () => {
+    const previous = makeFile({
+      emptys: [makeResult('success-service', true), makeResult('error-service', true)]
+    });
+    const current = makeFile({
+      results: [makeResult('success-service')],
+      emptys: [makeResult('empty-service', true), makeResult('empty-service', true)],
+      errors: [makeError('error-service')]
+    });
+
+    const patched = patchFileDetails(previous, current);
+
+    expect(patched.results.map(result => result.response.service_name)).toEqual(['success-service']);
+    expect(patched.errors.map(error => error.response.service_name)).toEqual(['error-service']);
+    expect(patched.emptys.map(result => result.response.service_name)).toEqual(['empty-service']);
+  });
 });

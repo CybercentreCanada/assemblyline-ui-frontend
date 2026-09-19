@@ -8,35 +8,43 @@ import { emptyResult } from 'ui/ResultCard';
 
 /**
  * @name patchFileDetails
- * @description Merges file details and live errors, keeping the latest entry for each service.
+ * @description Merges previous, current, and live file-detail outcomes by service. The latest outcome within each
+ * category is retained, and each service is emitted once across all categories using success, error, then empty
+ * result priority.
  * @param prev - Previously loaded file details
  * @param data - Newly loaded file details
  * @param liveErrors - Errors received from the live submission stream
- * @returns Merged file details with successful results prioritized over errors and empty results
+ * @returns File details containing one prioritized outcome per service across results, errors, and empty results
  */
 export const patchFileDetails = (prev: File | null, data: File, liveErrors: Error[] | null = null): File => {
   const newData = { ...(prev ?? {}), ...data } as File;
-  const resultByService = new Map(
-    [...(prev?.results ?? []), ...(data.results ?? [])].map(result => [result.response.service_name, result])
-  );
-  const errorByService = new Map(
-    [...(prev?.errors ?? []), ...(data.errors ?? []), ...(liveErrors ?? [])].map(error => [
-      error.response.service_name,
-      error
-    ])
-  );
-  const successfulResults = [...resultByService.values()].filter(result => !emptyResult(result));
-  const emptyResults = [...resultByService.values()].filter(result => emptyResult(result));
-  const successfulServices = new Set(successfulResults.map(result => result.response.service_name));
-  const errorServices = new Set([...errorByService.keys()].filter(serviceName => !successfulServices.has(serviceName)));
+  const successfulResultByService = new Map<string, File['results'][number]>();
+  const emptyResultByService = new Map<string, File['emptys'][number]>();
+  const errorByService = new Map<string, Error>();
 
-  newData.results = successfulResults.sort((a, b) => (a.response.service_name > b.response.service_name ? 1 : -1));
-  newData.emptys = emptyResults
-    .filter(result => {
-      const serviceName = result.response.service_name;
-      return !successfulServices.has(serviceName) && !errorServices.has(serviceName);
-    })
-    .sort((a, b) => (a.response.service_name > b.response.service_name ? 1 : -1));
-  newData.errors = [...errorByService.values()].filter(error => !successfulServices.has(error.response.service_name));
+  for (const result of prev?.emptys ?? []) emptyResultByService.set(result.response.service_name, result);
+  for (const result of prev?.results ?? []) {
+    (emptyResult(result) ? emptyResultByService : successfulResultByService).set(result.response.service_name, result);
+  }
+  for (const result of data.results ?? []) {
+    (emptyResult(result) ? emptyResultByService : successfulResultByService).set(result.response.service_name, result);
+  }
+  for (const result of data.emptys ?? []) emptyResultByService.set(result.response.service_name, result);
+  for (const error of prev?.errors ?? []) errorByService.set(error.response.service_name, error);
+  for (const error of data.errors ?? []) errorByService.set(error.response.service_name, error);
+  for (const error of liveErrors ?? []) errorByService.set(error.response.service_name, error);
+
+  newData.results = [...successfulResultByService.values()].sort((a, b) =>
+    a.response.service_name.localeCompare(b.response.service_name)
+  );
+  newData.errors = [];
+  for (const [serviceName, error] of errorByService) {
+    if (!successfulResultByService.has(serviceName)) newData.errors.push(error);
+  }
+  newData.emptys = [];
+  for (const [serviceName, result] of emptyResultByService) {
+    if (!successfulResultByService.has(serviceName) && !errorByService.has(serviceName)) newData.emptys.push(result);
+  }
+  newData.emptys.sort((a, b) => a.response.service_name.localeCompare(b.response.service_name));
   return newData;
 };

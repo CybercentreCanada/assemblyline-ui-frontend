@@ -901,13 +901,16 @@ const SubmissionDetail = memo(() => {
           }
         });
 
+        curFileLiveResults.sort();
+        curFileLiveErrors.sort();
+
         navigate.to<'/file/detail/:id'>({ replace: true }).update(s => ({
           ...s,
           search: {
             name: s?.search?.name ?? null,
             sid: submission?.sid ?? null,
             metadata: submission?.metadata,
-            liveResultKeys: liveResultKeys,
+            liveResultKeys: curFileLiveResults,
             liveErrors: curFileLiveErrors,
             force: submission && submission.max_score < 0,
             filetypeOverride: submission?.files?.[0]?.sha256 !== fid ? null : submission?.params?.filetype_override
