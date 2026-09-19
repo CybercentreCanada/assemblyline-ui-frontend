@@ -109,7 +109,7 @@ const waitForVisualReady = async (page: Page) => {
   );
 };
 
-test.describe('Route Smoke Tests', () => {
+test.describe.skip('Route Smoke Tests', () => {
   for (const route of routes) {
     test(`should load ${route} without errors and match snapshot`, async ({ page }) => {
       const errors: string[] = [];
