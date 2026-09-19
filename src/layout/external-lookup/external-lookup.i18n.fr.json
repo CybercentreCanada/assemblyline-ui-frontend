@@ -1,0 +1,10 @@
+{
+  "related_external": "Rechercher dans des sources externes",
+  "related_external.all": "Toutes sources",
+  "related_external.complete": "Recherche externe terminée",
+  "related_external.error": "Erreur de recherche dans les sources externes",
+  "related_external.error.invalidTagName": "Non consultable dans aucune source externe",
+  "related_external.error.maxClassification": "La classification dépasse le maximum autorisé pour cette source externe",
+  "related_external.notfound": "Aucun lien externe trouvé",
+  "related_external.title": "Résultats de recherche externes"
+}

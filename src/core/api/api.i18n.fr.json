@@ -1,0 +1,4 @@
+{
+  "invalid": "Données non valides renvoyées par le serveur API",
+  "unreachable": "Serveur API inaccessible, nous nous reconnecterons automatiquement une fois que le serveur sera de retour en ligne..."
+}

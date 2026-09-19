@@ -1,0 +1,71 @@
+import type { CursorState, PartialR, ScrollState, SearchState, SearchType, SelectState, TypesConfig } from '..';
+
+export type LocationParam = {
+  key: string;
+  type: 'number' | 'string' | 'symbol';
+  path: string[];
+};
+
+export type LocationQuery = {
+  d?: string;
+  scroll?: string;
+  cursor?: string;
+  selectStart?: string;
+  selectEnd?: string;
+  searchType?: SearchType;
+  searchValue?: string;
+  searchIndex?: string;
+  test?: {
+    test1: string;
+    test2: string;
+  };
+};
+
+export type LocationTypes = never;
+
+export type LocationState = {
+  location: PartialR<CursorState & SelectState & SearchState & ScrollState>;
+};
+
+export const LOCATION_PARAMS: LocationParam[] = [
+  { key: 'cursor', type: 'number', path: ['cursor', 'index'] },
+  { key: 'startIndex', type: 'number', path: ['select', 'startIndex'] },
+  { key: 'endIndex', type: 'number', path: ['select', 'endIndex'] },
+  { key: 'mode', type: 'string', path: ['search', 'mode', 'type'] },
+  { key: 'query', type: 'string', path: ['search', 'inputValue'] },
+  { key: 'selectedResult', type: 'number', path: ['search', 'selectedResult'] }
+];
+
+export const LOCATION_STATE: LocationState = {
+  location: {
+    cursor: { index: null },
+    select: { startIndex: -1, endIndex: -1 },
+    scroll: { index: 0, rowIndex: 0, type: 'top' },
+    search: { mode: { type: 'text', encoding: 'both', textSpan: 'wide' }, inputValue: '', selectedResult: null }
+  }
+};
+
+export const LOCATION_TYPES: TypesConfig<LocationState, SearchType> = {
+  location: {
+    // searchType: [
+    //   {
+    //     value: 0,
+    //     type: 'cursor',
+    //     label: { en: 'cursor', fr: 'cursor' },
+    //     description: { en: 'cursor', fr: 'cursor' }
+    //   },
+    //   {
+    //     value: 1,
+    //     type: 'hex',
+    //     label: { en: 'hex', fr: 'hex' },
+    //     description: { en: 'hex', fr: 'hex' }
+    //   },
+    //   {
+    //     value: 2,
+    //     type: 'text',
+    //     label: { en: 'text', fr: 'text' },
+    //     description: { en: 'text', fr: 'text' }
+    //   }
+    // ]
+  }
+};
