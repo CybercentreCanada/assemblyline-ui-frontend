@@ -13,8 +13,6 @@ services:
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.19.3
-    tmpfs:
-      - /usr/share/elasticsearch/data    
     environment:
       - node.name=elasticsearch
       - cluster.name=es-docker-cluster
@@ -24,6 +22,8 @@ services:
       - logger.level=WARN
       - 'ELASTIC_PASSWORD=devpass'
       - 'ES_JAVA_OPTS=-Xms1024m -Xmx1024m'
+    tmpfs:
+      - /usr/share/elasticsearch/data
     ports:
       - '9200:9200'
     healthcheck:
