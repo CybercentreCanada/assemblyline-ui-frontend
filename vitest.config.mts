@@ -9,6 +9,8 @@ import { configDefaults } from 'vitest/config';
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
 
+  // TODO: remove the excluded on src-deprecated
+
   return {
     plugins: [react(), tsconfigPaths(), mkcert()],
     resolve: {
@@ -20,9 +22,9 @@ export default defineConfig(({ mode }) => {
     test: {
       globals: true,
       environment: 'jsdom',
-      setupFiles: [path.join(__dirname, './src/tests/vitest.setup.mts')],
+      setupFiles: [path.join(__dirname, './src/core/test/vitest.setup.mts')],
       include: ['**/*.test.{ts,tsx}'],
-      exclude: [...configDefaults.exclude],
+      exclude: [...configDefaults.exclude, 'src-deprecated/'],
       testTimeout: 30000,
       clearMocks: true,
       coverage: {

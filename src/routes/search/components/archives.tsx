@@ -1,0 +1,243 @@
+import FileOpenIcon from '@mui/icons-material/FileOpen';
+import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
+import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
+import { AlertTitle, IconButton, Skeleton, Tooltip, useTheme } from '@mui/material';
+import Paper from '@mui/material/Paper';
+import TableContainer from '@mui/material/TableContainer';
+import useALContext from 'deprecated/hooks/useALContext';
+import type { SearchResult } from 'models/api/search';
+import type { FileIndexed, LabelCategories } from 'models/base/file';
+import { LABELS_COLOR_MAP } from 'models/base/file';
+import React, { memo, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { FileDownloader } from 'ui/buttons/FileDownloader';
+import Classification from 'ui/Classification';
+import CustomChip from 'ui/CustomChip';
+import {
+  DivTable,
+  DivTableBody,
+  DivTableCell,
+  DivTableHead,
+  DivTableRow,
+  LinkRow,
+  SortableHeaderCell
+} from 'ui/DivTable';
+import InformativeAlert from 'ui/InformativeAlert';
+import Moment from 'ui/Moment';
+
+type LabelCellProps = {
+  label_categories?: LabelCategories;
+  onLabelClick?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>, label: string) => void;
+};
+
+const WrappedLabelCell = ({ label_categories = null, onLabelClick = null }: LabelCellProps) => {
+  const { t } = useTranslation();
+  const theme = useTheme();
+  const [showMore, setShowMore] = useState<boolean>(false);
+
+  const labels = useMemo(
+    () =>
+      label_categories &&
+      ['attribution', 'technique', 'info'].flatMap(
+        category =>
+          category in label_categories &&
+          label_categories[category]
+            .sort((a: string, b: string) => a.valueOf().localeCompare(b.valueOf()))
+            .map(label => ({ category, label }))
+      ),
+    [label_categories]
+  );
+
+  return (
+    <div style={{ display: 'flex', gap: theme.spacing(1), flexWrap: 'wrap' }}>
+      {labels?.length > 0 && (
+        <>
+          {labels
+            .filter((_, j) => (showMore ? true : j < 5))
+            .map(({ category, label }, j) => (
+              <CustomChip
+                key={`${j}`}
+                wrap
+                variant="outlined"
+                size="tiny"
+                type="rounded"
+                color={category in LABELS_COLOR_MAP ? LABELS_COLOR_MAP[category] : 'primary'}
+                label={label}
+                style={{ height: 'auto', minHeight: '20px' }}
+                onClick={
+                  !onLabelClick
+                    ? null
+                    : event => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        onLabelClick(event, label);
+                      }
+                }
+              />
+            ))}
+          {!showMore && labels?.length > 5 && (
+            <Tooltip title={t('more')}>
+              <IconButton
+                size="small"
+                onClick={event => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  setShowMore(true);
+                }}
+                style={{ padding: 0 }}
+              >
+                <MoreHorizOutlinedIcon />
+              </IconButton>
+            </Tooltip>
+          )}
+        </>
+      )}
+    </div>
+  );
+};
+
+const LabelCell = React.memo(WrappedLabelCell);
+
+export type ArchivesTableProps = {
+  fileResults: SearchResult<FileIndexed>;
+  allowSort?: boolean;
+  onLabelClick?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>, label: string) => void;
+  onRowClick?: (event: React.MouseEvent<HTMLElement>, file: FileIndexed) => void;
+};
+
+export const ArchivesTable = memo(
+  ({ fileResults, allowSort = true, onLabelClick = null, onRowClick = () => null }: ArchivesTableProps) => {
+    const { t } = useTranslation(['archive']);
+    const theme = useTheme();
+    const { c12nDef, user: currentUser } = useALContext();
+
+    const hasSupplementary = useMemo<boolean>(
+      () => fileResults && fileResults?.total > 0 && fileResults?.items.some(item => item.is_supplementary),
+      [fileResults]
+    );
+
+    return !fileResults ? (
+      <Skeleton variant="rectangular" sx={{ height: '6rem', borderRadius: '4px' }} />
+    ) : !fileResults?.total ? (
+      <div style={{ width: '100%' }}>
+        <InformativeAlert>
+          <AlertTitle>{t('no_errors_title')}</AlertTitle>
+          {t('no_results_desc')}
+        </InformativeAlert>
+      </div>
+    ) : (
+      <TableContainer component={Paper}>
+        <DivTable>
+          <DivTableHead>
+            <DivTableRow>
+              {hasSupplementary && <DivTableCell />}
+              <SortableHeaderCell children={t('header.archive_ts')} sortField="archive_ts" allowSort={allowSort} />
+              <SortableHeaderCell children={t('header.sha256')} sortField="sha256" allowSort={allowSort} inverted />
+              <SortableHeaderCell children={t('header.type')} sortField="type" allowSort={allowSort} inverted />
+              <SortableHeaderCell children={t('header.labels')} sortField="labels" allowSort={allowSort} inverted />
+              {c12nDef.enforce && (
+                <SortableHeaderCell sortField="classification" allowSort={allowSort} inverted>
+                  {t('header.classification')}
+                </SortableHeaderCell>
+              )}
+              <DivTableCell />
+            </DivTableRow>
+          </DivTableHead>
+          <DivTableBody>
+            {fileResults.items.map((file, i) => (
+              <LinkRow
+                key={`${file.sha256}-${i}`}
+                nav={nav =>
+                  nav
+                    .to()
+                    .create(s =>
+                      s?.route === '/archive/:id/:tab'
+                        ? { route: '/archive/:id/:tab', path: { id: file.sha256, tab: s.path.tab } }
+                        : { route: '/archive/:id', path: { id: file.sha256 } }
+                    )
+                }
+                navDeps={[file.sha256]}
+                onClick={event => onRowClick(event, file)}
+                hover
+                style={{ textDecoration: 'none' }}
+              >
+                {hasSupplementary && (
+                  <DivTableCell style={{ textAlign: 'center' }}>
+                    {file?.is_supplementary && (
+                      <Tooltip title={t('tooltip.is_supplementary')}>
+                        <span>
+                          <FileOpenIcon fontSize={theme.breakpoints.down('md') ? 'small' : 'medium'} />
+                        </span>
+                      </Tooltip>
+                    )}
+                  </DivTableCell>
+                )}
+                <DivTableCell>
+                  <Tooltip title={file.archive_ts}>
+                    <div>
+                      <Moment variant="fromNow">{file.archive_ts}</Moment>
+                    </div>
+                  </Tooltip>
+                </DivTableCell>
+                <DivTableCell>
+                  {file?.type?.startsWith('uri/') && (
+                    <div
+                      style={{
+                        wordBreak: 'break-word'
+                        // width: upLG ? '100%' : '10vw',
+                      }}
+                    >
+                      {file?.uri_info?.uri}
+                    </div>
+                  )}
+                  <div
+                    style={{
+                      wordBreak: 'break-word',
+                      // width: upLG ? '100%' : '10vw',
+                      ...(file?.type?.startsWith('uri/') && {
+                        fontSize: 'x-small',
+                        color: theme.palette.text.disabled
+                      })
+                    }}
+                  >
+                    {file.sha256}
+                  </div>
+                </DivTableCell>
+                <DivTableCell children={'type' in file ? file.type : null} />
+                <DivTableCell
+                  children={<LabelCell label_categories={file?.label_categories} onLabelClick={onLabelClick} />}
+                />
+                {c12nDef.enforce && (
+                  <DivTableCell>
+                    <Classification type="text" size="tiny" c12n={file.classification} format="short" />
+                  </DivTableCell>
+                )}
+                <DivTableCell
+                  style={{
+                    padding: 'unset',
+                    textAlign: 'center',
+                    paddingLeft: theme.spacing(1),
+                    paddingRight: theme.spacing(1)
+                  }}
+                >
+                  <FileDownloader
+                    link={() => `/api/v4/file/download/${file.sha256}/?`}
+                    preventRender={!(currentUser.roles.includes('file_download') && 'sha256' in file)}
+                    size="small"
+                    tooltip={t('tooltip.download')}
+                    onClick={e => {
+                      e.stopPropagation();
+                      e.preventDefault();
+                    }}
+                  >
+                    <GetAppOutlinedIcon fontSize="small" />
+                  </FileDownloader>
+                </DivTableCell>
+              </LinkRow>
+            ))}
+          </DivTableBody>
+        </DivTable>
+      </TableContainer>
+    );
+  }
+);

@@ -1,0 +1,4 @@
+{
+  "invalid": "Invalid data returned by API server",
+  "unreachable": "API server unreachable, we will auto-reconnect once the server is back online..."
+}
