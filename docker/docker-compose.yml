@@ -3,7 +3,7 @@ version: '2.4'
 services:
   # Dependencies
   minio:
-    image: minio/minio
+    image: cccs/minio
     environment:
       MINIO_ACCESS_KEY: al_storage_key
       MINIO_SECRET_KEY: Ch@ngeTh!sPa33w0rd
@@ -12,7 +12,7 @@ services:
     command: server /data
 
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.10.2
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.19.3
     environment:
       - node.name=elasticsearch
       - cluster.name=es-docker-cluster
@@ -57,7 +57,7 @@ services:
 
   # Create test data
   create_test_data:
-    image: cccs/assemblyline-core:4.5.stable
+    image: cccs/assemblyline-core:4.7.stable
     environment:
       DEV_ADMIN_PASS: $DEV_ADMIN_PASS
       DEV_USER_PASS: $DEV_USER_PASS
@@ -71,7 +71,7 @@ services:
 
   # UI
   al_ui:
-    image: cccs/assemblyline-ui:4.5.stable
+    image: cccs/assemblyline-ui:4.7.stable
     ports:
       - '5000:5000'
     volumes:
@@ -84,7 +84,7 @@ services:
 
   # SocketIO Server
   al_socketio:
-    image: cccs/assemblyline-socketio:4.5.stable
+    image: cccs/assemblyline-socketio:4.7.stable
     ports:
       - '5002:5002'
     volumes:
