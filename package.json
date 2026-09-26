@@ -72,7 +72,7 @@
     "react-markdown": "^10.1.0",
     "react-resize-detector": "^8.0.3",
     "react-router": "~6.30.3",
-    "react-router-dom": "~6.30.3",
+    "react-router-dom": "~6.30.6",
     "react-virtualized-auto-sizer": "^1.0.7",
     "react-window": "^1.8.8",
     "remark-gfm": "^4.0.1",
