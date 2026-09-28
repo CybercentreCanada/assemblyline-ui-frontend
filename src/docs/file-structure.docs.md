@@ -31,7 +31,7 @@ alert.i18n.en.json
 
 **Rules:**
 
-- No `index` files as root elements — they obscure what the file actually does
+- Use `index.ts` files as explicit public module entry points; keep implementation files named by responsibility
 - The file name alone should tell you what resource it affects and what role it plays
 
 ## General Naming Conventions
@@ -45,7 +45,7 @@ alert.i18n.en.json
 | Tests                  | Mirror source filename   | `UserProfileCard.test.tsx`, `date-utils.test.ts` |
 | Constant/type files    | `kebab-case`             | `app-constants.ts`, `user-models.ts`             |
 | Constant exports       | `SCREAMING_SNAKE_CASE`   | `MAX_RETRY_COUNT`, `DEFAULT_APP_CONFIG`          |
-| Type/interface exports | `PascalCase`             | `AppConfig`, `NotificationModel`                 |
+| Type exports           | `PascalCase`             | `AppConfig`, `NotificationModel`                 |
 
 **Why:**
 
@@ -143,7 +143,7 @@ Both approaches can coexist — pick per-module based on complexity.
 - Single-component files must be placed in the module `components/` folder
 - Single-component filenames must match the component name (PascalCase), e.g. `AISummarySection.tsx`
 - Test files are co-located with the file they test: `*.test.tsx` / `*.test.ts`
-- Each module has an `index.ts` that exports the public API
+- Each module has an `index.ts` that explicitly exports its public API
 - **1:1 mappings**: each component gets a corresponding POM, each utility file gets a corresponding test file
 - POMs mirror component filenames: `ComponentA.tsx` → `ComponentA.pom.ts`
 - Folder-based subfolders may have their own `index.ts` for internal barrel exports

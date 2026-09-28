@@ -28,7 +28,7 @@ Status legend:
 - 🟡 Add a central way to annotate and aggregate risk reasons for a page so risks are discoverable and debuggable from router/navigation state.
 - 🟡 Verify that pending navigations remain in the Navigation Store until accepted or cancelled, including risk metadata.
 - ✅ Support navigation with raw string destinations in addition to app route values (for `create`/`update` flows).
-- ✅ Support passing React Router `Location` objects to `navigate.create/update` and parse them into app route values (legacy fallback, lower type safety).
+- ✅ Support passing React Router `Location` objects to `navigate.create/update` and parse them into app route values (compatibility fallback with lower type safety).
 - ✅ Implement and verify all `AppNavigateOptions` fields end-to-end (`hashScrollIntoView`, `href`, `ignoreBlocker`, `reloadDocument`, `replace`, `resetScroll`, `viewTransition`).
 - ✅ Extend navigation options so callers can explicitly bypass selected risk guards when consequences are understood (for example `ignoreRisk` by reason and `forceProceed`).
 - ✅ Add route-level loader execution in `createAppRoute` at navigation start (before page render) to prefetch API data with TanStack Query so data is available earlier in the pipeline.
@@ -49,7 +49,7 @@ Status legend:
 
 - 🚫 Simplify the implementation of the search params parser. (Not going to be implemented)
 - 🚫 Remove `useAppSearchSnapshot` and migrate usage to on-the-fly derived values. (Not going to be implemented)
-- ✅ Start wiring the new hash/state/transient parsers and params into [routes.utils.tsx](/home/njrheau/git/frontend1/src/core/routes/routes.utils.tsx); more integration work is still needed.
+- ✅ Start wiring the new hash/state/transient parsers and params into [routes.utils.ts](../core/router/utils/routes.utils.ts); more integration work is still needed.
 - ✅ Refactor the search parameter engine so it is only responsible for search parameters.
 - ✅ Move higher-level state resolution into the router/navigation infrastructure.
 - ✅ **Store search snapshot in LocationParam** — Update the LocationParam store to store both:
