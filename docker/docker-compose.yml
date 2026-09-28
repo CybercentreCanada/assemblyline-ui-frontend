@@ -46,7 +46,7 @@ services:
   nginx:
     image: cccs/nginx-ssl-frontend
     volumes:
-      - ./minimal.template:/opt/minimal.template
+      - ./minimal.template:/etc/nginx/templates/default.conf.template
     ports:
       - '443:443'
     environment:
