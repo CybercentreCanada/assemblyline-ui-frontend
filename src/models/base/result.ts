@@ -159,19 +159,19 @@ export type ResponseBody = {
 /** Result Model */
 export type Result = {
   /** Archiving timestamp (Deprecated) */
-  archive_ts?: string & Date;
+  archive_ts?: string;
 
   /** Aggregate classification for the result */
   classification: string;
 
   /** Date at which the result object got created */
-  created: string & Date;
+  created: string;
 
   /** Use to not pass to other stages after this run */
   drop_file: boolean;
 
   /** Expiry timestamp */
-  expiry_ts?: string & Date;
+  expiry_ts?: string;
 
   /** Was loaded from the archive */
   from_archive: boolean;
