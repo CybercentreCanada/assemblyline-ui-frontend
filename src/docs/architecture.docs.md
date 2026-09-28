@@ -15,13 +15,13 @@ This architecture was redesigned to move away from a **technology-based structur
 - All files related to a feature/resource live together in a single folder
 - You never leave that folder when working on a feature
 - File naming makes the role explicit: `<primary>-<secondary>.<role>.<ext>`
-- No `index` files as root elements — they obscure what the file actually does
+- Use `index.ts` files only as explicit public module entry points; keep implementation files named by responsibility
 
 ## Technology Stack
 
 | Layer        | Technology                                             |
 | ------------ | ------------------------------------------------------ |
-| UI Framework | React 18+ (StrictMode, memo, Activity API)             |
+| UI Framework | React 18+ (StrictMode, memo)                            |
 | State        | Zustand (vanilla store + devtools)                     |
 | Server State | TanStack React Query (persisted, lz-string compressed) |
 | Routing      | react-router v6 + custom multi-panel system            |
@@ -57,12 +57,10 @@ The foundational systems that the entire application depends on. These are frame
 **Contains:**
 
 - [`api/`](../core/api/api.docs.md) — HTTP client abstraction, request/response interceptors, query/mutation factories
-- [`auth/`](../core/auth/auth.docs.md) — Authentication flow, token management, session handling
 - [`config/`](../core/config/config.docs.md) — Global Zustand store (`AppConfig`), selectors, setters
 - [`error/`](../core/error/error.docs.md) — Error boundary components, error state management
-- [`layout/`](../core/layout/layout.docs.md) — Core layout state and configuration
-- [`router/`](../core/router/router.docs.md) — Custom multi-panel router system (panels, nodes, LRU cache, reverse portals, navigation utilities)
-- [`routes/`](../core/routes/routes.docs.md) — Route definitions, route guards, lazy loading configuration
+- [`preference/`](../core/preference/preference.docs.md) — Application preference state and selectors
+- [`router/`](../core/router/router.docs.md) — Custom multi-panel router system (panels, nodes, navigation utilities)
 - [`snackbar/`](../core/snackbar/snackbar.docs.md) — Toast notification system (success, error, info messages)
 - [`template/`](../core/template/template.docs.md) — App template/theme provider, TUI `AppRoot` integration, layout preferences
 
@@ -74,11 +72,12 @@ Self-contained, reusable modules that provide a specific capability to the appli
 
 - [`classification/`](../features/classification/classification.docs.md) — Classification banner and marking system
 - [`form/`](../features/form/form.docs.md) — TanStack Form integration, form field components, validation patterns
-- `hash-params/` — URL hash parameter reading and writing
+- [`hash-params/`](../features/hash-params/hash-params.docs.md) — URL hash parameter reading and writing
 - [`path-params/`](../features/path-params/path-params.docs.md) — URL path parameter extraction and typing
 - [`portal/`](../features/portal/portal.docs.md) — React portal management for rendering outside the DOM tree
 - [`prop-provider/`](../features/prop-provider/prop-provider.docs.md) — Prop injection without prop drilling (provider pattern)
 - [`search-params/`](../features/search-params/search-params.docs.md) — URL search parameter state management
+- [`state-params/`](../features/state-params/state-params.docs.md) — Route state and transient parameter parsing
 - [`store/`](../features/store/store.docs.md) — `createAppStore` factory for feature-scoped Zustand stores
 - [`table-of-content/`](../features/table-of-content/table-of-content.docs.md) — Table of contents generation and navigation
 
@@ -88,14 +87,12 @@ Components that form the application's visual structure and chrome — everythin
 
 **Contains:**
 
-- [`apps/`](../layout/apps/apps.docs.md) — Application switcher and app registry UI
 - [`auth/`](../layout/auth/auth.docs.md) — Login, logout, session expired screens
 - `carousel/` — Carousel/slideshow layout components
 - [`drawer/`](../layout/drawer/drawer.docs.md) — Side drawers (settings, filters, details panels)
 - [`notifications/`](../layout/notifications/notifications.docs.md) — Notification feed, badges, preference panels
-- [`router/`](../layout/router/router.docs.md) — Router panel layout, split views, tab bars, panel chrome
-- [`routes/`](../layout/routes/routes.docs.md) — Route transition animations and route-level layout wrappers
-- [`template/`](../layout/template/template.docs.md) — Page template components (headers, footers, content wrappers)
+- `left-nav/` — Primary application navigation
+- `system-version/` — Application version and update information
 
 ### `models/` — TypeScript Types and Domain Entities
 
@@ -108,7 +105,7 @@ Pure type definitions with zero runtime code and zero internal dependencies. Thi
 - `messages/` — Mirror of backend message models from assemblyline-base
 - `ontology/` — Mirror of backend ontology models from assemblyline-base
 
-### `pages/` — Route-Level Components
+### `routes/` — Route-Level Components
 
 The leaf nodes of the application. Each page is the component rendered when the user navigates to a specific route. Pages are thin orchestrators — they compose layout components, read from stores, and wire up mutations. Complex logic is pushed down into utilities and hooks; the page itself stays focused on assembly.
 
@@ -147,12 +144,12 @@ Shared test utilities, fixtures, mocks, and setup files used across unit and E2E
 Dependencies flow **downward only**:
 
 ```text
-pages → layout → features → core → models
+routes → layout → features → core → models
          ↓         ↓         ↓
         app       shared     ui
 ```
 
-- `pages/` can import from any layer below it
+- `routes/` can import from any layer below it
 - `layout/` can import from `core/`, `features/`, `models/`, `ui/`
 - `core/` can only import from `models/` and `ui/`
 - `models/` has zero internal dependencies
@@ -168,7 +165,7 @@ pages → layout → features → core → models
 ┌──────────────────────▼──────────────────────────────┐
 │  React Router (BrowserRouter)                        │
 │  └─ AppRouterLayout (multi-panel system)            │
-│     └─ Panels → Nodes → Pages                      │
+│     └─ Panels → Nodes → Routes                     │
 └──────────────────────┬──────────────────────────────┘
                        │
 ┌──────────────────────▼──────────────────────────────┐

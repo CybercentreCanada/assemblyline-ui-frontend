@@ -167,6 +167,8 @@ export function useAppNavigate<const Origin extends AppRoute['path']>() {
       const context = { operation: 'only', originPageKey: prevPageKey, targetPanelKey: destinationPanelKey };
       const nextPage = resolveNotFoundPage(nextPageInput, nextPageParam, context);
 
+      if (!shouldUpdatePage(routerState, prevPageKey, nextPage)) return;
+
       setNavigationStore(store => {
         store = getNavigationStoreFromRouter(store, routerState);
         store = setPageScrollPositions(store);
