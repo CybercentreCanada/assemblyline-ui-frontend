@@ -26,7 +26,7 @@ export const useParseTemplateLeftNavMenu = (
     const locationParamState = getAppLocationParamStateFromApi(locationParamStoreApi);
 
     const items = leftNavs
-      .map((item, index) => getLeftNavMenuItem(item, index, locationParamState, configState, t))
+      .map((item, index) => getLeftNavMenuItem(item, null, index, locationParamState, configState, t))
       .filter(item => item !== null);
 
     return [{ id: 'menu', type: 'menu', items }];
