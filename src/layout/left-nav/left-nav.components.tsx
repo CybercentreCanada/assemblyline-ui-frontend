@@ -13,22 +13,24 @@ export type LeftNavLinkProps<Origin extends AppRoute['path']> = InferAppNavigati
   name?: RouteName;
   navOpen: boolean;
   navProps?: LeftNavChildRenderProps;
+  parentMenuId?: string;
   primary?: ListItemTextProps['primary'];
 };
 
 function WrappedLeftNavRoute<const Origin extends AppRoute['path']>({
   icon,
-  navOpen,
-  navProps,
   name,
   nav,
   navDeps = null,
+  navOpen,
+  navProps,
+  parentMenuId,
   primary
 }: LeftNavLinkProps<Origin>) {
   const { t } = useTranslation();
   const theme = useTheme();
   const { active, level } = useMemo(() => navProps ?? { active: false, level: 0 }, [navProps]);
-  const { open } = useAppLeftNav();
+  const { open, closeMenu } = useAppLeftNav();
 
   return (
     <Tooltip
@@ -42,7 +44,14 @@ function WrappedLeftNavRoute<const Origin extends AppRoute['path']>({
           dense={level > 0}
           selected={active}
           sx={{ minHeight: undefined, paddingLeft: level === 0 ? undefined : theme.spacing(navOpen ? 4 : 2) }}
-          {...(!nav ? null : { component: AppLink, nav, navDeps })}
+          {...(!nav
+            ? null
+            : {
+                component: AppLink,
+                nav,
+                navDeps,
+                onClick: () => closeMenu(parentMenuId)
+              })}
         >
           {icon && <ListItemIcon sx={{ color: 'inherit' }}>{icon}</ListItemIcon>}
           <ListItemText primary={name ? t(name[0], name[1]) : primary} />

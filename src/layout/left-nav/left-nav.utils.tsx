@@ -31,6 +31,7 @@ export const isRouteHidden = (route: AppRoute | null, configState: AppConfigStor
  */
 export const getLeftNavMenuItem = (
   { link = null, divider = false, items = [] }: AppLeftNavItem,
+  parentMenuId: string,
   index: number,
   store: AppLocationParamStore,
   configState: AppConfigStore,
@@ -46,7 +47,7 @@ export const getLeftNavMenuItem = (
 
   if (items.length) {
     const nextItems = items
-      .map((child, childIndex) => getLeftNavMenuItem(child, childIndex, store, configState, t))
+      .map((child, childIndex) => getLeftNavMenuItem(child, id, childIndex, store, configState, t))
       .filter((child): child is LeftNavMenuItem => child !== null);
 
     return nextItems.length
@@ -62,11 +63,12 @@ export const getLeftNavMenuItem = (
     withProps: true,
     render: (navOpen, navProps) => (
       <LeftNavRoute
-        name={name}
         icon={icon}
+        name={name}
         nav={link ? navigate => navigate.to().only(link as never) : undefined}
         navOpen={navOpen}
         navProps={navProps}
+        parentMenuId={parentMenuId}
       />
     )
   };
