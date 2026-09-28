@@ -35,19 +35,19 @@ server {
         text/xml;
 
     location / {
-        try_files    ${DOLLAR}uri @frontend;
+        try_files    $uri @frontend;
     }
 
     location @frontend {
         add_header            X-Frame-Options            SAMEORIGIN;
         add_header            Strict-Transport-Security  "max-age=31536000; includeSubDomains";
 
-	    proxy_set_header      X-Forwarded-For            ${DOLLAR}proxy_add_x_forwarded_for;
-        proxy_set_header      X-Remote-Cert-Verified     ${DOLLAR}ssl_client_verify;
-        proxy_set_header      X-Remote-DN                ${DOLLAR}ssl_client_s_dn;
-        proxy_set_header      Host                       ${DOLLAR}http_host;
-        proxy_set_header      Scheme                     ${DOLLAR}scheme;
-        proxy_set_header      Server-Port                ${DOLLAR}server_port;
+	    proxy_set_header      X-Forwarded-For            $proxy_add_x_forwarded_for;
+        proxy_set_header      X-Remote-Cert-Verified     $ssl_client_verify;
+        proxy_set_header      X-Remote-DN                $ssl_client_s_dn;
+        proxy_set_header      Host                       $http_host;
+        proxy_set_header      Scheme                     $scheme;
+        proxy_set_header      Server-Port                $server_port;
 
         proxy_pass            https://${FRONTEND_HOST}:3000;
     }
@@ -55,13 +55,13 @@ server {
     location /ws {
         add_header            Strict-Transport-Security    "max-age=31536000; includeSubDomains";
 
-        proxy_set_header      X-Remote-User   ${DOLLAR}remote_user;
-        proxy_set_header      X-Forwarded-For ${DOLLAR}proxy_add_x_forwarded_for;
-        proxy_set_header      Host            ${DOLLAR}http_host;
+        proxy_set_header      X-Remote-User   $remote_user;
+        proxy_set_header      X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header      Host            $http_host;
         proxy_redirect        off;
         proxy_buffering       off;
         proxy_http_version    1.1;
-        proxy_set_header      Upgrade         ${DOLLAR}http_upgrade;
+        proxy_set_header      Upgrade         $http_upgrade;
         proxy_set_header      Connection      "upgrade";
 
         proxy_pass            https://${FRONTEND_HOST}:3000/ws;
@@ -70,13 +70,13 @@ server {
     location /socket.io/ {
         add_header            Strict-Transport-Security    "max-age=31536000; includeSubDomains";
 
-        proxy_set_header      X-Remote-User   ${DOLLAR}remote_user;
-        proxy_set_header      X-Forwarded-For ${DOLLAR}proxy_add_x_forwarded_for;
-        proxy_set_header      Host            ${DOLLAR}http_host;
+        proxy_set_header      X-Remote-User   $remote_user;
+        proxy_set_header      X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header      Host            $http_host;
         proxy_redirect        off;
         proxy_buffering       off;
         proxy_http_version    1.1;
-        proxy_set_header      Upgrade         ${DOLLAR}http_upgrade;
+        proxy_set_header      Upgrade         $http_upgrade;
         proxy_set_header      Connection      "upgrade";
 
         proxy_pass            http://${SOCKET_HOST}:5002;
@@ -86,12 +86,12 @@ server {
         add_header            X-Frame-Options            SAMEORIGIN;
         add_header            Strict-Transport-Security  "max-age=31536000; includeSubDomains";
 
-	    proxy_set_header      X-Forwarded-For            ${DOLLAR}proxy_add_x_forwarded_for;
-        proxy_set_header      X-Remote-Cert-Verified     ${DOLLAR}ssl_client_verify;
-        proxy_set_header      X-Remote-DN                ${DOLLAR}ssl_client_s_dn;
-        proxy_set_header      Host                       ${DOLLAR}http_host;
-        proxy_set_header      Scheme                     ${DOLLAR}scheme;
-        proxy_set_header      Server-Port                ${DOLLAR}server_port;
+	    proxy_set_header      X-Forwarded-For            $proxy_add_x_forwarded_for;
+        proxy_set_header      X-Remote-Cert-Verified     $ssl_client_verify;
+        proxy_set_header      X-Remote-DN                $ssl_client_s_dn;
+        proxy_set_header      Host                       $http_host;
+        proxy_set_header      Scheme                     $scheme;
+        proxy_set_header      Server-Port                $server_port;
 
         proxy_pass            http://${UI_HOST}:5000;
     }
