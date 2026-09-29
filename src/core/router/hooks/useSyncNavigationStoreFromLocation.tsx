@@ -90,7 +90,13 @@ export function useSyncNavigationStoreFromLocation() {
         let panelKey: number = -1;
 
         for (const [i, fragment] of hashFragment.split('#/').entries()) {
-          const href = i === 0 ? fragment : `/${fragment}`;
+          let href: string;
+          try {
+            href = decodeURIComponent(i === 0 ? fragment : `/${fragment}`);
+          } catch {
+            continue;
+          }
+
           const nextPageInput = sanitizePage(locationState, getDefaultRouterPage({ href }));
           const context = { operation: 'sync-location-hash', panelKey: i };
           const nextPage = resolveNotFoundPage(nextPageInput, { href }, context);
@@ -109,6 +115,8 @@ export function useSyncNavigationStoreFromLocation() {
             [store] = upsertPanel(store1, panelKey, { pageKey: nextPageKey }, preferenceState);
           }
         }
+
+        if (panelKey === -1) return store;
 
         for (let i = store.panels.length - 1; i > panelKey; i--) {
           store = removePanel(store, i);

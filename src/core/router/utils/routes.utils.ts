@@ -14,7 +14,7 @@ import { createPathParamsCodec } from 'features/path-params';
 import type { SearchParamBlueprintMap, SearchParamValueMap } from 'features/search-params';
 import { SearchParamEngine } from 'features/search-params';
 import type { Location, Location as ReactRouterLocation } from 'react-router';
-import { matchPath } from 'react-router';
+import { matchRoutes } from 'react-router';
 
 //*****************************************************************************************
 // App Routes
@@ -102,9 +102,12 @@ export const findAppRouteFromPage = function <const Origin extends AppRoute['pat
     return getDefaultAppRoute();
   }
 
-  const found = Object.values(store?.routes || {}).find(
-    r => !!r?.path && !!matchPath({ path: r.path, end: true }, pathname)
-  );
+  const found = matchRoutes(
+    Object.values(store?.routes || {})
+      .filter(route => Boolean(route?.path))
+      .map(route => ({ handle: route, path: route.path })),
+    pathname
+  )?.at(-1)?.route.handle;
   return (found as InferAppRouteFromPath<Origin>) ?? getDefaultAppRoute();
 };
 

@@ -52,18 +52,18 @@ export function useAppNavigate<const Origin extends AppRoute['path']>() {
     ) {
       const locationState = getAppLocationParamStateFromApi(locationParamStoreApi);
       const preferenceState = getAppPreferenceStateFromApi(preferenceStoreApi);
-      const routerState = getAppRouterStateFromApi(routerStoreApi);
-
-      const prevPageKey = findPageKeyFromPanelKey(routerState, destinationPanelKey);
-      const prevPageParam = getRouteParamFromKey<Origin>(locationState, prevPageKey);
-      const nextPageParam = applyNavigationDispatch(dispatch, prevPageParam as never) as never;
-      const nextPageInput = getPageFromInput<Destination>(locationState, nextPageParam);
-      const context = { operation: 'create', originPageKey: prevPageKey, targetPanelKey: destinationPanelKey };
-      const nextPage = resolveNotFoundPage(nextPageInput, nextPageParam, context);
-
-      if (!shouldUpdatePage(routerState, prevPageKey, nextPage)) return;
 
       setNavigationStore(store => {
+        const routerState = getAppRouterStateFromApi(routerStoreApi);
+        const prevPageKey = findPageKeyFromPanelKey(routerState, destinationPanelKey);
+        const prevPageParam = getRouteParamFromKey<Origin>(locationState, prevPageKey);
+        const nextPageParam = applyNavigationDispatch(dispatch, prevPageParam as never) as never;
+        const nextPageInput = getPageFromInput<Destination>(locationState, nextPageParam);
+        const context = { operation: 'create', originPageKey: prevPageKey, targetPanelKey: destinationPanelKey };
+        const nextPage = resolveNotFoundPage(nextPageInput, nextPageParam, context);
+
+        if (!shouldUpdatePage(routerState, prevPageKey, nextPage)) return store;
+
         store = getNavigationStoreFromRouter(store, routerState);
         store = setPageScrollPositions(store);
         const [nextStore, nextPageKey] = addPage(store, nextPage);
@@ -86,18 +86,18 @@ export function useAppNavigate<const Origin extends AppRoute['path']>() {
     ) {
       const locationState = getAppLocationParamStateFromApi(locationParamStoreApi);
       const preferenceState = getAppPreferenceStateFromApi(preferenceStoreApi);
-      const routerState = getAppRouterStateFromApi(routerStoreApi);
-
-      const prevPageKey = findPageKeyFromPanelKey(routerState, destinationPanelKey);
-      const prevPageParam = getRouteParamFromKey<Origin>(locationState, prevPageKey);
-      const nextPageParam = applyNavigationDispatch(dispatch, prevPageParam as never) as never;
-      const nextPageInput = getPageFromInput<Destination>(locationState, nextPageParam);
-      const context = { operation: 'update', originPageKey: prevPageKey, targetPanelKey: destinationPanelKey };
-      const nextPage = resolveNotFoundPage(nextPageInput, nextPageParam, context);
-
-      if (!shouldUpdatePage(routerState, prevPageKey, nextPage)) return;
 
       setNavigationStore(store => {
+        const routerState = getAppRouterStateFromApi(routerStoreApi);
+        const prevPageKey = findPageKeyFromPanelKey(routerState, destinationPanelKey);
+        const prevPageParam = getRouteParamFromKey<Origin>(locationState, prevPageKey);
+        const nextPageParam = applyNavigationDispatch(dispatch, prevPageParam as never) as never;
+        const nextPageInput = getPageFromInput<Destination>(locationState, nextPageParam);
+        const context = { operation: 'update', originPageKey: prevPageKey, targetPanelKey: destinationPanelKey };
+        const nextPage = resolveNotFoundPage(nextPageInput, nextPageParam, context);
+
+        if (!shouldUpdatePage(routerState, prevPageKey, nextPage)) return store;
+
         store = getNavigationStoreFromRouter(store, routerState);
         store = setPageScrollPositions(store);
         store = updatePage(store, prevPageKey, nextPage);
@@ -119,24 +119,22 @@ export function useAppNavigate<const Origin extends AppRoute['path']>() {
     ) {
       const locationState = getAppLocationParamStateFromApi(locationParamStoreApi);
       const preferenceState = getAppPreferenceStateFromApi(preferenceStoreApi);
-      const routerState = getAppRouterStateFromApi(routerStoreApi);
-
-      const prevPageKey = findPageKeyFromPanelKey(routerState, destinationPanelKey);
-      const prevPage = getPageFromPanelKey(routerState, destinationPanelKey);
-      const prevPageParam = getRouteParamFromKey<Origin>(locationState, prevPageKey);
-      const prevAppRoute = findAppRouteFromKey<Origin>(locationState, prevPageKey);
-
-      const prevSearchSnapshot = prevAppRoute.search.fromRoute(prevPage.href, prevPage.state, prevPage.transient);
-      const nextSearchSnapshot = applyNavigationDispatch(dispatch, prevSearchSnapshot);
-
-      const nextPageParam = { ...prevPageParam, search: nextSearchSnapshot.toObject() };
-      const nextPageInput = getPageFromParam<Destination>(locationState, nextPageParam as never);
-      const context = { operation: 'search', originPageKey: prevPageKey, targetPanelKey: destinationPanelKey };
-      const nextPage = resolveNotFoundPage(nextPageInput, nextPageParam, context);
-
-      if (!shouldUpdatePage(routerState, prevPageKey, nextPage)) return;
 
       setNavigationStore(store => {
+        const routerState = getAppRouterStateFromApi(routerStoreApi);
+        const prevPageKey = findPageKeyFromPanelKey(routerState, destinationPanelKey);
+        const prevPage = getPageFromPanelKey(routerState, destinationPanelKey);
+        const prevPageParam = getRouteParamFromKey<Origin>(locationState, prevPageKey);
+        const prevAppRoute = findAppRouteFromKey<Origin>(locationState, prevPageKey);
+        const prevSearchSnapshot = prevAppRoute.search.fromRoute(prevPage.href, prevPage.state, prevPage.transient);
+        const nextSearchSnapshot = applyNavigationDispatch(dispatch, prevSearchSnapshot);
+        const nextPageParam = { ...prevPageParam, search: nextSearchSnapshot.toObject() };
+        const nextPageInput = getPageFromParam<Destination>(locationState, nextPageParam as never);
+        const context = { operation: 'search', originPageKey: prevPageKey, targetPanelKey: destinationPanelKey };
+        const nextPage = resolveNotFoundPage(nextPageInput, nextPageParam, context);
+
+        if (!shouldUpdatePage(routerState, prevPageKey, nextPage)) return store;
+
         store = getNavigationStoreFromRouter(store, routerState);
         store = setPageScrollPositions(store);
         store = updatePage(store, prevPageKey, { ...nextPage, age: 0 });
@@ -158,18 +156,18 @@ export function useAppNavigate<const Origin extends AppRoute['path']>() {
     ) {
       const locationState = getAppLocationParamStateFromApi(locationParamStoreApi);
       const preferenceState = getAppPreferenceStateFromApi(preferenceStoreApi);
-      const routerState = getAppRouterStateFromApi(routerStoreApi);
-
-      const prevPageKey = findPageKeyFromPanelKey(routerState, destinationPanelKey);
-      const prevPageParam = getRouteParamFromKey<Origin>(locationState, prevPageKey);
-      const nextPageParam = applyNavigationDispatch(dispatch, prevPageParam as never) as never;
-      const nextPageInput = getPageFromParam<Destination>(locationState, nextPageParam);
-      const context = { operation: 'only', originPageKey: prevPageKey, targetPanelKey: destinationPanelKey };
-      const nextPage = resolveNotFoundPage(nextPageInput, nextPageParam, context);
-
-      if (!shouldUpdatePage(routerState, prevPageKey, nextPage)) return;
 
       setNavigationStore(store => {
+        const routerState = getAppRouterStateFromApi(routerStoreApi);
+        const prevPageKey = findPageKeyFromPanelKey(routerState, destinationPanelKey);
+        const prevPageParam = getRouteParamFromKey<Origin>(locationState, prevPageKey);
+        const nextPageParam = applyNavigationDispatch(dispatch, prevPageParam as never) as never;
+        const nextPageInput = getPageFromParam<Destination>(locationState, nextPageParam);
+        const context = { operation: 'only', originPageKey: prevPageKey, targetPanelKey: destinationPanelKey };
+        const nextPage = resolveNotFoundPage(nextPageInput, nextPageParam, context);
+
+        if (!shouldUpdatePage(routerState, prevPageKey, nextPage)) return store;
+
         store = getNavigationStoreFromRouter(store, routerState);
         store = setPageScrollPositions(store);
         const [nextStore, nextPageKey] = addPage(store, nextPage);
@@ -197,18 +195,18 @@ export function useAppNavigate<const Origin extends AppRoute['path']>() {
     ) {
       const locationState = getAppLocationParamStateFromApi(locationParamStoreApi);
       const preferenceState = getAppPreferenceStateFromApi(preferenceStoreApi);
-      const routerState = getAppRouterStateFromApi(routerStoreApi);
-
-      const prevPageKey = findPageKeyFromPanelKey(routerState, destinationPanelKey);
-      const prevPageParam = getRouteParamFromKey<Origin>(locationState, prevPageKey);
-      const nextPageParam = applyNavigationDispatch(dispatch, prevPageParam as never) as never;
-      const nextPageInput = getPageFromInput<Destination>(locationState, nextPageParam);
-      const context = { operation: 'closePanel', originPageKey: prevPageKey, targetPanelKey: destinationPanelKey };
-      const nextPage = resolveNotFoundPage(nextPageInput, nextPageParam, context);
-
-      if (!shouldUpdatePage(routerState, prevPageKey, nextPage)) return;
 
       setNavigationStore(store => {
+        const routerState = getAppRouterStateFromApi(routerStoreApi);
+        const prevPageKey = findPageKeyFromPanelKey(routerState, destinationPanelKey);
+        const prevPageParam = getRouteParamFromKey<Origin>(locationState, prevPageKey);
+        const nextPageParam = applyNavigationDispatch(dispatch, prevPageParam as never) as never;
+        const nextPageInput = getPageFromInput<Destination>(locationState, nextPageParam);
+        const context = { operation: 'closePanel', originPageKey: prevPageKey, targetPanelKey: destinationPanelKey };
+        const nextPage = resolveNotFoundPage(nextPageInput, nextPageParam, context);
+
+        if (!shouldUpdatePage(routerState, prevPageKey, nextPage)) return store;
+
         store = getNavigationStoreFromRouter(store, routerState);
         store = setPageScrollPositions(store);
         store = removePanel(store, destinationPanelKey);
