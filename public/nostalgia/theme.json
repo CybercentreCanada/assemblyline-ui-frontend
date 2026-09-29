@@ -1,0 +1,54 @@
+{
+  "components": {
+    "MuiPaper": {
+      "styleOverrides": {
+        "elevation": {
+          "backgroundImage": "none"
+        }
+      }
+    },
+    "MuiTab": {
+      "styleOverrides": {
+        "root": {
+          "minWidth": "145px"
+        }
+      }
+    }
+  },
+  "palette": {
+    "dark": {
+      "background": {
+        "default": "#303030",
+        "paper": "#424242"
+      },
+      "primary": {
+        "main": "#7c93b9"
+      },
+      "secondary": {
+        "main": "#929cad"
+      },
+      "divider": "rgba(255, 255, 255, 0.12)"
+    },
+    "light": {
+      "background": {
+        "default": "#fafafa",
+        "paper": "#fff"
+      },
+      "primary": {
+        "main": "#0b65a1"
+      },
+      "secondary": {
+        "main": "#939dac"
+      }
+    }
+  },
+  "appbar": {
+    "dark": {
+      "backgroundColor": "#303030"
+    },
+    "light": {
+      "color": "#000000",
+      "backgroundColor": "#FFFFFF"
+    }
+  }
+}

@@ -9,6 +9,13 @@ export const useMyTheme = (): AppTheme[] => {
     configs: {}
   });
 
+  const [nostalgiaTheme, setNostalgiaTheme] = useState<AppTheme>({
+    id: 'theme.nostalgia',
+    i18nKey: 'theme.nostalgia.label',
+    default: false,
+    configs: {}
+  });
+
   useEffect(() => {
     fetch('/theme.json')
       .then(response => response.json())
@@ -24,7 +31,22 @@ export const useMyTheme = (): AppTheme[] => {
       .catch(error => console.error('Error fetching the JSON theme file:', error));
   }, []);
 
-  return useMemo((): AppTheme[] => [theme], [theme]);
+  useEffect(() => {
+    fetch('/nostalgia/theme.json')
+      .then(response => response.json())
+      .then(data =>
+        setNostalgiaTheme({
+          id: 'theme.nostalgia',
+          i18nKey: 'theme.nostalgia.label',
+          default: true,
+          configs: data
+        })
+      )
+      // eslint-disable-next-line no-console
+      .catch(error => console.error('Error fetching the JSON theme file:', error));
+  }, []);
+
+  return useMemo((): AppTheme[] => [theme, nostalgiaTheme], [nostalgiaTheme, theme]);
 };
 
 export default useMyTheme;
