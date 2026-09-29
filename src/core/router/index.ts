@@ -77,8 +77,6 @@ export {
 } from './providers/AppNavigationProvider';
 export { AppPageKeyProvider, AppPageKeyStoreProvider, useAppPageKeyStore } from './providers/AppPageKeyProvider';
 export type { AppPageKeyStore, AppPageKeyStoreProviderProps } from './providers/AppPageKeyProvider';
-export { AppRouteLayoutProvider } from './providers/AppRouteLayoutProvider';
-export type { AppRouteLayoutProviderProps } from './providers/AppRouteLayoutProvider';
 export {
   AppRouterProvider,
   AppRouterStoreProvider,

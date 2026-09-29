@@ -155,6 +155,14 @@ describe('findAppRouteFromPage', () => {
     expect(findAppRouteFromPage(store, page)).toBe(route);
   });
 
+  it('prefers a specific static route over an earlier dynamic route', () => {
+    const dynamicRoute = makeSimpleRoute({ path: '/item/:itemID' } as never);
+    const staticRoute = makeSimpleRoute({ path: '/item/settings' } as never);
+    const store = makeStore([dynamicRoute, staticRoute]);
+    const page = makePage('/item/settings');
+    expect(findAppRouteFromPage(store, page)).toBe(staticRoute);
+  });
+
   it('returns the default route when the page has no href', () => {
     const store = makeStore([]);
     expect(findAppRouteFromPage(store, getDefaultRouterPage()).path).toBeNull();

@@ -25,14 +25,17 @@ export function useAppBlocker(
   const setNavigationStore = useAppSetNavigationStore();
   const isVisible = useAppRouterStore(s => isPageVisible(s, pageKey));
 
-  useEffect(
-    () =>
-      setNavigationStore(store => {
-        if (!pageKey || !isVisible) return removeBlockedPage(store, pageKey);
-        const reason = typeof shouldBlock === 'function' ? shouldBlock() : shouldBlock;
-        return setBlockedPage(store, pageKey, reason);
-      }),
+  useEffect(() => {
+    setNavigationStore(store => {
+      if (!pageKey || !isVisible) return removeBlockedPage(store, pageKey);
+      const reason = typeof shouldBlock === 'function' ? shouldBlock() : shouldBlock;
+      return setBlockedPage(store, pageKey, reason);
+    });
+
+    return () => {
+      if (!pageKey) return;
+      setNavigationStore(store => removeBlockedPage(store, pageKey));
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [isVisible, pageKey, setNavigationStore, ...(dependencies ?? [shouldBlock])]
-  );
+  }, [isVisible, pageKey, setNavigationStore, ...(dependencies ?? [shouldBlock])]);
 }

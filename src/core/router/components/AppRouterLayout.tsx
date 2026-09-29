@@ -1,6 +1,6 @@
 import {
   AppPageKeyProvider,
-  AppRouteLayoutProvider,
+  AppRouteLayout,
   findAppRouteFromKey,
   findNodeFromKey,
   useAppLocationParamStore,
@@ -24,11 +24,11 @@ export const AppRouterPageLayout = memo(({ pageKey }: AppRouterPageLayoutProps) 
 
   return !pageKey || !element ? null : (
     <AppPageKeyProvider pageKey={pageKey}>
-      <AppRouteLayoutProvider pageKey={pageKey}>
+      <AppRouteLayout pageKey={pageKey}>
         {/* <Activity mode={visible ? 'visible' : 'hidden'}> */}
         {element}
         {/* </Activity> */}
-      </AppRouteLayoutProvider>
+      </AppRouteLayout>
     </AppPageKeyProvider>
   );
 });

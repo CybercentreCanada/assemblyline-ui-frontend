@@ -166,7 +166,7 @@ export const AppDrawerContainer = memo(({ children }: PropsWithChildren) => {
   const transition = useMemo<CSSProperties['transition']>(
     () =>
       `${theme.transitions.create(['width'], {
-        duration: theme.transitions.duration.shortest,
+        duration: theme.transitions.duration.shorter,
         easing: theme.transitions.easing.easeOut
       })} !important`,
     [theme]
@@ -197,7 +197,7 @@ export const AppDrawerContainer = memo(({ children }: PropsWithChildren) => {
             backgroundColor: theme.palette.background.default,
             boxShadow: 'none',
             backgroundImage: 'none',
-            width: drawerWidth,
+            width: isXL ? (open ? drawerWidth : 0) : drawerWidth,
             transition
           }
         }
