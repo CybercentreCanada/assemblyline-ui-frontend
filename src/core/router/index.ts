@@ -26,8 +26,6 @@ export { useAppPathParams } from './hooks/useAppPathParams';
 export { useAppRoute } from './hooks/useAppRoute';
 export { useAppSearchParams } from './hooks/useAppSearchParams';
 export { useAppSearchSnapshot } from './hooks/useAppSearchSnapshot';
-export { useBlockNavigation } from './hooks/useBlockNavigation';
-export { useBlockUnloadEvent } from './hooks/useBlockUnloadEvent';
 export { useSyncNavigationStoreFromLocation } from './hooks/useSyncNavigationStoreFromLocation';
 export { useSyncRouterStoreFromNavigation } from './hooks/useSyncRouterStoreFromNavigation';
 export type { AppRouterBlockedPages, AppRouterBlockedReason } from './models/blocked-page.models';
