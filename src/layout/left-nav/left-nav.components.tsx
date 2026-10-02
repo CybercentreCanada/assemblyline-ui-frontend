@@ -50,7 +50,7 @@ function WrappedLeftNavRoute<const Origin extends AppRoute['path']>({
                 component: AppLink,
                 nav,
                 navDeps,
-                onClick: () => closeMenu(parentMenuId)
+                onClick: () => (open ? null : closeMenu(parentMenuId))
               })}
         >
           {icon && <ListItemIcon sx={{ color: 'inherit' }}>{icon}</ListItemIcon>}

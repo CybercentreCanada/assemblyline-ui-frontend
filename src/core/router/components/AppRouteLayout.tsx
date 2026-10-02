@@ -3,6 +3,7 @@ import type { PropsWithChildren } from 'react';
 import { memo, useEffect } from 'react';
 
 export type AppRouteLayoutProps = PropsWithChildren<{
+  /** Page key identifying the route instance. */
   pageKey: string;
 }>;
 

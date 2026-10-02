@@ -236,7 +236,6 @@ Most application code should use typed route hooks, `useAppNavigate`, and `AppLi
 - `providers/AppNavigationProvider.tsx` - Navigation store and synchronization hooks.
 - `providers/AppLocationParamProvider.tsx` - Route registry and location snapshot store.
 - `providers/AppPageKeyProvider.tsx` - Current page-key context.
-- `providers/AppRouteLayoutProvider.tsx` - Page scroll restoration and hash scrolling.
 
 ### Utilities And Tests
 

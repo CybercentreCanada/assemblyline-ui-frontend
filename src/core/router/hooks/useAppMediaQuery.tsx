@@ -6,7 +6,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 
 /**
  * @name useAppMediaQuery
- * @description Media query hook scoped to the AppRouteLayoutProvider's width instead of the browser window.
+ * @description Media query hook scoped to the AppRouteLayout's width instead of the browser window.
  * Uses theme.breakpoints and ResizeObserver to evaluate queries against the container's width.
  * Optimized with query parsing memoization and debounced resize evaluation using TanStack Pacer.
  * @param query - Media query string (e.g., "(min-width:600px)") or function that receives theme (e.g., theme => theme.breakpoints.up('sm'))

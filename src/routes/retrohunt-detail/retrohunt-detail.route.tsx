@@ -55,10 +55,6 @@ const SkeletonCustomChip = memo(
 
 const SOCKETIO_NAMESPACE = '/retrohunt';
 
-const PAGE_SIZE = 10;
-const MAX_TRACKED_RECORDS = 10000;
-const DEFAULT_QUERY = '';
-
 export const RetrohuntDetailPage = memo(() => {
   const { t } = useTranslation(['retrohunt']);
   const theme = useTheme();
@@ -283,7 +279,7 @@ export const RetrohuntDetailPage = memo(() => {
           )}
 
           <TabContainer
-            style={{ marginTop: theme.spacing(1), marginBottom: theme.spacing(1) }}
+            paper
             tabs={{
               details: {
                 label: t('details'),
@@ -631,7 +627,7 @@ export const RetrohuntDetailRoute = createAppRoute({
     query: s.string(''),
     offset: s.number(0).min(0).source('transient').ephemeral(),
     rows: s.number(10).locked().source('transient').ephemeral(),
-    sort: s.string('seen.last+desc'),
+    sort: s.string('seen.last desc'),
     filters: s.filters([]),
     track_total_hits: s.number(null).source('transient').nullable().ephemeral()
   }),

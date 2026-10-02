@@ -93,7 +93,7 @@ export const AlertsPage = memo(() => {
         onSuccess: ({ api_response }) => {
           if ('tc_start' in api_response) {
             navigate
-              .here<'/alerts'>()
+              .here<'/alerts'>({ replace: true })
               .update(s => ({ ...s, search: { ...s.search, tc_start: api_response.tc_start } }));
           }
 
@@ -155,14 +155,13 @@ export const AlertsPage = memo(() => {
   useEffect(() => {
     if (!!search.get('group_by')) return;
     else if (!alerts || alerts.length === 0)
-      navigate.here<'/alerts'>().update(s => ({ ...s, search: { ...s.search, tc_start: '' } }));
+      navigate.here<'/alerts'>({ replace: true }).update(s => ({ ...s, search: { ...s.search, tc_start: '' } }));
     else {
       const dates = alerts.map(a => new Date(a.reporting_ts));
       const min = Math.max.apply(null, dates) as string;
-      navigate.here<'/alerts'>().update(s => ({
-        ...s,
-        search: { ...s.search, tc_start: new Date(min).toISOString() }
-      }));
+      navigate
+        .here<'/alerts'>({ replace: true })
+        .update(s => ({ ...s, search: { ...s.search, tc_start: new Date(min).toISOString() } }));
     }
   }, [alerts, navigate, search?.toString()]);
 

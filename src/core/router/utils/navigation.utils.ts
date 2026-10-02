@@ -44,7 +44,7 @@ export const getDefaultNavigateOptions = function (options: Partial<AppNavigateO
 
 /**
  * @name resolveNavigationIntent
- * @description Captures the target and operation selected by a navigation callback without dispatching it.
+ * @description Captures the target and operation selected by a pure navigation descriptor without dispatching it.
  * @param nextNav - Optional navigation callback to inspect.
  * @returns Captured navigation target, operation, options, and dispatch value.
  */

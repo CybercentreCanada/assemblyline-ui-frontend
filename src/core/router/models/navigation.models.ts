@@ -62,6 +62,10 @@ export type InferAppNavigationOperationMapFromPath<Origin extends AppRoute['path
 };
 
 export type InferAppNavigationPropsFromPath<Origin extends AppRoute['path']> = {
+  /**
+   * Pure navigation descriptor used for both live navigation and external-href dry runs.
+   * Do not perform side effects while building the descriptor.
+   */
   nav?: (navigate: ReturnType<typeof useAppNavigate<Origin>>) => void;
   navDeps?: DependencyList;
 };

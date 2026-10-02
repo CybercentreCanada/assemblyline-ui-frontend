@@ -39,11 +39,7 @@ export const getHashFragmentsFromRouter = function (store: AppNavigationStore): 
 
       try {
         const url = new URL(page.href, 'http://localhost');
-        const pathname = url.pathname;
-        const search = url.search;
-        const hash = url.hash ? url.hash.slice(1) : '';
-
-        return `${pathname}${search}${hash ? `#${encodeURIComponent(hash)}` : ''}`;
+        return `${url.pathname}${url.search}${url.hash}`;
       } catch {
         return null;
       }

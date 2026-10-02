@@ -70,10 +70,12 @@ export const RetrohuntPage = memo(() => {
   const handleReload = useCallback(
     (curSearch: typeof search) => {
       if (curSearch && currentUser.roles.includes('retrohunt_view') && configuration?.retrohunt?.enabled) {
+        const body = curSearch.toObject();
+
         apiCall({
           method: 'POST',
           url: `/api/v4/retrohunt/`,
-          body: curSearch.toObject(),
+          body: { ...body, query: body?.query || '*' },
           onSuccess: api_data => {
             const { items, total, rows, offset } = api_data.api_response;
             if (items.length === 0 && offset !== 0 && offset >= total) {
