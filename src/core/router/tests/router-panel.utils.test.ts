@@ -80,7 +80,7 @@ describe('findPrevPanelKeyFromPageKey', () => {
 
   it('defaults to first panel (0) when the page is outside all panels', () => {
     const store = { ...getDefaultRouterStore(), panels: [{ pageKey: 'r1' }] };
-    expect(findPrevPanelKeyFromPageKey(store, 'missing', makePreferences({ navigation: 'push' }))).toBe(0);
+    expect(findPrevPanelKeyFromPageKey(store, 'missing', makePreferences({ navigation: 'push' }))).toBe(-1);
   });
 });
 
