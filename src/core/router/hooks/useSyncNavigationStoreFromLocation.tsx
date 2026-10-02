@@ -122,7 +122,7 @@ export function useSyncNavigationStoreFromLocation() {
           store = removePanel(store, i);
         }
 
-        store.options.replace = false;
+        store.options.replace = true;
         store.id = generateRandomUUID();
 
         store = sanitizeRouterStore(store, preferenceState);
