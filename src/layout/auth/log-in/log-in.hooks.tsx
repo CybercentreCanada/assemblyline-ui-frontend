@@ -1,0 +1,333 @@
+import { invalidateApiQuery, useApiMutation, useApiQuery } from 'core/api';
+import { useAppInterfaceStore, useAppSetInterfaceStore } from 'core/interface';
+import { useAppPreferenceStore, useAppSetPreferenceStore } from 'core/preference';
+import { useAppSnackbar } from 'core/snackbar/snackbar.hooks';
+import { useLoginForm } from 'layout/auth/log-in/log-in.providers';
+import { useCallback, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useLocation, useNavigate } from 'react-router';
+
+/**
+ * Creates a stable callback that resets the login form back to its default values.
+ *
+ * @returns A function that clears any in-progress login state (OTP, reset password, SSO tokens, etc.).
+ */
+export const useLoginReset = () => {
+  const navigate = useNavigate();
+
+  const redirectTo = useAppPreferenceStore(s => s?.auth?.redirectTo);
+
+  const setInterfaceStore = useAppSetInterfaceStore();
+  const setPreferenceStore = useAppSetPreferenceStore();
+
+  const form = useLoginForm();
+
+  return useCallback(() => {
+    form.setFieldValue('mode', 'log-in');
+
+    form.setFieldValue('avatar', null);
+    form.setFieldValue('username', null);
+    form.setFieldValue('password', null);
+    form.setFieldValue('password_confirm', null);
+    form.setFieldValue('email', null);
+
+    form.setFieldValue('reset_id', null);
+    form.setFieldValue('otp_code', null);
+    form.setFieldValue('registration_key', null);
+
+    form.setFieldValue('oauth_token_id', null);
+    form.setFieldValue('saml_token_id', null);
+    form.setFieldValue('webauthn_auth_resp', null);
+
+    form.setFieldValue('loading', null);
+
+    setInterfaceStore(s => {
+      s.auth.disableWhoAmI = false;
+      return s;
+    });
+
+    if (redirectTo) void navigate(redirectTo);
+
+    setPreferenceStore(s => {
+      s.auth.redirectTo = null;
+      return s;
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form, navigate, setInterfaceStore, setPreferenceStore]);
+};
+
+/**
+ * Reads the `reset_id` query param and, when present, switches the form into reset-password confirmation mode.
+ * This enables deep-linking from password reset emails.
+ *
+ * @returns Nothing (side-effect only).
+ */
+export const usePasswordResetEmail = () => {
+  const location = useLocation();
+  const form = useLoginForm();
+
+  const resetID = useMemo(() => {
+    const params = new URLSearchParams(location.search);
+    return params.get('reset_id') || '';
+  }, [location.search]);
+
+  useEffect(() => {
+    if (!resetID) return;
+
+    form.setFieldValue('mode', 'reset-password-confirmation');
+    form.setFieldValue('reset_id', resetID);
+  }, [form, resetID]);
+};
+
+/**
+ * Reads the `registration_key` query param and, when present, switches the form into sign-up confirmation mode.
+ * This enables deep-linking from registration emails.
+ *
+ * @returns Nothing (side-effect only).
+ */
+export const useSignUpEmail = () => {
+  const location = useLocation();
+  const form = useLoginForm();
+
+  const registrationKey = useMemo(() => {
+    const params = new URLSearchParams(location.search);
+    return params.get('registration_key') || '';
+  }, [location.search]);
+
+  useEffect(() => {
+    if (!registrationKey) return;
+
+    form.setFieldValue('registration_key', registrationKey);
+    form.setFieldValue('mode', 'sign-up-confirmation');
+  }, [form, registrationKey]);
+};
+
+/**
+ * Handles the OAuth callback flow:
+ * - detects the OAuth provider from the URL
+ * - exchanges the query string for a temporary token via the backend
+ * - transitions the login form into the SSO confirmation step
+ *
+ * @returns Nothing (side-effect only).
+ */
+export const useOAuthLogin = () => {
+  const { t } = useTranslation(['login']);
+  const navigate = useNavigate();
+  const { pathname, search } = useLocation();
+  const { showErrorMessage } = useAppSnackbar();
+
+  const form = useLoginForm();
+  const resetLogin = useLoginReset();
+
+  const setInterfaceStore = useAppSetInterfaceStore();
+  const setPreferenceStore = useAppSetPreferenceStore();
+  const redirectTo = useAppPreferenceStore(s => s.auth.redirectTo);
+
+  const provider = useMemo<string | null>(() => {
+    const marker = '/oauth/';
+    if (!pathname.includes(marker)) return null;
+    const tail = pathname.split(marker).pop() ?? '';
+    const normalized = tail.replace(/\/$/, '');
+    return normalized || null;
+  }, [pathname]);
+
+  const params = useMemo<URLSearchParams>(() => {
+    const p = new URLSearchParams(search);
+
+    if (provider && !p.has('provider')) {
+      p.set('provider', provider);
+    }
+    return p;
+  }, [provider, search]);
+
+  useApiQuery<{ avatar: string; username: string; oauth_token_id: string; email_adr: string }>({
+    url: `/api/v4/auth/oauth/?${params.toString()}`,
+    disabled: !provider,
+    onEnter: () => {
+      form.setFieldValue('mode', 'loading');
+      form.setFieldValue('loading', t('login.loading'));
+    },
+    onFailure: ({ api_error_message }) => {
+      showErrorMessage(api_error_message);
+      resetLogin();
+    },
+    onSuccess: ({ api_response }) => {
+      form.setFieldValue('avatar', api_response.avatar || null);
+      form.setFieldValue('username', api_response.username || null);
+      form.setFieldValue('oauth_token_id', api_response.oauth_token_id || null);
+      form.setFieldValue('email', api_response.email_adr || null);
+      form.setFieldValue('mode', 'sso');
+
+      setInterfaceStore(s => {
+        s.auth.disableWhoAmI = true;
+        return s;
+      });
+
+      setPreferenceStore(s => {
+        s.auth.redirectTo = null;
+        return s;
+      });
+
+      if (redirectTo) void navigate(redirectTo);
+    }
+  });
+};
+
+/**
+ * Handles the SAML callback flow by decoding the `data` query param and transitioning the login form into SSO mode.
+ *
+ * @returns Nothing (side-effect only).
+ */
+export const useSAMLLogin = () => {
+  const navigate = useNavigate();
+  const { pathname, search } = useLocation();
+  const { showErrorMessage } = useAppSnackbar();
+
+  const redirectTo = useAppPreferenceStore(s => s.auth.redirectTo);
+  const setInterfaceStore = useAppSetInterfaceStore();
+  const setPreferenceStore = useAppSetPreferenceStore();
+
+  const form = useLoginForm();
+  const resetLogin = useLoginReset();
+
+  type SAMLData = {
+    username: string | null;
+    email: string | null;
+    saml_token_id: string | null;
+    error: boolean;
+  };
+
+  const samlData = useMemo<SAMLData>(() => {
+    try {
+      if (pathname.includes(`/saml/`)) {
+        const params = new URLSearchParams(search);
+        const data = params.get('data');
+        if (data != null && data !== '') {
+          const parsed: unknown = JSON.parse(atob(data));
+          if (parsed === null || typeof parsed !== 'object') throw new Error('Invalid SAML response');
+
+          const response = parsed as Record<string, unknown>;
+          if (typeof response.saml_token_id !== 'string' || response.saml_token_id === '')
+            throw new Error('Invalid SAML response');
+
+          return {
+            username: typeof response.username === 'string' ? response.username : null,
+            email: typeof response.email === 'string' ? response.email : null,
+            saml_token_id: response.saml_token_id,
+            error: false
+          };
+        }
+      }
+    } catch {
+      return { username: null, email: null, saml_token_id: null, error: true };
+    }
+    return { username: null, email: null, saml_token_id: null, error: false };
+  }, [pathname, search]);
+
+  useEffect(() => {
+    if (!!samlData.error) {
+      showErrorMessage(samlData.error);
+      resetLogin();
+    } else if (!!samlData.saml_token_id) {
+      form.setFieldValue('username', prev => samlData.username || prev);
+      form.setFieldValue('email', prev => samlData.email || prev);
+      form.setFieldValue('saml_token_id', prev => samlData.saml_token_id || prev);
+      form.setFieldValue('mode', 'sso');
+
+      setInterfaceStore(s => {
+        s.auth.disableWhoAmI = true;
+        return s;
+      });
+
+      setPreferenceStore(s => {
+        s.auth.redirectTo = null;
+        return s;
+      });
+
+      if (redirectTo) void navigate(redirectTo);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form, navigate, resetLogin, samlData, setInterfaceStore, setPreferenceStore, showErrorMessage]);
+};
+
+/**
+ * Returns `true` when the current auth configuration implies there is only one viable login choice (so the UI can skip
+ * the "choose login method" step).
+ *
+ * @returns Whether the user should be auto-forwarded into the SSO confirmation step.
+ */
+export const useQuickLogin = () => {
+  const allowSAML = useAppInterfaceStore(s => s.auth.login.allow_saml_login);
+  const oAuthProviders = useAppInterfaceStore(s => s.auth.login.oauth_providers);
+
+  return (allowSAML && (oAuthProviders?.length ?? 0) === 0) || (!allowSAML && (oAuthProviders?.length ?? 0) === 1);
+};
+
+/**
+ * Performs a login request using the current form values (username/password/OTP/SSO tokens).
+ * On success, invalidates the `whoami` query and navigates to any stored post-login redirect.
+ *
+ * @returns A mutation object with a `mutate()` method that triggers the login attempt.
+ */
+export const useLoginRequest = () => {
+  const { t } = useTranslation(['login']);
+  const navigate = useNavigate();
+
+  const redirectTo = useAppPreferenceStore(s => s.auth.redirectTo);
+  const { showErrorMessage } = useAppSnackbar();
+  const setInterfaceStore = useAppSetInterfaceStore();
+  const setPreferenceStore = useAppSetPreferenceStore();
+
+  const form = useLoginForm();
+  const resetLogin = useLoginReset();
+
+  return useApiMutation(() => ({
+    url: '/api/v4/auth/login/',
+    method: 'POST',
+    body: {
+      user: form.getFieldValue('username'),
+      password: form.getFieldValue('password'),
+      otp: form.getFieldValue('otp_code'),
+      webauthn_auth_resp: form.getFieldValue('webauthn_auth_resp'),
+      oauth_token_id: form.getFieldValue('oauth_token_id'),
+      saml_token_id: form.getFieldValue('saml_token_id')
+    },
+    onEnter: () => {
+      form.setFieldValue('mode', 'loading');
+      form.setFieldValue('loading', t('login.loading'));
+    },
+    onFailure: ({ api_error_message: msg }) => {
+      const mode = form.getFieldValue('mode');
+
+      if (msg === 'Wrong OTP token' && mode !== 'otp') {
+        form.setFieldValue('mode', 'otp');
+      } else if (msg === 'Wrong Security Token' && mode === 'sectoken') {
+        form.setFieldValue('mode', 'otp');
+        showErrorMessage(t('securitytoken.error'));
+      } else if (msg === 'Wrong Security Token' && mode !== 'sectoken') {
+        form.setFieldValue('mode', 'sectoken');
+      } else if (mode === 'sso') {
+        showErrorMessage(msg);
+        resetLogin();
+      } else {
+        showErrorMessage(msg);
+        form.setFieldValue('mode', 'log-in');
+      }
+    },
+    onSuccess: () => {
+      setInterfaceStore(s => {
+        s.auth.disableWhoAmI = false;
+        return s;
+      });
+
+      setPreferenceStore(s => {
+        s.auth.redirectTo = null;
+        return s;
+      });
+
+      if (redirectTo) void navigate(redirectTo);
+
+      invalidateApiQuery(({ url }) => '/api/v4/user/whoami/' === url, 100);
+    }
+  }));
+};

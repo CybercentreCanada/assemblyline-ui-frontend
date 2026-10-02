@@ -1,0 +1,350 @@
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
+import StarIcon from '@mui/icons-material/Star';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import { Autocomplete, Grid, IconButton, MenuItem, Select, TextField, Tooltip, useTheme } from '@mui/material';
+import FormControl from '@mui/material/FormControl';
+import type { ServiceParameter } from 'models/base/service';
+import { DEFAULT_SERVICE_PARAMETER } from 'models/base/service';
+import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import CustomChip from 'ui/CustomChip';
+import { CheckboxInput } from 'ui/inputs/CheckboxInput';
+
+type MultiTypeParamProps<T extends 'bool' | 'int' | 'str' | 'list'> = {
+  param?: ServiceParameter;
+  id?: number;
+  warn?: boolean;
+  onAdd?: (param: ServiceParameter) => void;
+  onUpdate?: (param: ServiceParameter, id: number) => void;
+  onDelete?: (id: number) => void;
+};
+
+const WrappedMultiTypeParam = <T extends 'bool' | 'int' | 'str' | 'list'>({
+  param = null,
+  id = null,
+  warn = false,
+  onAdd = () => null,
+  onUpdate = () => null,
+  onDelete = () => null
+}: MultiTypeParamProps<T>) => {
+  const { t } = useTranslation(['adminServices']);
+  const [tempUserParams, setTempUserParams] = useState<ServiceParameter>(DEFAULT_SERVICE_PARAMETER);
+  const theme = useTheme();
+
+  const handleSubmissionParamUpdate = event => {
+    const { value } = event.target;
+    if (param.type === 'bool') {
+      onUpdate({ ...param, default: value === 'true', value: value === 'true' }, id);
+    } else if (param.type === 'str') {
+      onUpdate({ ...param, default: value, value }, id);
+    } else {
+      onUpdate({ ...param, default: parseInt(value) || 0, value: parseInt(value) || 0 } as ServiceParameter, id);
+    }
+  };
+
+  const handleParamHide = () => {
+    onUpdate({ ...param, hide: !param.hide }, id);
+  };
+
+  const handleSubmissionParamListUpdate = selections => {
+    let newDefault = selections[0];
+    if (selections.indexOf(param.default) !== -1) {
+      newDefault = param.default;
+    }
+    onUpdate({ ...param, list: selections, default: newDefault, value: newDefault }, id);
+  };
+
+  const addUserSubmissionParam = () => {
+    if (tempUserParams.type === 'bool') {
+      onAdd({
+        ...tempUserParams,
+        default: tempUserParams.default === 'true',
+        value: tempUserParams.default === 'true',
+        hide: tempUserParams.hide === 'true'
+      });
+    } else if (tempUserParams.type === 'list' || tempUserParams.type === 'str') {
+      onAdd({
+        ...tempUserParams,
+        default: tempUserParams.default,
+        value: tempUserParams.default,
+        hide: tempUserParams.hide === 'true'
+      });
+    } else {
+      onAdd({
+        ...tempUserParams,
+        default: parseInt(tempUserParams.default as unknown as string) || 0,
+        value: parseInt(tempUserParams.default as unknown as string) || 0,
+        hide: tempUserParams.hide === 'true'
+      });
+    }
+
+    setTempUserParams(DEFAULT_SERVICE_PARAMETER);
+  };
+
+  const handleSPNameChange = event => {
+    setTempUserParams({ ...tempUserParams, name: event.target.value });
+  };
+
+  const handleSPTypeChange = event => {
+    const type = event.target.value;
+    setTempUserParams({
+      ...tempUserParams,
+      type,
+      list: [],
+      default: type === 'int' ? '1' : type === 'bool' ? 'false' : '',
+      value: type === 'int' ? '1' : type === 'bool' ? 'false' : ''
+    });
+  };
+
+  const handleSPDefaultChange = event => {
+    setTempUserParams({ ...tempUserParams, default: event.target.value, value: event.target.value });
+  };
+
+  const handleSPAdvancedChange = () => {
+    setTempUserParams({ ...tempUserParams, hide: tempUserParams.hide === 'false' ? 'true' : 'false' });
+  };
+
+  const handleSPListChange = selections => {
+    let newDefault = selections[0];
+    if (selections.indexOf(tempUserParams.default) !== -1) {
+      newDefault = tempUserParams.default;
+    }
+    setTempUserParams({ ...tempUserParams, list: selections, default: newDefault, value: newDefault });
+  };
+
+  const renderParamLabelTags = (values: string[]) => {
+    return values.map((value, i) => (
+      <CustomChip
+        key={i}
+        label={
+          <div style={{ display: 'flex' }}>
+            {value === param.default ? (
+              <StarIcon fontSize="small" style={{ marginLeft: '-6px', marginRight: '6px', marginTop: '1px' }} />
+            ) : null}
+            {value}
+          </div>
+        }
+        // Render labels to show what are options to the user and what is selected by default
+
+        onClick={() => onUpdate({ ...param, default: value, value } as ServiceParameter, id)}
+        onDelete={() =>
+          handleSubmissionParamListUpdate(
+            param.list.filter(v => {
+              return v !== value;
+            })
+          )
+        }
+        color={value === param.default ? 'primary' : null}
+      />
+    ));
+  };
+
+  const renderSPLabelTags = (values: string[]) => {
+    return values.map((value, i) => (
+      <CustomChip
+        key={i}
+        label={
+          <div style={{ display: 'flex' }}>
+            {value === tempUserParams.default ? (
+              <StarIcon fontSize="small" style={{ marginLeft: '-6px', marginRight: '6px', marginTop: '1px' }} />
+            ) : null}
+            {value}
+          </div>
+        }
+        // Render labels to show what are options to the user and what is selected by default
+
+        onClick={() => setTempUserParams({ ...tempUserParams, default: value, value } as ServiceParameter)}
+        onDelete={() =>
+          handleSPListChange(
+            tempUserParams.list.filter(v => {
+              return v !== value;
+            })
+          )
+        }
+        color={value === tempUserParams.default ? 'primary' : null}
+      />
+    ));
+  };
+
+  return param ? (
+    <Grid container spacing={1} alignItems="center">
+      <Grid size={{ xs: 10, sm: 3 }} style={{ wordBreak: 'break-word' }}>
+        {warn && (
+          <Tooltip title={t('params.user.unused')} placement="bottom-start">
+            <span>
+              <WarningAmberIcon color="warning" fontSize="small" style={{ float: 'inline-start' }} />
+              &nbsp;
+            </span>
+          </Tooltip>
+        )}
+        {`${param.name} [${param.type}]:`}
+      </Grid>
+      <Grid size={{ xs: 2, sm: 1 }}>
+        <Tooltip title={t(param.hide ? 'params.user.show' : 'params.user.hide')}>
+          <IconButton onClick={handleParamHide} size="large">
+            {param.hide ? <VisibilityOffIcon /> : <VisibilityIcon />}
+          </IconButton>
+        </Tooltip>
+      </Grid>
+      <Grid size={{ xs: 10, sm: 7 }}>
+        {param.type === 'bool' ? (
+          <FormControl size="small" fullWidth>
+            <Select
+              id="user_spec_params"
+              fullWidth
+              value={param.default}
+              onChange={handleSubmissionParamUpdate}
+              variant="outlined"
+            >
+              <MenuItem value="false">{t('params.false')}</MenuItem>
+              <MenuItem value="true">{t('params.true')}</MenuItem>
+            </Select>
+          </FormControl>
+        ) : param.type === 'list' ? (
+          <Autocomplete
+            fullWidth
+            freeSolo
+            multiple
+            size="small"
+            options={[]}
+            renderInput={params => <TextField {...params}></TextField>}
+            onChange={(event, value, reason) => handleSubmissionParamListUpdate(value as string[])}
+            renderTags={(value, getTagProps, ownerState) => renderParamLabelTags(value)}
+            value={param.list}
+            sx={{
+              '& .MuiInputBase-root': {
+                gap: theme.spacing(0.5)
+              }
+            }}
+          />
+        ) : (
+          <TextField
+            fullWidth
+            type={param.type === 'int' ? 'number' : 'text'}
+            size="small"
+            margin="dense"
+            variant="outlined"
+            value={param.default}
+            onChange={handleSubmissionParamUpdate}
+            style={{ margin: 0 }}
+          />
+        )}
+      </Grid>
+      <Grid size={{ xs: 2, sm: 1 }}>
+        <Tooltip title={t('params.user.remove')}>
+          <IconButton
+            style={{
+              color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+            }}
+            onClick={() => onDelete(id)}
+            size="large"
+          >
+            <RemoveCircleOutlineOutlinedIcon />
+          </IconButton>
+        </Tooltip>
+      </Grid>
+    </Grid>
+  ) : (
+    <Grid container spacing={1} alignItems="center">
+      <Grid size={{ xs: 10, sm: 3 }}>
+        <TextField
+          fullWidth
+          size="small"
+          margin="dense"
+          variant="outlined"
+          onChange={handleSPNameChange}
+          value={tempUserParams.name}
+          style={{ margin: 0 }}
+        />
+      </Grid>
+      <Grid size={{ xs: 10, sm: 2 }}>
+        <FormControl size="small" fullWidth>
+          <Select
+            id="user_spec_params"
+            fullWidth
+            value={tempUserParams.type}
+            onChange={handleSPTypeChange}
+            variant="outlined"
+          >
+            <MenuItem value="bool">bool</MenuItem>
+            <MenuItem value="int">int</MenuItem>
+            <MenuItem value="list">list</MenuItem>
+            <MenuItem value="str">str</MenuItem>
+          </Select>
+        </FormControl>
+      </Grid>
+      <Grid size={{ xs: 10, sm: 6 }}>
+        {tempUserParams.type === 'bool' ? (
+          <FormControl size="small" fullWidth>
+            <Select
+              id="user_spec_params"
+              fullWidth
+              value={tempUserParams.default}
+              onChange={handleSPDefaultChange}
+              variant="outlined"
+            >
+              <MenuItem value="false">{t('params.false')}</MenuItem>
+              <MenuItem value="true">{t('params.true')}</MenuItem>
+            </Select>
+          </FormControl>
+        ) : tempUserParams.type === 'list' ? (
+          <Autocomplete
+            fullWidth
+            freeSolo
+            multiple
+            size="small"
+            options={[]}
+            value={tempUserParams.list}
+            renderInput={params => <TextField {...params}></TextField>}
+            renderTags={(value, getTagProps, ownerState) => renderSPLabelTags(value)}
+            onChange={(event, value, reason) => handleSPListChange(value as string[])}
+            sx={{
+              '& .MuiInputBase-root': {
+                gap: theme.spacing(0.5)
+              }
+            }}
+          />
+        ) : (
+          <TextField
+            fullWidth
+            type={tempUserParams.type === 'int' ? 'number' : 'text'}
+            size="small"
+            margin="dense"
+            variant="outlined"
+            value={tempUserParams.default}
+            onChange={handleSPDefaultChange}
+            style={{ margin: 0 }}
+          />
+        )}
+      </Grid>
+      <Grid size={{ xs: 2, sm: 1 }}>
+        {tempUserParams.name !== '' && (
+          <Tooltip title={t('params.user.add')}>
+            <IconButton
+              style={{
+                color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark
+              }}
+              onClick={addUserSubmissionParam}
+              size="large"
+            >
+              <AddCircleOutlineIcon />
+            </IconButton>
+          </Tooltip>
+        )}
+      </Grid>
+      <Grid size={{ xs: 12 }}>
+        <CheckboxInput
+          label={t('params.user.hide')}
+          value={tempUserParams.hide === 'true'}
+          onChange={handleSPAdvancedChange}
+        />
+      </Grid>
+    </Grid>
+  );
+};
+
+const MultiTypeParam = React.memo(WrappedMultiTypeParam);
+export default MultiTypeParam;

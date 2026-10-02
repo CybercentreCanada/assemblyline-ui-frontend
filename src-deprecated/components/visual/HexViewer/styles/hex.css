@@ -1,0 +1,96 @@
+.hex-viewer-root {
+  font-family:
+    'Source Code Pro', 'HexEd.it Symbols', 'Courier New', Consolas, Menlo, 'PT Mono', 'Liberation Mono', monospace;
+  font-size: '1rem';
+  line-height: 1.15;
+  display: 'flex';
+  flex-direction: 'row';
+  width: '100%';
+  height: '100%';
+  cursor: 'default';
+  overflow-x: 'hidden';
+  overflow-y: 'hidden';
+  align-items: 'stretch';
+  padding: 0;
+  margin: 0;
+  border-spacing: 0;
+  user-select: 'none';
+}
+
+.hex-viewer-border {
+  border-left: 1px solid var(--mui-palette-text-disabled);
+}
+
+.hex-viewer-null-color {
+  color: var(--mui-palette-text-disabled);
+}
+
+.hex-viewer-non-printable-color {
+  color: rgb(229, 185, 94);
+}
+
+.hex-viewer-non-printable-color[data-theme='dark'] {
+  color: rgb(203, 203, 99);
+}
+
+.hex-viewer-lower-ascii-color {
+  color: rgb(55, 161, 223);
+}
+
+.hex-viewer-lower-ascii-color[data-theme='dark'] {
+  color: rgb(153, 236, 255);
+}
+
+.hex-viewer-higher-ascii-color {
+  color: rgb(36, 128, 0);
+}
+
+.hex-viewer-higher-ascii-color[data-theme='dark'] {
+  color: rgb(104, 152, 59);
+}
+.hex-viewer-hover {
+  background-color: var(--mui-palette-action-selected);
+}
+
+.hex-viewer-search {
+  color: var(--mui-palette-common-black);
+  background-color: var(--mui-yellow-500);
+  opacity: 0.9;
+  font-weight: 600;
+}
+
+.hex-viewer-selected-search {
+  color: var(--mui-palette-common-white);
+  background-color: var(--mui-palette-warning-main);
+  opacity: 0.9;
+  font-weight: 600;
+}
+
+.hex-viewer-select {
+  color: var(--mui-palette-common-white);
+  background-color: var(--mui-palette-info-main);
+  opacity: 0.9;
+  font-weight: 600;
+}
+
+@keyframes blink {
+  from,
+  to {
+    box-shadow: inset 0 -4px 0 -2px var(--mui-palette-primary-dark);
+  }
+  50% {
+    box-shadow: none;
+  }
+}
+
+.hex-viewer-cursor {
+  font-weight: 600;
+  background-color: var(--mui-palette-primary-light);
+  opacity: 0.9;
+  color: white !important;
+  animation: 1s blink step-end infinite;
+}
+
+.hex-viewer-cursor[data-theme='dark'] {
+  font-weight: 400;
+}

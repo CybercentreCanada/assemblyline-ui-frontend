@@ -1,0 +1,101 @@
+import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
+import { AlertTitle, Box, IconButton, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
+import { AppLink } from 'core/router';
+import type { Childrens } from 'models/api/file';
+import React, { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import InformativeAlert from 'ui/InformativeAlert';
+import SectionContainer from 'ui/SectionContainer';
+
+type ChildrenSectionProps = {
+  childrens: Childrens;
+  show?: boolean;
+  title?: string;
+  nocollapse?: boolean;
+};
+
+const WrappedChildrenSection: React.FC<ChildrenSectionProps> = ({
+  childrens,
+  show = false,
+  title = null,
+  nocollapse = false
+}) => {
+  const { t: tDefault } = useTranslation();
+  const { t } = useTranslation(['fileDetail', 'archive']);
+  const theme = useTheme();
+
+  const [showExtra, setShowExtra] = useState<boolean>(false);
+
+  const filteredChildren = useMemo(
+    () => (!childrens || childrens.length === 0 || showExtra ? childrens : childrens.filter((fileItem, i) => i < 10)),
+    [childrens, showExtra]
+  );
+
+  return show || (childrens && childrens.length !== 0) ? (
+    <SectionContainer
+      title={title ?? t('childrens')}
+      nocollapse={nocollapse}
+      slots={{
+        end: childrens && childrens?.length > 0 && (
+          <Typography
+            color="secondary"
+            variant="subtitle1"
+            children={`${childrens?.length} ${t(childrens?.length === 1 ? 'file' : 'files', { ns: 'fileDetail' })}`}
+            sx={{ fontStyle: 'italic' }}
+          />
+        )
+      }}
+    >
+      {!childrens ? (
+        <Skeleton variant="rectangular" style={{ height: '6rem', borderRadius: '4px' }} />
+      ) : childrens.length === 0 ? (
+        <div style={{ width: '100%' }}>
+          <InformativeAlert>
+            <AlertTitle>{t('no_children_title', { ns: 'archive' })}</AlertTitle>
+            {t('no_children_desc', { ns: 'archive' })}
+          </InformativeAlert>
+        </div>
+      ) : (
+        <>
+          {filteredChildren?.map((fileItem, i) => (
+            <Box
+              key={i}
+              component={AppLink}
+              nav={nav =>
+                nav.to().create({
+                  route: '/file/detail/:id',
+                  path: { id: fileItem.sha256 },
+                  search: { name: fileItem.name }
+                })
+              }
+              navDeps={[fileItem.sha256, fileItem.name]}
+              sx={{
+                wordBreak: 'break-word',
+                color: 'inherit',
+                display: 'block',
+                textDecoration: 'none',
+                cursor: 'pointer',
+                '&:hover, &:focus': {
+                  backgroundColor: theme.palette.action.hover
+                }
+              }}
+            >
+              <span>{fileItem.name}</span>
+              <span style={{ fontSize: '80%', color: theme.palette.text.secondary }}>{` :: ${fileItem.sha256}`}</span>
+            </Box>
+          ))}
+          {!showExtra && childrens.length > 10 && (
+            <Tooltip title={tDefault('more')}>
+              <IconButton size="small" onClick={() => setShowExtra(true)} style={{ padding: 0 }}>
+                <MoreHorizOutlinedIcon />
+              </IconButton>
+            </Tooltip>
+          )}
+        </>
+      )}
+    </SectionContainer>
+  ) : null;
+};
+
+const ChildrenSection = React.memo(WrappedChildrenSection);
+export default ChildrenSection;
