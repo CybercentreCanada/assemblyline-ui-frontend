@@ -105,16 +105,6 @@ export const ManageWorkflowCreatePage = memo(() => {
   const handleFetch = useApiQuery<Workflow>({
     url: `/api/v4/workflow/${paramID}/`,
     disabled: !paramID || !currentUser.roles.includes('workflow_manage') || !originalWorkflow,
-    onSuccess: ({ api_response }) => {
-      const wf = {
-        ...api_response,
-        status: api_response.status || '',
-        priority: api_response.priority || '',
-        enabled: api_response.enabled === undefined ? true : api_response.enabled
-      } as Workflow;
-      setWorkflow(wf);
-      setOriginalWorkflow(wf);
-    },
     onFailure: api_data => {
       showErrorMessage(api_data.api_error_message);
       navigate.here().closePanel({ route: '/manage/workflows' });
@@ -125,6 +115,19 @@ export const ManageWorkflowCreatePage = memo(() => {
     setOriginalWorkflow(defaultWorkflow);
     setWorkflow(defaultWorkflow);
   }, [defaultWorkflow]);
+
+  useEffect(() => {
+    if (!handleFetch.data) return;
+
+    const wf = {
+      ...handleFetch.data,
+      status: handleFetch.data.status || '',
+      priority: handleFetch.data.priority || '',
+      enabled: handleFetch.data.enabled === undefined ? true : handleFetch.data.enabled
+    } as Workflow;
+    setWorkflow(wf);
+    setOriginalWorkflow(wf);
+  }, [handleFetch.data]);
 
   useEffect(() => {
     setWorkflow(prev => {
