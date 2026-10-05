@@ -1,0 +1,167 @@
+import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
+import MenuBookOutlinedIcon from '@mui/icons-material/MenuBookOutlined';
+import { Box, AppBar as MuiAppBar, Toolbar, useMediaQuery, useTheme } from '@mui/material';
+import {
+  useAppBar,
+  useAppBreadcrumbs,
+  useAppConfigs,
+  useAppLayout,
+  useAppQuickSearch
+} from 'deprecated/legacy/commons/components/app/hooks';
+import { APPBAR_READY_EVENT } from 'deprecated/legacy/commons/components/app/hooks/useAppBarHeight';
+import Breadcrumbs from 'deprecated/legacy/commons/components/breadcrumbs/Breadcrumbs';
+import AppSearch from 'layout/quick-search/quick-search.components';
+import AppName from 'deprecated/legacy/commons/components/topnav/AppName';
+import AppSwitcher from 'deprecated/legacy/commons/components/topnav/AppSwitcher';
+import ThemeSelectionIcon from 'deprecated/legacy/commons/components/topnav/ThemeSelectionIcon';
+import UserProfile from 'deprecated/legacy/commons/components/topnav/UserProfile';
+import useALContext from 'deprecated/legacy/components/hooks/useALContext';
+import { IconButton } from 'deprecated/legacy/components/visual/Buttons/IconButton';
+import { memo, useCallback, useLayoutEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+
+export const AppBarBase = ({ children }) => {
+  const layout = useAppLayout();
+  const configs = useAppConfigs();
+  const appbar = useAppBar();
+  const isTopLayout = layout.current === 'top';
+  const autoHide = !isTopLayout && appbar.autoHide;
+
+  const elevation = useMemo(() => {
+    if (layout.current === 'side') {
+      return 0;
+    }
+    return configs.theme.appbar?.elevation !== undefined ? configs.theme.appbar?.elevation : 1;
+  }, [layout, configs.theme.appbar?.elevation]);
+
+  return (
+    <MuiAppBar
+      id="appbar"
+      position={autoHide && !isTopLayout ? 'relative' : 'sticky'}
+      elevation={elevation}
+      sx={theme => ({
+        '@media print': {
+          display: 'none !important'
+        },
+        [theme.breakpoints.only('xs')]: {
+          zIndex: theme.zIndex.drawer - 1
+        },
+        ...(isTopLayout
+          ? {
+              zIndex: theme.zIndex.drawer + 1,
+              ...(configs.theme.appbar ? configs.theme.appbar[theme.palette.mode] : {})
+            }
+          : {
+              color: theme.palette.getContrastText(theme.palette.background.default),
+              backgroundColor: theme.palette.background.default
+            })
+      })}
+    >
+      {children}
+    </MuiAppBar>
+  );
+};
+
+const AppBar = () => {
+  // React Hooks.
+  const muiTheme = useTheme();
+
+  // TUI hooks.
+  const layout = useAppLayout();
+  const configs = useAppConfigs();
+  const breadcrumbs = useAppBreadcrumbs();
+  const quicksearch = useAppQuickSearch();
+  const { left, leftAfterBreadcrumbs, right, rightBeforeSearch, themeSelectionMode } = configs.preferences.topnav;
+
+  const { t } = useTranslation();
+  const { configuration } = useALContext();
+
+  // media queries.
+  const isXs = useMediaQuery(muiTheme.breakpoints.only('xs'));
+  const isMdDown = useMediaQuery(muiTheme.breakpoints.down('md'));
+  const isMdUp = useMediaQuery(muiTheme.breakpoints.up('md'));
+
+  // compute some flags we need to perform render.
+  const isTopLayout = layout.current === 'top';
+  const showSpacer = isXs || !quicksearch.show || (isMdUp && (breadcrumbs.show || !!left || !!leftAfterBreadcrumbs));
+  const showBreadcrumbs = breadcrumbs.show && !isMdDown;
+
+  // Once the dom is mounted, dispatch event to let listeners know
+  //  that the apppbar/topbar dom is available.
+  // Primary usecase is to initialize the 'useAppBarHeight' hook.
+  // That value doesn't initialize properly because it typically gets
+  //  called before the appbar is ready.
+  // The appbar/top bar is conditionally rendered on app/user ready state.
+  useLayoutEffect(() => {
+    window.dispatchEvent(new CustomEvent(APPBAR_READY_EVENT));
+  }, []);
+
+  const renderLeft = useCallback(
+    () => (
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center'
+        }}
+      >
+        {(isTopLayout || isXs) && <AppName noName={isXs} />}
+        <Box sx={{ ...(isTopLayout && { marginLeft: 3 }) }} />
+        {left}
+        {showBreadcrumbs &&
+          (configs.overrides?.providers?.breadcrumbs ? (
+            <configs.overrides.providers.breadcrumbs.element />
+          ) : (
+            <Breadcrumbs />
+          ))}
+        {leftAfterBreadcrumbs && (
+          <Box sx={{ ...(showBreadcrumbs && { marginLeft: 3, marginRight: 3 }) }}>{leftAfterBreadcrumbs}</Box>
+        )}
+      </Box>
+    ),
+    [configs, showBreadcrumbs, leftAfterBreadcrumbs, isTopLayout, left, isXs]
+  );
+
+  return (
+    <AppBarBase>
+      <Toolbar
+        disableGutters
+        style={{
+          paddingLeft: !isXs && !isTopLayout ? muiTheme.spacing(2) : null,
+          paddingRight: muiTheme.spacing(1)
+        }}
+      >
+        {renderLeft()}
+        {showSpacer && <div style={{ flex: 1 }} />}
+        {rightBeforeSearch}
+        {quicksearch.show && <AppSearch />}
+        {configuration.system.support?.documentation && (
+          <IconButton
+            color="inherit"
+            size="large"
+            tooltip={t('support.documentation')}
+            onClick={() => window.open(configuration.system.support.documentation, '_blank')}
+          >
+            <MenuBookOutlinedIcon />
+          </IconButton>
+        )}
+        {configuration.system.support?.email && (
+          <IconButton
+            color="inherit"
+            size="large"
+            tooltip={t('support.email')}
+            onClick={() => window.open(configuration.system.support.email, '_blank')}
+          >
+            <EmailOutlinedIcon />
+          </IconButton>
+        )}
+        {right}
+        {themeSelectionMode === 'icon' && <ThemeSelectionIcon />}
+        <AppSwitcher />
+        {!configs.preferences.topnav.hideUserAvatar && <UserProfile />}
+      </Toolbar>
+    </AppBarBase>
+  );
+};
+
+export default memo(AppBar);
