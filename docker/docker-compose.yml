@@ -45,8 +45,6 @@ services:
 
   nginx:
     image: cccs/nginx-ssl-frontend
-    volumes:
-      - ./minimal.template:/etc/nginx/templates/default.conf.template
     ports:
       - '443:443'
     environment:
@@ -55,7 +53,6 @@ services:
       - SOCKET_HOST=${EXTERNAL_IP}
       - FQDN=${EXTERNAL_IP}.nip.io
       - MAX_BODY_SIZE=100M
-      - TEMPLATE=minimal
 
   # Create test data
   create_test_data:
