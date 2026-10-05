@@ -1,3 +1,11 @@
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
 @media print {
   body {
     color: rgba(0, 0, 0, 0.87) !important;

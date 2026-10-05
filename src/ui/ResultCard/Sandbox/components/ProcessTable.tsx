@@ -1,0 +1,164 @@
+import { useTheme } from '@mui/material';
+import type { ColumnDef } from '@tanstack/react-table';
+import { createColumnHelper } from '@tanstack/react-table';
+import type { SandboxBody, SandboxProcessItem } from 'models/base/result_body';
+import React, { useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import CustomChip from 'ui/CustomChip';
+import { ProcessChip } from 'ui/ResultCard/Sandbox/common/ProcessChip';
+import { TableContainer } from 'ui/ResultCard/Sandbox/common/TableContainer';
+import { DetailTableCellValue } from 'ui/ResultCard/Sandbox/common/Tables';
+import { getProcessMapByPid, type SandboxFilter } from 'ui/ResultCard/Sandbox/sandbox.utils';
+
+type ProcessTableProps = {
+  body?: SandboxBody | null;
+  data?: SandboxProcessItem[];
+  processByPid?: ReadonlyMap<number, SandboxProcessItem>;
+  printable?: boolean;
+  startTime?: number;
+  filterValue?: SandboxFilter;
+  preventRender?: boolean;
+  getRowCount?: (count: number) => void;
+  onFilterChange?: React.Dispatch<React.SetStateAction<SandboxFilter>>;
+};
+
+export const ProcessTable = React.memo(
+  ({
+    body = null,
+    data,
+    processByPid: processByPidProp,
+    printable = false,
+    startTime,
+    filterValue,
+    preventRender,
+    getRowCount = () => null,
+    onFilterChange = () => null
+  }: ProcessTableProps) => {
+    const { t } = useTranslation('sandboxResult');
+    const theme = useTheme();
+    const columnHelper = createColumnHelper<SandboxProcessItem>();
+
+    const processByPid = useMemo(
+      () => processByPidProp ?? getProcessMapByPid(body?.processes),
+      [body?.processes, processByPidProp]
+    );
+
+    const tableData = data ?? body?.processes ?? [];
+
+    const columns = useMemo<ColumnDef<SandboxProcessItem>[]>(
+      () => [
+        columnHelper.accessor('start_time', {
+          header: () => t('timeshift'),
+          cell: ({ getValue }) => {
+            const cur = getValue();
+            if (!startTime || !cur) return null;
+            const deltaSec = (new Date(cur).getTime() - startTime) / 1000;
+            return `${deltaSec.toFixed(2)} s`;
+          },
+          meta: {
+            cellSx: {
+              whiteSpace: 'nowrap',
+              textAlign: 'right'
+            }
+          }
+        }),
+        columnHelper.accessor(row => row.image?.split(/[/\\]/).pop() ?? '', {
+          id: 'process',
+          header: () => t('process'),
+          cell: ({ row }) => <ProcessChip fullWidth process={row.original} />,
+          meta: { cellSx: { wordBreak: 'inherit !important' } }
+        }),
+        columnHelper.accessor('original_file_name', {
+          header: () => t('original_file_name'),
+          cell: ({ getValue }) => getValue() || null,
+          sortingFn: (a, b) => {
+            const nameA = a.original?.original_file_name?.toLowerCase();
+            const nameB = b.original?.original_file_name?.toLowerCase();
+
+            if (nameA == null && nameB == null) return 0;
+            if (nameA == null) return 1;
+            if (nameB == null) return -1;
+            return (nameA ?? '').localeCompare(nameB ?? '');
+          },
+          meta: {
+            cellSx: {
+              wordBreak: 'inherit !important'
+            }
+          }
+        }),
+        columnHelper.accessor('integrity_level', {
+          header: () => t('integrity_level'),
+          cell: ({ getValue }) => {
+            const level = getValue();
+            if (!level) return null;
+            return (
+              <CustomChip
+                label={level}
+                fullWidth
+                size="tiny"
+                variant="outlined"
+                sx={{ textTransform: 'capitalize', fontWeight: 'normal' }}
+              />
+            );
+          },
+          meta: {
+            cellSx: {
+              wordBreak: 'inherit !important',
+              color: theme.palette.text.secondary
+            }
+          }
+        }),
+        columnHelper.accessor(row => (row.sources?.length ? row.sources : null), {
+          id: 'sources',
+          header: () => t('sources'),
+          cell: ({ getValue }) => <DetailTableCellValue value={getValue()} />
+        }),
+        columnHelper.accessor(
+          row => {
+            const parent = processByPid.get(row.ppid);
+            return parent ? [parent.image?.split(/[/\\]/).pop() ?? '', parent.pid] : null;
+          },
+          {
+            id: 'parent_process',
+            header: () => t('parent_process'),
+            cell: ({ getValue }) => {
+              const parentPidRaw = getValue()?.[1];
+              const parentPid = typeof parentPidRaw === 'number' ? parentPidRaw : Number.NaN;
+              const parent = Number.isFinite(parentPid) ? processByPid.get(parentPid) : undefined;
+              return parent ? <ProcessChip fullWidth process={parent} /> : null;
+            },
+            sortDescFirst: false,
+            meta: {
+              cellSx: { wordBreak: 'inherit !important', whiteSpace: 'nowrap' }
+            }
+          }
+        )
+      ],
+      [t, theme.palette.text.secondary, startTime, processByPid, columnHelper]
+    );
+
+    const handleRowClick = useCallback(
+      (row: SandboxProcessItem) =>
+        onFilterChange(prev => {
+          const current = prev ?? [];
+          if (!row?.pid) return current;
+          return current.includes(row.pid) ? current.filter(n => n !== row.pid) : [...current, row.pid];
+        }),
+      [onFilterChange]
+    );
+
+    return (
+      <TableContainer
+        columns={columns}
+        data={tableData}
+        initialSorting={[{ id: 'start_time', desc: false }]}
+        printable={printable}
+        filterValue={filterValue}
+        preventRender={preventRender}
+        getRowCount={getRowCount}
+        isRowFiltered={(row, value) => (!value?.length ? true : value.includes(row.pid))}
+        onRowClick={handleRowClick}
+      />
+    );
+  }
+);
