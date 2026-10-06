@@ -1,8 +1,7 @@
 import type { AppSwitcherItem } from 'core/template/components/app/AppConfigs';
-import { type ReactNode, useMemo, useState } from 'react';
-
 import { AppSwitcherContext } from 'core/template/components/app/AppContexts';
 import { useAppConfigs } from 'core/template/components/app/hooks';
+import { type ReactNode, useMemo, useState } from 'react';
 
 type AppSwitcherProviderProps = {
   children: ReactNode;

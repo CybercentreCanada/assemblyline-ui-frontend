@@ -15,7 +15,6 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
-
 import { useAppSearchService } from 'core/template/components/app/hooks/useAppSearchService';
 import AppSearchInput from 'core/template/components/search/AppSearchInput';
 import AppSearchResult from 'core/template/components/search/AppSearchResult';
