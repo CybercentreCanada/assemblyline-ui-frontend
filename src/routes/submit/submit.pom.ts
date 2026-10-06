@@ -3,10 +3,10 @@ import { SHORT_TIMEOUT } from 'app/spec.constant';
 import { test } from 'core/e2e/e2e.fixtures';
 import type { WaitForOptions } from 'core/e2e/e2e.models';
 import { PageObjectModel } from 'core/e2e/utils/PageObjectModel';
+import path from 'path';
 import { SelectInput } from 'ui/inputs/pom/SelectInput.pom.ts';
 import { TextInput } from 'ui/inputs/pom/TextInput.pom.ts';
 import { TabContainer } from 'ui/TabContainer.pom.ts';
-import path from 'path';
 
 type SubmitTab = 'File' | 'Hash/URL';
 
@@ -45,11 +45,11 @@ export class SubmitPage extends PageObjectModel {
   }
 
   locators(): Locator[] {
-    return [this.bannerImage];
+    return [this.fileDropper];
   }
 
   async waitForPage({ state = 'visible', timeout = 0 }: WaitForOptions = {}) {
-    await this.bannerImage.waitFor({ state, timeout });
+    await this.fileDropper.waitFor({ state, timeout });
   }
 
   async switchTab(tabLabel: 'File' | 'Hash/URL') {
