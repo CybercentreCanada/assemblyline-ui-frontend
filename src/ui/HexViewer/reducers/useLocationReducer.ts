@@ -1,4 +1,4 @@
-import useClipboard from 'layout/clipboard/useClipboard';
+import useClipboard from 'layout/clipboard/clipboard.hooks';
 import { useCallback, useRef } from 'react';
 import SimpleSearchQuery from 'ui/SearchBar/simple-search-query';
 import type { LocationParam, LocationQuery, ReducerHandler, Reducers, Store, UseReducer } from '..';

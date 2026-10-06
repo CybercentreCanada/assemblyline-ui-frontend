@@ -1,6 +1,6 @@
 import { Divider, Link, styled, Typography, useTheme } from '@mui/material';
 import DOMPurify from 'dompurify';
-import type { JSONFeedAuthor, JSONFeedItem } from 'layout/notifications/useNotificationFeed';
+import type { JSONFeedAuthor, JSONFeedItem } from 'layout/notifications/notifications.hooks';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import Markdown from 'react-markdown';

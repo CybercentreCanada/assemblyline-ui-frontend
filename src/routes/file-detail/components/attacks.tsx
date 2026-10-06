@@ -1,5 +1,5 @@
 import { Grid, Skeleton } from '@mui/material';
-import useHighlighter from 'layout/highlighter/useHighlighter';
+import useHighlighter from 'layout/highlighter/highlighter.hooks';
 import type { AttackMatrix } from 'models/api/file';
 import React from 'react';
 import { useTranslation } from 'react-i18next';

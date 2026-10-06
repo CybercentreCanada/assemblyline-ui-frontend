@@ -1,7 +1,7 @@
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import { Collapse, Divider, Grid, Skeleton, Typography, useTheme } from '@mui/material';
-import useHighlighter from 'layout/highlighter/useHighlighter';
+import useHighlighter from 'layout/highlighter/highlighter.hooks';
 import type { Heuristics } from 'models/api/file';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';

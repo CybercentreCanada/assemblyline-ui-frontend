@@ -14,7 +14,7 @@ import { LABELS, PRIORITIES, STATUSES } from 'models/base/workflow';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useParams } from 'react-router';
-import ForbiddenPage from 'routes/forbidden/forbidden';
+import ForbiddenPage from 'routes/forbidden/forbidden.route';
 import { IconButton } from 'ui/buttons/IconButton';
 import Classification from 'ui/Classification';
 import { CheckboxInput } from 'ui/inputs/CheckboxInput';

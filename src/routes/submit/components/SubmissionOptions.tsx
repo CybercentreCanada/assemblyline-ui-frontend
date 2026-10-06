@@ -1,5 +1,5 @@
 import { Typography, useTheme } from '@mui/material';
-import useMyAPI from 'core/api/useMyAPI';
+import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';

@@ -17,16 +17,16 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import useMyAPI from 'core/api/useMyAPI';
+import useMyAPI from 'core/api/hooks/useMyAPI';
 import { invalidateAPIQuery } from 'core/api/utils/invalidateApiQuery';
 import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import { useAppUser } from 'core/template/components/app/hooks';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
 import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
-import useDrawer from 'layout/drawer/useDrawer';
-import type { JSONFeedItem } from 'layout/notifications/useNotificationFeed';
-import { useNotificationFeed } from 'layout/notifications/useNotificationFeed';
+import useDrawer from 'layout/drawer/drawer.hooks';
+import type { JSONFeedItem } from 'layout/notifications/notifications.hooks';
+import { useNotificationFeed } from 'layout/notifications/notifications.hooks';
 import type { CustomUser } from 'models/api/user';
 import type { ServiceIndexed, ServiceUpdateData, ServiceUpdates } from 'models/base/service';
 import type { ChangeEvent } from 'react';

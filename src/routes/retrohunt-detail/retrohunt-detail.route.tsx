@@ -16,11 +16,11 @@ import {
   useTheme
 } from '@mui/material';
 import TableContainer from '@mui/material/TableContainer';
-import useMyAPI from 'core/api/useMyAPI';
+import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
 import PageFullSize from 'core/template/branding/AppPageCenter';
 import { useAppUser } from 'core/template/components/app/hooks';
-import useDrawer from 'layout/drawer/useDrawer';
+import useDrawer from 'layout/drawer/drawer.hooks';
 import type { SearchResult } from 'models/api/search';
 import type { CustomUser, IndexDefinition } from 'models/api/user';
 import type { FileIndexed } from 'models/base/file';
@@ -30,7 +30,7 @@ import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router';
 import { Link } from 'react-router-dom';
 import FileDetail from 'routes/file-detail/file-detail.route';
-import ForbiddenPage from 'routes/forbidden/forbidden';
+import ForbiddenPage from 'routes/forbidden/forbidden.route';
 import NotFoundPage from 'routes/not-found/not-found.route';
 import RetrohuntErrors from 'routes/retrohunt-detail/components/errors';
 import { RetrohuntRepeat } from 'routes/retrohunt-detail/components/repeat';

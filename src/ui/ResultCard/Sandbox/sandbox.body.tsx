@@ -1,5 +1,5 @@
 import { useTheme } from '@mui/material';
-import useSafeResults from 'layout/safe-results/useSafeResults';
+import useSafeResults from 'layout/safe-results/safe-results.hooks';
 import type { SandboxBody as SandboxData } from 'models/base/result_body';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';

@@ -25,7 +25,7 @@ import {
 } from 'core/template/components/app/hooks';
 import { AppThemesContext } from 'core/template/components/app/providers/AppThemesProvider';
 import useLocalStorage from 'core/template/components/utils/hooks/useLocalStorage';
-import useSafeResults from 'layout/safe-results/useSafeResults';
+import useSafeResults from 'layout/safe-results/safe-results.hooks';
 import { memo, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 

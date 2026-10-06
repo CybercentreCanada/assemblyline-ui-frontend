@@ -7,7 +7,7 @@ import { PRIORITIES, STATUSES, type Workflow } from 'models/base/workflow';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
-import ForbiddenPage from 'routes/forbidden/forbidden';
+import ForbiddenPage from 'routes/forbidden/forbidden.route';
 import {
   DeleteWorkflowAction,
   DuplicateWorkflowAction,

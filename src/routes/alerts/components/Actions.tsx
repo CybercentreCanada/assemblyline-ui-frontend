@@ -24,7 +24,7 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import useMyAPI from 'core/api/useMyAPI';
+import useMyAPI from 'core/api/hooks/useMyAPI';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import { useAppUser } from 'core/template/components/app/hooks';
 import type { To } from 'history';

@@ -15,7 +15,7 @@ import {
 } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
 import Skeleton from '@mui/material/Skeleton';
-import useMyAPI from 'core/api/useMyAPI';
+import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
 import { memo, useEffect, useState } from 'react';

@@ -1,11 +1,11 @@
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import { Alert, alpha, IconButton, LinearProgress, Slider, styled } from '@mui/material';
-import useMyAPI from 'core/api/useMyAPI';
+import useMyAPI from 'core/api/hooks/useMyAPI';
 import { useAppUser } from 'core/template/components/app/hooks';
 import type { CustomUser } from 'models/api/user';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import ForbiddenPage from 'routes/forbidden/forbidden';
+import ForbiddenPage from 'routes/forbidden/forbidden.route';
 
 const MIN = 100;
 const MAX = 3000;

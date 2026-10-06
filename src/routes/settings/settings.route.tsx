@@ -2,7 +2,7 @@ import useALContext from 'core/config/useALContext';
 import { useTableOfContent } from 'features/table-of-content/table-of-content.providers';
 import React, { useCallback, useEffect } from 'react';
 import { useParams } from 'react-router';
-import ForbiddenPage from 'routes/forbidden/forbidden';
+import ForbiddenPage from 'routes/forbidden/forbidden.route';
 import { DefaultMetadataSection } from 'routes/settings/components/DefaultMetadata';
 import { ExternalSourcesSection } from 'routes/settings/components/ExternalSources';
 import { HeaderSection } from 'routes/settings/components/Header';

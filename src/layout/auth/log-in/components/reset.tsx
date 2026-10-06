@@ -1,5 +1,5 @@
 import { Button, CircularProgress, TextField, Typography } from '@mui/material';
-import useMyAPI from 'core/api/useMyAPI';
+import useMyAPI from 'core/api/hooks/useMyAPI';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
 import { useState } from 'react';

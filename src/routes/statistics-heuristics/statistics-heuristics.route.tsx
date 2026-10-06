@@ -1,9 +1,9 @@
 import { Skeleton, Typography, useTheme } from '@mui/material';
-import useMyAPI from 'core/api/useMyAPI';
+import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
 import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
-import useDrawer from 'layout/drawer/useDrawer';
+import useDrawer from 'layout/drawer/drawer.hooks';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import HeuristicDetail from 'routes/manage-heuristic-detail/manage-heuristic-detail.route';

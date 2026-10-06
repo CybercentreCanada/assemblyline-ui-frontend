@@ -1,11 +1,11 @@
 import { Alert, LinearProgress, styled } from '@mui/material';
-import useMyAPI from 'core/api/useMyAPI';
+import useMyAPI from 'core/api/hooks/useMyAPI';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import { useAppUser } from 'core/template/components/app/hooks';
 import type { CustomUser } from 'models/api/user';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import ForbiddenPage from 'routes/forbidden/forbidden';
+import ForbiddenPage from 'routes/forbidden/forbidden.route';
 import { HexViewerApp } from 'ui/HexViewer';
 
 const Wrapper = styled('div')(({ theme }) => ({

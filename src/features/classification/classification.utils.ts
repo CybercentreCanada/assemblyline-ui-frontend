@@ -1,4 +1,4 @@
-import type { ClassificationAliases } from 'layout/auth/useALContext';
+import type { ClassificationAliases } from 'layout/auth/auth.hooks';
 
 /**
  * Classification related utils.

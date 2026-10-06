@@ -22,9 +22,9 @@ import { AppStyledEngineProvider } from 'core/template/components/app/providers/
 import { AppThemesContext, AppThemesProvider } from 'core/template/components/app/providers/AppThemesProvider';
 import AppUserProvider from 'core/template/components/app/providers/AppUserProvider';
 import AssistantProvider from 'layout/assistant/assistant.providers';
-import CarouselProvider from 'layout/carousel/CarouselProvider';
-import DrawerProvider from 'layout/drawer/DrawerProvider';
-import { ExternalLookupProvider } from 'layout/external-lookup/external-lookup.hooks';
+import CarouselProvider from 'layout/carousel/carousel.providers';
+import DrawerProvider from 'layout/drawer/drawer.providers';
+import { ExternalLookupProvider } from 'layout/external-lookup/external-lookup.providers';
 import HighlightProvider from 'layout/highlighter/highlighter.providers';
 import { WhoAmIProps } from 'models/api/user';
 import { useCallback, useContext, useMemo, type ReactNode } from 'react';

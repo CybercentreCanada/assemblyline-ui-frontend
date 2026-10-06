@@ -1,7 +1,7 @@
 import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
-import type { WhoAmIProps } from 'layout/auth/useALContext';
-import useQuota from 'layout/quota/useQuota';
+import type { WhoAmIProps } from 'layout/auth/auth.hooks';
+import useQuota from 'layout/quota/quota.hooks';
 import type { Configuration } from 'models/base/config';
 import { useTranslation } from 'react-i18next';
 import { getFileName } from 'shared/utils/utils';

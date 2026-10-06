@@ -1,13 +1,13 @@
 import type { UndefinedInitialDataOptions } from '@tanstack/react-query';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { DEFAULT_RETRY_MS } from 'app/core.preference';
 import type { APIQueryKey, APIResponse } from 'core/api/api.models.ts';
 import { useAPIStore } from 'core/api/api.providers';
 import { getAPIResponse, isAPIData, stableStringify } from 'core/api/api.utils';
-import { DEFAULT_RETRY_MS } from 'core/api/constants';
-import type { LoginParamsProps } from 'core/api/useMyAPI';
+import type { LoginParamsProps } from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
-import useQuota from 'layout/quota/useQuota';
+import useQuota from 'layout/quota/quota.hooks';
 import type { CustomUser, WhoAmIProps } from 'models/api/user';
 import type { Configuration } from 'models/base/config';
 import { useMemo } from 'react';

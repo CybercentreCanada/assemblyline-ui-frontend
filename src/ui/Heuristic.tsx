@@ -1,6 +1,6 @@
 import useALContext from 'core/config/useALContext';
-import useHighlighter from 'layout/highlighter/useHighlighter';
-import useSafeResults from 'layout/safe-results/useSafeResults';
+import useHighlighter from 'layout/highlighter/highlighter.hooks';
+import useSafeResults from 'layout/safe-results/safe-results.hooks';
 import React, { useCallback, useState } from 'react';
 import type { PossibleColor } from 'shared/utils/colors';
 import ActionMenu from 'ui/ActionMenu';

@@ -10,7 +10,7 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
-import useMyAPI from 'core/api/useMyAPI';
+import useMyAPI from 'core/api/hooks/useMyAPI';
 import type { Metadata } from 'models/base/config';
 import { useEffect, useState } from 'react';
 import { isURL } from 'shared/utils/utils';

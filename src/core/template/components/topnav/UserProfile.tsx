@@ -24,7 +24,7 @@ import type { AppBarUserMenuElement } from 'core/template/components/app/AppConf
 import { useAppConfigs, useAppLayout } from 'core/template/components/app/hooks';
 import AppAvatar from 'core/template/components/display/AppAvatar';
 import ThemeSelection from 'core/template/components/topnav/ThemeSelection';
-import useQuota from 'layout/quota/useQuota';
+import useQuota from 'layout/quota/quota.hooks';
 import { memo, useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';

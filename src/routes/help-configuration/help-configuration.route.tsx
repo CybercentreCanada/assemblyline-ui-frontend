@@ -1,6 +1,6 @@
 import { Grid, Typography, useTheme } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
-import useMyAPI from 'core/api/useMyAPI';
+import useMyAPI from 'core/api/hooks/useMyAPI';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
 import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
 import { useState } from 'react';

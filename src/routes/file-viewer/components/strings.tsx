@@ -1,12 +1,12 @@
 import { Alert, LinearProgress } from '@mui/material';
-import useMyAPI from 'core/api/useMyAPI';
+import useMyAPI from 'core/api/hooks/useMyAPI';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import { useAppUser } from 'core/template/components/app/hooks';
 import type { CustomUser } from 'models/api/user';
 import type { editor } from 'monaco-editor';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import ForbiddenPage from 'routes/forbidden/forbidden';
+import ForbiddenPage from 'routes/forbidden/forbidden.route';
 import MonacoEditor, { LANGUAGE_SELECTOR } from 'ui/MonacoEditor';
 
 type Props = {

@@ -1,7 +1,7 @@
 import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
 import { IconButton, Tooltip, useTheme } from '@mui/material';
-import useHighlighter from 'layout/highlighter/useHighlighter';
-import useSafeResults from 'layout/safe-results/useSafeResults';
+import useHighlighter from 'layout/highlighter/highlighter.hooks';
+import useSafeResults from 'layout/safe-results/safe-results.hooks';
 import type { Verdict } from 'models/base/alert';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';

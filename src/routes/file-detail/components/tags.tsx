@@ -2,7 +2,7 @@ import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import type { GridProps } from '@mui/material';
 import { Collapse, Divider, Grid, Skeleton, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
-import useSafeResults from 'layout/safe-results/useSafeResults';
+import useSafeResults from 'layout/safe-results/safe-results.hooks';
 import type { Tags } from 'models/api/file';
 import type { Signature } from 'models/base/tagging';
 import React, { useCallback, useEffect, useRef, useState } from 'react';

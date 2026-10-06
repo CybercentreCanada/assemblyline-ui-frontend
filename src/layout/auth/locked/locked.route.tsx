@@ -4,7 +4,7 @@ import Typography from '@mui/material/Typography';
 import useALContext from 'core/config/useALContext';
 import PageCenter from 'core/template/components/pages/PageCenter';
 import { useTranslation } from 'react-i18next';
-import ForbiddenPage from 'routes/forbidden/forbidden';
+import ForbiddenPage from 'routes/forbidden/forbidden.route';
 
 const LockedPage = () => {
   const { t } = useTranslation(['locked']);

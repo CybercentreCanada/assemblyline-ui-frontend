@@ -1,6 +1,6 @@
 import type { PaginationProps } from '@mui/material';
 import { Pagination } from '@mui/material';
-import useMyAPI from 'core/api/useMyAPI';
+import useMyAPI from 'core/api/hooks/useMyAPI';
 import type { SearchResult } from 'models/api/search';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import SimpleSearchQuery from 'ui/SearchBar/simple-search-query';

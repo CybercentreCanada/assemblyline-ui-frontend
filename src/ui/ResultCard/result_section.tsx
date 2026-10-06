@@ -18,9 +18,9 @@ import {
   useTheme
 } from '@mui/material';
 import useALContext from 'core/config/useALContext';
-import useClipboard from 'layout/clipboard/useClipboard';
-import useHighlighter from 'layout/highlighter/useHighlighter';
-import useSafeResults from 'layout/safe-results/useSafeResults';
+import useClipboard from 'layout/clipboard/clipboard.hooks';
+import useHighlighter from 'layout/highlighter/highlighter.hooks';
+import useSafeResults from 'layout/safe-results/safe-results.hooks';
 import type { Section, SectionItem } from 'models/base/result';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';

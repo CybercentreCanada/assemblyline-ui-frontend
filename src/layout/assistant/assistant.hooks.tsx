@@ -1,6 +1,7 @@
-import { AppBarContext } from 'core/template/components/app/AppContexts';
+import type { AssistantContextProps } from 'layout/assistant/assistant.providers';
+import { AssistantContext } from 'layout/assistant/assistant.providers';
 import { useContext } from 'react';
 
-export function useAppBar() {
-  return useContext(AppBarContext);
+export default function useAssistant(): AssistantContextProps {
+  return useContext(AssistantContext);
 }

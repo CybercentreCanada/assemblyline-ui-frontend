@@ -1,7 +1,7 @@
 import useALContext from 'core/config/useALContext';
 import { useAppConfigs } from 'core/template/components/app/hooks';
 import PageCenter from 'core/template/components/pages/PageCenter';
-import ForbiddenPage from 'routes/forbidden/forbidden';
+import ForbiddenPage from 'routes/forbidden/forbidden.route';
 import LinkGrid from 'ui/linkgrid';
 
 export default function Manage() {

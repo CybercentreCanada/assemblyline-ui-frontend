@@ -9,7 +9,7 @@ import { Box, styled, Tooltip, useTheme } from '@mui/material';
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 import { TreeItem } from '@mui/x-tree-view/TreeItem';
 import useALContext from 'core/config/useALContext';
-import useSafeResults from 'layout/safe-results/useSafeResults';
+import useSafeResults from 'layout/safe-results/safe-results.hooks';
 import type { ProcessTreeBody as ProcessTreeData } from 'models/base/result_body';
 import type { FC } from 'react';
 import React, { memo } from 'react';

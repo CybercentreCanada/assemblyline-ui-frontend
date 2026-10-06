@@ -1,7 +1,7 @@
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import { Collapse, Divider, Grid, Typography, useTheme } from '@mui/material';
-import useSafeResults from 'layout/safe-results/useSafeResults';
+import useSafeResults from 'layout/safe-results/safe-results.hooks';
 import type { Tags } from 'models/api/file';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';

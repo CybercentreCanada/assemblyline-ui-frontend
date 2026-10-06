@@ -1,5 +1,5 @@
 import { CircularProgress, Typography, useTheme } from '@mui/material';
-import useMyAPI from 'core/api/useMyAPI';
+import useMyAPI from 'core/api/hooks/useMyAPI';
 import PageCardCentered from 'core/template/branding/AppPageCardCentered';
 import { useAppLayout } from 'core/template/components/app/hooks';
 import useAppBannerVert from 'core/template/components/app/hooks/useAppBannerVert';

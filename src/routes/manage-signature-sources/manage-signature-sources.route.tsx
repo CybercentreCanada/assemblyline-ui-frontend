@@ -23,12 +23,12 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import useMyAPI from 'core/api/useMyAPI';
+import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import { useAppUser } from 'core/template/components/app/hooks';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
-import useDrawer from 'layout/drawer/useDrawer';
+import useDrawer from 'layout/drawer/drawer.hooks';
 import type { CustomUser } from 'models/api/user';
 import type { UpdateConfig, UpdateSource } from 'models/base/service';
 import { DEFAULT_SOURCE } from 'models/base/service';
@@ -36,8 +36,8 @@ import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DiGitBranch } from 'react-icons/di';
 import { Link } from 'react-router-dom';
-import ForbiddenPage from 'routes/forbidden/forbidden';
-import { SourceDetail } from 'routes/manage-signature-source-detail/signature_sources_details';
+import ForbiddenPage from 'routes/forbidden/forbidden.route';
+import { SourceDetail } from 'routes/manage-signature-source-detail/manage-signature-source-detail.route';
 import Classification from 'ui/Classification';
 import ConfirmationDialog from 'ui/ConfirmationDialog';
 import { PageHeader } from 'ui/layouts/PageHeader';

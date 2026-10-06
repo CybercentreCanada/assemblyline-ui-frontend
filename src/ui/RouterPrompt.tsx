@@ -1,6 +1,6 @@
 import { useBlocker } from 'core/router/useBlocker';
-import { GD_EVENT_PREVENTED, GD_EVENT_PROCEED } from 'layout/drawer/DrawerProvider';
-import useDrawer from 'layout/drawer/useDrawer';
+import useDrawer from 'layout/drawer/drawer.hooks';
+import { GD_EVENT_PREVENTED, GD_EVENT_PROCEED } from 'layout/drawer/drawer.providers';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ConfirmationDialog from 'ui/ConfirmationDialog';

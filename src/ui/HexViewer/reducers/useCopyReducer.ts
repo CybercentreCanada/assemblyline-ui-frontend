@@ -1,4 +1,4 @@
-import useClipboard from 'layout/clipboard/useClipboard';
+import useClipboard from 'layout/clipboard/clipboard.hooks';
 import { useCallback } from 'react';
 import type { ReducerHandler, Reducers, Store, UseReducer } from '..';
 import {

@@ -33,12 +33,12 @@ import {
 } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
 import { blue } from '@mui/material/colors';
-import useMyAPI from 'core/api/useMyAPI';
+import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
-import NotificationItem from 'layout/notifications/NotificationItem';
-import type { JSONFeedItem } from 'layout/notifications/useNotificationFeed';
-import { useNotificationFeed } from 'layout/notifications/useNotificationFeed';
+import NotificationItem from 'layout/notifications/components/NotificationItem';
+import type { JSONFeedItem } from 'layout/notifications/notifications.hooks';
+import { useNotificationFeed } from 'layout/notifications/notifications.hooks';
 import type { SystemMessage } from 'models/api/user';
 import type { Configuration } from 'models/base/config';
 import type { ServiceIndexed } from 'models/base/service';

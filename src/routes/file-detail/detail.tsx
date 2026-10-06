@@ -3,7 +3,7 @@ import PageCenter from 'core/template/components/pages/PageCenter';
 import type { CustomUser } from 'models/api/user';
 import { useParams } from 'react-router';
 import FileDetail from 'routes/file-detail/file-detail.route';
-import ForbiddenPage from 'routes/forbidden/forbidden';
+import ForbiddenPage from 'routes/forbidden/forbidden.route';
 
 type ParamProps = {
   id: string;

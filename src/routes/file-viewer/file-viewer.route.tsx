@@ -25,12 +25,12 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import useMyAPI from 'core/api/useMyAPI';
+import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import PageFullSize from 'core/template/branding/AppPageCenter';
 import { useAppUser } from 'core/template/components/app/hooks';
-import useAssistant from 'layout/assistant/useAssistant';
+import useAssistant from 'layout/assistant/assistant.hooks';
 import type { CustomUser } from 'models/api/user';
 import type { File } from 'models/base/file';
 import type { Submission } from 'models/base/submission';
@@ -44,7 +44,7 @@ import { HexSection } from 'routes/file-viewer/components/hex';
 import { ImageSection } from 'routes/file-viewer/components/image';
 import { StringsSection } from 'routes/file-viewer/components/strings';
 import SelectionProvider, { useSelection } from 'routes/file-viewer/file-viewer.providers';
-import ForbiddenPage from 'routes/forbidden/forbidden';
+import ForbiddenPage from 'routes/forbidden/forbidden.route';
 import { FileDownloader } from 'ui/buttons/FileDownloader';
 import { IconButton } from 'ui/buttons/IconButton';
 import { TabContainer } from 'ui/TabContainer';

@@ -16,7 +16,7 @@ import {
   useTheme
 } from '@mui/material';
 import useALContext from 'core/config/useALContext';
-import useSafeResults from 'layout/safe-results/useSafeResults';
+import useSafeResults from 'layout/safe-results/safe-results.hooks';
 import type { SandboxBody as SandboxData, SandboxProcessItem } from 'models/base/result_body';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';

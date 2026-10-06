@@ -1,11 +1,11 @@
 import type { UndefinedInitialDataOptions } from '@tanstack/react-query';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { DEFAULT_RETRY_MS } from 'app/core.preference';
 import type { APIQueryKey, APIResponse, BlobResponse } from 'core/api/api.models.ts';
 import { getBlobResponse, isAPIData, stableStringify } from 'core/api/api.utils';
-import { DEFAULT_RETRY_MS } from 'core/api/constants';
 import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
-import useQuota from 'layout/quota/useQuota';
+import useQuota from 'layout/quota/quota.hooks';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getFileName } from 'shared/utils/utils';

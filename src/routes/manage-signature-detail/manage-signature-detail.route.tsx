@@ -17,7 +17,7 @@ import {
   useTheme
 } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
-import useMyAPI from 'core/api/useMyAPI';
+import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import { useAppTheme } from 'core/template/components/app/hooks';
@@ -30,7 +30,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TbUserX } from 'react-icons/tb';
 import { useNavigate, useParams } from 'react-router';
-import ForbiddenPage from 'routes/forbidden/forbidden';
+import ForbiddenPage from 'routes/forbidden/forbidden.route';
 import ResultsTable from 'routes/search/components/results';
 import { suricataConfig, suricataDef } from 'shared/utils/suricata';
 import { safeFieldValue, safeFieldValueURI } from 'shared/utils/utils';

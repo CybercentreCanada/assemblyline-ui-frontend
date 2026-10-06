@@ -1,9 +1,9 @@
+import { DEFAULT_RETRY_MS } from 'app/core.preference';
 import type { APIRequest, APIResponse } from 'core/api/api.models.ts';
 import { isAPIData } from 'core/api/api.utils';
-import { DEFAULT_RETRY_MS } from 'core/api/constants';
 import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
-import useQuota from 'layout/quota/useQuota';
+import useQuota from 'layout/quota/quota.hooks';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import getXSRFCookie from 'shared/utils/xsrf';

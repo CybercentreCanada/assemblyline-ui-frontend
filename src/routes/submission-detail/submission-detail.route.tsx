@@ -35,14 +35,14 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
-import useMyAPI from 'core/api/useMyAPI';
+import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import PageCenter from 'core/template/components/pages/PageCenter';
-import useAssistant from 'layout/assistant/useAssistant';
-import useDrawer from 'layout/drawer/useDrawer';
+import useAssistant from 'layout/assistant/assistant.hooks';
+import useDrawer from 'layout/drawer/drawer.hooks';
+import useHighlighter from 'layout/highlighter/highlighter.hooks';
 import type { HighlighMapProps } from 'layout/highlighter/highlighter.providers';
-import useHighlighter from 'layout/highlighter/useHighlighter';
 import type { Configuration } from 'models/api/help';
 import type { LiveStatus, OutstandingServices, WatchQueue } from 'models/api/live';
 import type { MultipleKeys } from 'models/api/result';
@@ -60,7 +60,7 @@ import { useLocation, useNavigate, useParams } from 'react-router';
 import { Link } from 'react-router-dom';
 import Detection from 'routes/file-detail/components/detection';
 import FileDetail from 'routes/file-detail/file-detail.route';
-import ForbiddenPage from 'routes/forbidden/forbidden';
+import ForbiddenPage from 'routes/forbidden/forbidden.route';
 import HeuristicDetail from 'routes/manage-heuristic-detail/manage-heuristic-detail.route';
 import AISummarySection from 'routes/submission-detail/components/ai_summary';
 import AttackSection from 'routes/submission-detail/components/attack';

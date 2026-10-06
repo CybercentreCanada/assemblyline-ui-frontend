@@ -1,10 +1,10 @@
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import { Box, Button, Collapse, Menu, MenuItem, Typography, useTheme } from '@mui/material';
-import useMyAPI from 'core/api/useMyAPI';
+import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
-import useHighlighter from 'layout/highlighter/useHighlighter';
-import useSafeResults from 'layout/safe-results/useSafeResults';
+import useHighlighter from 'layout/highlighter/highlighter.hooks';
+import useSafeResults from 'layout/safe-results/safe-results.hooks';
 import type { AlternateResult, FileResult } from 'models/base/result';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';

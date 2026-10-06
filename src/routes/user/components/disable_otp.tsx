@@ -1,5 +1,5 @@
 import { Button, Typography, useTheme } from '@mui/material';
-import useMyAPI from 'core/api/useMyAPI';
+import useMyAPI from 'core/api/hooks/useMyAPI';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 

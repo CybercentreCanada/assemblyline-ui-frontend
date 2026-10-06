@@ -14,14 +14,14 @@ import {
   useTheme
 } from '@mui/material';
 import Alert from '@mui/material/Alert';
-import useMyAPI from 'core/api/useMyAPI';
+import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
 import { useAppUser } from 'core/template/components/app/hooks';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
 import ListCarousel from 'deprecated/components/lists/carousel/ListCarousel';
 import ListNavigator from 'deprecated/components/lists/navigator/ListNavigator';
-import useAssistant from 'layout/assistant/useAssistant';
-import useClipboard from 'layout/clipboard/useClipboard';
+import useAssistant from 'layout/assistant/assistant.hooks';
+import useClipboard from 'layout/clipboard/clipboard.hooks';
 import type { CustomUser } from 'models/api/user';
 import type { AlertItem } from 'models/base/alert';
 import React, { memo, useCallback, useEffect, useState } from 'react';
@@ -46,7 +46,7 @@ import {
   SkeletonInline
 } from 'routes/alerts/components/Components';
 import { SearchParamsProvider } from 'routes/alerts/contexts/SearchParamsContext';
-import ForbiddenPage from 'routes/forbidden/forbidden';
+import ForbiddenPage from 'routes/forbidden/forbidden.route';
 import { verdictToColor } from 'shared/utils/utils';
 import { ActionableChipList } from 'ui/ActionableChipList';
 import ActionableText from 'ui/ActionableText';

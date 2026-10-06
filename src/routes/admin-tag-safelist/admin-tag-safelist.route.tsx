@@ -1,6 +1,6 @@
 import Editor, { DiffEditor, loader } from '@monaco-editor/react';
 import { Dialog, DialogActions, DialogContent, DialogTitle, Skeleton, useTheme } from '@mui/material';
-import useMyAPI from 'core/api/useMyAPI';
+import useMyAPI from 'core/api/hooks/useMyAPI';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import PageFullSize from 'core/template/branding/AppPageCenter';
 import { useAppTheme, useAppUser } from 'core/template/components/app/hooks';

@@ -1,6 +1,6 @@
 import { Box, Button, CircularProgress, Link, Typography, useTheme } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
-import useMyAPI from 'core/api/useMyAPI';
+import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
 import NotFoundPage from 'core/template/branding/AppBanner';
 import { useAppBanner } from 'core/template/components/app/hooks';

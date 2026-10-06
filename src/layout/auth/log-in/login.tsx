@@ -1,6 +1,6 @@
 import { Box, Button, CircularProgress, Link, Stack, Typography, useTheme } from '@mui/material';
 import { useAPIStore } from 'core/api/api.providers';
-import useMyAPI from 'core/api/useMyAPI';
+import useMyAPI from 'core/api/hooks/useMyAPI';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import PageCardCentered from 'core/template/branding/AppPageCardCentered';
 import { useAppBanner, useAppLayout } from 'core/template/components/app/hooks';

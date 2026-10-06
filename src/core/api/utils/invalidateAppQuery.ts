@@ -1,7 +1,7 @@
 import type { ALRequests } from 'app/core.api';
+import { DEFAULT_INVALIDATE_DELAY } from 'app/core.preference';
 import type { APIQueryKey, APIRequest } from 'core/api/api.models.ts';
 import { queryClient } from 'core/api/api.providers';
-import { DEFAULT_INVALIDATE_DELAY } from 'core/api/constants';
 
 function isObject(variable) {
   return variable !== null && typeof variable === 'object' && !Array.isArray(variable);

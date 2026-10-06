@@ -7,7 +7,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import PageviewOutlinedIcon from '@mui/icons-material/PageviewOutlined';
 import RemoveIcon from '@mui/icons-material/Remove';
 import { CircularProgress, IconButton, Modal, Skeleton, Slider, Tooltip, alpha, styled, useTheme } from '@mui/material';
-import useMyAPI from 'core/api/useMyAPI';
+import useMyAPI from 'core/api/hooks/useMyAPI';
 import Carousel from 'deprecated/components/Carousel';
 import CarouselItem from 'layout/carousel/components/AppCarouselItem';
 import type { Image as ImageData } from 'models/base/result_body';

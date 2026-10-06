@@ -1,6 +1,6 @@
 import CloudDownloadOutlinedIcon from '@mui/icons-material/CloudDownloadOutlined';
 import { AlertTitle, IconButton, Paper, Skeleton, TableContainer, Tooltip } from '@mui/material';
-import type { JSONFeedItem } from 'layout/notifications/useNotificationFeed';
+import type { JSONFeedItem } from 'layout/notifications/notifications.hooks';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow, ExternalLinkRow } from 'ui/DivTable';

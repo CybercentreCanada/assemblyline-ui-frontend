@@ -19,9 +19,9 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import useMyAPI from 'core/api/useMyAPI';
+import useMyAPI from 'core/api/hooks/useMyAPI';
 import { useAppUser } from 'core/template/components/app/hooks';
-import useClipboard from 'layout/clipboard/useClipboard';
+import useClipboard from 'layout/clipboard/clipboard.hooks';
 import type { CustomUser } from 'models/api/user';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';

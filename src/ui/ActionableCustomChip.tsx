@@ -1,5 +1,5 @@
 import useALContext from 'core/config/useALContext';
-import useExternalLookup from 'layout/external-lookup/useExternalLookup';
+import useExternalLookup from 'layout/external-lookup/external-lookup.hooks';
 import type { ExternalLinkType } from 'models/base/config';
 import React, { useCallback, useState } from 'react';
 import ActionMenu from 'ui/ActionMenu';
