@@ -126,7 +126,7 @@ test.describe('Submit Page', () => {
           await userSession.submitPage.clickSubmit();
           await userSession.snackbarContext.expect(
             'error',
-            /The file you are trying to start did not upload properly, try again.../i
+            /Filetype override 'bob' is not a recognized file type in the system/i
           );
         } else {
           await userSession.submitPage.switchTab('Hash/URL');

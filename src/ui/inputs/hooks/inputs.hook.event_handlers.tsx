@@ -1,9 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unnecessary-type-constraint */
 import { usePropStore } from 'features/prop-provider/prop-provider.providers';
-import {
-  useInputCoercingResolver,
-  useInputValidationResolver
-} from 'ui/inputs/hooks/inputs.hook.validation.tsx';
+import { useInputCoercingResolver, useInputValidationResolver } from 'ui/inputs/hooks/inputs.hook.validation.tsx';
 import type { InputControllerProps } from 'ui/inputs/models/inputs.model.ts';
 import type { SyntheticEvent } from 'react';
 import { useCallback, useRef, useTransition } from 'react';

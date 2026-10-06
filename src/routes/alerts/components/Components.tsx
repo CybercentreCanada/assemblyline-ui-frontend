@@ -28,14 +28,7 @@ import type { ActionableCustomChipProps } from 'ui/ActionableCustomChip';
 import type { CustomChipProps } from 'ui/CustomChip';
 import CustomChip from 'ui/CustomChip';
 import type { GridLinkRowProps } from 'ui/GridTable';
-import {
-  GridLinkRow,
-  GridTable,
-  GridTableBody,
-  GridTableCell,
-  GridTableHead,
-  GridTableRow
-} from 'ui/GridTable';
+import { GridLinkRow, GridTable, GridTableBody, GridTableCell, GridTableHead, GridTableRow } from 'ui/GridTable';
 import Moment from 'ui/Moment';
 import { verdictToColor } from 'shared/utils/utils';
 import type { ReactNode } from 'react';

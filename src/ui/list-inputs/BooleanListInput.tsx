@@ -7,11 +7,7 @@ import {
   ResetInputAdornment
 } from 'ui/inputs/components/inputs.component.adornment.tsx';
 import { InputHelperText } from 'ui/inputs/components/inputs.component.form.tsx';
-import {
-  useInputClick,
-  useInputClickBlur,
-  useInputFocus
-} from 'ui/inputs/hooks/inputs.hook.event_handlers.tsx';
+import { useInputClick, useInputClickBlur, useInputFocus } from 'ui/inputs/hooks/inputs.hook.event_handlers.tsx';
 import { useInputId } from 'ui/inputs/hooks/inputs.hook.renderer.tsx';
 import { useInputValidation } from 'ui/inputs/hooks/inputs.hook.validation.tsx';
 import type { InputRuntimeState, InputValueModel } from 'ui/inputs/models/inputs.model.ts';

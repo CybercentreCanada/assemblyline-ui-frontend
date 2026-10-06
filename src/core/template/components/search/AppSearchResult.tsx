@@ -1,11 +1,10 @@
 import { Box, MenuItem, MenuList, type MenuListProps, Typography } from '@mui/material';
 import type { AppSearchItem } from 'core/template/components/app/AppSearchService';
 import { useAppSearchService } from 'core/template/components/app/hooks/useAppSearchService';
-import { type KeyboardEvent, memo, useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
-
 import AppListEmpty from 'core/template/components/display/AppListEmpty';
 import { parseEvent } from 'deprecated/utils/keyboard';
+import { type KeyboardEvent, memo, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 type AppSearchResultProps = MenuListProps;
 
