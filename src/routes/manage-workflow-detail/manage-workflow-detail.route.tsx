@@ -1,9 +1,12 @@
 import { Grid, Skeleton, Typography, useTheme } from '@mui/material';
-import PageCenter from 'deprecated/legacy/commons/components/pages/PageCenter';
 import { useAPIQuery } from 'core/api/hooks/useApiQuery';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
+import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
+import PageCenter from 'core/template/components/pages/PageCenter';
 import { PRIORITIES, STATUSES, type Workflow } from 'models/base/workflow';
+import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useParams } from 'react-router';
 import ForbiddenPage from 'routes/forbidden/forbidden';
 import {
   DeleteWorkflowAction,
@@ -21,9 +24,6 @@ import { TextAreaInput } from 'ui/inputs/TextAreaInput';
 import { TextInput } from 'ui/inputs/TextInput';
 import { PageHeader } from 'ui/layouts/PageHeader';
 import Moment from 'ui/Moment';
-import React, { useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router';
 
 type Params = {
   id: string;

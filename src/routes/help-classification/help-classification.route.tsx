@@ -1,9 +1,9 @@
 import { Skeleton, Typography, useTheme } from '@mui/material';
-import PageCenter from 'deprecated/legacy/commons/components/pages/PageCenter';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
-import NotFoundPage from 'core/template/components/AppBanner';
-import Classification from 'ui/Classification';
+import useALContext from 'core/config/useALContext';
+import NotFoundPage from 'core/template/branding/AppBanner';
+import PageCenter from 'core/template/components/pages/PageCenter';
 import { Trans, useTranslation } from 'react-i18next';
+import Classification from 'ui/Classification';
 
 export default function HelpClassification() {
   const { t } = useTranslation(['helpClassification']);

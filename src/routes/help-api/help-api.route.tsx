@@ -15,13 +15,13 @@ import {
 } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
 import Skeleton from '@mui/material/Skeleton';
-import PageFullWidth from 'deprecated/legacy/commons/components/pages/PageFullWidth';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
+import useALContext from 'core/config/useALContext';
+import PageFullWidth from 'core/template/components/pages/PageFullWidth';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
-import CustomChip from 'ui/CustomChip';
-import { PageHeader } from 'ui/layouts/PageHeader';
 import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import CustomChip from 'ui/CustomChip';
+import { PageHeader } from 'ui/layouts/PageHeader';
 
 const apiHeight = '48px';
 

@@ -7,15 +7,15 @@ import ToggleOffOutlinedIcon from '@mui/icons-material/ToggleOffOutlined';
 import ToggleOnIcon from '@mui/icons-material/ToggleOn';
 import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
 import { Grid, IconButton, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
 import type { Workflow } from 'models/base/workflow';
-import ConfirmationDialog from 'ui/ConfirmationDialog';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 import { Link } from 'react-router-dom';
+import ConfirmationDialog from 'ui/ConfirmationDialog';
 
 type RunWorkflowActionProps = {
   id: string;

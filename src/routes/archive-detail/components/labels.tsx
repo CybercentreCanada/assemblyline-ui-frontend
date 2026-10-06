@@ -26,18 +26,18 @@ import {
 } from '@mui/material';
 import match from 'autosuggest-highlight/match';
 import parse from 'autosuggest-highlight/parse';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
 import type { LabelCategories } from 'models/base/file';
 import { DEFAULT_LABELS, LABELS_COLOR_MAP } from 'models/base/file';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import type { PossibleColor } from 'shared/utils/colors';
 import { ChipList } from 'ui/ChipList';
 import CustomChip from 'ui/CustomChip';
 import { useDebounce } from 'ui/HexViewer';
 import SectionContainer from 'ui/SectionContainer';
-import type { PossibleColor } from 'shared/utils/colors';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 
 const LABELS: Record<keyof LabelCategories, { color: PossibleColor }> = {
   attribution: { color: 'primary' },

@@ -1,7 +1,10 @@
 import StarIcon from '@mui/icons-material/Star';
 import { Chip, Grid, LinearProgress, useTheme } from '@mui/material';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
+import useALContext from 'core/config/useALContext';
 import type { Service, ServiceConstants } from 'models/base/service';
+import type { Dispatch, SetStateAction } from 'react';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { showReset } from 'routes/admin-service-detail/components/service.utils.ts';
 import { CheckboxInput } from 'ui/inputs/CheckboxInput';
 import { ChipsInput } from 'ui/inputs/ChipsInput';
@@ -11,9 +14,6 @@ import { RadioInput } from 'ui/inputs/RadioInput';
 import { SelectInput } from 'ui/inputs/SelectInput';
 import { TextAreaInput } from 'ui/inputs/TextAreaInput';
 import { TextInput } from 'ui/inputs/TextInput';
-import type { Dispatch, SetStateAction } from 'react';
-import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 
 type ServiceGeneralProps = {
   service: Service;

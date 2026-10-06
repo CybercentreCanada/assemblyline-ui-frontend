@@ -14,10 +14,7 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
-import { Button } from 'deprecated/legacy/components/visual/Buttons/Button';
-import CustomChip, { COLOR_MAP } from 'ui/CustomChip';
-import { Tooltip } from 'deprecated/legacy/components/visual/Tooltip';
+import useALContext from 'core/config/useALContext';
 import type {
   ClassificationGroup,
   ClassificationLevel,
@@ -37,9 +34,12 @@ import {
   getParts,
   normalizedClassification
 } from 'features/classification/classification.utils';
-import type { PossibleColor } from 'shared/utils/colors';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import type { PossibleColor } from 'shared/utils/colors';
+import { Button } from 'ui/buttons/Button';
+import CustomChip, { COLOR_MAP } from 'ui/CustomChip';
+import { Tooltip } from 'ui/Tooltip';
 
 export interface ClassificationProps {
   c12n: string;

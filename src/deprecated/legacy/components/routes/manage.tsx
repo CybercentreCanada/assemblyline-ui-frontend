@@ -1,6 +1,6 @@
-import { useAppConfigs } from 'deprecated/legacy/commons/components/app/hooks';
-import PageCenter from 'deprecated/legacy/commons/components/pages/PageCenter';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
+import useALContext from 'core/config/useALContext';
+import { useAppConfigs } from 'core/template/components/app/hooks';
+import PageCenter from 'core/template/components/pages/PageCenter';
 import LinkGrid from 'deprecated/legacy/components/layout/linkgrid';
 import ForbiddenPage from 'routes/forbidden/forbidden';
 

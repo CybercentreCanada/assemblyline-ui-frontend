@@ -1,4 +1,4 @@
-import type { AppSwitcherItem } from 'deprecated/legacy/commons/components/app/AppConfigs';
+import type { AppSwitcherItem } from 'core/template/components/app/AppConfigs';
 import type { ServiceSelection } from 'models/base/submission';
 import type { ACL, Role, Type } from 'models/base/user';
 

@@ -1,11 +1,11 @@
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
+import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
-import type { WhoAmIProps } from 'deprecated/hooks/useALContext';
-import useQuota from 'deprecated/legacy/components/hooks/useQuota';
+import type { WhoAmIProps } from 'layout/auth/useALContext';
+import useQuota from 'layout/quota/useQuota';
 import type { Configuration } from 'models/base/config';
+import { useTranslation } from 'react-i18next';
 import { getFileName } from 'shared/utils/utils';
 import getXSRFCookie from 'shared/utils/xsrf';
-import { useTranslation } from 'react-i18next';
 
 const DEFAULT_RETRY_MS = 32;
 

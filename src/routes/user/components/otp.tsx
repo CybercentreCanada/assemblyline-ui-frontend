@@ -1,10 +1,10 @@
 import { Button, TextField, Typography, useTheme } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
-import { useEffectOnce } from 'deprecated/legacy/commons/components/utils/hooks/useEffectOnce';
+import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
-import TextDivider from 'ui/TextDivider';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import TextDivider from 'ui/TextDivider';
 
 type OTPProps = {
   setDrawerOpen: (value: boolean) => void;

@@ -1,15 +1,15 @@
 import type { UndefinedInitialDataOptions } from '@tanstack/react-query';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import type { APIQueryKey, APIResponse, BlobResponse } from 'core/api/api.models.ts';
-import { DEFAULT_RETRY_MS } from 'deprecated/legacy/components/core/Query/components/constants';
 import { getBlobResponse, isAPIData, stableStringify } from 'core/api/api.utils';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
+import { DEFAULT_RETRY_MS } from 'core/api/constants';
+import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
-import useQuota from 'deprecated/legacy/components/hooks/useQuota';
-import { getFileName } from 'shared/utils/utils';
-import getXSRFCookie from 'shared/utils/xsrf';
+import useQuota from 'layout/quota/useQuota';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { getFileName } from 'shared/utils/utils';
+import getXSRFCookie from 'shared/utils/xsrf';
 
 export type UseDownloadBlobProps = {
   queryProps?: Omit<

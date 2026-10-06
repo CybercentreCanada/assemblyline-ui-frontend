@@ -5,14 +5,14 @@ import {
   NumberBlueprint,
   StringBlueprint
 } from 'features/search-params/search-params.blueprints.tsx';
+import type { ParamRuntime } from 'features/search-params/search-params.runtimes.tsx';
+import { PARAM_RUNTIMES } from 'features/search-params/search-params.runtimes.tsx';
+import { SearchParamSnapshot } from 'features/search-params/search-params.snapshots.tsx';
 import type {
   ParamBlueprints,
   SearchParamRuntimes,
   SearchParamValues
-} from 'deprecated/legacy/components/core/SearchParams/lib/search_params.model.tsx';
-import type { ParamRuntime } from 'features/search-params/search-params.runtimes.tsx';
-import { PARAM_RUNTIMES } from 'features/search-params/search-params.runtimes.tsx';
-import { SearchParamSnapshot } from 'features/search-params/search-params.snapshots.tsx';
+} from 'features/SearchParams/lib/search_params.model';
 import type { Location } from 'react-router';
 
 export class SearchParamEngine<Blueprints extends Record<string, ParamBlueprints>> {

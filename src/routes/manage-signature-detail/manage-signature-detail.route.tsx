@@ -17,32 +17,32 @@ import {
   useTheme
 } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
-import { useAppTheme } from 'deprecated/legacy/commons/components/app/hooks';
-import PageCenter from 'deprecated/legacy/commons/components/pages/PageCenter';
-import { useEffectOnce } from 'deprecated/legacy/commons/components/utils/hooks/useEffectOnce';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
+import { useAppTheme } from 'core/template/components/app/hooks';
+import PageCenter from 'core/template/components/pages/PageCenter';
+import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
 import type { Signature } from 'models/base/signature';
 import type { Statistic } from 'models/base/statistic';
 import { DEFAULT_STATS } from 'models/base/statistic';
+import React, { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { TbUserX } from 'react-icons/tb';
+import { useNavigate, useParams } from 'react-router';
 import ForbiddenPage from 'routes/forbidden/forbidden';
-import { IconButton } from 'deprecated/legacy/components/visual/Buttons/IconButton';
+import ResultsTable from 'routes/search/components/results';
+import { suricataConfig, suricataDef } from 'shared/utils/suricata';
+import { safeFieldValue, safeFieldValueURI } from 'shared/utils/utils';
+import { yaraConfig, yaraDef } from 'shared/utils/yara';
+import { IconButton } from 'ui/buttons/IconButton';
 import Classification from 'ui/Classification';
 import ConfirmationDialog from 'ui/ConfirmationDialog';
 import Histogram from 'ui/Histogram';
 import { PageHeader } from 'ui/layouts/PageHeader';
 import Moment from 'ui/Moment';
-import { RouterPrompt } from 'deprecated/legacy/components/visual/RouterPrompt';
-import ResultsTable from 'routes/search/components/results';
+import { RouterPrompt } from 'ui/RouterPrompt';
 import SignatureStatus from 'ui/SignatureStatus';
-import { suricataConfig, suricataDef } from 'shared/utils/suricata';
-import { safeFieldValue, safeFieldValueURI } from 'shared/utils/utils';
-import { yaraConfig, yaraDef } from 'shared/utils/yara';
-import React, { useCallback, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { TbUserX } from 'react-icons/tb';
-import { useNavigate, useParams } from 'react-router';
 
 loader.config({ paths: { vs: '/cdn/monaco_0.35.0/vs' } });
 

@@ -7,7 +7,7 @@ import {
   NumberBlueprint,
   StringBlueprint
 } from 'features/search-params/search-params.blueprints.tsx';
-import type { ParamValues } from 'deprecated/legacy/components/core/SearchParams/lib/search_params.model.tsx';
+import type { ParamValues } from 'features/SearchParams/lib/search_params.model';
 
 /**
  * Factory that wraps a blueprint class and re-exposes its

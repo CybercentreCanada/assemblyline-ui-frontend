@@ -4,20 +4,20 @@ import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import type { TypographyProps } from '@mui/material';
 import { Grid, IconButton, MenuItem, Select, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
-import { useAppUser } from 'deprecated/legacy/commons/components/app/hooks';
-import PageFullWidth from 'deprecated/legacy/commons/components/pages/PageFullWidth';
-import { useEffectOnce } from 'deprecated/legacy/commons/components/utils/hooks/useEffectOnce';
+import { useAppUser } from 'core/template/components/app/hooks';
+import PageFullWidth from 'core/template/components/pages/PageFullWidth';
+import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
-import type { Service as ServiceData } from 'models/base/service';
 import type { ServiceStats as ServiceStatsData } from 'models/api/service';
 import type { CustomUser } from 'models/api/user';
-import LineGraph from 'ui/LineGraph';
-import { getVersionQuery } from 'shared/utils/utils';
+import type { Service as ServiceData } from 'models/base/service';
 import type { Dispatch, SetStateAction } from 'react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useLocation } from 'react-router';
 import { Link } from 'react-router-dom';
+import { getVersionQuery } from 'shared/utils/utils';
+import LineGraph from 'ui/LineGraph';
 
 // TODO: version doesn't seem to be set correctly
 type ServiceStats = ServiceStatsData & { version: string };

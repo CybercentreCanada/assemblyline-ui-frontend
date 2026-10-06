@@ -16,19 +16,26 @@ import {
   useTheme
 } from '@mui/material';
 import TableContainer from '@mui/material/TableContainer';
-import { useAppUser } from 'deprecated/legacy/commons/components/app/hooks';
-import PageFullSize from 'core/template/components/AppPageCenter';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
-import useDrawer from 'deprecated/legacy/components/hooks/useDrawer';
+import useALContext from 'core/config/useALContext';
+import PageFullSize from 'core/template/branding/AppPageCenter';
+import { useAppUser } from 'core/template/components/app/hooks';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
-import type { FileIndexed } from 'models/base/file';
-import type { Retrohunt, RetrohuntProgress } from 'models/base/retrohunt';
+import useDrawer from 'layout/drawer/useDrawer';
 import type { SearchResult } from 'models/api/search';
 import type { CustomUser, IndexDefinition } from 'models/api/user';
+import type { FileIndexed } from 'models/base/file';
+import type { Retrohunt, RetrohuntProgress } from 'models/base/retrohunt';
+import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useLocation, useNavigate, useParams } from 'react-router';
+import { Link } from 'react-router-dom';
+import FileDetail from 'routes/file-detail/file-detail.route';
 import ForbiddenPage from 'routes/forbidden/forbidden';
 import NotFoundPage from 'routes/missing-node/missing-node.route';
 import RetrohuntErrors from 'routes/retrohunt-detail/components/errors';
 import { RetrohuntRepeat } from 'routes/retrohunt-detail/components/repeat';
+import { safeFieldValue } from 'shared/utils/utils';
+import { io } from 'socket.io-client';
 import { ChipList } from 'ui/ChipList';
 import Classification from 'ui/Classification';
 import type { CustomChipProps } from 'ui/CustomChip';
@@ -42,7 +49,6 @@ import {
   LinkRow,
   SortableHeaderCell
 } from 'ui/DivTable';
-import FileDetail from 'routes/file-detail/file-detail.route';
 import InformativeAlert from 'ui/InformativeAlert';
 import { PageHeader } from 'ui/layouts/PageHeader';
 import LineGraph from 'ui/LineGraph';
@@ -54,12 +60,6 @@ import SearchCount from 'ui/SearchBar/SearchCount';
 import SimpleSearchQuery from 'ui/SearchBar/simple-search-query';
 import SteppedProgress from 'ui/SteppedProgress';
 import { TabContainer } from 'ui/TabContainer';
-import { safeFieldValue } from 'shared/utils/utils';
-import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate, useParams } from 'react-router';
-import { Link } from 'react-router-dom';
-import { io } from 'socket.io-client';
 
 const SkeletonCustomChip = memo(
   styled(Skeleton)(() => ({

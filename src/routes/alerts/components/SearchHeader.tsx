@@ -12,14 +12,14 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import PageContainer from 'core/template/components/AppPageContainer';
+import PageContainer from 'core/template/branding/AppPageContainer';
 import type { IndexDefinition } from 'models/api/user';
-import { ChipList } from 'ui/ChipList';
-import SearchTextField from 'ui/SearchBar/search-textfield';
-import SearchResultCount from 'ui/SearchResultCount';
 import type { ReactNode } from 'react';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { ChipList } from 'ui/ChipList';
+import SearchTextField from 'ui/SearchBar/search-textfield';
+import SearchResultCount from 'ui/SearchResultCount';
 
 const MAX_TRACKED_RECORDS = 10000;
 

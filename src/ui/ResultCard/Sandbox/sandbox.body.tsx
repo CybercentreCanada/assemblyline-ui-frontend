@@ -1,6 +1,8 @@
 import { useTheme } from '@mui/material';
-import useSafeResults from 'deprecated/legacy/components/hooks/useSafeResults';
+import useSafeResults from 'layout/safe-results/useSafeResults';
 import type { SandboxBody as SandboxData } from 'models/base/result_body';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { CustomChip } from 'ui/CustomChip';
 import { NetflowTable } from 'ui/ResultCard/Sandbox/components/NetflowTable';
 import { ProcessGraph } from 'ui/ResultCard/Sandbox/components/ProcessGraph';
@@ -14,8 +16,6 @@ import {
   type SandboxFilter
 } from 'ui/ResultCard/Sandbox/sandbox.utils.ts';
 import { TabContainer } from 'ui/TabContainer';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 
 type LabelProps = {
   label?: string;

@@ -11,23 +11,23 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
-import PageCenter from 'deprecated/legacy/commons/components/pages/PageCenter';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
+import PageCenter from 'core/template/components/pages/PageCenter';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
 import { type ApiKey } from 'models/base/user';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate, useParams } from 'react-router';
 import ForbiddenPage from 'routes/forbidden/forbidden';
 import { useAPIKeyUtilities } from 'routes/user/components/api_keys';
-import { IconButton } from 'deprecated/legacy/components/visual/Buttons/IconButton';
+import { IconButton } from 'ui/buttons/IconButton';
 import ConfirmationDialog from 'ui/ConfirmationDialog';
 import CustomChip from 'ui/CustomChip';
 import DatePicker from 'ui/DatePicker';
 import { PageHeader } from 'ui/layouts/PageHeader';
 import Moment from 'ui/Moment';
-import { RouterPrompt } from 'deprecated/legacy/components/visual/RouterPrompt';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router';
+import { RouterPrompt } from 'ui/RouterPrompt';
 
 type ParamProps = {
   id: string;

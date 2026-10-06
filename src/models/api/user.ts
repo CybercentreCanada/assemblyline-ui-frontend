@@ -1,9 +1,9 @@
-import type { AppUser } from 'deprecated/legacy/commons/components/app/AppUserService';
+import type { AppUser } from 'core/template/components/app/AppUserService';
+import type { ClassificationDefinition } from 'features/classification/classification.utils';
 import type { Configuration } from 'models/base/config';
 import type { Role, Type, User } from 'models/base/user';
 import type { UserSettings } from 'models/base/user_settings';
 import type { RequestBuilder } from 'models/utils/request';
-import type { ClassificationDefinition } from 'features/classification/classification.utils';
 
 /** Data Types based on the elastic definitions */
 export const FIELD_TYPES = [

@@ -1,12 +1,12 @@
-import { useAppUser } from 'deprecated/legacy/commons/components/app/hooks';
 import { useAPIQuery } from 'core/api/hooks/useApiQuery';
-import type { Alert } from 'models/base/alert';
+import { useAppUser } from 'core/template/components/app/hooks';
 import type { SearchResult } from 'models/api/search';
 import type { CustomUser } from 'models/api/user';
-import Histogram from 'ui/Histogram';
-import AlertsTable from 'routes/search/components/alerts';
+import type { Alert } from 'models/base/alert';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import AlertsTable from 'routes/search/components/alerts';
+import Histogram from 'ui/Histogram';
 
 type AlertHistogramProps = {
   id: string;

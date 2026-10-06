@@ -1,4 +1,4 @@
-import { useEffectOnce } from 'deprecated/legacy/commons/components/utils/hooks/useEffectOnce';
+import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
 import React, { useCallback, useRef, useState } from 'react';
 
 export const useTrottledReducer = <State, Action>(

@@ -1,14 +1,14 @@
 import { HIDE_EVENT_ID } from '@cccsaurora/clue-ui/data/event';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
-import useHighlighter from 'deprecated/legacy/components/hooks/useHighlighter';
-import useSafeResults from 'deprecated/legacy/components/hooks/useSafeResults';
+import useALContext from 'core/config/useALContext';
+import useHighlighter from 'layout/highlighter/useHighlighter';
+import useSafeResults from 'layout/safe-results/useSafeResults';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import type { PossibleColor } from 'shared/utils/colors';
 import type { ActionMenuProps } from 'ui/ActionMenu';
 import ActionMenu from 'ui/ActionMenu';
 import CustomChip from 'ui/CustomChip';
 import EnrichmentCustomChip, { CLUE_TYPE_MAP } from 'ui/EnrichmentCustomChip';
 import ExternalLinks from 'ui/ExternalSearch';
-import type { PossibleColor } from 'shared/utils/colors';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 const STYLE = { height: 'auto', minHeight: '22px' };
 const initialMenuState = {

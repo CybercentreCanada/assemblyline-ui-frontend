@@ -11,23 +11,23 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
-import { useAppUser } from 'deprecated/legacy/commons/components/app/hooks';
-import PageFullSize from 'core/template/components/AppPageCenter';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
-import useDrawer from 'deprecated/legacy/components/hooks/useDrawer';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
-import type { Retrohunt, RetrohuntIndex } from 'models/base/retrohunt';
+import PageFullSize from 'core/template/branding/AppPageCenter';
+import { useAppUser } from 'core/template/components/app/hooks';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useDrawer from 'layout/drawer/useDrawer';
 import type { CustomUser } from 'models/api/user';
+import type { Retrohunt, RetrohuntIndex } from 'models/base/retrohunt';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useLocation } from 'react-router';
 import ForbiddenPage from 'routes/forbidden/forbidden';
 import Classification from 'ui/Classification';
 import ConfirmationDialog from 'ui/ConfirmationDialog';
 import { PageHeader } from 'ui/layouts/PageHeader';
 import { MonacoEditor } from 'ui/MonacoEditor';
-import { RouterPrompt } from 'deprecated/legacy/components/visual/RouterPrompt';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useLocation } from 'react-router';
+import { RouterPrompt } from 'ui/RouterPrompt';
 
 type RetrohuntData = Pick<
   Retrohunt,

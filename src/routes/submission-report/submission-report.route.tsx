@@ -6,13 +6,17 @@ import ListAltOutlinedIcon from '@mui/icons-material/ListAltOutlined';
 import PrintOutlinedIcon from '@mui/icons-material/PrintOutlined';
 import type { TooltipProps } from '@mui/material';
 import { Box, Grid, IconButton, Skeleton, styled, Tooltip, Typography, useTheme } from '@mui/material';
-import PageCenter from 'deprecated/legacy/commons/components/pages/PageCenter';
-import { useEffectOnce } from 'deprecated/legacy/commons/components/utils/hooks/useEffectOnce';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
-import useAssistant from 'deprecated/legacy/components/hooks/useAssistant';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
+import PageCenter from 'core/template/components/pages/PageCenter';
+import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useAssistant from 'layout/assistant/useAssistant';
 import type { SubmissionReport } from 'models/api/submission_report';
+import { memo, useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate, useParams } from 'react-router';
+import { Link } from 'react-router-dom';
 import ForbiddenPage from 'routes/forbidden/forbidden';
 import AISummarySection from 'routes/submission-detail/components/ai_summary';
 import Attack from 'routes/submission-report/components/attack';
@@ -22,12 +26,8 @@ import GeneralInformation from 'routes/submission-report/components/general_info
 import Heuristics from 'routes/submission-report/components/heuristics';
 import Metadata from 'routes/submission-report/components/metadata';
 import Tags from 'routes/submission-report/components/tags';
-import Classification from 'ui/Classification';
 import { filterObject } from 'shared/utils/utils';
-import { memo, useCallback, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router';
-import { Link } from 'react-router-dom';
+import Classification from 'ui/Classification';
 
 type ParamProps = {
   id: string;

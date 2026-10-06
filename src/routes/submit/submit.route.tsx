@@ -1,14 +1,13 @@
 import { Alert, Collapse, styled, useMediaQuery, useTheme } from '@mui/material';
-import { useAppBanner } from 'deprecated/legacy/commons/components/app/hooks';
-import PageCenter from 'deprecated/legacy/commons/components/pages/PageCenter';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
+import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
+import { useAppBanner } from 'core/template/components/app/hooks';
+import PageCenter from 'core/template/components/pages/PageCenter';
 import type { Metadata } from 'models/base/submission';
-import {
-  initializeSettings,
-  loadDefaultProfile,
-  loadSubmissionProfile
-} from 'routes/settings/settings.utils.ts';
+import React, { useCallback, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useLocation } from 'react-router';
+import { initializeSettings, loadDefaultProfile, loadSubmissionProfile } from 'routes/settings/settings.utils.ts';
 import { ServiceParameters } from 'routes/submit/components/ServiceParameters';
 import { SubmissionData } from 'routes/submit/components/SubmissionData';
 import {
@@ -39,12 +38,9 @@ import {
   switchProfile,
   useAutoURLServicesSelection
 } from 'routes/submit/submit.utils.ts';
-import { TabContainer } from 'ui/TabContainer';
 import { getSubmitType } from 'shared/utils/utils';
 import generateUUID from 'shared/utils/uuid';
-import React, { useCallback, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useLocation } from 'react-router';
+import { TabContainer } from 'ui/TabContainer';
 
 type AdjustProps = { adjust: boolean };
 

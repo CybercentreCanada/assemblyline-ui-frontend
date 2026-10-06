@@ -25,26 +25,29 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import { useAppUser } from 'deprecated/legacy/commons/components/app/hooks';
-import PageFullSize from 'core/template/components/AppPageCenter';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
-import useAssistant from 'deprecated/legacy/components/hooks/useAssistant';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
+import PageFullSize from 'core/template/branding/AppPageCenter';
+import { useAppUser } from 'core/template/components/app/hooks';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useAssistant from 'layout/assistant/useAssistant';
+import type { CustomUser } from 'models/api/user';
 import type { File } from 'models/base/file';
 import type { Submission } from 'models/base/submission';
-import type { CustomUser } from 'models/api/user';
-import ForbiddenPage from 'routes/forbidden/forbidden';
-import { FileDownloader } from 'ui/buttons/FileDownloader';
-import { IconButton } from 'deprecated/legacy/components/visual/Buttons/IconButton';
-import { ASCIISection, HexSection, ImageSection, StringsSection } from 'deprecated/legacy/components/visual/FileViewer';
-import CodeSection from 'routes/file-viewer/components/code_summary';
-import SelectionProvider, { useSelection } from 'routes/file-viewer/file-viewer.providers';
-import { TabContainer } from 'ui/TabContainer';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router';
 import { Link } from 'react-router-dom';
+import { ASCIISection } from 'routes/file-viewer/components/ascii';
+import CodeSection from 'routes/file-viewer/components/code_summary';
+import { HexSection } from 'routes/file-viewer/components/hex';
+import { ImageSection } from 'routes/file-viewer/components/image';
+import { StringsSection } from 'routes/file-viewer/components/strings';
+import SelectionProvider, { useSelection } from 'routes/file-viewer/file-viewer.providers';
+import ForbiddenPage from 'routes/forbidden/forbidden';
+import { FileDownloader } from 'ui/buttons/FileDownloader';
+import { IconButton } from 'ui/buttons/IconButton';
+import { TabContainer } from 'ui/TabContainer';
 
 loader.config({ paths: { vs: '/cdn/monaco_0.35.0/vs' } });
 

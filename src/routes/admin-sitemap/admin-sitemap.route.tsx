@@ -13,19 +13,19 @@ import {
   TableRow,
   useTheme
 } from '@mui/material';
-import { useAppUser } from 'deprecated/legacy/commons/components/app/hooks';
-import PageFullWidth from 'deprecated/legacy/commons/components/pages/PageFullWidth';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
+import useALContext from 'core/config/useALContext';
+import { useAppUser } from 'core/template/components/app/hooks';
+import PageFullWidth from 'core/template/components/pages/PageFullWidth';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
-import type { Role } from 'models/base/user';
 import type { SiteMapResponse } from 'models/api';
 import type { CustomUser } from 'models/api/user';
-import CustomChip from 'ui/CustomChip';
-import { PageHeader } from 'ui/layouts/PageHeader';
-import type { PossibleColor } from 'shared/utils/colors';
+import type { Role } from 'models/base/user';
 import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate } from 'react-router';
+import type { PossibleColor } from 'shared/utils/colors';
+import CustomChip from 'ui/CustomChip';
+import { PageHeader } from 'ui/layouts/PageHeader';
 
 const StyledTableCell = memo(
   styled(TableCell)(({ theme }) => ({

@@ -1,23 +1,20 @@
 import { AlertTitle, useMediaQuery, useTheme } from '@mui/material';
-import PageCenter from 'deprecated/legacy/commons/components/pages/PageCenter';
-import PageFullSize from 'core/template/components/AppPageCenter';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
-import useAssistant from 'deprecated/legacy/components/hooks/useAssistant';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
-import type { Section } from 'models/base/result';
+import PageFullSize from 'core/template/branding/AppPageCenter';
+import PageCenter from 'core/template/components/pages/PageCenter';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useAssistant from 'layout/assistant/useAssistant';
 import type { File } from 'models/api/file';
-import ForbiddenPage from 'routes/forbidden/forbidden';
-import NotFoundPage from 'routes/missing-node/missing-node.route';
-import AISummarySection from 'routes/submission-detail/components/ai_summary';
-import {
-  ArchiveBanner,
-  ArchivedTagSection,
-  CommentSection,
-  LabelSection,
-  SimilarSection
-} from 'deprecated/legacy/components/visual/ArchiveDetail';
-import Classification from 'ui/Classification';
+import type { Section } from 'models/base/result';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Navigate, useLocation, useNavigate, useParams } from 'react-router';
+import { ArchiveBanner } from 'routes/archive-detail/components/banner';
+import { CommentSection } from 'routes/archive-detail/components/comments';
+import { LabelSection } from 'routes/archive-detail/components/labels';
+import { SimilarSection } from 'routes/archive-detail/components/similar';
+import { ArchivedTagSection } from 'routes/archive-detail/components/tags';
 import AttackSection from 'routes/file-detail/components/attacks';
 import ChildrenSection from 'routes/file-detail/components/childrens';
 import Detection from 'routes/file-detail/components/detection';
@@ -29,14 +26,18 @@ import MetadataSection from 'routes/file-detail/components/metadata';
 import ParentSection from 'routes/file-detail/components/parents';
 import ResultSection from 'routes/file-detail/components/results';
 import URIIdentificationSection from 'routes/file-detail/components/uriIdent';
-import { ASCIISection, HexSection, ImageSection, StringsSection } from 'deprecated/legacy/components/visual/FileViewer';
+import { ASCIISection } from 'routes/file-viewer/components/ascii';
 import CodeSection from 'routes/file-viewer/components/code_summary';
+import { HexSection } from 'routes/file-viewer/components/hex';
+import { ImageSection } from 'routes/file-viewer/components/image';
+import { StringsSection } from 'routes/file-viewer/components/strings';
+import ForbiddenPage from 'routes/forbidden/forbidden';
+import NotFoundPage from 'routes/missing-node/missing-node.route';
+import AISummarySection from 'routes/submission-detail/components/ai_summary';
+import Classification from 'ui/Classification';
 import InformativeAlert from 'ui/InformativeAlert';
 import { emptyResult } from 'ui/ResultCard';
 import { TabContainer } from 'ui/TabContainer';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Navigate, useLocation, useNavigate, useParams } from 'react-router';
 
 type Params = {
   id?: string;

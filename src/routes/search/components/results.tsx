@@ -2,9 +2,13 @@ import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
 import { AlertTitle, Skeleton, Tooltip, useTheme } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
-import type { ResultIndexed } from 'models/base/result';
+import useALContext from 'core/config/useALContext';
 import type { SearchResult } from 'models/api/search';
+import type { ResultIndexed } from 'models/base/result';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { useLocation } from 'react-router';
+import { Link } from 'react-router-dom';
 import Classification from 'ui/Classification';
 import {
   DivTable,
@@ -18,10 +22,6 @@ import {
 import InformativeAlert from 'ui/InformativeAlert';
 import Moment from 'ui/Moment';
 import Verdict from 'ui/Verdict';
-import React from 'react';
-import { useTranslation } from 'react-i18next';
-import { useLocation } from 'react-router';
-import { Link } from 'react-router-dom';
 
 type Props = {
   resultResults: SearchResult<ResultIndexed>;

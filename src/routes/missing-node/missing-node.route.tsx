@@ -1,7 +1,7 @@
 import LinkOffIcon from '@mui/icons-material/LinkOff';
 import { useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
-import PageCenter from 'deprecated/legacy/commons/components/pages/PageCenter';
+import PageCenter from 'core/template/components/pages/PageCenter';
 import { useTranslation } from 'react-i18next';
 
 const NotFoundPage = () => {

@@ -2,9 +2,11 @@ import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import SettingsEthernetIcon from '@mui/icons-material/SettingsEthernet';
 import { Grid, Typography, useTheme } from '@mui/material';
 import Badge from '@mui/material/Badge';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
+import useALContext from 'core/config/useALContext';
 import type { EnvironmentVariable, UpdateSource, UpdateSourceCommon } from 'models/base/service';
 import { FETCH_METHODS } from 'models/base/service';
+import React, { useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { showReset } from 'routes/admin-service-detail/components/service.utils.ts';
 import { CheckboxInput } from 'ui/inputs/CheckboxInput';
 import { ClassificationInput } from 'ui/inputs/ClassificationInput';
@@ -16,8 +18,6 @@ import { TextAreaInput } from 'ui/inputs/TextAreaInput';
 import { TextInput } from 'ui/inputs/TextInput';
 import Moment from 'ui/Moment';
 import { TabContainer } from 'ui/TabContainer';
-import React, { useCallback, useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
 
 type Props = {
   source: UpdateSource;

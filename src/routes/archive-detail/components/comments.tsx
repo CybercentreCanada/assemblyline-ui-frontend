@@ -15,16 +15,16 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
 import type { Author, Comment } from 'models/base/file';
 import { DEFAULT_COMMENT } from 'models/base/file';
-import CommentCard from 'ui/CommentCard';
-import SectionContainer from 'ui/SectionContainer';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { io } from 'socket.io-client';
+import CommentCard from 'ui/CommentCard';
+import SectionContainer from 'ui/SectionContainer';
 
 type Confirmation = {
   open: boolean;

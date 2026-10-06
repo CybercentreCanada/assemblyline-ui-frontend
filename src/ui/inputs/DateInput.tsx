@@ -5,7 +5,11 @@ import { DigitalClock, LocalizationProvider, DateTimePicker as MuiDateTimePicker
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
 import { PropProvider, usePropStore } from 'features/prop-provider/prop-provider.providers';
-import { IconButton } from 'deprecated/legacy/components/visual/Buttons/IconButton';
+import type { Moment } from 'moment';
+import moment from 'moment';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { IconButton } from 'ui/buttons/IconButton';
 import {
   HelpInputAdornment,
   InputEndAdornment,
@@ -31,10 +35,6 @@ import type {
   InputValueModel
 } from 'ui/inputs/models/inputs.model.ts';
 import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'ui/inputs/models/inputs.model.ts';
-import type { Moment } from 'moment';
-import moment from 'moment';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 
 // This function updates the week start for the specified locale
 function configureMomentLocale(language: string) {

@@ -24,22 +24,22 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
-import type { LabelCategories } from 'models/base/file';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
 import type { File } from 'models/api/file';
-import { FileDownloader } from 'ui/buttons/FileDownloader';
-import Classification from 'ui/Classification';
-import CustomChip from 'ui/CustomChip';
-import InputDialog from 'ui/InputDialog';
-import Moment from 'ui/Moment';
-import { bytesToSize } from 'shared/utils/utils';
+import type { LabelCategories } from 'models/base/file';
 import type { CSSProperties } from 'react';
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 import { Link } from 'react-router-dom';
+import { bytesToSize } from 'shared/utils/utils';
+import { FileDownloader } from 'ui/buttons/FileDownloader';
+import Classification from 'ui/Classification';
+import CustomChip from 'ui/CustomChip';
+import InputDialog from 'ui/InputDialog';
+import Moment from 'ui/Moment';
 
 const VERDICTS = {
   malicious: { className: 'malicious' },

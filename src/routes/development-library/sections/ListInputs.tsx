@@ -1,4 +1,5 @@
 import { Grid, Typography, useTheme } from '@mui/material';
+import React from 'react';
 import { DemoContainer } from 'routes/development-library/components/DemoContainer';
 import { DemoSection } from 'routes/development-library/components/DemoSection';
 import { useForm } from 'routes/development-library/contexts/form';
@@ -8,13 +9,10 @@ import {
   SELECT_OPTIONS,
   TEXTFIELD_OPTIONS
 } from 'routes/development-library/sections/Inputs';
-import { Button } from 'deprecated/legacy/components/visual/Buttons/Button';
+import { Button } from 'ui/buttons/Button';
 import { CheckboxInput } from 'ui/inputs/CheckboxInput';
 import { RadioInput } from 'ui/inputs/RadioInput';
 import type { CoercersSchema, ValidationSchema } from 'ui/inputs/utils/inputs.util.validation.tsx';
-import { List } from 'ui/list/List';
-import type { ListHeaderProps } from 'ui/list/ListHeader';
-import { ListHeader } from 'ui/list/ListHeader';
 import { BooleanListInput } from 'ui/list-inputs/BooleanListInput';
 import { ClassificationListInput } from 'ui/list-inputs/ClassificationListInput';
 import type { ListInputOptions } from 'ui/list-inputs/lib/listinputs.model.ts';
@@ -22,8 +20,10 @@ import { NumberListInput } from 'ui/list-inputs/NumberListInput';
 import type { SelectListInputProps } from 'ui/list-inputs/SelectListInput';
 import { SelectListInput } from 'ui/list-inputs/SelectListInput';
 import { TextListInput } from 'ui/list-inputs/TextListInput';
+import { List } from 'ui/list/List';
+import type { ListHeaderProps } from 'ui/list/ListHeader';
+import { ListHeader } from 'ui/list/ListHeader';
 import MonacoEditor from 'ui/MonacoEditor';
-import React from 'react';
 
 export type ListInputsLibraryState = {
   list_inputs: {

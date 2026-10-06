@@ -1,15 +1,15 @@
 /* eslint-disable @typescript-eslint/prefer-for-of */
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
+import useALContext from 'core/config/useALContext';
+import type { CustomUser } from 'models/api/user';
 import type { Configuration, Submission } from 'models/base/config';
 import type { ServiceSpecification } from 'models/base/service';
 import type { UserSettings } from 'models/base/user_settings';
-import type { CustomUser } from 'models/api/user';
+import { useCallback, useRef } from 'react';
 import type { InterfaceKey, ProfileKey, ProfileSettings } from 'routes/settings/settings.utils.ts';
 import { getValidValue, INTERFACE_KEYS, PROFILE_KEYS } from 'routes/settings/settings.utils.ts';
 import type { AutoURLServiceIndices, SubmitStore } from 'routes/submit/submit.form.ts';
 import { useForm } from 'routes/submit/submit.form.ts';
 import { isURL } from 'shared/utils/utils';
-import { useCallback, useRef } from 'react';
 
 /**
  * @param settings - User settings.

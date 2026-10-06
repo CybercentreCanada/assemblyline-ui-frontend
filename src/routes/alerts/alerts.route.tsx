@@ -1,15 +1,25 @@
 import AddIcon from '@mui/icons-material/Add';
 import { AlertTitle, useMediaQuery, useTheme } from '@mui/material';
+import useALContext from 'core/config/useALContext';
+import { useAppUser } from 'core/template/components/app/hooks';
+import PageFullWidth from 'core/template/components/pages/PageFullWidth';
 import SimpleList from 'deprecated/components/lists/simplelist/SimpleList';
-import { useAppUser } from 'deprecated/legacy/commons/components/app/hooks';
-import PageFullWidth from 'deprecated/legacy/commons/components/pages/PageFullWidth';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
-import useDrawer from 'deprecated/legacy/components/hooks/useDrawer';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
+import {
+  SearchParamsProvider,
+  useSearchParams
+} from 'deprecated/legacy/components/routes/alerts/contexts/SearchParamsContext';
+import type { SearchParams } from 'deprecated/legacy/components/routes/alerts/utils/SearchParams';
+import type { SearchResult } from 'deprecated/legacy/components/routes/alerts/utils/SearchParser';
+import useDrawer from 'layout/drawer/useDrawer';
+import type { CustomUser, IndexDefinition } from 'models/api/user';
 import type { Alert, AlertIndexed, AlertItem } from 'models/base/alert';
 import type { Workflow } from 'models/base/workflow';
-import type { CustomUser, IndexDefinition } from 'models/api/user';
-import ForbiddenPage from 'routes/forbidden/forbidden';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { BiNetworkChart } from 'react-icons/bi';
+import { useLocation, useNavigate } from 'react-router';
+import AlertDetail from 'routes/alert-detail/alert-detail.route';
 import AlertActions from 'routes/alerts/components/Actions';
 import AlertDefaultSearchParameters from 'routes/alerts/components/DefaultSearchParameters';
 import AlertFavorites from 'routes/alerts/components/Favorites';
@@ -19,19 +29,12 @@ import { AlertSearchResults } from 'routes/alerts/components/Results';
 import SearchHeader from 'routes/alerts/components/SearchHeader';
 import AlertWorkflows from 'routes/alerts/components/Workflows';
 import { AlertsProvider } from 'routes/alerts/contexts/AlertsContext';
-import { SearchParamsProvider, useSearchParams } from 'deprecated/legacy/components/routes/alerts/contexts/SearchParamsContext';
-import AlertDetail from 'routes/alert-detail/alert-detail.route';
-import type { SearchParams } from 'deprecated/legacy/components/routes/alerts/utils/SearchParams';
-import type { SearchResult } from 'deprecated/legacy/components/routes/alerts/utils/SearchParser';
+import ForbiddenPage from 'routes/forbidden/forbidden';
 import { WorkflowCreate } from 'routes/manage-workflow-create/manage-workflow-create.route';
-import { IconButton } from 'deprecated/legacy/components/visual/Buttons/IconButton';
+import { IconButton } from 'ui/buttons/IconButton';
 import InformativeAlert from 'ui/InformativeAlert';
 import { PageHeader } from 'ui/layouts/PageHeader';
 import { DEFAULT_SUGGESTION } from 'ui/SearchBar/search-textfield';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { BiNetworkChart } from 'react-icons/bi';
-import { useLocation, useNavigate } from 'react-router';
 
 type ListResponse = {
   items: AlertIndexed[];

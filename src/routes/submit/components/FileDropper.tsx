@@ -1,12 +1,12 @@
 import BlockIcon from '@mui/icons-material/Block';
 import { styled } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
-import { ByteNumber } from 'ui/ByteNumber';
+import useALContext from 'core/config/useALContext';
 import { memo, useCallback, useMemo } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useTranslation } from 'react-i18next';
 import { AiOutlineSecurityScan } from 'react-icons/ai';
+import { ByteNumber } from 'ui/ByteNumber';
 
 type DropZoneProps = {
   enter?: boolean;

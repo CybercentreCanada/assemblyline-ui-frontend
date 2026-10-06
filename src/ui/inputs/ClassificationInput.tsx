@@ -12,10 +12,23 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
+import useALContext from 'core/config/useALContext';
+import type { ClassificationParts, ClassificationValidator } from 'features/classification/classification.utils';
+import {
+  applyAliases,
+  applyClassificationRules,
+  defaultClassificationValidator,
+  defaultParts,
+  getLevelText,
+  getParts,
+  normalizedClassification
+} from 'features/classification/classification.utils';
 import { PropProvider, usePropStore } from 'features/prop-provider/prop-provider.providers';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
 import type { WhoAmI } from 'models/api/user';
-import { Button } from 'deprecated/legacy/components/visual/Buttons/Button';
+import { useCallback, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import type { PossibleColor } from 'shared/utils/colors';
+import { Button } from 'ui/buttons/Button';
 import type { ClassificationProps } from 'ui/Classification';
 import CustomChip, { COLOR_MAP } from 'ui/CustomChip';
 import {
@@ -40,20 +53,7 @@ import type {
   InputValueModel
 } from 'ui/inputs/models/inputs.model.ts';
 import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'ui/inputs/models/inputs.model.ts';
-import { Tooltip } from 'deprecated/legacy/components/visual/Tooltip';
-import type { ClassificationParts, ClassificationValidator } from 'features/classification/classification.utils';
-import {
-  applyAliases,
-  applyClassificationRules,
-  defaultClassificationValidator,
-  defaultParts,
-  getLevelText,
-  getParts,
-  normalizedClassification
-} from 'features/classification/classification.utils';
-import type { PossibleColor } from 'shared/utils/colors';
-import { useCallback, useEffect, useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
+import { Tooltip } from 'ui/Tooltip';
 
 export type ClassificationInputProps = Omit<ClassificationProps, 'c12n' | 'setClassification'> &
   InputValueModel<ClassificationProps['c12n']> &

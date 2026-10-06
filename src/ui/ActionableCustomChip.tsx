@@ -1,12 +1,12 @@
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
-import useExternalLookup from 'deprecated/legacy/components/hooks/useExternalLookup';
+import useALContext from 'core/config/useALContext';
+import useExternalLookup from 'layout/external-lookup/useExternalLookup';
 import type { ExternalLinkType } from 'models/base/config';
+import React, { useCallback, useState } from 'react';
 import ActionMenu from 'ui/ActionMenu';
 import type { CustomChipProps } from 'ui/CustomChip';
 import CustomChip from 'ui/CustomChip';
 import EnrichmentCustomChip, { CLUE_TYPE_MAP } from 'ui/EnrichmentCustomChip';
 import ExternalLinks from 'ui/ExternalSearch';
-import React, { useCallback, useState } from 'react';
 
 export type ActionableCustomChipProps = CustomChipProps & {
   category?: ExternalLinkType;

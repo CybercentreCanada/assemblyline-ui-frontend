@@ -22,18 +22,18 @@ import {
   useTheme
 } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
-import useClipboard from 'deprecated/hooks/useClipboard';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
+import useClipboard from 'deprecated/hooks/useClipboard';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
 import type { ACL, ApiKey, Role } from 'models/base/user';
 import { PRIV_TO_ACL_MAP } from 'models/base/user';
-import CustomChip from 'ui/CustomChip';
-import DatePicker from 'ui/DatePicker';
-import Moment from 'ui/Moment';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BsClipboard } from 'react-icons/bs';
+import CustomChip from 'ui/CustomChip';
+import DatePicker from 'ui/DatePicker';
+import Moment from 'ui/Moment';
 
 /**
  * @name useAPIKeyUtilities

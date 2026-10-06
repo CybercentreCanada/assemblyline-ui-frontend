@@ -2,29 +2,25 @@ import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOu
 import EventBusyOutlinedIcon from '@mui/icons-material/EventBusyOutlined';
 import EventOutlinedIcon from '@mui/icons-material/EventOutlined';
 import { Grid, IconButton, Tooltip, useTheme } from '@mui/material';
-import { useAppUser } from 'deprecated/legacy/commons/components/app/hooks';
-import PageContainer from 'core/template/components/AppPageContainer';
-import PageFullWidth from 'deprecated/legacy/commons/components/pages/PageFullWidth';
-import {
-  createSearchParams,
-  SearchParamsProvider,
-  useSearchParams
-} from 'deprecated/legacy/components/core/SearchParams/createSearchParams';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
-import useDrawer from 'deprecated/legacy/components/hooks/useDrawer';
+import useALContext from 'core/config/useALContext';
+import PageContainer from 'core/template/branding/AppPageContainer';
+import { useAppUser } from 'core/template/components/app/hooks';
+import PageFullWidth from 'core/template/components/pages/PageFullWidth';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
-import type { WorkflowIndexed } from 'models/base/workflow';
+import { createSearchParams, SearchParamsProvider, useSearchParams } from 'features/SearchParams/createSearchParams';
+import useDrawer from 'layout/drawer/useDrawer';
 import type { CustomUser, IndexDefinition } from 'models/api/user';
-import ForbiddenPage from 'routes/forbidden/forbidden';
-import WorkflowCreate from 'routes/manage-workflow-create/manage-workflow-create.route';
-import WorkflowDetail from 'routes/manage-workflow-detail/manage-workflow-detail.route';
-import { PageHeader } from 'ui/layouts/PageHeader';
-import SearchHeader from 'ui/SearchBar/SearchHeader';
-import { DEFAULT_SUGGESTION } from 'ui/SearchBar/search-textfield';
-import WorkflowTable from 'routes/search/components/workflow';
+import type { WorkflowIndexed } from 'models/base/workflow';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
+import ForbiddenPage from 'routes/forbidden/forbidden';
+import WorkflowCreate from 'routes/manage-workflow-create/manage-workflow-create.route';
+import WorkflowDetail from 'routes/manage-workflow-detail/manage-workflow-detail.route';
+import WorkflowTable from 'routes/search/components/workflow';
+import { PageHeader } from 'ui/layouts/PageHeader';
+import { DEFAULT_SUGGESTION } from 'ui/SearchBar/search-textfield';
+import SearchHeader from 'ui/SearchBar/SearchHeader';
 
 type SearchResults = {
   items: WorkflowIndexed[];

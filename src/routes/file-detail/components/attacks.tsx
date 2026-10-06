@@ -1,10 +1,10 @@
 import { Grid, Skeleton } from '@mui/material';
-import useHighlighter from 'deprecated/legacy/components/hooks/useHighlighter';
+import useHighlighter from 'layout/highlighter/useHighlighter';
 import type { AttackMatrix } from 'models/api/file';
-import Attack from 'ui/Attack';
-import SectionContainer from 'ui/SectionContainer';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import Attack from 'ui/Attack';
+import SectionContainer from 'ui/SectionContainer';
 
 type AttackSectionProps = {
   attacks: AttackMatrix;

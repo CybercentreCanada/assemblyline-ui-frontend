@@ -1,12 +1,12 @@
 import { Alert, LinearProgress, styled } from '@mui/material';
-import { useAppUser } from 'deprecated/legacy/commons/components/app/hooks';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
+import { useAppUser } from 'core/template/components/app/hooks';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
 import type { CustomUser } from 'models/api/user';
-import ForbiddenPage from 'routes/forbidden/forbidden';
-import { HexViewerApp } from 'ui/HexViewer';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import ForbiddenPage from 'routes/forbidden/forbidden';
+import { HexViewerApp } from 'ui/HexViewer';
 
 const Wrapper = styled('div')(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#FAFAFA',

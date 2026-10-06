@@ -33,21 +33,21 @@ import {
 } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
 import { blue } from '@mui/material/colors';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
+import NotificationItem from 'layout/notifications/NotificationItem';
+import type { JSONFeedItem } from 'layout/notifications/useNotificationFeed';
+import { useNotificationFeed } from 'layout/notifications/useNotificationFeed';
+import type { SystemMessage } from 'models/api/user';
 import type { Configuration } from 'models/base/config';
 import type { ServiceIndexed } from 'models/base/service';
-import type { SystemMessage } from 'models/api/user';
-import ConfirmationDialog from 'ui/ConfirmationDialog';
-import NotificationItem from 'deprecated/legacy/components/visual/Notification/NotificationItem';
-import type { JSONFeedItem } from 'deprecated/legacy/components/visual/Notification/useNotificationFeed';
-import { useNotificationFeed } from 'deprecated/legacy/components/visual/Notification/useNotificationFeed';
-import type { PossibleColor } from 'shared/utils/colors';
 import 'moment-timezone';
 import type { ComponentProps, ComponentType, CSSProperties, ElementType } from 'react';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import type { PossibleColor } from 'shared/utils/colors';
+import ConfirmationDialog from 'ui/ConfirmationDialog';
 
 const Row = styled('div')(() => ({
   width: '100%',

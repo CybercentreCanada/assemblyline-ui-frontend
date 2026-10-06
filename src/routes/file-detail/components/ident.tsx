@@ -1,16 +1,16 @@
 import { Grid, Skeleton, Typography, useMediaQuery, useTheme } from '@mui/material';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
+import useALContext from 'core/config/useALContext';
 import type { File as FileInfo } from 'models/base/file';
 import type { Section } from 'models/base/result';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { bytesToSize } from 'shared/utils/utils';
 import ActionableText from 'ui/ActionableText';
 import Classification from 'ui/Classification';
 import Moment from 'ui/Moment';
 import { GraphBody } from 'ui/ResultCard/graph_body';
 import SectionContainer from 'ui/SectionContainer';
 import { ImageInlineBody } from 'ui/image_inline';
-import { bytesToSize } from 'shared/utils/utils';
-import React from 'react';
-import { useTranslation } from 'react-i18next';
 
 type IdentificationSectionProps = {
   fileinfo: FileInfo;

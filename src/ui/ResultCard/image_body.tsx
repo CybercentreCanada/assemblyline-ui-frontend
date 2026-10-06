@@ -1,8 +1,8 @@
 import { Box, useTheme } from '@mui/material';
-import useCarousel from 'deprecated/legacy/components/hooks/useCarousel';
+import useCarousel from 'layout/carousel/useCarousel';
 import type { Image, ImageBody as ImageData } from 'models/base/result_body';
-import { ImageItem } from 'ui/image_inline';
 import { default as React, useEffect, useState } from 'react';
+import { ImageItem } from 'ui/image_inline';
 
 type Props = {
   body: ImageData;

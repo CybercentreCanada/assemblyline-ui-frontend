@@ -1,9 +1,9 @@
+import useALContext from 'core/config/useALContext';
 import { useTableOfContent } from 'features/table-of-content/table-of-content.providers';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
-import { useForm } from 'routes/settings/settings.form.ts';
-import { PageNavigation, PageNavigationItem } from 'ui/layouts/PageNavigation';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useForm } from 'routes/settings/settings.form.ts';
+import { PageNavigation, PageNavigationItem } from 'ui/layouts/PageNavigation';
 
 export const RightNav = React.memo(() => {
   const { t } = useTranslation(['settings']);

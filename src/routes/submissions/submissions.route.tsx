@@ -3,24 +3,20 @@ import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
 import PersonIcon from '@mui/icons-material/Person';
 import { useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
-import PageContainer from 'core/template/components/AppPageContainer';
-import PageFullWidth from 'deprecated/legacy/commons/components/pages/PageFullWidth';
-import {
-  createSearchParams,
-  SearchParamsProvider,
-  useSearchParams
-} from 'deprecated/legacy/components/core/SearchParams/createSearchParams';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
+import useALContext from 'core/config/useALContext';
+import PageContainer from 'core/template/branding/AppPageContainer';
+import PageFullWidth from 'core/template/components/pages/PageFullWidth';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
-import type { SubmissionIndexed } from 'models/base/submission';
+import { createSearchParams, SearchParamsProvider, useSearchParams } from 'features/SearchParams/createSearchParams';
 import type { IndexDefinition } from 'models/api/user';
-import ForbiddenPage from 'routes/forbidden/forbidden';
-import SearchHeader from 'ui/SearchBar/SearchHeader';
-import { DEFAULT_SUGGESTION } from 'ui/SearchBar/search-textfield';
-import SubmissionsTable from 'routes/search/components/submissions';
-import { safeFieldValue } from 'shared/utils/utils';
+import type { SubmissionIndexed } from 'models/base/submission';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import ForbiddenPage from 'routes/forbidden/forbidden';
+import SubmissionsTable from 'routes/search/components/submissions';
+import { safeFieldValue } from 'shared/utils/utils';
+import SearchHeader from 'ui/SearchBar/SearchHeader';
+import { DEFAULT_SUGGESTION } from 'ui/SearchBar/search-textfield';
 
 type SearchResults = {
   items: SubmissionIndexed[];

@@ -2,11 +2,15 @@ import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
 import { AlertTitle, Skeleton, Tooltip } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
-import { useSearchParams } from 'deprecated/legacy/components/core/SearchParams/createSearchParams';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
-import type { SubmissionIndexed } from 'models/base/submission';
+import useALContext from 'core/config/useALContext';
+import { useSearchParams } from 'features/SearchParams/createSearchParams';
 import type { SearchResult } from 'models/api/search';
+import type { SubmissionIndexed } from 'models/base/submission';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import type { SubmissionParams } from 'routes/submissions/submissions.route';
+import { maxLenStr } from 'shared/utils/utils';
 import Classification from 'ui/Classification';
 import CustomChip from 'ui/CustomChip';
 import {
@@ -22,10 +26,6 @@ import InformativeAlert from 'ui/InformativeAlert';
 import Moment from 'ui/Moment';
 import SubmissionState from 'ui/SubmissionState';
 import Verdict from 'ui/Verdict';
-import { maxLenStr } from 'shared/utils/utils';
-import React from 'react';
-import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
 
 type Props = {
   submissionResults: SearchResult<SubmissionIndexed>;

@@ -1,5 +1,7 @@
+import useALContext from 'core/config/useALContext';
 import { TableOfContentProvider, useTableOfContent } from 'features/table-of-content/table-of-content.providers';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
+import React, { useCallback, useEffect, useMemo } from 'react';
+import { Navigate, useLocation, useNavigate } from 'react-router';
 import type { LibraryFormStore } from 'routes/development-library/contexts/form';
 import { FormProvider, useForm } from 'routes/development-library/contexts/form';
 import { DateTimeSection } from 'routes/development-library/sections/DateTime';
@@ -12,8 +14,6 @@ import { PageLayout } from 'ui/layouts/PageLayout';
 import type { PageNavigationItemProp } from 'ui/layouts/PageNavigation';
 import { PageNavigation } from 'ui/layouts/PageNavigation';
 import SimpleSearchQuery from 'ui/SearchBar/simple-search-query';
-import React, { useCallback, useEffect, useMemo } from 'react';
-import { Navigate, useLocation, useNavigate } from 'react-router';
 
 type LibraryTab = LibraryFormStore['state']['tab'];
 type ComponentsState = LibraryFormStore['components'];

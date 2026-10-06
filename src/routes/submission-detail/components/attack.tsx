@@ -1,11 +1,11 @@
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import { Collapse, Divider, Grid, Skeleton, Typography, useTheme } from '@mui/material';
-import useHighlighter from 'deprecated/legacy/components/hooks/useHighlighter';
+import useHighlighter from 'layout/highlighter/useHighlighter';
 import type { AttackMatrix } from 'models/api/file';
-import Attack from 'ui/Attack';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import Attack from 'ui/Attack';
 
 type AttackSectionProps = {
   attack_matrix: AttackMatrix;

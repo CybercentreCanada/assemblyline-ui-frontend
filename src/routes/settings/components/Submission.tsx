@@ -1,14 +1,14 @@
 import { Paper, useTheme } from '@mui/material';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
+import useALContext from 'core/config/useALContext';
+import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useForm } from 'routes/settings/settings.form.ts';
 import { PageSection } from 'ui/layouts/PageSection';
-import { List } from 'ui/list/List';
 import { BooleanListInput } from 'ui/list-inputs/BooleanListInput';
 import { ClassificationListInput } from 'ui/list-inputs/ClassificationListInput';
 import { NumberListInput } from 'ui/list-inputs/NumberListInput';
+import { List } from 'ui/list/List';
 import { Markdown } from 'ui/Markdown';
-import React, { useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
 
 export const SubmissionProfileDescription = React.memo(() => {
   const { t } = useTranslation(['settings']);

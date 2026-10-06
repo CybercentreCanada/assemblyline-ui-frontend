@@ -1,11 +1,11 @@
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import { Alert, CircularProgress, Collapse, Divider, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
+import useALContext from 'core/config/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
-import AIMarkdown from 'ui/AiMarkdown';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import AIMarkdown from 'ui/AiMarkdown';
 
 type AISummarySectionProps = {
   type: 'submission' | 'file';

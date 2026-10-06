@@ -7,9 +7,11 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import type { InputAdornmentProps } from '@mui/material';
 import { CircularProgress, InputAdornment, Tooltip, useTheme } from '@mui/material';
 import { usePropStore } from 'features/prop-provider/prop-provider.providers';
-import type { ButtonProps } from 'deprecated/legacy/components/visual/Buttons/Button';
-import { Button } from 'deprecated/legacy/components/visual/Buttons/Button';
-import { IconButton } from 'deprecated/legacy/components/visual/Buttons/IconButton';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
+import type { ButtonProps } from 'ui/buttons/Button';
+import { Button } from 'ui/buttons/Button';
+import { IconButton } from 'ui/buttons/IconButton';
 import { useInputBlur, useInputChange } from 'ui/inputs/hooks/inputs.hook.event_handlers.tsx';
 import {
   useInputId,
@@ -24,8 +26,6 @@ import {
   useShouldRenderReset
 } from 'ui/inputs/hooks/inputs.hook.renderer.tsx';
 import type { InputControllerProps } from 'ui/inputs/models/inputs.model.ts';
-import React, { useCallback, useEffect, useMemo, useRef } from 'react';
-import { useTranslation } from 'react-i18next';
 
 export type InputButtonAdornmentProps = {
   variant?: 'icon' | 'text';

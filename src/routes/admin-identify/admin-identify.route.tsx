@@ -1,18 +1,18 @@
 import { loader } from '@monaco-editor/react';
 import { Alert, Box, Grid, Paper, styled, Tab, Tabs, Typography, useTheme } from '@mui/material';
-import { useAppUser } from 'deprecated/legacy/commons/components/app/hooks';
-import PageFullSize from 'core/template/components/AppPageCenter';
-import { useEffectOnce } from 'deprecated/legacy/commons/components/utils/hooks/useEffectOnce';
+import PageFullSize from 'core/template/branding/AppPageCenter';
+import { useAppUser } from 'core/template/components/app/hooks';
+import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import type { CustomUser } from 'models/api/user';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Navigate } from 'react-router';
 import LibMagic from 'routes/admin-identify/components/libmagic';
 import Mimes from 'routes/admin-identify/components/mimes';
 import Patterns from 'routes/admin-identify/components/patterns';
 import Yara from 'routes/admin-identify/components/yara';
-import { RouterPrompt } from 'deprecated/legacy/components/visual/RouterPrompt';
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Navigate } from 'react-router';
+import { RouterPrompt } from 'ui/RouterPrompt';
 
 loader.config({ paths: { vs: '/cdn/monaco_0.35.0/vs' } });
 

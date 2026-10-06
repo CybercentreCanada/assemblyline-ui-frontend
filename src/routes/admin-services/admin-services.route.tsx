@@ -17,29 +17,29 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import { useAppUser } from 'deprecated/legacy/commons/components/app/hooks';
-import PageFullWidth from 'deprecated/legacy/commons/components/pages/PageFullWidth';
-import { useEffectOnce } from 'deprecated/legacy/commons/components/utils/hooks/useEffectOnce';
 import { invalidateAPIQuery } from 'core/api/utils/invalidateApiQuery';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
-import useDrawer from 'deprecated/legacy/components/hooks/useDrawer';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
-import type { ServiceIndexed, ServiceUpdateData, ServiceUpdates } from 'models/base/service';
+import { useAppUser } from 'core/template/components/app/hooks';
+import PageFullWidth from 'core/template/components/pages/PageFullWidth';
+import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useDrawer from 'layout/drawer/useDrawer';
+import type { JSONFeedItem } from 'layout/notifications/useNotificationFeed';
+import { useNotificationFeed } from 'layout/notifications/useNotificationFeed';
 import type { CustomUser } from 'models/api/user';
-import ServiceDetail from 'routes/admin-service-detail/admin-service-detail.route';
-import { FileDownloader } from 'ui/buttons/FileDownloader';
-import ConfirmationDialog from 'ui/ConfirmationDialog';
-import { PageHeader } from 'ui/layouts/PageHeader';
-import type { JSONFeedItem } from 'deprecated/legacy/components/visual/Notification/useNotificationFeed';
-import { useNotificationFeed } from 'deprecated/legacy/components/visual/Notification/useNotificationFeed';
-import ServiceTable from 'routes/search/components/service';
-import CommunityServiceTable from 'routes/admin-services/components/CommunityServiceTable';
-import NewServiceTable from 'routes/admin-services/components/NewServiceTable';
+import type { ServiceIndexed, ServiceUpdateData, ServiceUpdates } from 'models/base/service';
 import type { ChangeEvent } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useLocation, useNavigate } from 'react-router';
+import ServiceDetail from 'routes/admin-service-detail/admin-service-detail.route';
+import CommunityServiceTable from 'routes/admin-services/components/CommunityServiceTable';
+import NewServiceTable from 'routes/admin-services/components/NewServiceTable';
+import ServiceTable from 'routes/search/components/service';
+import { FileDownloader } from 'ui/buttons/FileDownloader';
+import ConfirmationDialog from 'ui/ConfirmationDialog';
+import { PageHeader } from 'ui/layouts/PageHeader';
 
 export default function Services() {
   const { t } = useTranslation(['adminServices']);

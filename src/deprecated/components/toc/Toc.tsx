@@ -1,5 +1,5 @@
 import { styled, useTheme } from '@mui/material';
-import { useAppBar, useAppLayout, useAppUser } from 'deprecated/legacy/commons/components/app/hooks';
+import { useAppBar, useAppLayout, useAppUser } from 'core/template/components/app/hooks';
 import type { ReactNode } from 'react';
 import React, { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';

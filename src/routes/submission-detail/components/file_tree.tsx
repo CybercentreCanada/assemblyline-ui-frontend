@@ -4,14 +4,14 @@ import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { Box, Button, Collapse, Divider, IconButton, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
-import useHighlighter from 'deprecated/legacy/components/hooks/useHighlighter';
-import useSafeResults from 'deprecated/legacy/components/hooks/useSafeResults';
+import useHighlighter from 'layout/highlighter/useHighlighter';
+import useSafeResults from 'layout/safe-results/useSafeResults';
 import type { SubmissionTree, Tree } from 'models/api/submission';
-import Verdict from 'ui/Verdict';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { Link } from 'react-router-dom';
+import Verdict from 'ui/Verdict';
 
 const MAX_FILE_COUNT = 500;
 

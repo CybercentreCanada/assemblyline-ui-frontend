@@ -7,7 +7,8 @@ import type {
   TooltipProps,
   TypographyProps
 } from '@mui/material';
-import type { IconButtonProps } from 'deprecated/legacy/components/visual/Buttons/IconButton';
+import type React from 'react';
+import type { IconButtonProps } from 'ui/buttons/IconButton';
 import type {
   Coercer,
   CoercersSchema,
@@ -15,7 +16,6 @@ import type {
   ValidationStatus,
   Validator
 } from 'ui/inputs/utils/inputs.util.validation.tsx';
-import type React from 'react';
 
 /**********************************************************************************************************************
  * Input Models

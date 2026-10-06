@@ -3,9 +3,12 @@ import DoneIcon from '@mui/icons-material/Done';
 import { AlertTitle, Skeleton } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
-import type { WorkflowIndexed } from 'models/base/workflow';
+import useALContext from 'core/config/useALContext';
 import type { SearchResult } from 'models/api/search';
+import type { WorkflowIndexed } from 'models/base/workflow';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import { AlertPriority, AlertStatus } from 'routes/alerts/components/Components';
 import Classification from 'ui/Classification';
 import {
@@ -19,9 +22,6 @@ import {
 } from 'ui/DivTable';
 import InformativeAlert from 'ui/InformativeAlert';
 import Moment from 'ui/Moment';
-import React from 'react';
-import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
 
 type Props = {
   workflowResults: SearchResult<WorkflowIndexed>;

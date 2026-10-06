@@ -1,9 +1,9 @@
-import { useAppUser } from 'deprecated/legacy/commons/components/app/hooks';
-import PageCenter from 'deprecated/legacy/commons/components/pages/PageCenter';
+import { useAppUser } from 'core/template/components/app/hooks';
+import PageCenter from 'core/template/components/pages/PageCenter';
 import type { CustomUser } from 'models/api/user';
-import ForbiddenPage from 'routes/forbidden/forbidden';
-import FileDetail from 'routes/file-detail/file-detail.route';
 import { useParams } from 'react-router';
+import FileDetail from 'routes/file-detail/file-detail.route';
+import ForbiddenPage from 'routes/forbidden/forbidden';
 
 type ParamProps = {
   id: string;

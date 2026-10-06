@@ -2,7 +2,7 @@ import { Fetcher, useClueFetcherSelector } from '@cccsaurora/clue-ui';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { Button, Collapse, Divider, Skeleton, styled, Typography, useTheme } from '@mui/material';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
+import useALContext from 'core/config/useALContext';
 import type { SubmissionReport } from 'models/api/submission_report';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';

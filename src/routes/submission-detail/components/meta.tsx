@@ -2,11 +2,11 @@ import { Fetcher, useClueFetcherSelector } from '@cccsaurora/clue-ui';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { Button, Collapse, Divider, Grid, Skeleton, styled, Typography, useTheme } from '@mui/material';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
+import useALContext from 'core/config/useALContext';
 import type { Metadata } from 'models/base/submission';
-import ActionableText from 'ui/ActionableText';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import ActionableText from 'ui/ActionableText';
 
 const Empty = styled('pre')(({ theme }) => ({
   '@media print': {

@@ -5,20 +5,20 @@ import PanToolOutlinedIcon from '@mui/icons-material/PanToolOutlined';
 import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
 import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
 import { Card, Grid, IconButton, styled, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
-import { useAppUser } from 'deprecated/legacy/commons/components/app/hooks';
-import PageCenter from 'deprecated/legacy/commons/components/pages/PageCenter';
+import { useAppUser } from 'core/template/components/app/hooks';
+import PageCenter from 'core/template/components/pages/PageCenter';
 import useClipboard from 'deprecated/hooks/useClipboard';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
-import type { Error as ErrorModel } from 'models/base/error';
 import type { CustomUser } from 'models/api/user';
-import { DEFAULT_TAB, TAB_OPTIONS } from 'routes/file-viewer/file-viewer.route';
-import { FileDownloader } from 'ui/buttons/FileDownloader';
-import Moment from 'ui/Moment';
+import type { Error as ErrorModel } from 'models/base/error';
 import { ReactElement, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BsClipboard } from 'react-icons/bs';
 import { Navigate, useLocation, useParams } from 'react-router';
 import { Link } from 'react-router-dom';
+import { DEFAULT_TAB, TAB_OPTIONS } from 'routes/file-viewer/file-viewer.route';
+import { FileDownloader } from 'ui/buttons/FileDownloader';
+import Moment from 'ui/Moment';
 
 const StyledBsClipboard = styled(BsClipboard)(({ theme }) => ({
   marginRight: theme.spacing(1),

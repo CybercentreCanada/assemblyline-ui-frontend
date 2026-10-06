@@ -18,19 +18,19 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import { useAppUser } from 'deprecated/legacy/commons/components/app/hooks';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
+import { useAppUser } from 'core/template/components/app/hooks';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
+import { useSearchParams } from 'deprecated/legacy/components/routes/alerts/contexts/SearchParamsContext';
 import type { CustomUser } from 'models/api/user';
+import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { AlertSearchParams } from 'routes/alerts/alerts.route';
 import { useAlerts } from 'routes/alerts/contexts/AlertsContext';
-import { useSearchParams } from 'deprecated/legacy/components/routes/alerts/contexts/SearchParamsContext';
 import { ChipList } from 'ui/ChipList';
 import Classification from 'ui/Classification';
 import ConfirmationDialog from 'ui/ConfirmationDialog';
-import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 
 const Preview = memo(
   styled(({ component = 'pre', variant = 'outlined', ...props }: PaperProps) => (

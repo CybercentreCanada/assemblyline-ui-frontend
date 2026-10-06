@@ -1,7 +1,7 @@
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Button, Collapse, LinearProgress, Paper, SvgIcon, Typography, useMediaQuery, useTheme } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import PageCenter from 'deprecated/legacy/commons/components/pages/PageCenter';
+import PageCenter from 'core/template/components/pages/PageCenter';
 import React, { useState } from 'react';
 import type { FallbackProps } from 'react-error-boundary';
 import { ErrorBoundary } from 'react-error-boundary';

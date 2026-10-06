@@ -1,8 +1,10 @@
 import { Alert, Tooltip, Typography, useTheme } from '@mui/material';
-import { invalidateAPIQuery } from 'core/api/utils/invalidateApiQuery';
 import { useAPIMutation } from 'core/api/hooks/useApiMutation';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
+import { invalidateAPIQuery } from 'core/api/utils/invalidateApiQuery';
+import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useForm } from 'routes/settings/settings.form.ts';
 import {
   hasDifferentDefaultSubmissionValues,
@@ -11,12 +13,10 @@ import {
   resetDefaultSubmissionValues,
   resetPreviousSubmissionValues,
   updatePreviousSubmissionValues
-} from 'routes/settings/settings.utils.ts';
-import { Button } from 'deprecated/legacy/components/visual/Buttons/Button';
+} from 'routes/settings/settings.utils';
+import { Button } from 'ui/buttons/Button';
 import { PageHeader } from 'ui/layouts/PageHeader';
-import { RouterPrompt } from 'deprecated/legacy/components/visual/RouterPrompt';
-import React from 'react';
-import { useTranslation } from 'react-i18next';
+import { RouterPrompt } from 'ui/RouterPrompt';
 
 export const HeaderSection = React.memo(() => {
   const { t } = useTranslation(['settings', 'submit']);

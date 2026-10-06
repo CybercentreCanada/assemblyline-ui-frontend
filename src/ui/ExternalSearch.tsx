@@ -22,18 +22,18 @@ import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import Tooltip from '@mui/material/Tooltip';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
-import useExternalLookup from 'deprecated/legacy/components/hooks/useExternalLookup';
-import type { DetailedItem } from 'models/base/alert';
+import useALContext from 'core/config/useALContext';
+import { getMaxClassification } from 'features/classification/classification.utils';
 import type { ExternalEnrichmentResult } from 'layout/external-lookup/external-lookup.hooks';
+import useExternalLookup from 'layout/external-lookup/useExternalLookup';
+import type { DetailedItem } from 'models/base/alert';
+import React, { useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { toTitleCase, verdictToColor } from 'shared/utils/utils';
 import { ChipList } from 'ui/ChipList';
 import Classification from 'ui/Classification';
 import type { CustomChipProps } from 'ui/CustomChip';
 import CustomChip from 'ui/CustomChip';
-import { getMaxClassification } from 'features/classification/classification.utils';
-import { toTitleCase, verdictToColor } from 'shared/utils/utils';
-import React, { useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 
 const TARGET_RESULT_COUNT = 10;
 

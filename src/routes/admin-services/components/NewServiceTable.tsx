@@ -1,17 +1,10 @@
 import CloudDownloadOutlinedIcon from '@mui/icons-material/CloudDownloadOutlined';
 import { AlertTitle, IconButton, Paper, Skeleton, TableContainer, Tooltip } from '@mui/material';
-import {
-  DivTable,
-  DivTableBody,
-  DivTableCell,
-  DivTableHead,
-  DivTableRow,
-  ExternalLinkRow
-} from 'ui/DivTable';
-import InformativeAlert from 'ui/InformativeAlert';
-import type { JSONFeedItem } from 'deprecated/legacy/components/visual/Notification/useNotificationFeed';
+import type { JSONFeedItem } from 'layout/notifications/useNotificationFeed';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow, ExternalLinkRow } from 'ui/DivTable';
+import InformativeAlert from 'ui/InformativeAlert';
 
 type Props = {
   services: JSONFeedItem[];

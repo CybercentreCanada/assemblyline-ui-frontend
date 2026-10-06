@@ -12,13 +12,13 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
 import type { Apps as AppData, User } from 'models/base/user';
-import CustomChip from 'ui/CustomChip';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import CustomChip from 'ui/CustomChip';
 
 type AppsProps = {
   user: User;

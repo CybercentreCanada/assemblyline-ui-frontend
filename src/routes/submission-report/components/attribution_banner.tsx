@@ -4,13 +4,13 @@ import MoodBadIcon from '@mui/icons-material/MoodBad';
 import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import type { SvgIconProps } from '@mui/material';
 import { Box, Grid, Skeleton, useMediaQuery, useTheme } from '@mui/material';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
+import useALContext from 'core/config/useALContext';
 import type { SubmissionReport } from 'models/api/submission_report';
-import Verdict from 'ui/Verdict';
-import VerdictGauge from 'ui/VerdictGauge';
 import type { FC } from 'react';
 import React, { memo } from 'react';
 import { useTranslation } from 'react-i18next';
+import Verdict from 'ui/Verdict';
+import VerdictGauge from 'ui/VerdictGauge';
 
 type IconProps = SvgIconProps & {
   component: FC<SvgIconProps>;

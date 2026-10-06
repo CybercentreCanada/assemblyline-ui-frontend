@@ -1,7 +1,7 @@
 import { shallowEqual } from 'features/prop-provider/prop-provider.utils.ts';
 import { SearchParamEngine } from 'features/search-params/search-params.engines.tsx';
-import type { SearchParamBlueprints, SearchParamValues } from 'deprecated/legacy/components/core/SearchParams/lib/search_params.model.tsx';
 import { SearchParamSnapshot } from 'features/search-params/search-params.snapshots.tsx';
+import type { SearchParamBlueprints, SearchParamValues } from 'features/SearchParams/lib/search_params.model';
 import React, {
   createContext,
   useCallback,

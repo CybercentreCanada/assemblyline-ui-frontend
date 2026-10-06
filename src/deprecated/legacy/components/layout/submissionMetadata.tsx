@@ -1,6 +1,6 @@
 import ClearIcon from '@mui/icons-material/Clear';
 import { Grid, IconButton, Tooltip, Typography, useTheme } from '@mui/material';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
+import useALContext from 'core/config/useALContext';
 import { useTranslation } from 'react-i18next';
 
 type ExternalSourcesProps = {

@@ -23,26 +23,26 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import { useAppUser } from 'deprecated/legacy/commons/components/app/hooks';
-import PageFullWidth from 'deprecated/legacy/commons/components/pages/PageFullWidth';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
-import useDrawer from 'deprecated/legacy/components/hooks/useDrawer';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
+import { useAppUser } from 'core/template/components/app/hooks';
+import PageFullWidth from 'core/template/components/pages/PageFullWidth';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
+import { SourceDetail } from 'deprecated/legacy/components/routes/manage/signature_sources_details';
+import useDrawer from 'layout/drawer/useDrawer';
+import type { CustomUser } from 'models/api/user';
 import type { UpdateConfig, UpdateSource } from 'models/base/service';
 import { DEFAULT_SOURCE } from 'models/base/service';
-import type { CustomUser } from 'models/api/user';
-import ForbiddenPage from 'routes/forbidden/forbidden';
-import { SourceDetail } from 'deprecated/legacy/components/routes/manage/signature_sources_details';
-import Classification from 'ui/Classification';
-import ConfirmationDialog from 'ui/ConfirmationDialog';
-import { PageHeader } from 'ui/layouts/PageHeader';
-import Moment from 'ui/Moment';
-import { RouterPrompt } from 'deprecated/legacy/components/visual/RouterPrompt';
 import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DiGitBranch } from 'react-icons/di';
 import { Link } from 'react-router-dom';
+import ForbiddenPage from 'routes/forbidden/forbidden';
+import Classification from 'ui/Classification';
+import ConfirmationDialog from 'ui/ConfirmationDialog';
+import { PageHeader } from 'ui/layouts/PageHeader';
+import Moment from 'ui/Moment';
+import { RouterPrompt } from 'ui/RouterPrompt';
 
 const CardCaption = memo(
   styled('div')(() => ({

@@ -1,17 +1,21 @@
 import CheckIcon from '@mui/icons-material/Check';
 import DoDisturbAltOutlinedIcon from '@mui/icons-material/DoDisturbAltOutlined';
 import { Grid, useTheme } from '@mui/material';
-import PageCenter from 'deprecated/legacy/commons/components/pages/PageCenter';
 import { useAPIMutation } from 'core/api/hooks/useApiMutation';
 import { useAPIQuery } from 'core/api/hooks/useApiQuery';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
+import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
+import PageCenter from 'core/template/components/pages/PageCenter';
+import _ from 'lodash';
+import type { SearchResult } from 'models/api/search';
 import type { Alert } from 'models/base/alert';
 import type { Priority, Status, Workflow } from 'models/base/workflow';
 import { LABELS, PRIORITIES, STATUSES } from 'models/base/workflow';
-import type { SearchResult } from 'models/api/search';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useLocation, useParams } from 'react-router';
 import ForbiddenPage from 'routes/forbidden/forbidden';
-import { IconButton } from 'deprecated/legacy/components/visual/Buttons/IconButton';
+import { IconButton } from 'ui/buttons/IconButton';
 import Classification from 'ui/Classification';
 import { CheckboxInput } from 'ui/inputs/CheckboxInput';
 import { ChipsInput } from 'ui/inputs/ChipsInput';
@@ -19,10 +23,6 @@ import { SelectInput } from 'ui/inputs/SelectInput';
 import { TextAreaInput } from 'ui/inputs/TextAreaInput';
 import { TextInput } from 'ui/inputs/TextInput';
 import { PageHeader } from 'ui/layouts/PageHeader';
-import _ from 'lodash';
-import React, { useEffect, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useLocation, useParams } from 'react-router';
 
 type Params = {
   id: string;

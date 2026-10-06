@@ -1,9 +1,9 @@
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
+import useALContext from 'core/config/useALContext';
+import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useForm } from 'routes/settings/settings.form.ts';
 import { getProfileNames } from 'routes/settings/settings.utils.ts';
 import { PageNavigation } from 'ui/layouts/PageNavigation';
-import React, { useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
 
 export const LeftNav = React.memo(() => {
   const { t } = useTranslation(['settings']);

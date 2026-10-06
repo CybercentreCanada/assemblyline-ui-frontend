@@ -3,7 +3,7 @@ import type {
   ParamSource,
   ParamValues,
   SearchParamValues
-} from 'deprecated/legacy/components/core/SearchParams/lib/search_params.model.tsx';
+} from 'features/SearchParams/lib/search_params.model';
 import type { SearchParamSnapshot } from 'features/search-params/search-params.snapshots.tsx';
 import type { Location } from 'react-router';
 

@@ -1,18 +1,18 @@
 import Editor, { DiffEditor, loader } from '@monaco-editor/react';
 import { Dialog, DialogActions, DialogContent, DialogTitle, Skeleton, useTheme } from '@mui/material';
-import { useAppTheme, useAppUser } from 'deprecated/legacy/commons/components/app/hooks';
-import PageFullSize from 'core/template/components/AppPageCenter';
-import { useEffectOnce } from 'deprecated/legacy/commons/components/utils/hooks/useEffectOnce';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
+import PageFullSize from 'core/template/branding/AppPageCenter';
+import { useAppTheme, useAppUser } from 'core/template/components/app/hooks';
+import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
 import type { CustomUser } from 'models/api/user';
-import { Button } from 'deprecated/legacy/components/visual/Buttons/Button';
-import { PageHeader } from 'ui/layouts/PageHeader';
-import { RouterPrompt } from 'deprecated/legacy/components/visual/RouterPrompt';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ReactResizeDetector from 'react-resize-detector';
 import { Navigate } from 'react-router';
+import { Button } from 'ui/buttons/Button';
+import { PageHeader } from 'ui/layouts/PageHeader';
+import { RouterPrompt } from 'ui/RouterPrompt';
 
 loader.config({ paths: { vs: '/cdn/monaco_0.35.0/vs' } });
 

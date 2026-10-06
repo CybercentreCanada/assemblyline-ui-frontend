@@ -1,24 +1,24 @@
 import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
 import type { PaperProps } from '@mui/material';
 import { Grid, Paper, Skeleton, styled, Typography, useTheme } from '@mui/material';
-import { useAppUser } from 'deprecated/legacy/commons/components/app/hooks';
-import PageCenter from 'deprecated/legacy/commons/components/pages/PageCenter';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
+import useALContext from 'core/config/useALContext';
+import { useAppUser } from 'core/template/components/app/hooks';
+import PageCenter from 'core/template/components/pages/PageCenter';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
+import type { CustomUser } from 'models/api/user';
 import type { Heuristic } from 'models/base/heuristic';
 import { DEFAULT_STATS, type Statistic } from 'models/base/statistic';
-import type { CustomUser } from 'models/api/user';
+import { memo, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useParams } from 'react-router';
 import ForbiddenPage from 'routes/forbidden/forbidden';
-import { IconButton } from 'deprecated/legacy/components/visual/Buttons/IconButton';
+import ResultsTable from 'routes/search/components/results';
+import { safeFieldValueURI } from 'shared/utils/utils';
+import { IconButton } from 'ui/buttons/IconButton';
 import Classification from 'ui/Classification';
 import Histogram from 'ui/Histogram';
 import { PageHeader } from 'ui/layouts/PageHeader';
 import Moment from 'ui/Moment';
-import ResultsTable from 'routes/search/components/results';
-import { safeFieldValueURI } from 'shared/utils/utils';
-import { memo, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router';
 
 const Preview = memo(
   styled(({ component = 'pre', variant = 'outlined', ...props }: PaperProps) => (

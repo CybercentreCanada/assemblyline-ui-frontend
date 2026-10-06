@@ -21,13 +21,18 @@ import {
 } from '@mui/material';
 import match from 'autosuggest-highlight/match';
 import parse from 'autosuggest-highlight/parse';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
-import useSafeResults from 'deprecated/legacy/components/hooks/useSafeResults';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useSafeResults from 'layout/safe-results/useSafeResults';
+import type { SearchResult } from 'models/api/search';
 import type { ResultIndexed } from 'models/base/result';
 import type { Signature, Tag } from 'models/base/tagging';
-import type { SearchResult } from 'models/api/search';
+import React, { useCallback, useEffect, useMemo, useState, useTransition } from 'react';
+import { useTranslation } from 'react-i18next';
+import AutoSizer from 'react-virtualized-auto-sizer';
+import ResultsTable from 'routes/search/components/results';
+import { safeFieldValue } from 'shared/utils/utils';
 import ActionMenu from 'ui/ActionMenu';
 import Classification from 'ui/Classification';
 import {
@@ -41,13 +46,8 @@ import {
 } from 'ui/GridTable';
 import InformativeAlert from 'ui/InformativeAlert';
 import SimpleSearchQuery from 'ui/SearchBar/simple-search-query';
-import ResultsTable from 'routes/search/components/results';
 import SectionContainer from 'ui/SectionContainer';
 import Verdict from 'ui/Verdict';
-import { safeFieldValue } from 'shared/utils/utils';
-import React, { useCallback, useEffect, useMemo, useState, useTransition } from 'react';
-import { useTranslation } from 'react-i18next';
-import AutoSizer from 'react-virtualized-auto-sizer';
 
 type Result = {
   tag_type: string;

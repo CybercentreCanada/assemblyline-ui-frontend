@@ -2,31 +2,27 @@ import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import PanToolOutlinedIcon from '@mui/icons-material/PanToolOutlined';
 import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
 import { Grid, Typography, useTheme } from '@mui/material';
-import { useAppUser } from 'deprecated/legacy/commons/components/app/hooks';
-import PageContainer from 'core/template/components/AppPageContainer';
-import PageFullWidth from 'deprecated/legacy/commons/components/pages/PageFullWidth';
-import {
-  createSearchParams,
-  SearchParamsProvider,
-  useSearchParams
-} from 'deprecated/legacy/components/core/SearchParams/createSearchParams';
-import useDrawer from 'deprecated/legacy/components/hooks/useDrawer';
+import PageContainer from 'core/template/branding/AppPageContainer';
+import { useAppUser } from 'core/template/components/app/hooks';
+import PageFullWidth from 'core/template/components/pages/PageFullWidth';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
-import type { Error } from 'models/base/error';
+import { createSearchParams, SearchParamsProvider, useSearchParams } from 'features/SearchParams/createSearchParams';
+import useDrawer from 'layout/drawer/useDrawer';
 import type { FacetResult, HistogramResult, SearchResult } from 'models/api/search';
 import type { CustomUser, IndexDefinition } from 'models/api/user';
+import type { Error } from 'models/base/error';
+import React, { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Navigate, useLocation, useNavigate } from 'react-router';
 import { ErrorDetail } from 'routes/admin-error-detail/admin-error-detail.route';
+import ErrorsTable from 'routes/search/components/errors';
+import { safeFieldValue } from 'shared/utils/utils';
 import { DateTimeRangePicker } from 'ui/DateTime/DateTimeRangePicker';
 import { LuceneDateTime, LuceneDateTimeGap } from 'ui/DateTime/LuceneDateTime';
 import Histogram from 'ui/Histogram';
 import LineGraph from 'ui/LineGraph';
 import SearchHeader from 'ui/SearchBar/SearchHeader';
 import { DEFAULT_SUGGESTION } from 'ui/SearchBar/search-textfield';
-import ErrorsTable from 'routes/search/components/errors';
-import { safeFieldValue } from 'shared/utils/utils';
-import React, { useCallback, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Navigate, useLocation, useNavigate } from 'react-router';
 
 const ERROR_VIEWER_PARAMS = createSearchParams(p => ({
   query: p.string(''),

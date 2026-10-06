@@ -1,4 +1,4 @@
-import { useAppUser } from 'deprecated/legacy/commons/components/app/hooks';
+import { useAppUser } from 'core/template/components/app/hooks';
 import type { CustomUser } from 'models/api/user';
 import User from 'routes/user/user.route';
 

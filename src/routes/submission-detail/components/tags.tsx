@@ -1,12 +1,12 @@
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import { Collapse, Divider, Grid, Typography, useTheme } from '@mui/material';
-import useSafeResults from 'deprecated/legacy/components/hooks/useSafeResults';
+import useSafeResults from 'layout/safe-results/useSafeResults';
 import type { Tags } from 'models/api/file';
-import AutoHideTagList from 'ui/AutoHideTagList';
-import { TooltipGrid } from 'routes/file-detail/components/tags';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { TooltipGrid } from 'routes/file-detail/components/tags';
+import AutoHideTagList from 'ui/AutoHideTagList';
 
 type Props = {
   tag_group: string;

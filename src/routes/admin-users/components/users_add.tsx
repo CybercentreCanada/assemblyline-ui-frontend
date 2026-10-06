@@ -14,13 +14,13 @@ import {
 } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
 import Typography from '@mui/material/Typography';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
-import Classification from 'ui/Classification';
-import CustomChip from 'ui/CustomChip';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import Classification from 'ui/Classification';
+import CustomChip from 'ui/CustomChip';
 
 type User = {
   avatar: string;

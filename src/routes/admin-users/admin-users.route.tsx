@@ -1,26 +1,22 @@
 import BlockIcon from '@mui/icons-material/Block';
 import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount';
 import { useTheme } from '@mui/material';
-import PageContainer from 'core/template/components/AppPageContainer';
-import PageFullWidth from 'deprecated/legacy/commons/components/pages/PageFullWidth';
-import {
-  createSearchParams,
-  SearchParamsProvider,
-  useSearchParams
-} from 'deprecated/legacy/components/core/SearchParams/createSearchParams';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
+import useALContext from 'core/config/useALContext';
+import PageContainer from 'core/template/branding/AppPageContainer';
+import PageFullWidth from 'core/template/components/pages/PageFullWidth';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
-import type { UserIndexed } from 'models/base/user';
+import { createSearchParams, SearchParamsProvider, useSearchParams } from 'features/SearchParams/createSearchParams';
 import type { SearchResult } from 'models/api/search';
 import type { IndexDefinition } from 'models/api/user';
-import { AddUserPage } from 'routes/admin-users/components/users_add';
-import { PageHeader } from 'ui/layouts/PageHeader';
-import { SearchHeader } from 'ui/SearchBar/SearchHeader';
-import { DEFAULT_SUGGESTION } from 'ui/SearchBar/search-textfield';
-import UsersTable from 'routes/search/components/users';
+import type { UserIndexed } from 'models/base/user';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate } from 'react-router';
+import { AddUserPage } from 'routes/admin-users/components/users_add';
+import UsersTable from 'routes/search/components/users';
+import { PageHeader } from 'ui/layouts/PageHeader';
+import { DEFAULT_SUGGESTION } from 'ui/SearchBar/search-textfield';
+import { SearchHeader } from 'ui/SearchBar/SearchHeader';
 
 const USERS_PARAMS = createSearchParams(p => ({
   query: p.string(''),

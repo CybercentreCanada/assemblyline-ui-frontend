@@ -1,4 +1,4 @@
-import type { AppUser } from 'deprecated/legacy/commons/components/app/AppUserService';
+import type { AppUser } from 'core/template/components/app/AppUserService';
 
 export const TYPES = [
   'admin',

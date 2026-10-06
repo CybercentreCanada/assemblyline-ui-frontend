@@ -1,5 +1,5 @@
 import { CircularProgress } from '@mui/material';
-import useAppBannerVert from 'deprecated/legacy/commons/components/app/hooks/useAppBannerVert';
+import useAppBannerVert from 'core/template/components/app/hooks/useAppBannerVert';
 import { memo } from 'react';
 
 const WrappedLoadingScreen = ({ showImage = true }) => {

@@ -1,9 +1,9 @@
-import { useAppUser } from 'deprecated/legacy/commons/components/app/hooks';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
+import useALContext from 'core/config/useALContext';
+import { useAppUser } from 'core/template/components/app/hooks';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import type { CustomUser } from 'models/api/user';
-import type { Favorite } from 'routes/alerts/components/Favorites';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import type { Favorite } from 'routes/alerts/components/Favorites';
 
 type ContextProps = {
   userFavorites: Favorite[];

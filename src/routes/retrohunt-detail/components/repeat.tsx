@@ -15,17 +15,17 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
-import { useAppUser } from 'deprecated/legacy/commons/components/app/hooks';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
-import type { Retrohunt } from 'models/base/retrohunt';
+import { useAppUser } from 'core/template/components/app/hooks';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
 import type { CustomUser } from 'models/api/user';
+import type { Retrohunt } from 'models/base/retrohunt';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import ForbiddenPage from 'routes/forbidden/forbidden';
 import NotFoundPage from 'routes/missing-node/missing-node.route';
 import Classification from 'ui/Classification';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 
 type RetrohuntData = Pick<Retrohunt, 'key' | 'search_classification' | 'ttl'>;
 

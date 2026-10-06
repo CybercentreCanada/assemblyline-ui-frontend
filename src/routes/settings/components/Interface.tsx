@@ -1,14 +1,14 @@
 import { useTheme } from '@mui/material';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
+import useALContext from 'core/config/useALContext';
+import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useForm } from 'routes/settings/settings.form.ts';
 import { getProfileNames } from 'routes/settings/settings.utils.ts';
-import { List } from 'ui/list/List';
-import { ListHeader } from 'ui/list/ListHeader';
 import { BooleanListInput } from 'ui/list-inputs/BooleanListInput';
 import { SelectListInput } from 'ui/list-inputs/SelectListInput';
 import { TextListInput } from 'ui/list-inputs/TextListInput';
-import React, { useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
+import { List } from 'ui/list/List';
+import { ListHeader } from 'ui/list/ListHeader';
 
 export const InterfaceSection = React.memo(() => {
   const { t } = useTranslation(['settings']);

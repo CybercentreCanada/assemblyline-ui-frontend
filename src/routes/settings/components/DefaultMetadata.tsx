@@ -1,9 +1,9 @@
 import { List, useTheme } from '@mui/material';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
-import { PageSection } from 'ui/layouts/PageSection';
-import { TextListInput } from 'ui/list-inputs/TextListInput';
+import useALContext from 'core/config/useALContext';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { PageSection } from 'ui/layouts/PageSection';
+import { TextListInput } from 'ui/list-inputs/TextListInput';
 
 export const DefaultMetadataSection = React.memo(() => {
   const { t } = useTranslation(['settings']);

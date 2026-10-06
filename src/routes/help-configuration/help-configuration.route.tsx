@@ -1,11 +1,11 @@
 import { Grid, Typography, useTheme } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
-import PageFullWidth from 'deprecated/legacy/commons/components/pages/PageFullWidth';
-import { useEffectOnce } from 'deprecated/legacy/commons/components/utils/hooks/useEffectOnce';
+import PageFullWidth from 'core/template/components/pages/PageFullWidth';
+import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
-import CustomChip from 'ui/CustomChip';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import CustomChip from 'ui/CustomChip';
 
 export default function Configuration() {
   const { apiCall } = useMyAPI();

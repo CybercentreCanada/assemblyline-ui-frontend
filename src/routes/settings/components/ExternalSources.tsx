@@ -1,10 +1,10 @@
 import { List, useTheme } from '@mui/material';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
+import useALContext from 'core/config/useALContext';
+import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useForm } from 'routes/settings/settings.form.ts';
 import { PageSection } from 'ui/layouts/PageSection';
 import { BooleanListInput } from 'ui/list-inputs/BooleanListInput';
-import React, { useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
 
 export const ExternalSourcesSection = React.memo(() => {
   const { t } = useTranslation(['settings']);

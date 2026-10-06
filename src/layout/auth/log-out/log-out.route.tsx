@@ -1,8 +1,8 @@
 import { CircularProgress, Typography, useTheme } from '@mui/material';
-import { useAppLayout } from 'deprecated/legacy/commons/components/app/hooks';
-import useAppBannerVert from 'deprecated/legacy/commons/components/app/hooks/useAppBannerVert';
-import PageCardCentered from 'core/template/components/AppPageCardCentered';
-import { useEffectOnce } from 'deprecated/legacy/commons/components/utils/hooks/useEffectOnce';
+import PageCardCentered from 'core/template/branding/AppPageCardCentered';
+import { useAppLayout } from 'core/template/components/app/hooks';
+import useAppBannerVert from 'core/template/components/app/hooks/useAppBannerVert';
+import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import { useTranslation } from 'react-i18next';
 

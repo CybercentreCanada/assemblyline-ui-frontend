@@ -1,19 +1,19 @@
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import { Box, Button, Collapse, Menu, MenuItem, Typography, useTheme } from '@mui/material';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
-import useHighlighter from 'deprecated/legacy/components/hooks/useHighlighter';
+import useALContext from 'core/config/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
-import useSafeResults from 'deprecated/legacy/components/hooks/useSafeResults';
+import useHighlighter from 'layout/highlighter/useHighlighter';
+import useSafeResults from 'layout/safe-results/useSafeResults';
 import type { AlternateResult, FileResult } from 'models/base/result';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import Classification from 'ui/Classification';
 import Moment from 'ui/Moment';
 import ExtractedSection from 'ui/ResultCard/extracted';
 import ResultSection from 'ui/ResultCard/result_section';
 import SupplementarySection from 'ui/ResultCard/supplementary';
 import Verdict from 'ui/Verdict';
-import React, { useEffect, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 
 export const emptyResult = (result: FileResult) =>
   result.result.score === 0 &&

@@ -3,24 +3,17 @@ import WarningAmberOutlinedIcon from '@mui/icons-material/WarningAmberOutlined';
 import { AlertTitle, Divider, Grid, Pagination, Paper, Skeleton, Typography, useTheme } from '@mui/material';
 import LinearProgress from '@mui/material/LinearProgress';
 import TableContainer from '@mui/material/TableContainer';
-import { useAppUser } from 'deprecated/legacy/commons/components/app/hooks';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
+import useALContext from 'core/config/useALContext';
+import { useAppUser } from 'core/template/components/app/hooks';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
-import type { Retrohunt } from 'models/base/retrohunt';
 import type { SearchResult } from 'models/api/search';
 import type { CustomUser } from 'models/api/user';
-import {
-  DivTable,
-  DivTableBody,
-  DivTableCell,
-  DivTableHead,
-  DivTableRow,
-  SortableHeaderCell
-} from 'ui/DivTable';
-import InformativeAlert from 'ui/InformativeAlert';
-import SimpleSearchQuery from 'ui/SearchBar/simple-search-query';
+import type { Retrohunt } from 'models/base/retrohunt';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow, SortableHeaderCell } from 'ui/DivTable';
+import InformativeAlert from 'ui/InformativeAlert';
+import SimpleSearchQuery from 'ui/SearchBar/simple-search-query';
 
 const PAGE_SIZE = 10;
 

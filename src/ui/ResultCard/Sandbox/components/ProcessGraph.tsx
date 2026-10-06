@@ -15,9 +15,12 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
-import useSafeResults from 'deprecated/legacy/components/hooks/useSafeResults';
+import useALContext from 'core/config/useALContext';
+import useSafeResults from 'layout/safe-results/useSafeResults';
 import type { SandboxBody as SandboxData, SandboxProcessItem } from 'models/base/result_body';
+import React, { useCallback, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { humanReadableNumber } from 'shared/utils/utils';
 import { CustomChip } from 'ui/CustomChip';
 import type { ProcessItem, SandboxFilter } from 'ui/ResultCard/Sandbox/sandbox.utils.ts';
 import {
@@ -28,9 +31,6 @@ import {
   getDescendantPids,
   getProcessScore
 } from 'ui/ResultCard/Sandbox/sandbox.utils.ts';
-import { humanReadableNumber } from 'shared/utils/utils';
-import React, { useCallback, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 
 /* ----------------------------------------------------------------------------
  * ProcessStats

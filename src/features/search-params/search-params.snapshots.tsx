@@ -3,7 +3,7 @@ import type {
   ParamValues,
   SearchParamRuntimes,
   SearchParamValues
-} from 'deprecated/legacy/components/core/SearchParams/lib/search_params.model.tsx';
+} from 'features/SearchParams/lib/search_params.model';
 import type { ParamRuntime } from 'features/search-params/search-params.runtimes.tsx';
 import type { Location } from 'react-router';
 

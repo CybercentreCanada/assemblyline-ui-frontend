@@ -1,21 +1,21 @@
 import { Box, Button, CircularProgress, Link, Stack, Typography, useTheme } from '@mui/material';
-import { useAppBanner, useAppLayout } from 'deprecated/legacy/commons/components/app/hooks';
-import useAppBannerVert from 'deprecated/legacy/commons/components/app/hooks/useAppBannerVert';
-import PageCardCentered from 'core/template/components/AppPageCardCentered';
 import { useAPIStore } from 'core/api/api.providers';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
+import PageCardCentered from 'core/template/branding/AppPageCardCentered';
+import { useAppBanner, useAppLayout } from 'core/template/components/app/hooks';
+import useAppBannerVert from 'core/template/components/app/hooks/useAppBannerVert';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
 import { OneTimePassLogin } from 'deprecated/legacy/components/routes/login/otp';
 import { ResetPassword, ResetPasswordNow } from 'deprecated/legacy/components/routes/login/reset';
-import { SecurityTokenLogin } from 'layout/auth/log-in/components/SecurityToken';
 import { SignUp } from 'deprecated/legacy/components/routes/login/signup';
 import { SSOLogin } from 'deprecated/legacy/components/routes/login/sso';
 import { UserPassLogin } from 'deprecated/legacy/components/routes/login/userpass';
-import TextDivider from 'ui/TextDivider';
-import { getProvider, getSAMLData } from 'shared/utils/utils';
+import { SecurityTokenLogin } from 'layout/auth/log-in/components/SecurityToken';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
+import { getProvider, getSAMLData } from 'shared/utils/utils';
+import TextDivider from 'ui/TextDivider';
 
 type LoginScreenProps = {
   allowUserPass: boolean;

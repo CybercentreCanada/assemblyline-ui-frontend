@@ -1,7 +1,7 @@
 import BrokenImageOutlinedIcon from '@mui/icons-material/BrokenImageOutlined';
 import { Badge, Button, CircularProgress, Tooltip, useTheme } from '@mui/material';
-import useCarousel from 'deprecated/legacy/components/hooks/useCarousel';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useCarousel from 'layout/carousel/useCarousel';
 import type { Image, ImageBody } from 'models/base/result_body';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';

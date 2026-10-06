@@ -16,9 +16,9 @@ import {
   useTheme
 } from '@mui/material';
 
-import { useAppSearchService } from 'deprecated/legacy/commons/components/app/hooks/useAppSearchService';
-import AppSearchInput from 'deprecated/legacy/commons/components/search/AppSearchInput';
-import AppSearchResult from 'deprecated/legacy/commons/components/search/AppSearchResult';
+import { useAppSearchService } from 'core/template/components/app/hooks/useAppSearchService';
+import AppSearchInput from 'core/template/components/search/AppSearchInput';
+import AppSearchResult from 'core/template/components/search/AppSearchResult';
 import { parseEvent } from 'deprecated/utils/keyboard';
 import { type ChangeEvent, forwardRef, type KeyboardEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';

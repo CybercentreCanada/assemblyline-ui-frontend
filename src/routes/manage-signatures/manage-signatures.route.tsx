@@ -1,30 +1,26 @@
 import BlockIcon from '@mui/icons-material/Block';
 import RecordVoiceOverOutlinedIcon from '@mui/icons-material/RecordVoiceOverOutlined';
 import { useMediaQuery, useTheme } from '@mui/material';
-import { useAppUser } from 'deprecated/legacy/commons/components/app/hooks';
-import PageContainer from 'core/template/components/AppPageContainer';
-import PageFullWidth from 'deprecated/legacy/commons/components/pages/PageFullWidth';
-import {
-  createSearchParams,
-  SearchParamsProvider,
-  useSearchParams
-} from 'deprecated/legacy/components/core/SearchParams/createSearchParams';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
-import useDrawer from 'deprecated/legacy/components/hooks/useDrawer';
+import useALContext from 'core/config/useALContext';
+import PageContainer from 'core/template/branding/AppPageContainer';
+import { useAppUser } from 'core/template/components/app/hooks';
+import PageFullWidth from 'core/template/components/pages/PageFullWidth';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
-import type { Signature } from 'models/base/signature';
+import { createSearchParams, SearchParamsProvider, useSearchParams } from 'features/SearchParams/createSearchParams';
+import useDrawer from 'layout/drawer/useDrawer';
 import type { SearchResult } from 'models/api/search';
 import type { CustomUser, IndexDefinition } from 'models/api/user';
-import ForbiddenPage from 'routes/forbidden/forbidden';
-import SignatureDetail from 'routes/manage-signature-detail/manage-signature-detail.route';
-import { FileDownloader } from 'ui/buttons/FileDownloader';
-import { PageHeader } from 'ui/layouts/PageHeader';
-import SearchHeader from 'ui/SearchBar/SearchHeader';
-import { DEFAULT_SUGGESTION } from 'ui/SearchBar/search-textfield';
-import SignaturesTable from 'routes/search/components/signatures';
+import type { Signature } from 'models/base/signature';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
+import ForbiddenPage from 'routes/forbidden/forbidden';
+import SignatureDetail from 'routes/manage-signature-detail/manage-signature-detail.route';
+import SignaturesTable from 'routes/search/components/signatures';
+import { FileDownloader } from 'ui/buttons/FileDownloader';
+import { PageHeader } from 'ui/layouts/PageHeader';
+import { DEFAULT_SUGGESTION } from 'ui/SearchBar/search-textfield';
+import SearchHeader from 'ui/SearchBar/SearchHeader';
 
 export const SIGNATURES_PARAMS = createSearchParams(p => ({
   query: p.string(''),

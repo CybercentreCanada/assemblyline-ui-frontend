@@ -3,8 +3,10 @@ import GroupOutlinedIcon from '@mui/icons-material/GroupOutlined';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
 import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import { Grid, Tooltip, useTheme } from '@mui/material';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
+import useALContext from 'core/config/useALContext';
 import type { Alert, DetailedItem } from 'models/base/alert';
+import React, { useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   AlertExtendedScan,
   AlertListChip,
@@ -12,13 +14,11 @@ import {
   AlertPriority,
   AlertStatus
 } from 'routes/alerts/components/Components';
+import { verdictRank, verdictToColor } from 'shared/utils/utils';
 import { ChipList } from 'ui/ChipList';
 import CustomChip from 'ui/CustomChip';
 import Moment from 'ui/Moment';
 import Verdict from 'ui/Verdict';
-import { verdictRank, verdictToColor } from 'shared/utils/utils';
-import React, { useCallback, useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
 
 type Props = {
   item: Alert;

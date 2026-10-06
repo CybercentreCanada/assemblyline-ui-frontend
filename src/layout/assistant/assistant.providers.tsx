@@ -22,17 +22,17 @@ import {
 } from '@mui/material';
 import MuiPopper from '@mui/material/Popper';
 import { styled } from '@mui/material/styles';
-import type { AppUser } from 'deprecated/legacy/commons/components/app/AppUserService';
-import { useAppUser } from 'deprecated/legacy/commons/components/app/hooks';
-import AppAvatar from 'deprecated/legacy/commons/components/display/AppAvatar';
-import { isEnter } from 'deprecated/utils/keyboard';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
+import useALContext from 'core/config/useALContext';
+import type { AppUser } from 'core/template/components/app/AppUserService';
+import { useAppUser } from 'core/template/components/app/hooks';
+import AppAvatar from 'core/template/components/display/AppAvatar';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
+import { isEnter } from 'deprecated/utils/keyboard';
+import React, { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import AIMarkdown from 'ui/AiMarkdown';
 import CustomChip from 'ui/CustomChip';
 import { ThinkingBadge } from 'ui/ThinkingBadge';
-import React, { useEffect, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 
 const Popper = styled(MuiPopper)(() => ({
   zIndex: 1,

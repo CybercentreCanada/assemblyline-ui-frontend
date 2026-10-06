@@ -1,12 +1,12 @@
 import type { APIRequest, APIResponse } from 'core/api/api.models.ts';
-import { DEFAULT_RETRY_MS } from 'deprecated/legacy/components/core/Query/components/constants';
 import { isAPIData } from 'core/api/api.utils';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
+import { DEFAULT_RETRY_MS } from 'core/api/constants';
+import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
-import useQuota from 'deprecated/legacy/components/hooks/useQuota';
-import getXSRFCookie from 'shared/utils/xsrf';
+import useQuota from 'layout/quota/useQuota';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import getXSRFCookie from 'shared/utils/xsrf';
 
 export type UseAPICallFnProps<
   Response extends APIResponse,

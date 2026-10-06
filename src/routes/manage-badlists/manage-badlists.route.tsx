@@ -3,29 +3,25 @@ import BlockOutlinedIcon from '@mui/icons-material/BlockOutlined';
 import LabelOutlinedIcon from '@mui/icons-material/LabelOutlined';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
 import { useTheme } from '@mui/material';
-import { useAppUser } from 'deprecated/legacy/commons/components/app/hooks';
-import PageContainer from 'core/template/components/AppPageContainer';
-import PageFullWidth from 'deprecated/legacy/commons/components/pages/PageFullWidth';
 import { useALQuery } from 'core/api/hooks/useAppQuery';
-import {
-  createSearchParams,
-  SearchParamsProvider,
-  useSearchParams
-} from 'deprecated/legacy/components/core/SearchParams/createSearchParams';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
-import useDrawer from 'deprecated/legacy/components/hooks/useDrawer';
+import useALContext from 'core/config/useALContext';
+import PageContainer from 'core/template/branding/AppPageContainer';
+import { useAppUser } from 'core/template/components/app/hooks';
+import PageFullWidth from 'core/template/components/pages/PageFullWidth';
+import { createSearchParams, SearchParamsProvider, useSearchParams } from 'features/SearchParams/createSearchParams';
+import useDrawer from 'layout/drawer/useDrawer';
 import type { CustomUser, IndexDefinition } from 'models/api/user';
-import ForbiddenPage from 'routes/forbidden/forbidden';
-import BadlistNew from 'routes/manage-badlist-add/manage-badlist-add.route';
-import BadlistDetail from 'routes/manage-badlist-detail/manage-badlist-detail.route';
-import { IconButton } from 'deprecated/legacy/components/visual/Buttons/IconButton';
-import { PageHeader } from 'ui/layouts/PageHeader';
-import SearchHeader from 'ui/SearchBar/SearchHeader';
-import { DEFAULT_SUGGESTION } from 'ui/SearchBar/search-textfield';
-import BadlistTable from 'routes/search/components/badlist';
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
+import ForbiddenPage from 'routes/forbidden/forbidden';
+import BadlistNew from 'routes/manage-badlist-add/manage-badlist-add.route';
+import BadlistDetail from 'routes/manage-badlist-detail/manage-badlist-detail.route';
+import BadlistTable from 'routes/search/components/badlist';
+import { IconButton } from 'ui/buttons/IconButton';
+import { PageHeader } from 'ui/layouts/PageHeader';
+import { DEFAULT_SUGGESTION } from 'ui/SearchBar/search-textfield';
+import SearchHeader from 'ui/SearchBar/SearchHeader';
 
 const BADLIST_PARAMS = createSearchParams(p => ({
   query: p.string(''),

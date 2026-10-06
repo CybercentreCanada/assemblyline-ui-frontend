@@ -1,8 +1,9 @@
 import type { ThemeObject } from '@microlink/react-json-view';
 import ReactJson from '@microlink/react-json-view';
 import { useTheme } from '@mui/material';
-import { useAppTheme } from 'deprecated/legacy/commons/components/app/hooks';
+import { useAppTheme } from 'core/template/components/app/hooks';
 import { PropProvider, usePropStore } from 'features/prop-provider/prop-provider.providers';
+import React, { useMemo } from 'react';
 import {
   HelpInputAdornment,
   InputEndAdornment,
@@ -26,7 +27,6 @@ import type {
   InputValueModel
 } from 'ui/inputs/models/inputs.model.ts';
 import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'ui/inputs/models/inputs.model.ts';
-import React, { useMemo } from 'react';
 
 export type JSONInputProps = InputValueModel<object> & InputOptions & InputSlotProps;
 

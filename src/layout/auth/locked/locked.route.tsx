@@ -1,10 +1,10 @@
 import HourglassEmptyOutlinedIcon from '@mui/icons-material/HourglassEmptyOutlined';
 import { useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
-import PageCenter from 'deprecated/legacy/commons/components/pages/PageCenter';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
-import ForbiddenPage from 'routes/forbidden/forbidden';
+import useALContext from 'core/config/useALContext';
+import PageCenter from 'core/template/components/pages/PageCenter';
 import { useTranslation } from 'react-i18next';
+import ForbiddenPage from 'routes/forbidden/forbidden';
 
 const LockedPage = () => {
   const { t } = useTranslation(['locked']);

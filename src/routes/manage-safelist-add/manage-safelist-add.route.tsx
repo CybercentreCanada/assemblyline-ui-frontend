@@ -12,11 +12,11 @@ import {
   useTheme
 } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
-import PageFullWidth from 'deprecated/legacy/commons/components/pages/PageFullWidth';
-import { useEffectOnce } from 'deprecated/legacy/commons/components/utils/hooks/useEffectOnce';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
+import PageFullWidth from 'core/template/components/pages/PageFullWidth';
+import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
 import { HASHES } from 'models/base/badlist';
 import type { Safelist } from 'models/base/safelist';
 import {
@@ -25,14 +25,14 @@ import {
   DEFAULT_SAFELIST_SIGNATURE,
   DEFAULT_SAFELIST_TAG
 } from 'models/base/safelist';
-import ForbiddenPage from 'routes/forbidden/forbidden';
-import Classification from 'ui/Classification';
-import DatePicker from 'ui/DatePicker';
-import { RouterPrompt } from 'deprecated/legacy/components/visual/RouterPrompt';
-import { HASH_MAP, MD5_REGEX, SHA1_REGEX, SHA256_REGEX, SSDEEP_REGEX, TLSH_REGEX } from 'shared/utils/constants';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router';
+import ForbiddenPage from 'routes/forbidden/forbidden';
+import { HASH_MAP, MD5_REGEX, SHA1_REGEX, SHA256_REGEX, SSDEEP_REGEX, TLSH_REGEX } from 'shared/utils/constants';
+import Classification from 'ui/Classification';
+import DatePicker from 'ui/DatePicker';
+import { RouterPrompt } from 'ui/RouterPrompt';
 
 type ParamProps = {
   id: string;

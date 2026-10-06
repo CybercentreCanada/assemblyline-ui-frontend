@@ -3,31 +3,27 @@ import BlockOutlinedIcon from '@mui/icons-material/BlockOutlined';
 import LabelOutlinedIcon from '@mui/icons-material/LabelOutlined';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
 import { useTheme } from '@mui/material';
-import { useAppUser } from 'deprecated/legacy/commons/components/app/hooks';
-import PageContainer from 'core/template/components/AppPageContainer';
-import PageFullWidth from 'deprecated/legacy/commons/components/pages/PageFullWidth';
-import {
-  createSearchParams,
-  SearchParamsProvider,
-  useSearchParams
-} from 'deprecated/legacy/components/core/SearchParams/createSearchParams';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
-import useDrawer from 'deprecated/legacy/components/hooks/useDrawer';
+import useALContext from 'core/config/useALContext';
+import PageContainer from 'core/template/branding/AppPageContainer';
+import { useAppUser } from 'core/template/components/app/hooks';
+import PageFullWidth from 'core/template/components/pages/PageFullWidth';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
-import type { Safelist } from 'models/base/safelist';
+import { createSearchParams, SearchParamsProvider, useSearchParams } from 'features/SearchParams/createSearchParams';
+import useDrawer from 'layout/drawer/useDrawer';
 import type { SearchResult } from 'models/api/search';
 import type { CustomUser, IndexDefinition } from 'models/api/user';
-import ForbiddenPage from 'routes/forbidden/forbidden';
-import SafelistNew from 'routes/manage-safelist-add/manage-safelist-add.route';
-import SafelistDetail from 'routes/manage-safelist-detail/manage-safelist-detail.route';
-import { IconButton } from 'deprecated/legacy/components/visual/Buttons/IconButton';
-import { PageHeader } from 'ui/layouts/PageHeader';
-import SearchHeader from 'ui/SearchBar/SearchHeader';
-import { DEFAULT_SUGGESTION } from 'ui/SearchBar/search-textfield';
-import SafelistTable from 'routes/search/components/safelist';
+import type { Safelist } from 'models/base/safelist';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
+import ForbiddenPage from 'routes/forbidden/forbidden';
+import SafelistNew from 'routes/manage-safelist-add/manage-safelist-add.route';
+import SafelistDetail from 'routes/manage-safelist-detail/manage-safelist-detail.route';
+import SafelistTable from 'routes/search/components/safelist';
+import { IconButton } from 'ui/buttons/IconButton';
+import { PageHeader } from 'ui/layouts/PageHeader';
+import { DEFAULT_SUGGESTION } from 'ui/SearchBar/search-textfield';
+import SearchHeader from 'ui/SearchBar/SearchHeader';
 
 const SAFELIST_PARAMS = createSearchParams(p => ({
   query: p.string(''),

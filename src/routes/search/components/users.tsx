@@ -3,9 +3,11 @@ import DoneIcon from '@mui/icons-material/Done';
 import { AlertTitle, Skeleton } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
-import type { UserIndexed } from 'models/base/user';
+import useALContext from 'core/config/useALContext';
 import type { SearchResult } from 'models/api/search';
+import type { UserIndexed } from 'models/base/user';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
 import Classification from 'ui/Classification';
 import {
   DivTable,
@@ -17,8 +19,6 @@ import {
   SortableHeaderCell
 } from 'ui/DivTable';
 import InformativeAlert from 'ui/InformativeAlert';
-import React from 'react';
-import { useTranslation } from 'react-i18next';
 
 type Props = {
   userResults: SearchResult<UserIndexed>;

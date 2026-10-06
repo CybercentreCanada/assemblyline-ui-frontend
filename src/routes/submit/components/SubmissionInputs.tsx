@@ -13,13 +13,17 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
+import useALContext from 'core/config/useALContext';
+import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import type { APIResponseProps } from 'deprecated/hooks/useMyAPI';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
-import useMySnackbar from 'core/snackbar/snackbar.hooks';
+import type { SearchResult } from 'models/api/search';
 import type { File } from 'models/base/file';
 import type { Submission } from 'models/base/submission';
-import type { SearchResult } from 'models/api/search';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router';
+import { Link } from 'react-router-dom';
 import { getProfileNames } from 'routes/settings/settings.utils.ts';
 import FileDropper from 'routes/submit/components/FileDropper';
 import type { SubmitStore } from 'routes/submit/submit.form.ts';
@@ -32,9 +36,11 @@ import {
   switchProfile,
   useAutoURLServicesSelection
 } from 'routes/submit/submit.utils.ts';
-import type { ButtonProps } from 'deprecated/legacy/components/visual/Buttons/Button';
-import { Button } from 'deprecated/legacy/components/visual/Buttons/Button';
-import { IconButton } from 'deprecated/legacy/components/visual/Buttons/IconButton';
+import { getSubmitType } from 'shared/utils/utils';
+import generateUUID from 'shared/utils/uuid';
+import type { ButtonProps } from 'ui/buttons/Button';
+import { Button } from 'ui/buttons/Button';
+import { IconButton } from 'ui/buttons/IconButton';
 import Classification from 'ui/Classification';
 import { CheckboxInput } from 'ui/inputs/CheckboxInput';
 import type { SelectInputOption } from 'ui/inputs/models/inputs.model.ts';
@@ -42,12 +48,6 @@ import { SelectInput } from 'ui/inputs/SelectInput';
 import { SwitchInput } from 'ui/inputs/SwitchInput';
 import { TextAreaInput } from 'ui/inputs/TextAreaInput';
 import { TextInput } from 'ui/inputs/TextInput';
-import { getSubmitType } from 'shared/utils/utils';
-import generateUUID from 'shared/utils/uuid';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
-import { Link } from 'react-router-dom';
 
 export const ClassificationInput = React.memo(() => {
   const { t } = useTranslation(['submit']);

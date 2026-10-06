@@ -1,13 +1,13 @@
 import { Grid, Skeleton, useMediaQuery, useTheme } from '@mui/material';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
+import useALContext from 'core/config/useALContext';
 import type { File as FileInfo } from 'models/base/file';
 import type { Section } from 'models/base/result';
 import type { KeyValueBody, OrderedKeyValueBody } from 'models/base/result_body';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
 import Classification from 'ui/Classification';
 import { ImageInlineBody } from 'ui/image_inline';
 import SectionContainer from 'ui/SectionContainer';
-import React from 'react';
-import { useTranslation } from 'react-i18next';
 
 const KVItem = ({ name, value }: { name: string; value: any }) => (
   <>

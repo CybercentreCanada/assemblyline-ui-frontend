@@ -14,17 +14,14 @@ import {
   useTheme
 } from '@mui/material';
 import { usePropStore } from 'features/prop-provider/prop-provider.providers';
-import { IconButton } from 'deprecated/legacy/components/visual/Buttons/IconButton';
-import {
-  InputListItemText,
-  SelectInputOptionMenuItem
-} from 'ui/inputs/components/inputs.component.form.tsx';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { IconButton } from 'ui/buttons/IconButton';
+import { InputListItemText, SelectInputOptionMenuItem } from 'ui/inputs/components/inputs.component.form.tsx';
 import { useInputTextFieldSlots } from 'ui/inputs/components/inputs.component.textfield.tsx';
 import { useInputId } from 'ui/inputs/hooks/inputs.hook.renderer.tsx';
 import type { SelectInputOption } from 'ui/inputs/models/inputs.model.ts';
 import type { ListInputControllerProps } from 'ui/list-inputs/lib/listinputs.model.ts';
-import React from 'react';
-import { useTranslation } from 'react-i18next';
 
 /**********************************************************************************************************************
  * Skeletons

@@ -3,14 +3,14 @@ import CheckBoxOutlinedIcon from '@mui/icons-material/CheckBoxOutlined';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import { Button, Collapse, Divider, Grid, Skeleton, Typography, useMediaQuery, useTheme } from '@mui/material';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
+import useALContext from 'core/config/useALContext';
 import type { SelectedService } from 'models/base/service';
 import type { ParsedSubmission } from 'models/base/submission';
+import React, { Fragment, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import Moment from 'ui/Moment';
 import Priority from 'ui/Priority';
 import Verdict from 'ui/Verdict';
-import React, { Fragment, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 
 type Props = {
   submission: ParsedSubmission;

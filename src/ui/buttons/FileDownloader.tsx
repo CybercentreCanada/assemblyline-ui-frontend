@@ -1,10 +1,10 @@
 import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
-import type { IconButtonProps } from 'deprecated/legacy/components/visual/Buttons/IconButton';
-import { IconButton } from 'deprecated/legacy/components/visual/Buttons/IconButton';
-import { getTextContent } from 'shared/utils/utils';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
 import React, { useCallback, useMemo, useState } from 'react';
+import { getTextContent } from 'shared/utils/utils';
+import type { IconButtonProps } from 'ui/buttons/IconButton';
+import { IconButton } from 'ui/buttons/IconButton';
 
 export type FileDownloaderProps = IconButtonProps & {
   link: string | (() => string);

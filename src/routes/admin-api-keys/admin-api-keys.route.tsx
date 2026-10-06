@@ -1,27 +1,23 @@
 import PersonIcon from '@mui/icons-material/Person';
 import { Grid, useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
-import PageContainer from 'core/template/components/AppPageContainer';
-import PageFullWidth from 'deprecated/legacy/commons/components/pages/PageFullWidth';
-import {
-  createSearchParams,
-  SearchParamsProvider,
-  useSearchParams
-} from 'deprecated/legacy/components/core/SearchParams/createSearchParams';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
-import useDrawer from 'deprecated/legacy/components/hooks/useDrawer';
+import useALContext from 'core/config/useALContext';
+import PageContainer from 'core/template/branding/AppPageContainer';
+import PageFullWidth from 'core/template/components/pages/PageFullWidth';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
-import type { ApiKey } from 'models/base/user';
+import { createSearchParams, SearchParamsProvider, useSearchParams } from 'features/SearchParams/createSearchParams';
+import useDrawer from 'layout/drawer/useDrawer';
 import type { SearchResult } from 'models/api/search';
 import type { IndexDefinition } from 'models/api/user';
-import ApikeyDetail from 'routes/admin-api-key-detail/admin-api-key-detail.route';
-import SearchHeader from 'ui/SearchBar/SearchHeader';
-import { DEFAULT_SUGGESTION } from 'ui/SearchBar/search-textfield';
-import ApikeysTable from 'routes/search/components/apikeys';
-import { safeFieldValue } from 'shared/utils/utils';
+import type { ApiKey } from 'models/base/user';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useLocation, useNavigate } from 'react-router';
+import ApikeyDetail from 'routes/admin-api-key-detail/admin-api-key-detail.route';
+import ApikeysTable from 'routes/search/components/apikeys';
+import { safeFieldValue } from 'shared/utils/utils';
+import SearchHeader from 'ui/SearchBar/SearchHeader';
+import { DEFAULT_SUGGESTION } from 'ui/SearchBar/search-textfield';
 
 const API_KEYS_PARAMS = createSearchParams(p => ({
   query: p.string(''),

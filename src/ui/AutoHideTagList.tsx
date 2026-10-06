@@ -1,15 +1,15 @@
 import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
 import { IconButton, Tooltip, useTheme } from '@mui/material';
-import useHighlighter from 'deprecated/legacy/components/hooks/useHighlighter';
-import useSafeResults from 'deprecated/legacy/components/hooks/useSafeResults';
+import useHighlighter from 'layout/highlighter/useHighlighter';
+import useSafeResults from 'layout/safe-results/useSafeResults';
 import type { Verdict } from 'models/base/alert';
+import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { SECOND_LEVEL_DOMAINS } from 'shared/utils/2LD';
+import { verdictRank, verdictToColor } from 'shared/utils/utils';
 import CustomChip from 'ui/CustomChip';
 import Heuristic from 'ui/Heuristic';
 import Tag from 'ui/Tag';
-import { SECOND_LEVEL_DOMAINS } from 'shared/utils/2LD';
-import { verdictRank, verdictToColor } from 'shared/utils/utils';
-import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 
 const DOMAIN_KEYS = ['network.static.domain', 'network.dynamic.domain'];
 const IP_KEYS = ['network.static.ip', 'network.dynamic.ip'];

@@ -1,4 +1,5 @@
 import { Grid, useTheme } from '@mui/material';
+import PageCenter from 'core/template/components/pages/PageCenter';
 import useListKeyboard from 'deprecated/components/lists/hooks/useListKeyboard';
 import useListNavigator from 'deprecated/components/lists/hooks/useListNavigator';
 import type { LineItem } from 'deprecated/components/lists/item/ListItemBase';
@@ -8,7 +9,6 @@ import SimpleListScroller from 'deprecated/components/lists/scrollers/SimpleList
 import { Inner, Outer, ProgressCt, ProgressSpinner } from 'deprecated/components/lists/simplelist/SimpleList';
 import type { TableListMoreConfig } from 'deprecated/components/lists/table/TableListMoreBtn';
 import TableListMoreBtn from 'deprecated/components/lists/table/TableListMoreBtn';
-import PageCenter from 'deprecated/legacy/commons/components/pages/PageCenter';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 interface Breakpoints {

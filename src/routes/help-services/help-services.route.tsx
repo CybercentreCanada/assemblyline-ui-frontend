@@ -1,13 +1,13 @@
 import { Card, CardHeader, Grid, Typography, useTheme } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
-import PageFullWidth from 'deprecated/legacy/commons/components/pages/PageFullWidth';
-import { useEffectOnce } from 'deprecated/legacy/commons/components/utils/hooks/useEffectOnce';
+import PageFullWidth from 'core/template/components/pages/PageFullWidth';
+import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import Classification from 'ui/Classification';
 import CustomChip from 'ui/CustomChip';
 import { PageHeader } from 'ui/layouts/PageHeader';
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 
 function ServiceCard({ service }) {
   const { t } = useTranslation(['helpServices']);

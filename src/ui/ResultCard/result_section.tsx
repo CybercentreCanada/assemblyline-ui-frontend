@@ -17,11 +17,13 @@ import {
   Tooltip,
   useTheme
 } from '@mui/material';
+import useALContext from 'core/config/useALContext';
 import useClipboard from 'deprecated/hooks/useClipboard';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
-import useHighlighter from 'deprecated/legacy/components/hooks/useHighlighter';
-import useSafeResults from 'deprecated/legacy/components/hooks/useSafeResults';
+import useHighlighter from 'layout/highlighter/useHighlighter';
+import useSafeResults from 'layout/safe-results/useSafeResults';
 import type { Section, SectionItem } from 'models/base/result';
+import React, { useCallback, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import Attack from 'ui/Attack';
 import Classification from 'ui/Classification';
 import Heuristic from 'ui/Heuristic';
@@ -42,8 +44,6 @@ import { URLBody } from 'ui/ResultCard/url_body';
 import SectionHighlight from 'ui/SectionHighlight';
 import Tag from 'ui/Tag';
 import Verdict from 'ui/Verdict';
-import React, { useCallback, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 
 const CLIPBOARD_ICON = <AssignmentOutlinedIcon style={{ marginRight: '16px' }} />;
 const HEURISTIC_ICON = <SimCardOutlinedIcon style={{ marginRight: '16px' }} />;

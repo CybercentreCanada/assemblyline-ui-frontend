@@ -1,4 +1,4 @@
-import { AppBarContext } from 'deprecated/legacy/commons/components/app/AppContexts';
+import { AppBarContext } from 'core/template/components/app/AppContexts';
 import { useContext } from 'react';
 
 export function useAppBar() {

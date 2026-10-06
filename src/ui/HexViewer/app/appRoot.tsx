@@ -1,8 +1,8 @@
 import { useMediaQuery, useTheme } from '@mui/material';
-import { useAppTheme } from 'deprecated/legacy/commons/components/app/hooks';
-import 'ui/HexViewer/styles/hex.css';
+import { useAppTheme } from 'core/template/components/app/hooks';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import 'ui/HexViewer/styles/hex.css';
 import type { DataProps, ModeLanguage, ModeTheme, ModeWidth } from '..';
 import { ACTIONS, HexLoading, HexPageLayout, useStore } from '..';
 

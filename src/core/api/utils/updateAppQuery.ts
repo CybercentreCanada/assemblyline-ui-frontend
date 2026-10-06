@@ -1,6 +1,6 @@
-import { queryClient } from 'core/api/api.providers';
-import type { ALRequests, ALResponses } from 'deprecated/legacy/components/core/Query/components/al.models.ts';
+import type { ALRequests, ALResponses } from 'app/core.api';
 import type { APIQueryKey, APIRequest, APIResponse } from 'core/api/api.models.ts';
+import { queryClient } from 'core/api/api.providers';
 
 function isObject(variable) {
   return variable !== null && typeof variable === 'object' && !Array.isArray(variable);

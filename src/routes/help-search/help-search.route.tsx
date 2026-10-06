@@ -11,15 +11,15 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
+import useALContext from 'core/config/useALContext';
+import { useAppBar, useAppLayout } from 'core/template/components/app/hooks';
+import PageCenter from 'core/template/components/pages/PageCenter';
 import type { ContentWithTOCItemDef } from 'deprecated/components/toc/Toc';
 import ContentWithTOC from 'deprecated/components/toc/Toc';
-import { useAppBar, useAppLayout } from 'deprecated/legacy/commons/components/app/hooks';
-import PageCenter from 'deprecated/legacy/commons/components/pages/PageCenter';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
-import CustomChip from 'ui/CustomChip';
-import { PageHeader } from 'ui/layouts/PageHeader';
 import { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import CustomChip from 'ui/CustomChip';
+import { PageHeader } from 'ui/layouts/PageHeader';
 
 const Toc: ContentWithTOCItemDef[] = [
   { id: 'overview' },

@@ -4,9 +4,12 @@ import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
 import { AlertTitle, IconButton, Skeleton, Tooltip, useTheme } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
-import { LABELS_COLOR_MAP, type FileIndexed, type LabelCategories } from 'models/base/file';
+import useALContext from 'core/config/useALContext';
 import type { SearchResult } from 'models/api/search';
+import { LABELS_COLOR_MAP, type FileIndexed, type LabelCategories } from 'models/base/file';
+import React, { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import { FileDownloader } from 'ui/buttons/FileDownloader';
 import Classification from 'ui/Classification';
 import CustomChip from 'ui/CustomChip';
@@ -21,9 +24,6 @@ import {
 } from 'ui/DivTable';
 import InformativeAlert from 'ui/InformativeAlert';
 import Moment from 'ui/Moment';
-import React, { useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
 
 type LabelCellProps = {
   label_categories?: LabelCategories;

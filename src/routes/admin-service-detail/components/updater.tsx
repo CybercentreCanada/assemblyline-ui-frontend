@@ -1,8 +1,10 @@
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
 import { Button, Grid, IconButton, Tooltip, Typography, useTheme } from '@mui/material';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
+import useALContext from 'core/config/useALContext';
 import type { Service, UpdateSource } from 'models/base/service';
 import { DEFAULT_SOURCE } from 'models/base/service';
+import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { showReset } from 'routes/admin-service-detail/components/service.utils.ts';
 import SourceDialog from 'routes/admin-service-detail/components/source_dialog';
 import { SourceCard } from 'routes/manage-signature-sources/manage-signature-sources.route';
@@ -11,8 +13,6 @@ import { RadioInput } from 'ui/inputs/RadioInput';
 import { SelectInput } from 'ui/inputs/SelectInput';
 import { SliderInput } from 'ui/inputs/SliderInput';
 import { TextInput } from 'ui/inputs/TextInput';
-import { useCallback, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 
 type ServiceUpdaterProps = {
   service: Service;

@@ -1,9 +1,12 @@
 import { AlertTitle, Skeleton } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
-import type { Heuristic } from 'models/base/heuristic';
+import useALContext from 'core/config/useALContext';
 import type { SearchResult } from 'models/api/search';
+import type { Heuristic } from 'models/base/heuristic';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import Classification from 'ui/Classification';
 import {
   DivTable,
@@ -16,9 +19,6 @@ import {
 } from 'ui/DivTable';
 import InformativeAlert from 'ui/InformativeAlert';
 import Moment from 'ui/Moment';
-import React from 'react';
-import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
 
 type Props = {
   heuristicResults: SearchResult<Heuristic>;

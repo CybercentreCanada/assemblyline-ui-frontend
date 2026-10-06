@@ -1,13 +1,18 @@
 import type { Monaco } from '@monaco-editor/react';
 import Editor, { loader } from '@monaco-editor/react';
 import { Button, Grid, Paper, Skeleton, Typography, useTheme } from '@mui/material';
-import PageFullSize from 'core/template/components/AppPageCenter';
-import { useALQuery } from 'core/api/hooks/useAppQuery';
 import { useAPIMutation } from 'core/api/hooks/useApiMutation';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
+import { useALQuery } from 'core/api/hooks/useAppQuery';
+import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
+import PageFullSize from 'core/template/branding/AppPageCenter';
 import type { ApiDocumentation } from 'models/api';
 import type { Method } from 'models/utils/request';
+import type { editor } from 'monaco-editor';
+import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Navigate } from 'react-router';
+import AutoSizer from 'react-virtualized-auto-sizer';
 import type { Request, Response } from 'routes/development-api/development-api.models.ts';
 import {
   formatMilliseconds,
@@ -18,11 +23,6 @@ import {
 } from 'routes/development-api/development-api.utils.ts';
 import CustomChip from 'ui/CustomChip';
 import { PageHeader } from 'ui/layouts/PageHeader';
-import type { editor } from 'monaco-editor';
-import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Navigate } from 'react-router';
-import AutoSizer from 'react-virtualized-auto-sizer';
 
 loader.config({ paths: { vs: '/cdn/monaco_0.35.0/vs' } });
 

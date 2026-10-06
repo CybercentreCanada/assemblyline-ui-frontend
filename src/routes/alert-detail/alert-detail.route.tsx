@@ -14,17 +14,21 @@ import {
   useTheme
 } from '@mui/material';
 import Alert from '@mui/material/Alert';
+import useALContext from 'core/config/useALContext';
+import { useAppUser } from 'core/template/components/app/hooks';
+import PageFullWidth from 'core/template/components/pages/PageFullWidth';
 import ListCarousel from 'deprecated/components/lists/carousel/ListCarousel';
 import ListNavigator from 'deprecated/components/lists/navigator/ListNavigator';
-import { useAppUser } from 'deprecated/legacy/commons/components/app/hooks';
-import PageFullWidth from 'deprecated/legacy/commons/components/pages/PageFullWidth';
 import useClipboard from 'deprecated/hooks/useClipboard';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
-import useAssistant from 'deprecated/legacy/components/hooks/useAssistant';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
-import type { AlertItem } from 'models/base/alert';
+import { SearchParamsProvider } from 'deprecated/legacy/components/routes/alerts/contexts/SearchParamsContext';
+import useAssistant from 'layout/assistant/useAssistant';
 import type { CustomUser } from 'models/api/user';
-import ForbiddenPage from 'routes/forbidden/forbidden';
+import type { AlertItem } from 'models/base/alert';
+import React, { memo, useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { BsClipboard } from 'react-icons/bs';
+import { useParams } from 'react-router';
 import { ALERT_DEFAULT_PARAMS, ALERT_SIMPLELIST_ID } from 'routes/alerts/alerts.route';
 import AlertActions, {
   AlertBadlist,
@@ -42,7 +46,8 @@ import {
   AutoHideChipList,
   SkeletonInline
 } from 'routes/alerts/components/Components';
-import { SearchParamsProvider } from 'deprecated/legacy/components/routes/alerts/contexts/SearchParamsContext';
+import ForbiddenPage from 'routes/forbidden/forbidden';
+import { verdictToColor } from 'shared/utils/utils';
 import { ActionableChipList } from 'ui/ActionableChipList';
 import ActionableText from 'ui/ActionableText';
 import { ChipSkeleton, ChipSkeletonInline } from 'ui/ChipList';
@@ -51,11 +56,6 @@ import CustomChip from 'ui/CustomChip';
 import Verdict from 'ui/Verdict';
 import VerdictBar from 'ui/VerdictBar';
 import { ImageInline } from 'ui/image_inline';
-import { verdictToColor } from 'shared/utils/utils';
-import React, { memo, useCallback, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { BsClipboard } from 'react-icons/bs';
-import { useParams } from 'react-router';
 
 const Section = memo(
   styled('div')(({ theme }) => ({

@@ -1,8 +1,8 @@
 import { Link as MaterialLink, Skeleton, useTheme } from '@mui/material';
-import useExternalLookup from 'deprecated/legacy/components/hooks/useExternalLookup';
+import useExternalLookup from 'layout/external-lookup/useExternalLookup';
+import React, { useCallback, useState } from 'react';
 import ActionMenu from 'ui/ActionMenu';
 import ExternalLinks from 'ui/ExternalSearch';
-import React, { useCallback, useState } from 'react';
 
 const initialMenuState = {
   mouseX: null,

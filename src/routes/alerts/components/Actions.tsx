@@ -24,26 +24,26 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import { useAppUser } from 'deprecated/legacy/commons/components/app/hooks';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
-import type { AlertItem } from 'models/base/alert';
-import type { CustomUser } from 'models/api/user';
-import type { AlertSearchParams } from 'routes/alerts/alerts.route';
-import { AlertEventsTable } from 'routes/alerts/components/Components';
-import AlertFiltersSelected from 'routes/alerts/components/FiltersSelected';
-import { AlertWorkflowDrawer } from 'routes/alerts/components/Workflows';
+import { useAppUser } from 'core/template/components/app/hooks';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
 import { useSearchParams } from 'deprecated/legacy/components/routes/alerts/contexts/SearchParamsContext';
 import type { SearchResult } from 'deprecated/legacy/components/routes/alerts/utils/SearchParser';
-import ConfirmationDialog from 'ui/ConfirmationDialog';
-import { getValueFromPath } from 'shared/utils/utils';
 import type { To } from 'history';
+import type { CustomUser } from 'models/api/user';
+import type { AlertItem } from 'models/base/alert';
 import type { CSSProperties } from 'react';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
 import { useLocation } from 'react-router';
 import { Link } from 'react-router-dom';
+import type { AlertSearchParams } from 'routes/alerts/alerts.route';
+import { AlertEventsTable } from 'routes/alerts/components/Components';
+import AlertFiltersSelected from 'routes/alerts/components/FiltersSelected';
+import { AlertWorkflowDrawer } from 'routes/alerts/components/Workflows';
+import { getValueFromPath } from 'shared/utils/utils';
+import ConfirmationDialog from 'ui/ConfirmationDialog';
 
 type AlertActionButtonProps = {
   authorized?: boolean;

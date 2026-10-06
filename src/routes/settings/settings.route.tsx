@@ -1,5 +1,7 @@
+import useALContext from 'core/config/useALContext';
 import { useTableOfContent } from 'features/table-of-content/table-of-content.providers';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
+import React, { useCallback, useEffect } from 'react';
+import { useParams } from 'react-router';
 import ForbiddenPage from 'routes/forbidden/forbidden';
 import { DefaultMetadataSection } from 'routes/settings/components/DefaultMetadata';
 import { ExternalSourcesSection } from 'routes/settings/components/ExternalSources';
@@ -8,20 +10,11 @@ import { InterfaceSection } from 'routes/settings/components/Interface';
 import { LeftNav } from 'routes/settings/components/LeftNav';
 import { RightNav } from 'routes/settings/components/RightNav';
 import { ServicesSection } from 'routes/settings/components/Services';
-import {
-  SubmissionOptionsSection,
-  SubmissionProfileDescription
-} from 'routes/settings/components/Submission';
+import { SubmissionOptionsSection, SubmissionProfileDescription } from 'routes/settings/components/Submission';
 import type { SettingsStore } from 'routes/settings/settings.form.ts';
 import { useForm } from 'routes/settings/settings.form.ts';
-import {
-  initializeSettings,
-  loadDefaultProfile,
-  loadSubmissionProfile
-} from 'routes/settings/settings.utils.ts';
+import { initializeSettings, loadDefaultProfile, loadSubmissionProfile } from 'routes/settings/settings.utils.ts';
 import { PageLayout } from 'ui/layouts/PageLayout';
-import React, { useCallback, useEffect } from 'react';
-import { useParams } from 'react-router';
 
 type Params = {
   tab: SettingsStore['state']['tab'];

@@ -2,8 +2,9 @@ import AddPhotoAlternateOutlinedIcon from '@mui/icons-material/AddPhotoAlternate
 import FileOpenIcon from '@mui/icons-material/FileOpen';
 import { Button, IconButton, Stack, Switch, useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
-import PageCenter from 'deprecated/legacy/commons/components/pages/PageCenter';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
+import useALContext from 'core/config/useALContext';
+import PageCenter from 'core/template/components/pages/PageCenter';
+import { Navigate } from 'react-router';
 import { AlertExtendedScan, AlertPriority, AlertStatus } from 'routes/alerts/components/Components';
 import Classification from 'ui/Classification';
 import CustomChip from 'ui/CustomChip';
@@ -14,7 +15,6 @@ import SubmissionState from 'ui/SubmissionState';
 import Tag from 'ui/Tag';
 import TextVerdict from 'ui/TextVerdict';
 import Verdict from 'ui/Verdict';
-import { Navigate } from 'react-router';
 
 const Theme = () => {
   const theme = useTheme();

@@ -1,8 +1,10 @@
 import { useTheme } from '@mui/material';
 import type { ColumnDef } from '@tanstack/react-table';
 import { createColumnHelper } from '@tanstack/react-table';
-import useSafeResults from 'deprecated/legacy/components/hooks/useSafeResults';
+import useSafeResults from 'layout/safe-results/useSafeResults';
 import type { SandboxBody, SandboxProcessItem, SandboxSignatureItem } from 'models/base/result_body';
+import React, { useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import Classification from 'ui/Classification';
 import CustomChip from 'ui/CustomChip';
 import { ProcessChip } from 'ui/ResultCard/Sandbox/common/ProcessChip';
@@ -14,8 +16,6 @@ import {
   type SandboxFilter
 } from 'ui/ResultCard/Sandbox/sandbox.utils.ts';
 import Verdict from 'ui/Verdict';
-import React, { useCallback, useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
 
 type FlatSignatures = SandboxSignatureItem & {
   flatAttacks?: Record<string, string[]>;

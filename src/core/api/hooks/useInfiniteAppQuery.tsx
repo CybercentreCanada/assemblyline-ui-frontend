@@ -1,7 +1,7 @@
-import { useInfiniteAPIQuery } from 'core/api/hooks/useInfiniteApiQuery';
-import type { ALRequests, ALResponses } from 'deprecated/legacy/components/core/Query/components/al.models.ts';
+import type { ALRequests, ALResponses } from 'app/core.api';
 import type { APIResponse } from 'core/api/api.models.ts';
 import type { UseAPICallFnProps } from 'core/api/hooks/useApiCallFn';
+import { useInfiniteAPIQuery } from 'core/api/hooks/useInfiniteApiQuery';
 
 export type UseInfiniteALQueryProps<Request extends ALRequests, Error extends string = string> = {
   initialOffset?: number;

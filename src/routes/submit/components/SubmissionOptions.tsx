@@ -1,13 +1,13 @@
 import { Typography, useTheme } from '@mui/material';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
+import useALContext from 'core/config/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useForm } from 'routes/submit/submit.form.ts';
 import { CheckboxInput } from 'ui/inputs/CheckboxInput';
 import { NumberInput } from 'ui/inputs/NumberInput';
 import { SelectInput } from 'ui/inputs/SelectInput';
 import { TextInput } from 'ui/inputs/TextInput';
-import React, { useEffect, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 
 export const SubmissionOptions = React.memo(() => {
   const { apiCall } = useMyAPI();

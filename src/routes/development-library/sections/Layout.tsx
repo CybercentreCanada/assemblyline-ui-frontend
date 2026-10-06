@@ -2,15 +2,15 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { Button } from '@mui/material';
+import React from 'react';
 import { DemoContainer } from 'routes/development-library/components/DemoContainer';
 import { DemoSection } from 'routes/development-library/components/DemoSection';
 import { useForm } from 'routes/development-library/contexts/form';
-import { IconButton } from 'deprecated/legacy/components/visual/Buttons/IconButton';
+import { IconButton } from 'ui/buttons/IconButton';
 import CustomChip from 'ui/CustomChip';
 import { PageHeader } from 'ui/layouts/PageHeader';
 import { PageSection } from 'ui/layouts/PageSection';
 import MonacoEditor from 'ui/MonacoEditor';
-import React from 'react';
 
 export type LayoutLibraryState = {
   layout: {

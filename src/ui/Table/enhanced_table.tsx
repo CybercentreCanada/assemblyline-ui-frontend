@@ -9,13 +9,13 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableSortLabel from '@mui/material/TableSortLabel';
 import { alpha, useTheme } from '@mui/material/styles';
+import PageContainer from 'core/template/branding/AppPageContainer';
 import Throttler from 'deprecated/components/utils/throttler';
-import PageContainer from 'core/template/components/AppPageContainer';
-import Classification from 'ui/Classification';
-import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow, LinkRow } from 'ui/DivTable';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+import Classification from 'ui/Classification';
+import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow, LinkRow } from 'ui/DivTable';
 
 const throttler = new Throttler(250);
 

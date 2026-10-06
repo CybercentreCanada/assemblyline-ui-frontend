@@ -1,5 +1,5 @@
-import { useAppConfigs, useAppUser } from 'deprecated/legacy/commons/components/app/hooks';
-import PageCenter from 'deprecated/legacy/commons/components/pages/PageCenter';
+import { useAppConfigs, useAppUser } from 'core/template/components/app/hooks';
+import PageCenter from 'core/template/components/pages/PageCenter';
 import LinkGrid from 'deprecated/legacy/components/layout/linkgrid';
 import type { CustomUser } from 'models/api/user';
 import { Navigate } from 'react-router';

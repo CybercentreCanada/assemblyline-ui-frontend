@@ -1,6 +1,6 @@
 import { Checkbox, FormControlLabel, Typography, useTheme } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
+import useALContext from 'core/config/useALContext';
 import type { UserSettings } from 'models/base/user_settings';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';

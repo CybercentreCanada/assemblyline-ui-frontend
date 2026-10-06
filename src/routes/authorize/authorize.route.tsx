@@ -1,14 +1,14 @@
 import { Backdrop, Button, Typography, useTheme } from '@mui/material';
-import { useAppUser } from 'deprecated/legacy/commons/components/app/hooks';
-import useAppBannerVert from 'deprecated/legacy/commons/components/app/hooks/useAppBannerVert';
-import PageCardCentered from 'core/template/components/AppPageCardCentered';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
+import useALContext from 'core/config/useALContext';
+import PageCardCentered from 'core/template/branding/AppPageCardCentered';
+import { useAppUser } from 'core/template/components/app/hooks';
+import useAppBannerVert from 'core/template/components/app/hooks/useAppBannerVert';
+import type { CustomUser } from 'models/api/user';
 import type { Role, Scope } from 'models/base/user';
 import { SCOPES } from 'models/base/user';
-import type { CustomUser } from 'models/api/user';
-import getXSRFCookie from 'shared/utils/xsrf';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
+import getXSRFCookie from 'shared/utils/xsrf';
 
 const VALID_SCOPES: Omit<Scope, 'c'>[] = SCOPES.filter(s => s !== 'c');
 

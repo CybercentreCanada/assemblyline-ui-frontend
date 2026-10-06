@@ -12,16 +12,16 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import { useAppUser } from 'deprecated/legacy/commons/components/app/hooks';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
+import { useAppUser } from 'core/template/components/app/hooks';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
 import type { CustomUser } from 'models/api/user';
-import ForbiddenPage from 'routes/forbidden/forbidden';
-import AIMarkdown from 'ui/AiMarkdown';
-import MonacoEditor, { LANGUAGE_SELECTOR } from 'ui/MonacoEditor';
 import type { editor } from 'monaco-editor';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import ForbiddenPage from 'routes/forbidden/forbidden';
+import AIMarkdown from 'ui/AiMarkdown';
+import MonacoEditor, { LANGUAGE_SELECTOR } from 'ui/MonacoEditor';
 
 const AIButton = styled(Button)(({ theme }) => ({
   height: '100%',

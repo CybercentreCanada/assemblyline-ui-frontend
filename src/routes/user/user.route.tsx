@@ -25,12 +25,15 @@ import {
 import Autocomplete from '@mui/material/Autocomplete';
 import Skeleton from '@mui/material/Skeleton';
 import { red } from '@mui/material/colors';
-import PageCenter from 'deprecated/legacy/commons/components/pages/PageCenter';
-import { useEffectOnce } from 'deprecated/legacy/commons/components/utils/hooks/useEffectOnce';
-import useALContext from 'deprecated/legacy/components/hooks/useALContext';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
+import PageCenter from 'core/template/components/pages/PageCenter';
+import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
 import type { User } from 'models/base/user';
+import React, { memo, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Navigate, useLocation, useNavigate, useParams } from 'react-router';
 import APIKeys from 'routes/user/components/api_keys';
 import Apps from 'routes/user/components/apps';
 import DisableOTP from 'routes/user/components/disable_otp';
@@ -39,10 +42,7 @@ import SecurityToken from 'routes/user/components/token';
 import Classification from 'ui/Classification';
 import ConfirmationDialog from 'ui/ConfirmationDialog';
 import CustomChip from 'ui/CustomChip';
-import { RouterPrompt } from 'deprecated/legacy/components/visual/RouterPrompt';
-import React, { memo, useMemo, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Navigate, useLocation, useNavigate, useParams } from 'react-router';
+import { RouterPrompt } from 'ui/RouterPrompt';
 
 type ParsedUser = Omit<
   User,
