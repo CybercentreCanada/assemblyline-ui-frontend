@@ -17,11 +17,7 @@ import {
 } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
 import type { DockerConfig, EnvironmentVariable, PersistentVolume } from 'models/base/service';
-import {
-  DEFAULT_DOCKER_CONFIG,
-  DEFAULT_ENVIRONMENT_VARIABLE,
-  DEFAULT_PERSISTENT_VOLUME
-} from 'models/base/service';
+import { DEFAULT_DOCKER_CONFIG, DEFAULT_ENVIRONMENT_VARIABLE, DEFAULT_PERSISTENT_VOLUME } from 'models/base/service';
 import { showReset } from 'routes/admin-service-detail/components/service.utils.ts';
 import { NumberInput } from 'ui/inputs/NumberInput';
 import { RadioInput } from 'ui/inputs/RadioInput';

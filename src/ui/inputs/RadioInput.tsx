@@ -19,11 +19,7 @@ import {
   InputHelperText,
   InputRoot
 } from 'ui/inputs/components/inputs.component.form.tsx';
-import {
-  useInputChange,
-  useInputClickBlur,
-  useInputFocus
-} from 'ui/inputs/hooks/inputs.hook.event_handlers.tsx';
+import { useInputChange, useInputClickBlur, useInputFocus } from 'ui/inputs/hooks/inputs.hook.event_handlers.tsx';
 import { useInputValidation } from 'ui/inputs/hooks/inputs.hook.validation.tsx';
 import type {
   InputOptions,

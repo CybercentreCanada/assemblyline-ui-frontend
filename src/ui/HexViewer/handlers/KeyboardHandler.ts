@@ -1,11 +1,4 @@
-import {
-  isArrowDown,
-  isArrowLeft,
-  isArrowRight,
-  isArrowUp,
-  isEnter,
-  isEscape
-} from 'deprecated/utils/keyboard';
+import { isArrowDown, isArrowLeft, isArrowRight, isArrowUp, isEnter, isEscape } from 'deprecated/utils/keyboard';
 import type { KeyboardEvent } from 'react';
 
 export const isArrowKey = (event: KeyboardEvent) =>

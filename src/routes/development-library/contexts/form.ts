@@ -4,10 +4,7 @@ import { DATETIME_LIBRARY_STATE } from 'routes/development-library/sections/Date
 import { INPUTS_LIBRARY_STATE, type InputsLibraryState } from 'routes/development-library/sections/Inputs';
 import { LAYOUT_LIBRARY_STATE, type LayoutLibraryState } from 'routes/development-library/sections/Layout';
 import { LIST_LIBRARY_STATE, type ListLibraryState } from 'routes/development-library/sections/List';
-import {
-  LIST_INPUTS_LIBRARY_STATE,
-  type ListInputsLibraryState
-} from 'routes/development-library/sections/ListInputs';
+import { LIST_INPUTS_LIBRARY_STATE, type ListInputsLibraryState } from 'routes/development-library/sections/ListInputs';
 
 type LibraryComponents = DateTimeLibraryState &
   InputsLibraryState &
