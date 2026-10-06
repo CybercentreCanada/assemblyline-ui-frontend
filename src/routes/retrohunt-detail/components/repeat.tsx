@@ -15,16 +15,16 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
+import useMyAPI from 'core/api/useMyAPI';
 import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import { useAppUser } from 'core/template/components/app/hooks';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
 import type { CustomUser } from 'models/api/user';
 import type { Retrohunt } from 'models/base/retrohunt';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ForbiddenPage from 'routes/forbidden/forbidden';
-import NotFoundPage from 'routes/missing-node/missing-node.route';
+import NotFoundPage from 'routes/not-found/not-found.route';
 import Classification from 'ui/Classification';
 
 type RetrohuntData = Pick<Retrohunt, 'key' | 'search_classification' | 'ttl'>;

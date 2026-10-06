@@ -22,11 +22,11 @@ import {
 } from '@mui/material';
 import MuiPopper from '@mui/material/Popper';
 import { styled } from '@mui/material/styles';
+import useMyAPI from 'core/api/useMyAPI';
 import useALContext from 'core/config/useALContext';
 import type { AppUser } from 'core/template/components/app/AppUserService';
 import { useAppUser } from 'core/template/components/app/hooks';
 import AppAvatar from 'core/template/components/display/AppAvatar';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
 import { isEnter } from 'deprecated/utils/keyboard';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';

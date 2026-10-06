@@ -1,9 +1,9 @@
 import Editor, { DiffEditor, loader } from '@monaco-editor/react';
 import { Dialog, DialogActions, DialogContent, DialogTitle, Skeleton, useTheme } from '@mui/material';
+import useMyAPI from 'core/api/useMyAPI';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import { useAppTheme } from 'core/template/components/app/hooks';
 import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
 import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ReactResizeDetector from 'react-resize-detector';

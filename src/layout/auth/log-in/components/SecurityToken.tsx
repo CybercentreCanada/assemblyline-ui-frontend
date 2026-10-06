@@ -1,8 +1,8 @@
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { Typography } from '@mui/material';
+import useMyAPI from 'core/api/useMyAPI';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
 import { useTranslation } from 'react-i18next';
 import { decode, encode } from 'shared/utils/cbor';
 import toArrayBuffer from 'shared/utils/toArrayBuffer';

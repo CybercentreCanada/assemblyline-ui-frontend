@@ -1,8 +1,8 @@
 import { Skeleton, Typography, useTheme } from '@mui/material';
+import useMyAPI from 'core/api/useMyAPI';
 import useALContext from 'core/config/useALContext';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
 import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
 import useDrawer from 'layout/drawer/useDrawer';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';

@@ -14,9 +14,9 @@ import {
   Tooltip,
   useTheme
 } from '@mui/material';
+import useMyAPI from 'core/api/useMyAPI';
 import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
 import type { File } from 'models/base/result';
 import type { Submission } from 'models/base/submission';
 import React, { useCallback, useMemo, useState } from 'react';

@@ -25,11 +25,11 @@ import {
 import Autocomplete from '@mui/material/Autocomplete';
 import Skeleton from '@mui/material/Skeleton';
 import { red } from '@mui/material/colors';
+import useMyAPI from 'core/api/useMyAPI';
 import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import PageCenter from 'core/template/components/pages/PageCenter';
 import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
 import type { User } from 'models/base/user';
 import React, { memo, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';

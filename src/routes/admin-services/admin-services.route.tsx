@@ -17,13 +17,13 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
+import useMyAPI from 'core/api/useMyAPI';
 import { invalidateAPIQuery } from 'core/api/utils/invalidateApiQuery';
 import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import { useAppUser } from 'core/template/components/app/hooks';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
 import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
 import useDrawer from 'layout/drawer/useDrawer';
 import type { JSONFeedItem } from 'layout/notifications/useNotificationFeed';
 import { useNotificationFeed } from 'layout/notifications/useNotificationFeed';

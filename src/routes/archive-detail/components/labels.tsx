@@ -26,9 +26,9 @@ import {
 } from '@mui/material';
 import match from 'autosuggest-highlight/match';
 import parse from 'autosuggest-highlight/parse';
+import useMyAPI from 'core/api/useMyAPI';
 import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
 import type { LabelCategories } from 'models/base/file';
 import { DEFAULT_LABELS, LABELS_COLOR_MAP } from 'models/base/file';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';

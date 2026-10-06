@@ -1,9 +1,9 @@
-import type { Params } from 'deprecated/legacy/components/routes/alerts/utils/SearchParams';
-import type { SearchResult } from 'deprecated/legacy/components/routes/alerts/utils/SearchParser';
-import { SearchParser } from 'deprecated/legacy/components/routes/alerts/utils/SearchParser';
 import { once } from 'lodash';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
+import type { Params } from 'routes/alerts/utils/SearchParams';
+import type { SearchResult } from 'routes/alerts/utils/SearchParser';
+import { SearchParser } from 'routes/alerts/utils/SearchParser';
 
 type ContextProps<T extends Params> = {
   search: SearchResult<T>;

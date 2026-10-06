@@ -19,11 +19,9 @@ import type { AutocompleteChangeReason } from '@mui/material/Autocomplete';
 import Autocomplete from '@mui/material/Autocomplete';
 import match from 'autosuggest-highlight/match';
 import parse from 'autosuggest-highlight/parse';
+import useMyAPI from 'core/api/useMyAPI';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import { useAppUser } from 'core/template/components/app/hooks';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
-import { useSearchParams } from 'deprecated/legacy/components/routes/alerts/contexts/SearchParamsContext';
-import type { SearchResult } from 'deprecated/legacy/components/routes/alerts/utils/SearchParser';
 import type { CustomUser } from 'models/api/user';
 import type { AlertItem } from 'models/base/alert';
 import { LABELS, PRIORITIES, STATUSES, type Label, type Priority, type Status } from 'models/base/workflow';
@@ -33,6 +31,8 @@ import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
 import type { AlertSearchParams } from 'routes/alerts/alerts.route';
 import AlertFiltersSelected from 'routes/alerts/components/FiltersSelected';
+import { useSearchParams } from 'routes/alerts/contexts/SearchParamsContext';
+import type { SearchResult } from 'routes/alerts/utils/SearchParser';
 import CustomChip from 'ui/CustomChip';
 
 type WorkflowBody = {

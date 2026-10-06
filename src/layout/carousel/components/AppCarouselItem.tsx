@@ -1,6 +1,6 @@
 import BrokenImageOutlinedIcon from '@mui/icons-material/BrokenImageOutlined';
 import { alpha, Button, CircularProgress, styled, Tooltip, useTheme } from '@mui/material';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useMyAPI from 'core/api/useMyAPI';
 import type { BackgroundMode } from 'layout/carousel/components/AppCarouselImage';
 import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 

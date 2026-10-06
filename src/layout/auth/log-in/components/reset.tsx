@@ -1,7 +1,7 @@
 import { Button, CircularProgress, TextField, Typography } from '@mui/material';
+import useMyAPI from 'core/api/useMyAPI';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';

@@ -1,9 +1,9 @@
 import type { PaginationProps } from '@mui/material';
 import { Pagination } from '@mui/material';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useMyAPI from 'core/api/useMyAPI';
 import type { SearchResult } from 'models/api/search';
-import SimpleSearchQuery from 'ui/SearchBar/simple-search-query';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import SimpleSearchQuery from 'ui/SearchBar/simple-search-query';
 
 const MAX_TRACKED_RECORDS = 10000;
 

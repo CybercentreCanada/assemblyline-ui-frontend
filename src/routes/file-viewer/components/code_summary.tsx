@@ -1,6 +1,6 @@
 import { Alert, CircularProgress, styled, Tooltip, useTheme } from '@mui/material';
+import useMyAPI from 'core/api/useMyAPI';
 import { useAppUser } from 'core/template/components/app/hooks';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
 import type { CustomUser } from 'models/api/user';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';

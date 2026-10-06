@@ -21,9 +21,9 @@ import {
 } from '@mui/material';
 import match from 'autosuggest-highlight/match';
 import parse from 'autosuggest-highlight/parse';
+import useMyAPI from 'core/api/useMyAPI';
 import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
 import useSafeResults from 'layout/safe-results/useSafeResults';
 import type { SearchResult } from 'models/api/search';
 import type { ResultIndexed } from 'models/base/result';

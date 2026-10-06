@@ -13,10 +13,10 @@ import {
   TableRow,
   useTheme
 } from '@mui/material';
+import useMyAPI from 'core/api/useMyAPI';
 import useALContext from 'core/config/useALContext';
 import { useAppUser } from 'core/template/components/app/hooks';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
 import type { SiteMapResponse } from 'models/api';
 import type { CustomUser } from 'models/api/user';
 import type { Role } from 'models/base/user';

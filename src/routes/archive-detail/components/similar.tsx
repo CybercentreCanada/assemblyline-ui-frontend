@@ -1,9 +1,13 @@
 import ArchiveIcon from '@mui/icons-material/Archive';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import { AlertTitle, Box, IconButton, Skeleton, TableContainer, Tooltip, Typography, useTheme } from '@mui/material';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useMyAPI from 'core/api/useMyAPI';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import type { File, SimilarResult, SimilarResults, SimilarType } from 'models/api/file';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
+import { safeFieldValueURI } from 'shared/utils/utils';
 import {
   GridLinkRow,
   GridTable,
@@ -16,10 +20,6 @@ import {
 import InformativeAlert from 'ui/InformativeAlert';
 import Moment from 'ui/Moment';
 import SectionContainer from 'ui/SectionContainer';
-import { safeFieldValueURI } from 'shared/utils/utils';
-import React, { useEffect, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
 
 const DEFAULT_SIMILAR: Record<SimilarType, { label: string; prefix: string; suffix: string }> = {
   tlsh: { label: 'TLSH', prefix: '/search/file?query=tlsh:', suffix: '&use_archive=true' },

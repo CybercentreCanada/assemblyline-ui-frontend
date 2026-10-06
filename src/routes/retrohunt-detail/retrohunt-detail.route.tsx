@@ -16,10 +16,10 @@ import {
   useTheme
 } from '@mui/material';
 import TableContainer from '@mui/material/TableContainer';
+import useMyAPI from 'core/api/useMyAPI';
 import useALContext from 'core/config/useALContext';
 import PageFullSize from 'core/template/branding/AppPageCenter';
 import { useAppUser } from 'core/template/components/app/hooks';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
 import useDrawer from 'layout/drawer/useDrawer';
 import type { SearchResult } from 'models/api/search';
 import type { CustomUser, IndexDefinition } from 'models/api/user';
@@ -31,7 +31,7 @@ import { useLocation, useNavigate, useParams } from 'react-router';
 import { Link } from 'react-router-dom';
 import FileDetail from 'routes/file-detail/file-detail.route';
 import ForbiddenPage from 'routes/forbidden/forbidden';
-import NotFoundPage from 'routes/missing-node/missing-node.route';
+import NotFoundPage from 'routes/not-found/not-found.route';
 import RetrohuntErrors from 'routes/retrohunt-detail/components/errors';
 import { RetrohuntRepeat } from 'routes/retrohunt-detail/components/repeat';
 import { safeFieldValue } from 'shared/utils/utils';

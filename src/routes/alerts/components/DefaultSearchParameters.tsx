@@ -14,12 +14,12 @@ import {
   useTheme
 } from '@mui/material';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
-import { ALERT_DEFAULT_PARAMS, ALERT_STORAGE_KEY, type AlertSearchParams } from 'routes/alerts/alerts.route';
-import AlertFiltersSelected from 'routes/alerts/components/FiltersSelected';
-import { useSearchParams } from 'deprecated/legacy/components/routes/alerts/contexts/SearchParamsContext';
-import { SearchParser, type SearchResult } from 'deprecated/legacy/components/routes/alerts/utils/SearchParser';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { ALERT_DEFAULT_PARAMS, ALERT_STORAGE_KEY, type AlertSearchParams } from 'routes/alerts/alerts.route';
+import AlertFiltersSelected from 'routes/alerts/components/FiltersSelected';
+import { useSearchParams } from 'routes/alerts/contexts/SearchParamsContext';
+import { SearchParser, type SearchResult } from 'routes/alerts/utils/SearchParser';
 
 const IGNORED_PARAMETERS: (keyof AlertSearchParams)[] = [
   'q',

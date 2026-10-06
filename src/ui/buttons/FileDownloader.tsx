@@ -1,6 +1,6 @@
 import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
+import useMyAPI from 'core/api/useMyAPI';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
 import React, { useCallback, useMemo, useState } from 'react';
 import { getTextContent } from 'shared/utils/utils';
 import type { IconButtonProps } from 'ui/buttons/IconButton';

@@ -1,6 +1,6 @@
 import BrokenImageOutlinedIcon from '@mui/icons-material/BrokenImageOutlined';
 import { Badge, Button, CircularProgress, Tooltip, useTheme } from '@mui/material';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useMyAPI from 'core/api/useMyAPI';
 import useCarousel from 'layout/carousel/useCarousel';
 import type { Image, ImageBody } from 'models/base/result_body';
 import React, { useEffect, useState } from 'react';

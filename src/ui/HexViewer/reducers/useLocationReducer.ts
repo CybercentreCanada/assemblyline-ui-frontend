@@ -1,6 +1,6 @@
-import useClipboard from 'deprecated/hooks/useClipboard';
-import SimpleSearchQuery from 'ui/SearchBar/simple-search-query';
+import useClipboard from 'layout/clipboard/useClipboard';
 import { useCallback, useRef } from 'react';
+import SimpleSearchQuery from 'ui/SearchBar/simple-search-query';
 import type { LocationParam, LocationQuery, ReducerHandler, Reducers, Store, UseReducer } from '..';
 import { DEFAULT_STORE, getValueFromPath, isAction, LOCATION_PARAMS, setStoreWithPath } from '..';
 

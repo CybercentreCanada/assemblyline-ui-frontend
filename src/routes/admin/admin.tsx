@@ -1,8 +1,8 @@
 import { useAppConfigs, useAppUser } from 'core/template/components/app/hooks';
 import PageCenter from 'core/template/components/pages/PageCenter';
-import LinkGrid from 'deprecated/legacy/components/layout/linkgrid';
 import type { CustomUser } from 'models/api/user';
 import { Navigate } from 'react-router';
+import LinkGrid from 'ui/linkgrid';
 
 export default function Admin() {
   const { preferences: layout } = useAppConfigs();

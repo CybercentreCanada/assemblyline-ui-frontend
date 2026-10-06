@@ -1,10 +1,10 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, useTheme } from '@mui/material';
 import useALContext from 'core/config/useALContext';
-import { SourceDetail } from 'deprecated/legacy/components/routes/manage/signature_sources_details';
 import type { UpdateSource } from 'models/base/service';
 import { DEFAULT_SOURCE } from 'models/base/service';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { SourceDetail } from 'routes/manage-signature-source-detail/signature_sources_details';
 
 type Props = {
   open: boolean;

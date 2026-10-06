@@ -1,11 +1,11 @@
 import { Box, Button, CircularProgress, Link, Typography, useTheme } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
+import useMyAPI from 'core/api/useMyAPI';
 import useALContext from 'core/config/useALContext';
 import NotFoundPage from 'core/template/branding/AppBanner';
 import { useAppBanner } from 'core/template/components/app/hooks';
 import PageCenter from 'core/template/components/pages/PageCenter';
 import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Markdown from 'react-markdown';

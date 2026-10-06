@@ -13,11 +13,11 @@ import {
   useTheme
 } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
+import useMyAPI from 'core/api/useMyAPI';
 import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
 import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
 import type { Badlist } from 'models/base/badlist';
 import {
   ATTRIBUTION_TYPES,

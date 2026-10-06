@@ -15,9 +15,9 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
+import useMyAPI from 'core/api/useMyAPI';
 import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
 import type { Author, Comment } from 'models/base/file';
 import { DEFAULT_COMMENT } from 'models/base/file';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';

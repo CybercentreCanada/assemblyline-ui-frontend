@@ -1,9 +1,9 @@
 import { CircularProgress, Typography, useTheme } from '@mui/material';
+import useMyAPI from 'core/api/useMyAPI';
 import PageCardCentered from 'core/template/branding/AppPageCardCentered';
 import { useAppLayout } from 'core/template/components/app/hooks';
 import useAppBannerVert from 'core/template/components/app/hooks/useAppBannerVert';
 import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
 import { useTranslation } from 'react-i18next';
 
 function Logout() {

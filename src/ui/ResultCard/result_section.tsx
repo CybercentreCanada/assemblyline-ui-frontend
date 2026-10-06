@@ -18,7 +18,7 @@ import {
   useTheme
 } from '@mui/material';
 import useALContext from 'core/config/useALContext';
-import useClipboard from 'deprecated/hooks/useClipboard';
+import useClipboard from 'layout/clipboard/useClipboard';
 import useHighlighter from 'layout/highlighter/useHighlighter';
 import useSafeResults from 'layout/safe-results/useSafeResults';
 import type { Section, SectionItem } from 'models/base/result';

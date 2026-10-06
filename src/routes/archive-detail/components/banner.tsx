@@ -24,9 +24,9 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
+import useMyAPI from 'core/api/useMyAPI';
 import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
 import type { File } from 'models/api/file';
 import type { LabelCategories } from 'models/base/file';
 import type { CSSProperties } from 'react';

@@ -2,10 +2,10 @@ import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOu
 import PersonIcon from '@mui/icons-material/Person';
 import TimerOutlinedIcon from '@mui/icons-material/TimerOutlined';
 import { Pagination, Typography, useMediaQuery, useTheme } from '@mui/material';
+import useMyAPI from 'core/api/useMyAPI';
 import useALContext from 'core/config/useALContext';
 import PageContainer from 'core/template/branding/AppPageContainer';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
 import useDrawer from 'layout/drawer/useDrawer';
 import type { SearchResult } from 'models/api/search';
 import type { IndexDefinition } from 'models/api/user';

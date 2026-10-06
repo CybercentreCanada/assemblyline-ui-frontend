@@ -1,6 +1,6 @@
 import { Typography, useTheme } from '@mui/material';
+import useMyAPI from 'core/api/useMyAPI';
 import useALContext from 'core/config/useALContext';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'routes/submit/submit.form.ts';

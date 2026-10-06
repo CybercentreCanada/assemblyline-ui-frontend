@@ -25,11 +25,11 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
+import useMyAPI from 'core/api/useMyAPI';
 import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import PageFullSize from 'core/template/branding/AppPageCenter';
 import { useAppUser } from 'core/template/components/app/hooks';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
 import useAssistant from 'layout/assistant/useAssistant';
 import type { CustomUser } from 'models/api/user';
 import type { File } from 'models/base/file';

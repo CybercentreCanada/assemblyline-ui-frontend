@@ -22,10 +22,10 @@ import {
   useTheme
 } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
+import useMyAPI from 'core/api/useMyAPI';
 import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
-import useClipboard from 'deprecated/hooks/useClipboard';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useClipboard from 'layout/clipboard/useClipboard';
 import type { ACL, ApiKey, Role } from 'models/base/user';
 import { PRIV_TO_ACL_MAP } from 'models/base/user';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';

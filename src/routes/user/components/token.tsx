@@ -10,13 +10,13 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useMyAPI from 'core/api/useMyAPI';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import type { User } from 'models/base/user';
-import { decode, encode } from 'shared/utils/cbor';
-import toArrayBuffer from 'shared/utils/toArrayBuffer';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { decode, encode } from 'shared/utils/cbor';
+import toArrayBuffer from 'shared/utils/toArrayBuffer';
 
 type Props = {
   user: User;

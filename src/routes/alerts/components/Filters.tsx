@@ -19,10 +19,9 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
+import useMyAPI from 'core/api/useMyAPI';
 import { useAppUser } from 'core/template/components/app/hooks';
-import useClipboard from 'deprecated/hooks/useClipboard';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
-import { useSearchParams } from 'deprecated/legacy/components/routes/alerts/contexts/SearchParamsContext';
+import useClipboard from 'layout/clipboard/useClipboard';
 import type { CustomUser } from 'models/api/user';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -30,6 +29,7 @@ import type { AlertSearchParams } from 'routes/alerts/alerts.route';
 import { ALERT_DEFAULT_PARAMS } from 'routes/alerts/alerts.route';
 import type { Favorite } from 'routes/alerts/components/Favorites';
 import { useAlerts } from 'routes/alerts/contexts/AlertsContext';
+import { useSearchParams } from 'routes/alerts/contexts/SearchParamsContext';
 import { humanReadableNumber, safeFieldValue } from 'shared/utils/utils';
 import CustomChip from 'ui/CustomChip';
 

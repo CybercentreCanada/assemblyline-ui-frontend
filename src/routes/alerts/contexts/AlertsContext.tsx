@@ -1,6 +1,6 @@
+import useMyAPI from 'core/api/useMyAPI';
 import useALContext from 'core/config/useALContext';
 import { useAppUser } from 'core/template/components/app/hooks';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
 import type { CustomUser } from 'models/api/user';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import type { Favorite } from 'routes/alerts/components/Favorites';

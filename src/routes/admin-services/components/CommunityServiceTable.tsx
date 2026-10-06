@@ -20,7 +20,7 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
-import useClipboard from 'deprecated/hooks/useClipboard';
+import useClipboard from 'layout/clipboard/useClipboard';
 import type { JSONFeedItem } from 'layout/notifications/useNotificationFeed';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';

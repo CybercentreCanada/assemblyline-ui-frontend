@@ -4,7 +4,7 @@ import SelectAllOutlinedIcon from '@mui/icons-material/SelectAllOutlined';
 import { Menu, MenuItem } from '@mui/material';
 import useALContext from 'core/config/useALContext';
 import { useAppUser } from 'core/template/components/app/hooks';
-import useClipboard from 'deprecated/hooks/useClipboard';
+import useClipboard from 'layout/clipboard/useClipboard';
 import useHighlighter from 'layout/highlighter/useHighlighter';
 import useSafeResults from 'layout/safe-results/useSafeResults';
 import type { CustomUser } from 'models/api/user';

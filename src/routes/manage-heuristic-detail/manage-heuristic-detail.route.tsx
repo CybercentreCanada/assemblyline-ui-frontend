@@ -1,10 +1,10 @@
 import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
 import type { PaperProps } from '@mui/material';
 import { Grid, Paper, Skeleton, styled, Typography, useTheme } from '@mui/material';
+import useMyAPI from 'core/api/useMyAPI';
 import useALContext from 'core/config/useALContext';
 import { useAppUser } from 'core/template/components/app/hooks';
 import PageCenter from 'core/template/components/pages/PageCenter';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
 import type { CustomUser } from 'models/api/user';
 import type { Heuristic } from 'models/base/heuristic';
 import { DEFAULT_STATS, type Statistic } from 'models/base/statistic';

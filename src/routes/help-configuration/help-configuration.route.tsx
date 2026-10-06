@@ -1,8 +1,8 @@
 import { Grid, Typography, useTheme } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
+import useMyAPI from 'core/api/useMyAPI';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
 import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import CustomChip from 'ui/CustomChip';

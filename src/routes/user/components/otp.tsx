@@ -1,7 +1,7 @@
 import { Button, TextField, Typography, useTheme } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
+import useMyAPI from 'core/api/useMyAPI';
 import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import TextDivider from 'ui/TextDivider';

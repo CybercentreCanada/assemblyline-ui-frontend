@@ -1,10 +1,10 @@
 import PersonIcon from '@mui/icons-material/Person';
 import { Grid, useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
+import useMyAPI from 'core/api/useMyAPI';
 import useALContext from 'core/config/useALContext';
 import PageContainer from 'core/template/branding/AppPageContainer';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
 import { createSearchParams, SearchParamsProvider, useSearchParams } from 'features/SearchParams/createSearchParams';
 import useDrawer from 'layout/drawer/useDrawer';
 import type { SearchResult } from 'models/api/search';

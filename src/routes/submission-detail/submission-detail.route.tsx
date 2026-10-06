@@ -35,10 +35,10 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
+import useMyAPI from 'core/api/useMyAPI';
 import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import PageCenter from 'core/template/components/pages/PageCenter';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
 import useAssistant from 'layout/assistant/useAssistant';
 import useDrawer from 'layout/drawer/useDrawer';
 import type { HighlighMapProps } from 'layout/highlighter/highlighter.providers';

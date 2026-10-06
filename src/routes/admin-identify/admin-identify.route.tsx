@@ -1,9 +1,9 @@
 import { loader } from '@monaco-editor/react';
 import { Alert, Box, Grid, Paper, styled, Tab, Tabs, Typography, useTheme } from '@mui/material';
+import useMyAPI from 'core/api/useMyAPI';
 import PageFullSize from 'core/template/branding/AppPageCenter';
 import { useAppUser } from 'core/template/components/app/hooks';
 import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
 import type { CustomUser } from 'models/api/user';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';

@@ -1,8 +1,8 @@
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import { Box, Button, Collapse, Menu, MenuItem, Typography, useTheme } from '@mui/material';
+import useMyAPI from 'core/api/useMyAPI';
 import useALContext from 'core/config/useALContext';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
 import useHighlighter from 'layout/highlighter/useHighlighter';
 import useSafeResults from 'layout/safe-results/useSafeResults';
 import type { AlternateResult, FileResult } from 'models/base/result';

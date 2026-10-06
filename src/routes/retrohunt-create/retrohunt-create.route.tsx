@@ -11,11 +11,11 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
+import useMyAPI from 'core/api/useMyAPI';
 import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import PageFullSize from 'core/template/branding/AppPageCenter';
 import { useAppUser } from 'core/template/components/app/hooks';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
 import useDrawer from 'layout/drawer/useDrawer';
 import type { CustomUser } from 'models/api/user';
 import type { Retrohunt, RetrohuntIndex } from 'models/base/retrohunt';

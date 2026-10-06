@@ -33,9 +33,9 @@ import {
 } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
 import { blue } from '@mui/material/colors';
+import useMyAPI from 'core/api/useMyAPI';
 import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
 import NotificationItem from 'layout/notifications/NotificationItem';
 import type { JSONFeedItem } from 'layout/notifications/useNotificationFeed';
 import { useNotificationFeed } from 'layout/notifications/useNotificationFeed';

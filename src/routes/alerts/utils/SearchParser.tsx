@@ -1,11 +1,5 @@
-import type { Params, Types } from 'deprecated/legacy/components/routes/alerts/utils/SearchParams';
-import {
-  ArrayParam,
-  BaseParam,
-  BooleanParam,
-  NumberParam,
-  StringParam
-} from 'deprecated/legacy/components/routes/alerts/utils/SearchParams';
+import type { Params, Types } from 'routes/alerts/utils/SearchParams';
+import { ArrayParam, BaseParam, BooleanParam, NumberParam, StringParam } from 'routes/alerts/utils/SearchParams';
 
 type SearchInput = string | string[][] | Record<string, string> | URLSearchParams;
 

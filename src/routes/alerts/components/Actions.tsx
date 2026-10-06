@@ -24,11 +24,9 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
+import useMyAPI from 'core/api/useMyAPI';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import { useAppUser } from 'core/template/components/app/hooks';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
-import { useSearchParams } from 'deprecated/legacy/components/routes/alerts/contexts/SearchParamsContext';
-import type { SearchResult } from 'deprecated/legacy/components/routes/alerts/utils/SearchParser';
 import type { To } from 'history';
 import type { CustomUser } from 'models/api/user';
 import type { AlertItem } from 'models/base/alert';
@@ -42,6 +40,8 @@ import type { AlertSearchParams } from 'routes/alerts/alerts.route';
 import { AlertEventsTable } from 'routes/alerts/components/Components';
 import AlertFiltersSelected from 'routes/alerts/components/FiltersSelected';
 import { AlertWorkflowDrawer } from 'routes/alerts/components/Workflows';
+import { useSearchParams } from 'routes/alerts/contexts/SearchParamsContext';
+import type { SearchResult } from 'routes/alerts/utils/SearchParser';
 import { getValueFromPath } from 'shared/utils/utils';
 import ConfirmationDialog from 'ui/ConfirmationDialog';
 
