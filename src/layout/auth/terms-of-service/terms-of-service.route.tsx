@@ -1,0 +1,125 @@
+import { Box, Button, CircularProgress, Link, Typography, useTheme } from '@mui/material';
+import Skeleton from '@mui/material/Skeleton';
+import useMyAPI from 'core/api/hooks/useMyAPI';
+import useALContext from 'core/config/useALContext';
+import NotFoundPage from 'core/template/branding/AppBanner';
+import { useAppBanner } from 'core/template/components/app/hooks';
+import PageCenter from 'core/template/components/pages/PageCenter';
+import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import Markdown from 'react-markdown';
+
+export default function Tos() {
+  const { t } = useTranslation(['tos']);
+  const theme = useTheme();
+  const banner = useAppBanner();
+  const { apiCall } = useMyAPI();
+  const { user: currentUser, configuration } = useALContext();
+
+  const [tos, setTos] = useState('');
+  const [buttonLoading, setButtonLoading] = useState(false);
+
+  const sp6 = theme.spacing(6);
+
+  function acceptTOS() {
+    apiCall({
+      url: `/api/v4/user/tos/${currentUser.username}/`,
+      onSuccess: () => window.location.reload(),
+      onEnter: () => setButtonLoading(true),
+      onExit: () => setButtonLoading(false)
+    });
+  }
+
+  function cancelTOS() {
+    apiCall({
+      url: '/api/v4/auth/logout/',
+      onSuccess: () => window.location.reload(),
+      onEnter: () => setButtonLoading(true),
+      onExit: () => setButtonLoading(false)
+    });
+  }
+
+  useEffectOnce(() => {
+    if (configuration.ui.tos) {
+      apiCall({
+        url: '/api/v4/help/tos/',
+        onSuccess: api_data => setTos(api_data.api_response)
+      });
+    }
+  });
+
+  return configuration.ui.tos ? (
+    <PageCenter margin={4} width="100%">
+      <Box
+        sx={{
+          display: 'inline-block',
+          textAlign: 'center',
+          maxWidth: '960px',
+          width: '100%',
+          [theme.breakpoints.down('sm')]: {
+            maxWidth: '100%'
+          },
+          [theme.breakpoints.only('md')]: {
+            maxWidth: '630px'
+          }
+        }}
+      >
+        <div>{banner}</div>
+        <div style={{ marginBottom: sp6, textAlign: 'left' }}>
+          <Typography variant="h3" gutterBottom>
+            {t('title')}
+          </Typography>
+        </div>
+        {tos ? (
+          <>
+            <div style={{ textAlign: 'left' }}>
+              <Markdown components={{ a: props => <Link href={props.href}>{props.children}</Link> }}>{tos}</Markdown>
+            </div>
+            {currentUser.agrees_with_tos ? (
+              <div style={{ marginTop: sp6 }}>
+                <Typography variant="subtitle1" color="secondary">
+                  {t('agreed')}
+                </Typography>
+              </div>
+            ) : (
+              <div>
+                <Button
+                  style={{ marginTop: '3rem', marginBottom: '3rem' }}
+                  variant="contained"
+                  color="primary"
+                  disabled={buttonLoading}
+                  onClick={acceptTOS}
+                >
+                  {t('button')}
+                  {buttonLoading && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
+                </Button>
+                <Button
+                  style={{ marginLeft: '1rem', marginTop: '3rem', marginBottom: '3rem' }}
+                  variant="contained"
+                  color="secondary"
+                  disabled={buttonLoading}
+                  onClick={cancelTOS}
+                >
+                  {t('logout')}
+                  {buttonLoading && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
+                </Button>
+              </div>
+            )}
+          </>
+        ) : (
+          <>
+            <Skeleton style={{ marginBottom: 12 }} />
+            <Skeleton style={{ marginBottom: 12 }} />
+            <Skeleton style={{ marginBottom: 12 }} />
+            <Skeleton style={{ marginBottom: 12 }} />
+            <Skeleton style={{ marginBottom: 12 }} />
+            <Skeleton />
+          </>
+        )}
+      </Box>
+    </PageCenter>
+  ) : (
+    <NotFoundPage />
+  );
+}
