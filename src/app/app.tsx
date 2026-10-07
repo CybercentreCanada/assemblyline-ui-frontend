@@ -2,6 +2,7 @@
 import { useClue } from '@cccsaurora/clue-ui';
 import { DEFAULT_APP_CONFIG_STORE } from 'app/core.config';
 import { DEFAULT_APP_INTERFACE_STORE } from 'app/core.interface';
+import { APP_PREFERENCE_SCHEMA, APP_PREFERENCE_STORAGE_KEY } from 'app/core.preference';
 import Routes from 'app/routes';
 import useMyPreferences from 'app/useMyPreferences';
 import useMySitemap from 'app/useMySitemap';
@@ -32,7 +33,6 @@ import React, { memo, StrictMode, useCallback, useEffect, useState } from 'react
 import { BrowserRouter } from 'react-router-dom';
 import setMomentFRLocale from 'shared/utils/moment-fr-locale';
 import { getProvider, getSAMLData } from 'shared/utils/utils';
-import { APP_PREFERENCE_SCHEMA, APP_PREFERENCE_STORAGE_KEY } from './core.preference';
 
 type PossibleApps = 'load' | 'locked' | 'login' | 'routes' | 'tos' | 'quota';
 
