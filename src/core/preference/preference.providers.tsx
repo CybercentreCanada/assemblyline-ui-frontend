@@ -39,9 +39,13 @@ export const AppPreferenceProvider = memo(({ children, schema, storageKey }: App
   const setPreferenceStore = useAppSetPreferenceStore();
 
   useEffect(() => {
-    preferenceStoreApi.subscribe(store => {
+    return preferenceStoreApi.subscribe(store => {
       if (!store) return;
-      savePreferenceToLocalStorage(schema, store, storageKey);
+      try {
+        savePreferenceToLocalStorage(schema, store, storageKey);
+      } catch (err) {
+        console.error('Failed to save preferences to localStorage', err);
+      }
     });
   }, [preferenceStoreApi, schema, storageKey]);
 
