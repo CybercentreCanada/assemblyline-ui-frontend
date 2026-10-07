@@ -16,6 +16,7 @@ export const createAppStore = <Store extends object>(initialState: Store) => {
 
   const StoreProvider = React.memo(({ children, data = null }: PropsWithChildren<{ data?: StorePatch }>) => {
     const storeRef = useRef<StoreApi<Store> | null>(null);
+    const previousDataRef = useRef(data);
 
     if (!storeRef.current) {
       const patch = typeof data === 'function' ? data(initialState) : (data ?? {});
@@ -24,7 +25,11 @@ export const createAppStore = <Store extends object>(initialState: Store) => {
     }
 
     useEffect(() => {
-      if (!storeRef.current || !data) return;
+      if (!storeRef.current) return;
+
+      const previousData = previousDataRef.current;
+      previousDataRef.current = data;
+      if (!data || Object.is(previousData, data)) return;
 
       storeRef.current.setState(prev => ({ ...prev, ...(typeof data === 'function' ? data(prev) : data) }));
     }, [data]);
@@ -39,9 +44,10 @@ export const createAppStore = <Store extends object>(initialState: Store) => {
       console.warn('[createAppStore] `useStore` called outside of StoreProvider.');
     }
 
-    const value = useZustandStore((store ?? FALLBACK_STORE) as StoreApi<Store>, useShallow(selector));
-
-    return store ? value : selector(initialState);
+    return useZustandStore(
+      (store ?? FALLBACK_STORE) as StoreApi<Store>,
+      useShallow((state: Store) => selector(store ? state : initialState))
+    );
   };
 
   const useSetStore = (hideWarnings: boolean = false) => {
