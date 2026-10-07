@@ -32,12 +32,8 @@ export default defineConfig(({ mode }) => {
         reporter: ['cobertura', 'clover', 'lcov'],
         reportsDirectory: './coverage'
       },
-      poolOptions: {
-        threads: {
-          maxThreads: 6,
-          minThreads: 3
-        }
-      }
+      maxWorkers: 6,
+      minWorkers: 3
     }
   };
 });
