@@ -1,52 +1,34 @@
-# Project Coding Instructions
+# Repository Agent Guidance
 
-This project follows strict architecture rules documented in `src/agents/`.
+This file is the repository entry point for coding agents. Detailed project
+guidance and reusable workflows live under `.agents/`.
 
-Before generating or modifying code, read and follow the AI rules in `src/agents/`:
+## Before Implementing Features
 
-## Architecture & File Structure
+1. Inspect the target module, neighboring implementations, tests, and package scripts.
+2. Read [architecture](.agents/instructions/architecture.instructions.md),
+   [file structure](.agents/instructions/file-structure.instructions.md), and
+   [import conventions](.agents/instructions/conventions/imports.instructions.md).
+3. Read the topic-specific instructions below before editing relevant areas.
+4. Make a focused change and run the narrowest relevant validation. Run
+   `pnpm typecheck` when a change affects TypeScript.
 
-- `src/agents/rules/architecture.agent.md` — Layer dependencies, forbidden/required patterns
-- `src/agents/rules/file-structure.agent.md` — Where to put files, naming conventions
+| Work area | Read these instructions |
+| --- | --- |
+| React components | [Components](.agents/instructions/file-structure/components.instructions.md), [React](.agents/instructions/conventions/react.instructions.md), [styling](.agents/instructions/conventions/styling.instructions.md), [accessibility](.agents/instructions/conventions/accessibility.instructions.md), [performance](.agents/instructions/conventions/performance.instructions.md) |
+| Hooks and state | [Hooks](.agents/instructions/file-structure/hooks.instructions.md), [models](.agents/instructions/file-structure/models.instructions.md), [performance](.agents/instructions/conventions/performance.instructions.md) |
+| Utilities | [Utility conventions](.agents/instructions/file-structure/utils.instructions.md), [utility test conventions](.agents/instructions/file-structure/utils.test.instructions.md) |
+| Localization | [i18n](.agents/instructions/file-structure/i18n.instructions.md) |
+| Documentation | [Module documentation](.agents/instructions/file-structure/docs.instructions.md) |
+| Playwright tests | [Specs](.agents/instructions/file-structure/spec.instructions.md), [page objects](.agents/instructions/file-structure/pom.instructions.md) |
 
-## File Types
+## Reusable Workflows
 
-- `src/agents/rules/file-structure/components.agent.md` — How to write React components
-- `src/agents/rules/file-structure/hooks.agent.md` — Hook ordering, when to extract hooks
-- `src/agents/rules/file-structure/models.agent.md` — Type declarations, defaults, enums
-- `src/agents/rules/file-structure/i18n.agent.md` — Translation key conventions
-- `src/agents/rules/file-structure/utils.agent.md` — Utility function patterns
-- `src/agents/rules/file-structure/utils.test.agent.md` — Unit test patterns for utilities
-- `src/agents/rules/file-structure/pom.agent.md` — Page Object Model for E2E tests
-- `src/agents/rules/file-structure/spec.agent.md` — Playwright E2E spec files
+- Use the `react-feature-implementation` skill for React feature work.
+- Use `api-reviewer`, `bug-hunter`, `codebase-reviewer`, or
+  `performance-reviewer` for focused reviews.
+- Use `commit-message` to draft a message from staged changes. Do not commit
+  unless explicitly asked.
 
-## Conventions
-
-- `src/agents/rules/conventions/imports.agent.md` — Import ordering and syntax
-- `src/agents/rules/conventions/styling.agent.md` — Styling approach (styled, raw HTML, theme)
-- `src/agents/rules/conventions/performance.agent.md` — Memoization, stable references, selectors
-- `src/agents/rules/conventions/accessibility.agent.md` — ARIA, semantic HTML, keyboard, E2E locators
-- `src/agents/rules/conventions/react.agent.md` — React hooks and components usage guide
-
-## Git Commit Messages
-
-When asked to write a commit message, run `git diff --cached --stat` and `git diff --cached` to inspect all staged changes. Never run `git commit` or otherwise commit on the user's behalf — only output the message, pasted as-is inside a markdown code block. Then produce a message as:
-
-- A single flat bullet-point list (no title line, no paragraphs, no grouping)
-- One bullet per logical change
-- Each bullet starts with a **bold high-level description**, followed by an em dash (—) and the technical detail
-- Use imperative mood (e.g. "Add", "Fix", "Remove", "Replace", "Rename")
-- Inline markdown formatting:
-  - `backticks` for code symbols, file paths, and anything you'd type in an editor
-  - **bold** for modules or areas as a whole (e.g. **core**, **SubmitPage**, **router**)
-  - *italic* for specific items within a module (e.g. *Link*, *replace* variant, *MonacoEditor*)
-
-Example:
-
-```
-- **Migrate auth context to selector pattern** — replace `useAuthContext` with `useSessionStore` leaf selectors across all **dashboard** components
-- **Add loading skeleton to UserCard** — wrap *UserCard* avatar and name fields in `Skeleton` placeholders during fetch
-- **Fix stale closure in debounced search** — capture latest `query` ref inside `useCallback` in `SearchInput.tsx`
-- **Remove deprecated date formatter** — delete `formatLegacyDate` from `shared/utils/date.utils.ts` and replace all usages with *DateDisplay* component
-- **Add keyboard navigation to TagList** — wire `onKeyDown` handler for arrow-key focus movement in **settings** *TagList*
-```
+All reusable skills are under `.agents/skills/`. Keep detailed guidance under
+`.agents/instructions/` authoritative; do not maintain duplicate rule copies.
