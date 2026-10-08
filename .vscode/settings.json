@@ -37,31 +37,5 @@
   "emmet.includeLanguages": {
     "javascript": "javascriptreact",
     "typescript": "typescriptreact"
-  },
-  "chat.useAgentsMdFile": true,
-  "chat.includeReferencedInstructions": true,
-  "eslint.run": "onSave",
-  "typescript.disableAutomaticTypeAcquisition": true,
-  "typescript.tsserver.maxTsServerMemory": 4096,
-  "files.watcherExclude": {
-    "**/node_modules/**": true,
-    "**/.git/objects/**": true,
-    "**/build/**": true,
-    "**/dist/**": true,
-    "**/coverage/**": true,
-    "**/playwright-report/**": true
-  },
-  "search.exclude": {
-    "**/node_modules/**": true,
-    "**/build/**": true,
-    "**/dist/**": true,
-    "**/coverage/**": true,
-    "**/playwright-report/**": true
-  },
-  "files.exclude": {
-    "**/build": true,
-    "**/dist": true,
-    "**/coverage": true,
-    "**/playwright-report": true
   }
 }
