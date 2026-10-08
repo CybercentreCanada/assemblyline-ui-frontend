@@ -5,12 +5,14 @@ applyTo: "src/**/*.ts, src/**/*.tsx"
 
 # Performance — AI Rules
 
+> Applies to new and modified code. Legacy code is exempt until it is touched; do not refactor it unless asked.
+
 ## Must
 
 - Every exported component wrapped in `memo()`
 - Focused store selectors — never subscribe to entire store
 - Store selectors must access the most nested (leaf) values — never select a parent object and read its fields later
-- For the app's `createStoreContext` store, mutate only changed nested fields and return the state; its setter creates a new root reference and notifies subscribers. Avoid spreading nested parent objects. For vanilla Zustand without Immer, use immutable updates so subscribers are notified.
+- Update store state by mutating the changed fields in place inside the `useAppSetConfigStore` callback — never spread parent objects (see Store Mutations)
 - Functions passed as props must use `useCallback`
 - Computed arrays/objects (filter, sort, map, spread) passed as props must use `useMemo`
 - Empty array/object defaults must be module-level constants
@@ -55,10 +57,10 @@ const services = useAppConfigStore(s => s?.services ?? []);
 
 ## Store Selectors — Access Leaf Values
 
-Vanilla Zustand uses `Object.is` to detect whether the next state changed. Mutating the current state and returning the same object is treated as unchanged, so subscribers are not notified. The app's `createStoreContext` setter instead shallow-copies the root and notifies subscribers after its updater runs. Since nested references are preserved by in-place field updates, select leaf values rather than parent objects to observe changes and avoid unrelated re-renders.
+The app store's setter runs the updater, shallow-copies the root state, and notifies subscribers, but nested objects keep their references. A selector that returns a nested object therefore never sees in-place field changes, so select leaf values rather than parent objects to observe changes and avoid unrelated re-renders.
 
 ```typescript
-// ❌ Selecting the parent object — re-renders when any field on the route changes
+// ❌ Selecting the parent object — won't re-render when `href` or `state` is mutated in place
 const route = useStore(s => s.routes[routeKey]);
 return <AppRoutes href={route.href} state={route.state} />;
 
@@ -72,10 +74,10 @@ return <AppRoutes href={href} state={state} />;
 
 ## Store Mutations — Mutate In Place
 
-The app's `createStoreContext` setter runs the updater, shallow-copies the root state, and notifies subscribers. This lets an updater change a nested field in place without spreading every parent object; return the state so the setter can merge it into the new root. Use leaf selectors because unchanged nested references are retained.
+The app store's setter runs the updater, shallow-copies the root state, and notifies subscribers. An updater can therefore change a nested field in place without spreading every parent object, which avoids allocating new objects along the update path. Return the state so the setter can merge it into the new root. Only leaf selectors observe these changes, because unchanged nested references are retained.
 
 ```typescript
-// ❌ Spreading creates new references along the update path; selectors returning those objects re-render
+// ❌ Spreading allocates new objects along the update path
 setStore(s => ({ ...s, routes: { ...s.routes, [key]: { ...s.routes[key], href: newHref } } }));
 
 // ✅ Mutate in place — only selectors for `href` will re-render
@@ -116,6 +118,7 @@ useEffect(() => { setFiltered(items.filter(...)); }, [items]);
 - NO subscribing to entire store
 - NO selecting a parent object from a store and reading its fields in JSX — select each leaf field separately
 - NO spreading/replacing parent objects in store mutations — mutate fields in place
+- NO spreading parent objects in store updates — mutate the changed fields in place
 - NO `lazy()` or code splitting — everything bundled upfront
 - NO unvirtualized lists of 100+ items
 - NO MUI layout components (`Box`, `Stack`, `Grid`) — raw HTML

@@ -97,18 +97,18 @@ Use when > 3 files OR sub-features:
 
 ## Rules
 
-- `.tsx` for files with JSX, `.ts` for pure logic/types
+- `.tsx` for files with JSX, `.ts` for logic/types without JSX
 - Single-component files must be placed in the module's `components/` folder
 - Single-component filenames must match the component name (PascalCase), e.g. `AISummarySection.tsx`
 - Tests co-located: `*.test.ts` next to source
 - One `index.ts` per module — exports public API only
-- 1:1 mappings: component → POM, utility → test file
-- POMs mirror component filenames: `ComponentA.tsx` → `ComponentA.pom.ts`
+- Each page or component with E2E coverage has one POM; each utility file has one test file
+- POM placement: `<module>.pom.ts` in file-based modules, `pom/<ComponentName>.pom.ts` in folder-based modules
 
 ## Creating a Module
 
 1. Create `<module>.models.ts` — types + `DEFAULT_<MODEL>`
 2. Create `<module>.components.tsx` — component(s)
-3. Add `.utils.ts` only if pure functions extracted from components
+3. Add `.utils.ts` only if framework-free functions are extracted from components
 4. Add `.store.ts` + `.providers.tsx` only if feature-scoped state needed
 5. Add `.i18n.*.json` only if module has user-visible strings

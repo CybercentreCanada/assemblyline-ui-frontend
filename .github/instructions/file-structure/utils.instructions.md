@@ -1,9 +1,11 @@
 ---
-description: "Use when creating or modifying reusable utility functions and pure module logic."
+description: "Use when creating or modifying reusable utility functions and framework-free module logic."
 applyTo: "src/**/*.utils.ts, src/**/utils/**/*.ts"
 ---
 
 # Utility Functions — AI Rules
+
+> Applies to new and modified utilities. Legacy utilities are exempt until they are touched, including missing tests.
 
 ## Purpose
 
@@ -25,7 +27,7 @@ Utility functions extract complex logic from hooks/components to make it unit-te
 - NO classes — standalone functions only
 - NO copying input to avoid mutation (no `[...items]`, no `{ ...obj }`)
 - NO multi-purpose functions
-- NO side effects (pure functions — same input → same output)
+- NO side effects beyond mutating the provided arguments — no I/O, globals, timers, or storage
 - NO `function` keyword
 
 ## Placement

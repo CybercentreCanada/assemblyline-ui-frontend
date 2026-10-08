@@ -6,6 +6,8 @@ applyTo: "src/**/*.components.tsx, src/**/components/**/*.tsx"
 # Components
 
 > Applies to: `*.components.tsx` files and files inside `components/` folders.
+>
+> Applies to new and modified code. Legacy code is exempt until it is touched; do not refactor it unless asked.
 
 ## Template
 
@@ -31,12 +33,10 @@ export const MyComponent = memo(({ open, onClose }: MyComponentProps) => {
   const setConfigStore = useAppSetConfigStore();
 
   const handleAction = useCallback(() => {
-    setConfigStore(prev => ({
-      layout: {
-        ...prev.layout,
-        someFeature: { ...prev.layout.someFeature, value: 'new' }
-      }
-    }));
+    setConfigStore(s => {
+      s.layout.someFeature.value = 'new';
+      return s;
+    });
   }, [setConfigStore]);
 
   return !open ? null : (
@@ -64,7 +64,7 @@ MyComponent.displayName = 'MyComponent';
 ## Hook Ordering (strict)
 
 1. Library hooks (`useTranslation`, `useNavigate`, `useTheme`)
-2. App/core hooks (`useAppConfig`, `useAppSetConfig`, `useAPIQuery`, `useSnackbar`)
+2. App/core hooks (`useAppConfigStore`, `useAppSetConfigStore`, `useAPIQuery`, `useSnackbar`)
 3. `useState` (rare — local ephemeral UI only)
 4. `useRef`
 5. `useMemo`
@@ -109,7 +109,7 @@ if (isLoading) return <Spinner />;
 | TanStack Form stores             | Form state with validation            |
 
 - Always use focused selectors — never subscribe to entire store
-- Write via callback: `setConfig(prev => ({ ...prev.layout, ... }))`
+- Write via callback that mutates in place: `setConfigStore(s => { s.layout.open = true; return s; })`
 
 ## Decision Table
 
@@ -160,8 +160,8 @@ if (!data) return null;
 // ❌ Missing displayName
 export const Foo = memo(() => { ... });
 
-// ❌ Direct setConfig without callback
-setConfig({ layout: { ...config.layout, open: true } });
+// ❌ Spreading parent objects from a render-time value
+setConfigStore({ layout: { ...config.layout, open: true } });
 
 // ❌ Redux patterns
 dispatch(action); useReducer(...); useSelector(...)

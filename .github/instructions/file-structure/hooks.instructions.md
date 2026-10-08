@@ -19,13 +19,13 @@ applyTo: "src/**/*.hooks.ts, src/**/*.hooks.tsx, src/**/hooks/**/*.ts, src/**/ho
 - Live in `<module>.hooks.tsx`
 - Only export hooks used outside the module
 - Group hooks with comment delimiters (same as utils)
-- If logic is complex and pure, extract to a utility function — hook just calls it
+- If logic is complex and framework-free, extract to a utility function — hook just calls it
 
 ## Never
 
 - NO single-use hooks — keep logic inline in the component
 - NO wrapping a single `useAPIMutation` — use it directly
-- NO wrapping a single `useAppConfig` selector with no added logic
+- NO wrapping a single `useAppConfigStore` selector with no added logic
 - NO complex multi-step orchestration — hooks can't be unit tested
 
 ## Template

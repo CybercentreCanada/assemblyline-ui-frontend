@@ -5,6 +5,8 @@ applyTo: "src/**/*.ts, src/**/*.tsx"
 
 # Architecture Rules
 
+> Applies to new and modified code. Legacy code is exempt until it is touched; do not refactor it unless asked.
+
 ## Layer Hierarchy
 
 The codebase has strict dependency layers (top imports from bottom, never reverse):
@@ -50,7 +52,7 @@ These patterns are NOT allowed in this codebase:
 2. **Every component sets `.displayName`** — for React DevTools
 3. **All component-internal functions use `useCallback`**
 4. **Components read state via `useAppConfigStore(selector)`** — not props for shared state
-5. **Components write state via `useAppSetConfigStore()`** — callback form for modifying the store state
+5. **Components write state via `useAppSetConfigStore()`** — callback form that mutates the changed fields in place and returns the state (see performance rules)
 6. **API mutations use `useAPIMutation()`** — not raw fetch or axios
 7. **API queries use `useAPIQuery()`** — not raw useQuery
 8. **Translation keys come from per-module i18n files** — no inline strings for user-visible text

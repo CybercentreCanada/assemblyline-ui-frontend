@@ -5,6 +5,8 @@ applyTo: "src/**/*.ts, src/**/*.tsx"
 
 # Import Conventions — AI Rules
 
+> Applies to new and modified code. Legacy code is exempt until it is touched; do not refactor it unless asked.
+
 ## Import Ordering (strict)
 
 1. MUI icons — default imports from `@mui/icons-material/*`
@@ -40,7 +42,7 @@ applyTo: "src/**/*.ts, src/**/*.tsx"
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import { Badge, Drawer, styled, useTheme } from '@mui/material';
 import { useAPIMutation } from 'core/api';
-import { useAppConfig, useAppSetConfig } from 'core/config';
+import { useAppConfigStore, useAppSetConfigStore } from 'core/config';
 import type { SystemMessage } from 'models/ui/user';
 import { IconButton } from 'ui/buttons/IconButton';
 import { memo, useCallback, useMemo } from 'react';
