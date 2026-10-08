@@ -10,7 +10,7 @@ applyTo: "src/**/*.ts, src/**/*.tsx"
 - Every exported component wrapped in `memo()`
 - Focused store selectors — never subscribe to entire store
 - Store selectors must access the most nested (leaf) values — never select a parent object and read its fields later
-- Mutate store objects in place — never spread/replace parent objects (preserves reference identity for unchanged siblings)
+- For the app's `createStoreContext` store, mutate only changed nested fields and return the state; its setter creates a new root reference and notifies subscribers. Avoid spreading nested parent objects. For vanilla Zustand without Immer, use immutable updates so subscribers are notified.
 - Functions passed as props must use `useCallback`
 - Computed arrays/objects (filter, sort, map, spread) passed as props must use `useMemo`
 - Empty array/object defaults must be module-level constants
@@ -55,10 +55,10 @@ const services = useAppConfigStore(s => s?.services ?? []);
 
 ## Store Selectors — Access Leaf Values
 
-Zustand (and similar stores) only trigger re-renders when the selected value's reference changes. Selecting a parent object and then reading its fields in JSX will **not** react to field-level mutations (since the parent reference is preserved).
+Vanilla Zustand uses `Object.is` to detect whether the next state changed. Mutating the current state and returning the same object is treated as unchanged, so subscribers are not notified. The app's `createStoreContext` setter instead shallow-copies the root and notifies subscribers after its updater runs. Since nested references are preserved by in-place field updates, select leaf values rather than parent objects to observe changes and avoid unrelated re-renders.
 
 ```typescript
-// ❌ Selecting the parent object — won't re-render when `href` or `state` changes
+// ❌ Selecting the parent object — re-renders when any field on the route changes
 const route = useStore(s => s.routes[routeKey]);
 return <AppRoutes href={route.href} state={route.state} />;
 
@@ -72,10 +72,10 @@ return <AppRoutes href={href} state={state} />;
 
 ## Store Mutations — Mutate In Place
 
-Never spread/replace a parent object in the store. Mutate the individual fields to preserve reference identity for unchanged siblings:
+The app's `createStoreContext` setter runs the updater, shallow-copies the root state, and notifies subscribers. This lets an updater change a nested field in place without spreading every parent object; return the state so the setter can merge it into the new root. Use leaf selectors because unchanged nested references are retained.
 
 ```typescript
-// ❌ Spreading creates a new object — causes re-renders for ALL selectors on that subtree
+// ❌ Spreading creates new references along the update path; selectors returning those objects re-render
 setStore(s => ({ ...s, routes: { ...s.routes, [key]: { ...s.routes[key], href: newHref } } }));
 
 // ✅ Mutate in place — only selectors for `href` will re-render
