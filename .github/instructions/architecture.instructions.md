@@ -56,7 +56,7 @@ These patterns are NOT allowed in this codebase:
 8. **Translation keys come from per-module i18n files** — no inline strings for user-visible text
 9. **Feature files use dot-prefix naming** — `notifications.components.tsx`, not `Components.tsx`
 10. **Types live in `*.models.ts`** — not scattered in component files
-11. **Zod validates localStorage config only** — API responses are trusted (backend validates). URL params use Zod via route factories.
+11. **Validate data when runtime guarantees are needed** — Backend responses can generally be trusted; use Zod for localStorage config or URL params via route factories when validation is needed.
 12. **Use `import type {}` for type-only imports** — the `type` keyword goes on the import statement, NOT on individual specifiers
 13. **Every shared model type has a `DEFAULT_<MODEL>` constant** — defined directly below its type
 14. **Stable references for props** — objects/arrays wrapped in `useMemo`, functions in `useCallback`, or defined as module-level constants

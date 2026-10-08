@@ -27,6 +27,7 @@ applyTo: "src/**"
 | `.hooks`                | `.tsx`    | Shared hooks (reused in 3+ components)                 |
 | `.utils`                | `.ts`     | Pure utility functions                                 |
 | `.utils.test`           | `.ts`     | Unit tests for utils                                   |
+| `.docs`                 | `.md`     | Module documentation                                   |
 | `.store`                | `.ts`     | Zustand store (`createAppStore`)                       |
 | `.providers`            | `.tsx`    | Context providers, store providers                     |
 | `.i18n.en` / `.i18n.fr` | `.json`   | Translation files                                      |

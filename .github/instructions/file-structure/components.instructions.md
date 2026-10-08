@@ -12,8 +12,7 @@ applyTo: "src/**/*.components.tsx, src/**/components/**/*.tsx"
 ```typescript
 import { memo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useAppConfig, useAppSetConfig } from 'core/config';
-import type { MyComponentProps } from './my-feature.models';
+import { useAppConfigStore, useAppSetConfigStore } from 'core/config';
 
 //*****************************************************************************************
 // My Component
@@ -32,13 +31,13 @@ export const MyComponent = memo(({ open, onClose }: MyComponentProps) => {
   const setConfigStore = useAppSetConfigStore();
 
   const handleAction = useCallback(() => {
-    setConfig(prev => ({
+    setConfigStore(prev => ({
       layout: {
         ...prev.layout,
         someFeature: { ...prev.layout.someFeature, value: 'new' }
       }
     }));
-  }, [setConfig]);
+  }, [setConfigStore]);
 
   return !open ? null : (
     <div>{t('feature.title')}</div>

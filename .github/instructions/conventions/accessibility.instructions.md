@@ -70,14 +70,7 @@ applyTo: "src/**/*.tsx"
 ## Keyboard Template
 
 ```typescript
-<div
-  role="button"
-  tabIndex={0}
-  onClick={handleClick}
-  onKeyDown={(e) => {
-    if (e.key === 'Enter' || e.key === ' ') handleClick();
-  }}
->
+<button type="button" onClick={handleClick}>
 ```
 
 ## E2E Locator Priority
