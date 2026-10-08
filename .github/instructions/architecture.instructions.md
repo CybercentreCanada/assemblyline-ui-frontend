@@ -1,3 +1,8 @@
+---
+description: "Use when changing application architecture, module boundaries, shared state, API access, or cross-layer dependencies."
+applyTo: "src/**/*.ts, src/**/*.tsx"
+---
+
 # Architecture Rules
 
 ## Layer Hierarchy

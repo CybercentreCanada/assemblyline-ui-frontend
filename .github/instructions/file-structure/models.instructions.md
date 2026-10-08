@@ -1,3 +1,8 @@
+---
+description: "Use when creating or modifying shared TypeScript models, types, interfaces, defaults, or enums."
+applyTo: "src/**/*.models.ts, src/**/models/**/*.ts"
+---
+
 # Models & Types — AI Rules
 
 ## Must

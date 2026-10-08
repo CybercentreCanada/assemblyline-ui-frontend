@@ -1,3 +1,8 @@
+---
+description: "Use when creating or modifying Playwright end-to-end tests and user-facing browser scenarios."
+applyTo: "src/**/*.spec.ts, src/e2e/**/*.ts, src/**/spec/**/*.ts"
+---
+
 # Spec Files (E2E Tests) — AI Rules
 
 ## Must

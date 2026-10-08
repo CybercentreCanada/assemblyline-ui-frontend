@@ -1,3 +1,8 @@
+---
+description: "Use when building or modifying React UI, forms, dialogs, interactive controls, keyboard behavior, or accessible names."
+applyTo: "src/**/*.tsx"
+---
+
 # Accessibility — AI Rules
 
 ## Must

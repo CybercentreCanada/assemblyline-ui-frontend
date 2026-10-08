@@ -1,3 +1,8 @@
+---
+description: "Use when changing React render paths, store selectors, memoization, list rendering, or performance-sensitive TypeScript."
+applyTo: "src/**/*.ts, src/**/*.tsx"
+---
+
 # Performance — AI Rules
 
 ## Must

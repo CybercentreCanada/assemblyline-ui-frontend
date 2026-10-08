@@ -1,3 +1,8 @@
+---
+description: "Use when creating or modifying reusable utility functions and pure module logic."
+applyTo: "src/**/*.utils.ts, src/**/utils/**/*.ts"
+---
+
 # Utility Functions — AI Rules
 
 ## Purpose

@@ -1,3 +1,8 @@
+---
+description: "Use when creating or editing React components, JSX, component props, files named *.components.tsx, or files under a components/ directory."
+applyTo: "src/**/*.components.tsx, src/**/components/**/*.tsx"
+---
+
 # Components
 
 > Applies to: `*.components.tsx` files and files inside `components/` folders.

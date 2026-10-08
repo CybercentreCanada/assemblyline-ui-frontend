@@ -11,22 +11,22 @@ Review the codebase as a whole: module boundaries, layering, cross-cutting conve
 
 Consult the applicable project rules before reporting violations:
 
-- [Architecture](../../instructions/architecture.instructions.md)
-- [File structure](../../instructions/file-structure.instructions.md)
-- [Accessibility](../../instructions/conventions/accessibility.instructions.md)
-- [Imports](../../instructions/conventions/imports.instructions.md)
-- [Performance](../../instructions/conventions/performance.instructions.md)
-- [React](../../instructions/conventions/react.instructions.md)
-- [Styling](../../instructions/conventions/styling.instructions.md)
-- [Components](../../instructions/file-structure/components.instructions.md)
-- [Documentation](../../instructions/file-structure/docs.instructions.md)
-- [Hooks](../../instructions/file-structure/hooks.instructions.md)
-- [i18n](../../instructions/file-structure/i18n.instructions.md)
-- [Models](../../instructions/file-structure/models.instructions.md)
-- [Page objects](../../instructions/file-structure/pom.instructions.md)
-- [Playwright specs](../../instructions/file-structure/spec.instructions.md)
-- [Utilities](../../instructions/file-structure/utils.instructions.md)
-- [Utility tests](../../instructions/file-structure/utils.test.instructions.md)
+- [Architecture](../../../.github/instructions/architecture.instructions.md)
+- [File structure](../../../.github/instructions/file-structure.instructions.md)
+- [Accessibility](../../../.github/instructions/conventions/accessibility.instructions.md)
+- [Imports](../../../.github/instructions/conventions/imports.instructions.md)
+- [Performance](../../../.github/instructions/conventions/performance.instructions.md)
+- [React](../../../.github/instructions/conventions/react.instructions.md)
+- [Styling](../../../.github/instructions/conventions/styling.instructions.md)
+- [Components](../../../.github/instructions/file-structure/components.instructions.md)
+- [Documentation](../../../.github/instructions/file-structure/docs.instructions.md)
+- [Hooks](../../../.github/instructions/file-structure/hooks.instructions.md)
+- [i18n](../../../.github/instructions/file-structure/i18n.instructions.md)
+- [Models](../../../.github/instructions/file-structure/models.instructions.md)
+- [Page objects](../../../.github/instructions/file-structure/pom.instructions.md)
+- [Playwright specs](../../../.github/instructions/file-structure/spec.instructions.md)
+- [Utilities](../../../.github/instructions/file-structure/utils.instructions.md)
+- [Utility tests](../../../.github/instructions/file-structure/utils.test.instructions.md)
 
 ## Review
 

@@ -1,3 +1,8 @@
+---
+description: "Use when adding, moving, or naming source files and modules in the React application."
+applyTo: "src/**"
+---
+
 # File Structure
 
 > Applies to: all new files and modules in `src/`.

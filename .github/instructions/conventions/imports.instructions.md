@@ -1,3 +1,8 @@
+---
+description: "Use when adding or changing imports, exports, module boundaries, or barrel files in TypeScript."
+applyTo: "src/**/*.ts, src/**/*.tsx"
+---
+
 # Import Conventions — AI Rules
 
 ## Import Ordering (strict)

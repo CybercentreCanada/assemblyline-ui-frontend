@@ -1,3 +1,8 @@
+---
+description: "Use when creating or modifying reusable React hooks or hook modules."
+applyTo: "src/**/*.hooks.ts, src/**/*.hooks.tsx, src/**/hooks/**/*.ts, src/**/hooks/**/*.tsx"
+---
+
 # Hooks — AI Rules
 
 ## Valid Reasons to Create a Hook

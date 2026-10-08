@@ -1,3 +1,8 @@
+---
+description: "Use when writing or updating unit tests for TypeScript utility functions."
+applyTo: "src/**/*.utils.test.ts, src/**/utils/**/*.test.ts"
+---
+
 # Utility Unit Tests — AI Rules
 
 ## Must

@@ -1,3 +1,8 @@
+---
+description: "Use when creating or editing module documentation, API guides, or feature documentation in src."
+applyTo: "src/**/*.docs.md"
+---
+
 # Module Documentation
 
 ## 1. Purpose
