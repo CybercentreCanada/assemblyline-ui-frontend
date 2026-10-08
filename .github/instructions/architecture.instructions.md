@@ -50,7 +50,7 @@ These patterns are NOT allowed in this codebase:
 2. **Every component sets `.displayName`** — for React DevTools
 3. **All component-internal functions use `useCallback`**
 4. **Components read state via `useAppConfigStore(selector)`** — not props for shared state
-5. **Components write state via `useAppSetConfigStore()`** — callback form with manual nested spreading
+5. **Components write state via `useAppSetConfigStore()`** — callback form for modifying the store state
 6. **API mutations use `useAPIMutation()`** — not raw fetch or axios
 7. **API queries use `useAPIQuery()`** — not raw useQuery
 8. **Translation keys come from per-module i18n files** — no inline strings for user-visible text
