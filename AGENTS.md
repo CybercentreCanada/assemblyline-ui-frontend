@@ -28,8 +28,7 @@ instructions live under `.github/instructions/`; reusable workflows live under
 - Use the `react-feature-implementation` skill for React feature work.
 - Use `api-reviewer`, `bug-hunter`, `codebase-reviewer`, or
   `performance-reviewer` for focused reviews.
-- Use `commit-message` to draft a message from staged changes. Do not commit
-  unless explicitly asked.
+- Do not commit unless explicitly asked.
 
 All reusable skills are under `.agents/skills/`. Keep `.github/instructions/`
 authoritative; do not maintain duplicate rule copies.
