@@ -1,6 +1,6 @@
 ---
-description: "Use when building or modifying React UI, forms, dialogs, interactive controls, keyboard behavior, or accessible names."
-applyTo: "src/**/*.tsx"
+description: 'Use when building or modifying React UI, forms, dialogs, interactive controls, keyboard behavior, or accessible names.'
+applyTo: 'src/**/*.tsx'
 ---
 
 # Accessibility — AI Rules
@@ -27,15 +27,14 @@ applyTo: "src/**/*.tsx"
 
 ## Semantic HTML
 
-| Need | Use | Not |
-| ---- | --- | --- |
-
-| Action | `<button>` | `<div onClick>` |
-| Navigation | `<nav>` | `<div role="navigation">` |
-| Main content | `<main>` | `<div role="main">` |
-| Heading | `<h1>`–`<h6>` | `<div aria-level>` |
-| List | `<ul>`/`<ol>` + `<li>` | nested `<div>` |
-| Table | `<table>` | grid of `<div>` |
+| Need         | Use                    | Not                       |
+| ------------ | ---------------------- | ------------------------- |
+| Action       | `<button>`             | `<div onClick>`           |
+| Navigation   | `<nav>`                | `<div role="navigation">` |
+| Main content | `<main>`               | `<div role="main">`       |
+| Heading      | `<h1>`–`<h6>`          | `<div aria-level>`        |
+| List         | `<ul>`/`<ol>` + `<li>` | nested `<div>`            |
+| Table        | `<table>`              | grid of `<div>`           |
 
 ## ARIA Patterns
 

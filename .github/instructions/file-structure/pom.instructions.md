@@ -1,6 +1,6 @@
 ---
-description: "Use when creating or modifying Playwright page objects, locators, and reusable browser interactions."
-applyTo: "src/**/*.pom.ts, src/**/pom/**/*.ts"
+description: 'Use when creating or modifying Playwright page objects, locators, and reusable browser interactions.'
+applyTo: 'src/**/*.pom.ts, src/**/pom/**/*.ts'
 ---
 
 # Page Object Model (POM) — AI Rules
