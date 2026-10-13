@@ -11,8 +11,16 @@ instructions live under `.github/instructions/`; reusable workflows live under
    [file structure](.github/instructions/file-structure.instructions.md), and
    [import conventions](.github/instructions/conventions/imports.instructions.md).
 3. Read the topic-specific instructions below before editing relevant areas.
-4. Make a focused change and run the narrowest relevant validation. Run
-   `pnpm typecheck` when a change affects TypeScript.
+4. Make a focused change and run the narrowest relevant tests.
+5. After every significant code change, validate in this order, scoped to the
+   files you changed:
+   1. `pnpm eslint --fix <changed files>`
+   2. `pnpm prettier --write <changed files>`
+   3. `pnpm typecheck`
+
+   Fix all remaining errors and as many warnings as possible in the code you
+   touched. Do not fix warnings in untouched legacy code. Report any errors or
+   warnings you could not resolve.
 
 | Work area | Read these instructions |
 | --- | --- |
