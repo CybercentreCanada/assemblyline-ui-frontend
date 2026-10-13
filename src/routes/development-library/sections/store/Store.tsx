@@ -6,6 +6,7 @@ import { StoreDemoCreateStoreContext } from 'routes/development-library/sections
 import { StoreDemoSyncExternalStore } from 'routes/development-library/sections/store/StoreDemoSyncExternalStore';
 import { StoreDemoTanStackForm } from 'routes/development-library/sections/store/StoreDemoTanStackForm';
 import { StoreDemoZustand } from 'routes/development-library/sections/store/StoreDemoZustand';
+import { StoreDemoZustandMatrix } from 'routes/development-library/sections/store/StoreDemoZustandMatrix';
 
 export type StoreLibraryState = {
   store: {
@@ -33,5 +34,6 @@ export const StoreSection = React.memo(() => (
     <StoreDemoCreateFormContext />
     <StoreDemoSyncExternalStore />
     <StoreDemoCreateStoreContext />
+    <StoreDemoZustandMatrix />
   </DemoContainer>
 ));

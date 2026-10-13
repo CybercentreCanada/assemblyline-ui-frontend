@@ -110,6 +110,8 @@ StoreDemoRenderCount.displayName = 'StoreDemoRenderCount';
 //*****************************************************************************************
 
 export type StoreDemoTextFieldProps = {
+  /** Ref of the element that displays the render count of the connected parent. Defaults to the field's own count. */
+  countRef?: RefObject<HTMLSpanElement | null>;
   /** Source of the code that writes the value to the store. */
   implementation: string;
   /** Label of the text field. */
@@ -120,19 +122,24 @@ export type StoreDemoTextFieldProps = {
   value: string;
 };
 
-export const StoreDemoTextField = memo(({ implementation, label, onChange, value }: StoreDemoTextFieldProps) => {
-  const countRef = useRenderCount();
+export const StoreDemoTextField = memo(
+  ({ countRef, implementation, label, onChange, value }: StoreDemoTextFieldProps) => {
+    const ownCountRef = useRenderCount();
 
-  const handleChange = useCallback((event: ChangeEvent<HTMLInputElement>) => onChange(event.target.value), [onChange]);
+    const handleChange = useCallback(
+      (event: ChangeEvent<HTMLInputElement>) => onChange(event.target.value),
+      [onChange]
+    );
 
-  return (
-    <Row>
-      <TextField fullWidth label={label} size="small" value={value} onChange={handleChange} />
-      <StoreDemoRenderCount countRef={countRef} />
-      <Implementation>{implementation}</Implementation>
-    </Row>
-  );
-});
+    return (
+      <Row>
+        <TextField fullWidth label={label} size="small" value={value} onChange={handleChange} />
+        <StoreDemoRenderCount countRef={countRef ?? ownCountRef} />
+        <Implementation>{implementation}</Implementation>
+      </Row>
+    );
+  }
+);
 
 StoreDemoTextField.displayName = 'StoreDemoTextField';
 
@@ -143,6 +150,8 @@ StoreDemoTextField.displayName = 'StoreDemoTextField';
 export type StoreDemoCheckboxProps = {
   /** Current checked state. */
   checked: boolean;
+  /** Ref of the element that displays the render count of the connected parent. Defaults to the checkbox's own count. */
+  countRef?: RefObject<HTMLSpanElement | null>;
   /** Source of the code that writes the value to the store. */
   implementation: string;
   /** Label of the checkbox. */
@@ -151,22 +160,24 @@ export type StoreDemoCheckboxProps = {
   onChange: (checked: boolean) => void;
 };
 
-export const StoreDemoCheckbox = memo(({ checked, implementation, label, onChange }: StoreDemoCheckboxProps) => {
-  const countRef = useRenderCount();
+export const StoreDemoCheckbox = memo(
+  ({ checked, countRef, implementation, label, onChange }: StoreDemoCheckboxProps) => {
+    const ownCountRef = useRenderCount();
 
-  const handleChange = useCallback(
-    (_event: ChangeEvent<HTMLInputElement>, value: boolean) => onChange(value),
-    [onChange]
-  );
+    const handleChange = useCallback(
+      (_event: ChangeEvent<HTMLInputElement>, value: boolean) => onChange(value),
+      [onChange]
+    );
 
-  return (
-    <Row>
-      <FormControlLabel control={<Checkbox checked={checked} size="small" onChange={handleChange} />} label={label} />
-      <StoreDemoRenderCount countRef={countRef} />
-      <Implementation>{implementation}</Implementation>
-    </Row>
-  );
-});
+    return (
+      <Row>
+        <FormControlLabel control={<Checkbox checked={checked} size="small" onChange={handleChange} />} label={label} />
+        <StoreDemoRenderCount countRef={countRef ?? ownCountRef} />
+        <Implementation>{implementation}</Implementation>
+      </Row>
+    );
+  }
+);
 
 StoreDemoCheckbox.displayName = 'StoreDemoCheckbox';
 
@@ -175,6 +186,8 @@ StoreDemoCheckbox.displayName = 'StoreDemoCheckbox';
 //*****************************************************************************************
 
 export type StoreDemoRecreateButtonProps = {
+  /** Ref of the element that displays the render count of the connected parent. Defaults to the button's own count. */
+  countRef?: RefObject<HTMLSpanElement | null>;
   /** Unique id of the button, since several demos share the page. */
   id: string;
   /** Source of the code that recreates the store. */
@@ -183,21 +196,23 @@ export type StoreDemoRecreateButtonProps = {
   onClick: () => void;
 };
 
-export const StoreDemoRecreateButton = memo(({ id, implementation, onClick }: StoreDemoRecreateButtonProps) => {
-  const countRef = useRenderCount();
+export const StoreDemoRecreateButton = memo(
+  ({ countRef, id, implementation, onClick }: StoreDemoRecreateButtonProps) => {
+    const ownCountRef = useRenderCount();
 
-  return (
-    <Row>
-      <div>
-        <Button id={id} size="small" variant="outlined" onClick={onClick}>
-          Recreate store
-        </Button>
-      </div>
-      <StoreDemoRenderCount countRef={countRef} />
-      <Implementation>{implementation}</Implementation>
-    </Row>
-  );
-});
+    return (
+      <Row>
+        <div>
+          <Button id={id} size="small" variant="outlined" onClick={onClick}>
+            Recreate store
+          </Button>
+        </div>
+        <StoreDemoRenderCount countRef={countRef ?? ownCountRef} />
+        <Implementation>{implementation}</Implementation>
+      </Row>
+    );
+  }
+);
 
 StoreDemoRecreateButton.displayName = 'StoreDemoRecreateButton';
 
