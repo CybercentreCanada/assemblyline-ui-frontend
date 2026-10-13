@@ -5,12 +5,14 @@ import { INPUTS_LIBRARY_STATE, type InputsLibraryState } from 'routes/developmen
 import { LAYOUT_LIBRARY_STATE, type LayoutLibraryState } from 'routes/development-library/sections/Layout';
 import { LIST_LIBRARY_STATE, type ListLibraryState } from 'routes/development-library/sections/List';
 import { LIST_INPUTS_LIBRARY_STATE, type ListInputsLibraryState } from 'routes/development-library/sections/ListInputs';
+import { STORE_LIBRARY_STATE, type StoreLibraryState } from 'routes/development-library/sections/Store';
 
 type LibraryComponents = DateTimeLibraryState &
   InputsLibraryState &
   LayoutLibraryState &
   ListInputsLibraryState &
-  ListLibraryState;
+  ListLibraryState &
+  StoreLibraryState;
 
 export type LibraryFormStore = {
   state: {
@@ -28,7 +30,8 @@ const LIBRARY_FORM_STORE: LibraryFormStore = Object.freeze({
     ...INPUTS_LIBRARY_STATE,
     ...LAYOUT_LIBRARY_STATE,
     ...LIST_INPUTS_LIBRARY_STATE,
-    ...LIST_LIBRARY_STATE
+    ...LIST_LIBRARY_STATE,
+    ...STORE_LIBRARY_STATE
   }
 });
 
