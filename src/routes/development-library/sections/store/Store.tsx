@@ -1,7 +1,10 @@
 import React from 'react';
 import { DemoContainer } from 'routes/development-library/components/DemoContainer';
-import { StoreDemoCustom } from 'routes/development-library/sections/store/StoreDemoCustom';
-import { StoreDemoTanStack } from 'routes/development-library/sections/store/StoreDemoTanStack';
+import { StoreDemoCreateAppStore } from 'routes/development-library/sections/store/StoreDemoCreateAppStore';
+import { StoreDemoCreateFormContext } from 'routes/development-library/sections/store/StoreDemoCreateFormContext';
+import { StoreDemoCreateStoreContext } from 'routes/development-library/sections/store/StoreDemoCreateStoreContext';
+import { StoreDemoSyncExternalStore } from 'routes/development-library/sections/store/StoreDemoSyncExternalStore';
+import { StoreDemoTanStackForm } from 'routes/development-library/sections/store/StoreDemoTanStackForm';
 import { StoreDemoZustand } from 'routes/development-library/sections/store/StoreDemoZustand';
 
 export type StoreLibraryState = {
@@ -25,7 +28,10 @@ export const STORE_LIBRARY_STATE: StoreLibraryState = {
 export const StoreSection = React.memo(() => (
   <DemoContainer>
     <StoreDemoZustand />
-    <StoreDemoTanStack />
-    <StoreDemoCustom />
+    <StoreDemoCreateAppStore />
+    <StoreDemoTanStackForm />
+    <StoreDemoCreateFormContext />
+    <StoreDemoSyncExternalStore />
+    <StoreDemoCreateStoreContext />
   </DemoContainer>
 ));

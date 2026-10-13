@@ -19,10 +19,10 @@ const RECREATE_IMPLEMENTATION =
   'const [, setStore] = useStore(() => null);\nsetStore({ ...DEFAULT_STORE_DEMO_STATE });';
 
 //*****************************************************************************************
-// Custom First Field
+// CreateStoreContext First Field
 //*****************************************************************************************
 
-const CustomFirstField = memo(() => {
+const CreateStoreContextFirstField = memo(() => {
   const [value, setStore] = useStore(s => s.first);
 
   const handleChange = useCallback((first: string) => setStore({ first }), [setStore]);
@@ -32,13 +32,13 @@ const CustomFirstField = memo(() => {
   );
 });
 
-CustomFirstField.displayName = 'CustomFirstField';
+CreateStoreContextFirstField.displayName = 'CreateStoreContextFirstField';
 
 //*****************************************************************************************
-// Custom Last Field
+// CreateStoreContext Last Field
 //*****************************************************************************************
 
-const CustomLastField = memo(() => {
+const CreateStoreContextLastField = memo(() => {
   const [value, setStore] = useStore(s => s.last);
 
   const handleChange = useCallback((last: string) => setStore({ last }), [setStore]);
@@ -46,13 +46,13 @@ const CustomLastField = memo(() => {
   return <StoreDemoTextField implementation={LAST_IMPLEMENTATION} label="Last" value={value} onChange={handleChange} />;
 });
 
-CustomLastField.displayName = 'CustomLastField';
+CreateStoreContextLastField.displayName = 'CreateStoreContextLastField';
 
 //*****************************************************************************************
-// Custom Checked Field
+// CreateStoreContext Checked Field
 //*****************************************************************************************
 
-const CustomCheckedField = memo(() => {
+const CreateStoreContextCheckedField = memo(() => {
   const [checked, setStore] = useStore(s => s.checked);
 
   const handleChange = useCallback((value: boolean) => setStore({ checked: value }), [setStore]);
@@ -67,58 +67,58 @@ const CustomCheckedField = memo(() => {
   );
 });
 
-CustomCheckedField.displayName = 'CustomCheckedField';
+CreateStoreContextCheckedField.displayName = 'CreateStoreContextCheckedField';
 
 //*****************************************************************************************
-// Custom Recreate Button
+// CreateStoreContext Recreate Button
 //*****************************************************************************************
 
-const CustomRecreateButton = memo(() => {
+const CreateStoreContextRecreateButton = memo(() => {
   const [, setStore] = useStore(() => null);
 
   const handleClick = useCallback(() => setStore({ ...DEFAULT_STORE_DEMO_STATE }), [setStore]);
 
   return (
     <StoreDemoRecreateButton
-      id="store-demo-custom-recreate"
+      id="store-demo-create-store-context-recreate"
       implementation={RECREATE_IMPLEMENTATION}
       onClick={handleClick}
     />
   );
 });
 
-CustomRecreateButton.displayName = 'CustomRecreateButton';
+CreateStoreContextRecreateButton.displayName = 'CreateStoreContextRecreateButton';
 
 //*****************************************************************************************
-// Custom Values
+// CreateStoreContext Values
 //*****************************************************************************************
 
-const CustomValues = memo(() => {
+const CreateStoreContextValues = memo(() => {
   const [values] = useStore(s => s);
 
   return <StoreDemoValues values={values} />;
 });
 
-CustomValues.displayName = 'CustomValues';
+CreateStoreContextValues.displayName = 'CreateStoreContextValues';
 
 //*****************************************************************************************
-// Store Demo Custom
+// Store Demo CreateStoreContext
 //*****************************************************************************************
 
-export const StoreDemoCustom = memo(() => (
+export const StoreDemoCreateStoreContext = memo(() => (
   <StoreProvider data={DEFAULT_STORE_DEMO_STATE}>
     <StoreDemoSection
-      primary="Custom Store"
+      primary="createStoreContext"
       secondary="Store created with `createStoreContext`, built on `useSyncExternalStore`. Each field subscribes to its own leaf value."
       implementationLabel="setStore"
-      values={<CustomValues />}
+      values={<CreateStoreContextValues />}
     >
-      <CustomFirstField />
-      <CustomLastField />
-      <CustomCheckedField />
-      <CustomRecreateButton />
+      <CreateStoreContextFirstField />
+      <CreateStoreContextLastField />
+      <CreateStoreContextCheckedField />
+      <CreateStoreContextRecreateButton />
     </StoreDemoSection>
   </StoreProvider>
 ));
 
-StoreDemoCustom.displayName = 'StoreDemoCustom';
+StoreDemoCreateStoreContext.displayName = 'StoreDemoCreateStoreContext';

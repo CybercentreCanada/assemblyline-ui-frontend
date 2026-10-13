@@ -1,4 +1,3 @@
-import { createAppStore } from 'features/store';
 import { memo, useCallback } from 'react';
 import {
   StoreDemoCheckbox,
@@ -9,23 +8,23 @@ import {
 } from 'routes/development-library/sections/store/StoreDemo.components';
 import type { StoreDemoState } from 'routes/development-library/sections/store/store.models';
 import { DEFAULT_STORE_DEMO_STATE } from 'routes/development-library/sections/store/store.models';
+import { create } from 'zustand';
 
-const { StoreProvider, useSetStore, useStore } = createAppStore<StoreDemoState>(DEFAULT_STORE_DEMO_STATE);
+const useDemoStore = create<StoreDemoState>(() => ({ ...DEFAULT_STORE_DEMO_STATE }));
 
-const FIRST_IMPLEMENTATION = 'const setStore = useSetStore();\nsetStore({ first: value });';
-const LAST_IMPLEMENTATION = 'const setStore = useSetStore();\nsetStore({ last: value });';
-const CHECKED_IMPLEMENTATION = 'const setStore = useSetStore();\nsetStore({ checked: value });';
-const RECREATE_IMPLEMENTATION = 'const setStore = useSetStore();\nsetStore({ ...DEFAULT_STORE_DEMO_STATE });';
+const FIRST_IMPLEMENTATION = 'useDemoStore.setState({ first: value });';
+const LAST_IMPLEMENTATION = 'useDemoStore.setState({ last: value });';
+const CHECKED_IMPLEMENTATION = 'useDemoStore.setState({ checked: value });';
+const RECREATE_IMPLEMENTATION = 'useDemoStore.setState({ ...DEFAULT_STORE_DEMO_STATE });';
 
 //*****************************************************************************************
 // Zustand First Field
 //*****************************************************************************************
 
 const ZustandFirstField = memo(() => {
-  const value = useStore(s => s.first);
-  const setStore = useSetStore();
+  const value = useDemoStore(s => s.first);
 
-  const handleChange = useCallback((first: string) => setStore({ first }), [setStore]);
+  const handleChange = useCallback((first: string) => useDemoStore.setState({ first }), []);
 
   return (
     <StoreDemoTextField implementation={FIRST_IMPLEMENTATION} label="First" value={value} onChange={handleChange} />
@@ -39,10 +38,9 @@ ZustandFirstField.displayName = 'ZustandFirstField';
 //*****************************************************************************************
 
 const ZustandLastField = memo(() => {
-  const value = useStore(s => s.last);
-  const setStore = useSetStore();
+  const value = useDemoStore(s => s.last);
 
-  const handleChange = useCallback((last: string) => setStore({ last }), [setStore]);
+  const handleChange = useCallback((last: string) => useDemoStore.setState({ last }), []);
 
   return <StoreDemoTextField implementation={LAST_IMPLEMENTATION} label="Last" value={value} onChange={handleChange} />;
 });
@@ -54,10 +52,9 @@ ZustandLastField.displayName = 'ZustandLastField';
 //*****************************************************************************************
 
 const ZustandCheckedField = memo(() => {
-  const checked = useStore(s => s.checked);
-  const setStore = useSetStore();
+  const checked = useDemoStore(s => s.checked);
 
-  const handleChange = useCallback((value: boolean) => setStore({ checked: value }), [setStore]);
+  const handleChange = useCallback((value: boolean) => useDemoStore.setState({ checked: value }), []);
 
   return (
     <StoreDemoCheckbox
@@ -76,9 +73,7 @@ ZustandCheckedField.displayName = 'ZustandCheckedField';
 //*****************************************************************************************
 
 const ZustandRecreateButton = memo(() => {
-  const setStore = useSetStore();
-
-  const handleClick = useCallback(() => setStore({ ...DEFAULT_STORE_DEMO_STATE }), [setStore]);
+  const handleClick = useCallback(() => useDemoStore.setState({ ...DEFAULT_STORE_DEMO_STATE }), []);
 
   return (
     <StoreDemoRecreateButton
@@ -96,7 +91,7 @@ ZustandRecreateButton.displayName = 'ZustandRecreateButton';
 //*****************************************************************************************
 
 const ZustandValues = memo(() => {
-  const values = useStore(s => s);
+  const values = useDemoStore(s => s);
 
   return <StoreDemoValues values={values} />;
 });
@@ -108,19 +103,17 @@ ZustandValues.displayName = 'ZustandValues';
 //*****************************************************************************************
 
 export const StoreDemoZustand = memo(() => (
-  <StoreProvider>
-    <StoreDemoSection
-      primary="Zustand"
-      secondary="Store created with `createAppStore`. Each field subscribes to its own leaf value."
-      implementationLabel="setStore"
-      values={<ZustandValues />}
-    >
-      <ZustandFirstField />
-      <ZustandLastField />
-      <ZustandCheckedField />
-      <ZustandRecreateButton />
-    </StoreDemoSection>
-  </StoreProvider>
+  <StoreDemoSection
+    primary="zustand"
+    secondary="Module-level store created with zustand's `create`, without a provider or factory. Each field selects its own leaf value."
+    implementationLabel="setState"
+    values={<ZustandValues />}
+  >
+    <ZustandFirstField />
+    <ZustandLastField />
+    <ZustandCheckedField />
+    <ZustandRecreateButton />
+  </StoreDemoSection>
 ));
 
 StoreDemoZustand.displayName = 'StoreDemoZustand';

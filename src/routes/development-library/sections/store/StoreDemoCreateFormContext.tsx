@@ -20,10 +20,10 @@ const CHECKED_IMPLEMENTATION = '<form.Field name="checked">\nfield.handleChange(
 const RECREATE_IMPLEMENTATION = 'form.reset({ ...DEFAULT_STORE_DEMO_STATE });';
 
 //*****************************************************************************************
-// TanStack First Field
+// CreateFormContext First Field
 //*****************************************************************************************
 
-const TanStackFirstField = memo(() => {
+const CreateFormContextFirstField = memo(() => {
   const form = useForm();
 
   return (
@@ -40,13 +40,13 @@ const TanStackFirstField = memo(() => {
   );
 });
 
-TanStackFirstField.displayName = 'TanStackFirstField';
+CreateFormContextFirstField.displayName = 'CreateFormContextFirstField';
 
 //*****************************************************************************************
-// TanStack Last Field
+// CreateFormContext Last Field
 //*****************************************************************************************
 
-const TanStackLastField = memo(() => {
+const CreateFormContextLastField = memo(() => {
   const form = useForm();
 
   return (
@@ -63,13 +63,13 @@ const TanStackLastField = memo(() => {
   );
 });
 
-TanStackLastField.displayName = 'TanStackLastField';
+CreateFormContextLastField.displayName = 'CreateFormContextLastField';
 
 //*****************************************************************************************
-// TanStack Checked Field
+// CreateFormContext Checked Field
 //*****************************************************************************************
 
-const TanStackCheckedField = memo(() => {
+const CreateFormContextCheckedField = memo(() => {
   const form = useForm();
 
   return (
@@ -86,33 +86,33 @@ const TanStackCheckedField = memo(() => {
   );
 });
 
-TanStackCheckedField.displayName = 'TanStackCheckedField';
+CreateFormContextCheckedField.displayName = 'CreateFormContextCheckedField';
 
 //*****************************************************************************************
-// TanStack Recreate Button
+// CreateFormContext Recreate Button
 //*****************************************************************************************
 
-const TanStackRecreateButton = memo(() => {
+const CreateFormContextRecreateButton = memo(() => {
   const form = useForm();
 
   const handleClick = useCallback(() => form.reset({ ...DEFAULT_STORE_DEMO_STATE }), [form]);
 
   return (
     <StoreDemoRecreateButton
-      id="store-demo-tanstack-recreate"
+      id="store-demo-create-form-context-recreate"
       implementation={RECREATE_IMPLEMENTATION}
       onClick={handleClick}
     />
   );
 });
 
-TanStackRecreateButton.displayName = 'TanStackRecreateButton';
+CreateFormContextRecreateButton.displayName = 'CreateFormContextRecreateButton';
 
 //*****************************************************************************************
-// TanStack Values
+// CreateFormContext Values
 //*****************************************************************************************
 
-const TanStackValues = memo(() => {
+const CreateFormContextValues = memo(() => {
   const form = useForm();
 
   return (
@@ -120,26 +120,26 @@ const TanStackValues = memo(() => {
   );
 });
 
-TanStackValues.displayName = 'TanStackValues';
+CreateFormContextValues.displayName = 'CreateFormContextValues';
 
 //*****************************************************************************************
-// Store Demo TanStack
+// Store Demo CreateFormContext
 //*****************************************************************************************
 
-export const StoreDemoTanStack = memo(() => (
+export const StoreDemoCreateFormContext = memo(() => (
   <FormProvider>
     <StoreDemoSection
-      primary="TanStack Form"
+      primary="createFormContext"
       secondary="Form created with `createFormContext`. Each field is a `form.Field` bound to its own value."
       implementationLabel="onChange"
-      values={<TanStackValues />}
+      values={<CreateFormContextValues />}
     >
-      <TanStackFirstField />
-      <TanStackLastField />
-      <TanStackCheckedField />
-      <TanStackRecreateButton />
+      <CreateFormContextFirstField />
+      <CreateFormContextLastField />
+      <CreateFormContextCheckedField />
+      <CreateFormContextRecreateButton />
     </StoreDemoSection>
   </FormProvider>
 ));
 
-StoreDemoTanStack.displayName = 'StoreDemoTanStack';
+StoreDemoCreateFormContext.displayName = 'StoreDemoCreateFormContext';
