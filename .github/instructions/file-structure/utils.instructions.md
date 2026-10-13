@@ -1,6 +1,6 @@
 ---
-description: "Use when creating or modifying reusable utility functions and framework-free module logic."
-applyTo: "src/**/*.utils.ts, src/**/utils/**/*.ts"
+description: 'Use when creating or modifying reusable utility functions and framework-free module logic.'
+applyTo: 'src/**/*.utils.ts, src/**/utils/**/*.ts'
 ---
 
 # Utility Functions — AI Rules
