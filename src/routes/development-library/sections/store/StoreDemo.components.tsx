@@ -1,9 +1,10 @@
-import { Checkbox, FormControlLabel, styled, TextField } from '@mui/material';
-import type { ChangeEvent, RefObject } from 'react';
+import { Checkbox, FormControlLabel, styled, TextField, Typography, useTheme } from '@mui/material';
+import type { ChangeEvent, ReactNode, RefObject } from 'react';
 import { memo, useCallback } from 'react';
 import { useRenderCount } from 'routes/development-library/sections/store/store.hooks';
 import type { StoreDemoState } from 'routes/development-library/sections/store/store.models';
 import { Button } from 'ui/buttons/Button';
+import { PageSection } from 'ui/layouts/PageSection';
 
 const RenderCounter = styled('span')(({ theme }) => ({
   color: theme.palette.text.secondary,
@@ -12,6 +13,80 @@ const RenderCounter = styled('span')(({ theme }) => ({
 }));
 
 RenderCounter.displayName = 'RenderCounter';
+
+const Row = styled('div')(({ theme }) => ({
+  alignItems: 'center',
+  columnGap: theme.spacing(2),
+  display: 'grid',
+  gridTemplateColumns: 'minmax(160px, 1fr) 100px minmax(0, 1.5fr)'
+}));
+
+Row.displayName = 'Row';
+
+const Implementation = styled('code')(({ theme }) => ({
+  color: theme.palette.text.secondary,
+  fontFamily: 'monospace',
+  fontSize: theme.typography.caption.fontSize,
+  whiteSpace: 'pre-wrap'
+}));
+
+Implementation.displayName = 'Implementation';
+
+//*****************************************************************************************
+// Store Demo Section
+//*****************************************************************************************
+
+export type StoreDemoSectionProps = {
+  /** Rows of the demo, one per input. */
+  children: ReactNode;
+  /** Header of the column that shows how each input writes to the store. */
+  implementationLabel: string;
+  /** Title of the section. */
+  primary: ReactNode;
+  /** Description of the section. */
+  secondary: ReactNode;
+  /** Content showing the whole store state. */
+  values: ReactNode;
+};
+
+export const StoreDemoSection = memo(
+  ({ children, implementationLabel, primary, secondary, values }: StoreDemoSectionProps) => {
+    const theme = useTheme();
+
+    return (
+      <PageSection primary={primary} secondary={secondary} anchor>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: theme.spacing(4) }}>
+          <div
+            style={{ display: 'flex', flexDirection: 'column', flex: '3 1 560px', gap: theme.spacing(2), minWidth: 0 }}
+          >
+            <Row>
+              <Typography color="textSecondary" variant="caption">
+                Input
+              </Typography>
+              <Typography color="textSecondary" variant="caption">
+                Renders
+              </Typography>
+              <Typography color="textSecondary" variant="caption">
+                {implementationLabel}
+              </Typography>
+            </Row>
+            {children}
+          </div>
+          <div
+            style={{ display: 'flex', flexDirection: 'column', flex: '1 1 240px', gap: theme.spacing(2), minWidth: 0 }}
+          >
+            <Typography color="textSecondary" variant="caption">
+              Store state
+            </Typography>
+            {values}
+          </div>
+        </div>
+      </PageSection>
+    );
+  }
+);
+
+StoreDemoSection.displayName = 'StoreDemoSection';
 
 //*****************************************************************************************
 // Store Demo Render Count
@@ -24,7 +99,6 @@ export type StoreDemoRenderCountProps = {
 
 export const StoreDemoRenderCount = memo(({ countRef }: StoreDemoRenderCountProps) => (
   <RenderCounter>
-    {'renders: '}
     <span ref={countRef}>0</span>
   </RenderCounter>
 ));
@@ -36,6 +110,8 @@ StoreDemoRenderCount.displayName = 'StoreDemoRenderCount';
 //*****************************************************************************************
 
 export type StoreDemoTextFieldProps = {
+  /** Source of the code that writes the value to the store. */
+  implementation: string;
   /** Label of the text field. */
   label: string;
   /** Callback fired when the value changes. */
@@ -44,16 +120,17 @@ export type StoreDemoTextFieldProps = {
   value: string;
 };
 
-export const StoreDemoTextField = memo(({ label, onChange, value }: StoreDemoTextFieldProps) => {
+export const StoreDemoTextField = memo(({ implementation, label, onChange, value }: StoreDemoTextFieldProps) => {
   const countRef = useRenderCount();
 
   const handleChange = useCallback((event: ChangeEvent<HTMLInputElement>) => onChange(event.target.value), [onChange]);
 
   return (
-    <div style={{ alignItems: 'center', display: 'flex', gap: 8 }}>
+    <Row>
       <TextField fullWidth label={label} size="small" value={value} onChange={handleChange} />
       <StoreDemoRenderCount countRef={countRef} />
-    </div>
+      <Implementation>{implementation}</Implementation>
+    </Row>
   );
 });
 
@@ -66,13 +143,15 @@ StoreDemoTextField.displayName = 'StoreDemoTextField';
 export type StoreDemoCheckboxProps = {
   /** Current checked state. */
   checked: boolean;
+  /** Source of the code that writes the value to the store. */
+  implementation: string;
   /** Label of the checkbox. */
   label: string;
   /** Callback fired when the checked state changes. */
   onChange: (checked: boolean) => void;
 };
 
-export const StoreDemoCheckbox = memo(({ checked, label, onChange }: StoreDemoCheckboxProps) => {
+export const StoreDemoCheckbox = memo(({ checked, implementation, label, onChange }: StoreDemoCheckboxProps) => {
   const countRef = useRenderCount();
 
   const handleChange = useCallback(
@@ -81,10 +160,11 @@ export const StoreDemoCheckbox = memo(({ checked, label, onChange }: StoreDemoCh
   );
 
   return (
-    <div style={{ alignItems: 'center', display: 'flex', gap: 8, justifyContent: 'space-between' }}>
+    <Row>
       <FormControlLabel control={<Checkbox checked={checked} size="small" onChange={handleChange} />} label={label} />
       <StoreDemoRenderCount countRef={countRef} />
-    </div>
+      <Implementation>{implementation}</Implementation>
+    </Row>
   );
 });
 
@@ -97,20 +177,25 @@ StoreDemoCheckbox.displayName = 'StoreDemoCheckbox';
 export type StoreDemoRecreateButtonProps = {
   /** Unique id of the button, since several demos share the page. */
   id: string;
+  /** Source of the code that recreates the store. */
+  implementation: string;
   /** Callback fired when requesting the store to be recreated. */
   onClick: () => void;
 };
 
-export const StoreDemoRecreateButton = memo(({ id, onClick }: StoreDemoRecreateButtonProps) => {
+export const StoreDemoRecreateButton = memo(({ id, implementation, onClick }: StoreDemoRecreateButtonProps) => {
   const countRef = useRenderCount();
 
   return (
-    <div style={{ alignItems: 'center', display: 'flex', gap: 8, justifyContent: 'space-between' }}>
-      <Button id={id} size="small" variant="outlined" onClick={onClick}>
-        Recreate store
-      </Button>
+    <Row>
+      <div>
+        <Button id={id} size="small" variant="outlined" onClick={onClick}>
+          Recreate store
+        </Button>
+      </div>
       <StoreDemoRenderCount countRef={countRef} />
-    </div>
+      <Implementation>{implementation}</Implementation>
+    </Row>
   );
 });
 
@@ -130,7 +215,10 @@ export const StoreDemoValues = memo(({ values }: StoreDemoValuesProps) => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-      <StoreDemoRenderCount countRef={countRef} />
+      <RenderCounter>
+        {'renders: '}
+        <span ref={countRef}>0</span>
+      </RenderCounter>
       <pre style={{ margin: 0 }}>{JSON.stringify(values, null, 2)}</pre>
     </div>
   );

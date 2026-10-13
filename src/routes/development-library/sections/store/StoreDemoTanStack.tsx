@@ -1,9 +1,9 @@
 import { createFormContext } from 'features/form/form.factories';
 import { memo, useCallback } from 'react';
-import { DemoSection } from 'routes/development-library/components/DemoSection';
 import {
   StoreDemoCheckbox,
   StoreDemoRecreateButton,
+  StoreDemoSection,
   StoreDemoTextField,
   StoreDemoValues
 } from 'routes/development-library/sections/store/StoreDemo.components';
@@ -14,6 +14,11 @@ const { FormProvider, useForm } = createFormContext<StoreDemoState>({
   defaultValues: structuredClone(DEFAULT_STORE_DEMO_STATE)
 });
 
+const FIRST_IMPLEMENTATION = '<form.Field name="first">\nfield.handleChange(value);';
+const LAST_IMPLEMENTATION = '<form.Field name="last">\nfield.handleChange(value);';
+const CHECKED_IMPLEMENTATION = '<form.Field name="checked">\nfield.handleChange(value);';
+const RECREATE_IMPLEMENTATION = 'form.reset({ ...DEFAULT_STORE_DEMO_STATE });';
+
 //*****************************************************************************************
 // TanStack First Field
 //*****************************************************************************************
@@ -23,7 +28,14 @@ const TanStackFirstField = memo(() => {
 
   return (
     <form.Field name="first">
-      {field => <StoreDemoTextField label="First" value={field.state.value} onChange={field.handleChange} />}
+      {field => (
+        <StoreDemoTextField
+          implementation={FIRST_IMPLEMENTATION}
+          label="First"
+          value={field.state.value}
+          onChange={field.handleChange}
+        />
+      )}
     </form.Field>
   );
 });
@@ -39,7 +51,14 @@ const TanStackLastField = memo(() => {
 
   return (
     <form.Field name="last">
-      {field => <StoreDemoTextField label="Last" value={field.state.value} onChange={field.handleChange} />}
+      {field => (
+        <StoreDemoTextField
+          implementation={LAST_IMPLEMENTATION}
+          label="Last"
+          value={field.state.value}
+          onChange={field.handleChange}
+        />
+      )}
     </form.Field>
   );
 });
@@ -55,7 +74,14 @@ const TanStackCheckedField = memo(() => {
 
   return (
     <form.Field name="checked">
-      {field => <StoreDemoCheckbox label="Checked" checked={field.state.value} onChange={field.handleChange} />}
+      {field => (
+        <StoreDemoCheckbox
+          checked={field.state.value}
+          implementation={CHECKED_IMPLEMENTATION}
+          label="Checked"
+          onChange={field.handleChange}
+        />
+      )}
     </form.Field>
   );
 });
@@ -71,7 +97,13 @@ const TanStackRecreateButton = memo(() => {
 
   const handleClick = useCallback(() => form.reset({ ...DEFAULT_STORE_DEMO_STATE }), [form]);
 
-  return <StoreDemoRecreateButton id="store-demo-tanstack-recreate" onClick={handleClick} />;
+  return (
+    <StoreDemoRecreateButton
+      id="store-demo-tanstack-recreate"
+      implementation={RECREATE_IMPLEMENTATION}
+      onClick={handleClick}
+    />
+  );
 });
 
 TanStackRecreateButton.displayName = 'TanStackRecreateButton';
@@ -96,19 +128,17 @@ TanStackValues.displayName = 'TanStackValues';
 
 export const StoreDemoTanStack = memo(() => (
   <FormProvider>
-    <DemoSection
+    <StoreDemoSection
       primary="TanStack Form"
       secondary="Form created with `createFormContext`. Each field is a `form.Field` bound to its own value."
-      left={
-        <>
-          <TanStackFirstField />
-          <TanStackLastField />
-          <TanStackCheckedField />
-          <TanStackRecreateButton />
-        </>
-      }
-      right={<TanStackValues />}
-    />
+      implementationLabel="onChange"
+      values={<TanStackValues />}
+    >
+      <TanStackFirstField />
+      <TanStackLastField />
+      <TanStackCheckedField />
+      <TanStackRecreateButton />
+    </StoreDemoSection>
   </FormProvider>
 ));
 
