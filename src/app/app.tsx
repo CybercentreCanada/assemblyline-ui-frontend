@@ -1,12 +1,18 @@
 // TODO: change syntax to "import type {theme}" to avoid potential problems like type-only imports being incorrectly bundled.
 import { useClue } from '@cccsaurora/clue-ui';
+import { DEFAULT_APP_CONFIG_STORE } from 'app/core.config';
+import { DEFAULT_APP_INTERFACE_STORE } from 'app/core.interface';
+import { APP_PREFERENCE_SCHEMA, APP_PREFERENCE_STORAGE_KEY } from 'app/core.preference';
 import Routes from 'app/routes';
 import useMyPreferences from 'app/useMyPreferences';
 import useMySitemap from 'app/useMySitemap';
 import { APIProvider } from 'core/api/api.providers';
 import { useBootstrapQuery } from 'core/api/hooks/useBootstrapQuery';
 import type { LoginParamsProps } from 'core/api/hooks/useMyAPI';
+import { AppConfigStoreProvider } from 'core/config';
 import useALContext from 'core/config/useALContext';
+import { AppInterfaceStoreProvider } from 'core/interface';
+import { AppPreferenceProvider, AppPreferenceStoreProvider } from 'core/preference';
 import QuotaExceeded from 'core/template/branding/AppVerticalBanner';
 import type { AppPreferenceConfigs, AppSiteMapConfigs, AppTheme } from 'core/template/components/app/AppConfigs';
 import AppProvider from 'core/template/components/app/AppProvider';
@@ -22,7 +28,8 @@ import Tos from 'layout/auth/terms-of-service/terms-of-service.route';
 import QuotaProvider from 'layout/quota/quota.providers';
 import SafeResultsProvider from 'layout/safe-results/safe-results.providers';
 import type { CustomUser } from 'models/api/user';
-import React, { useCallback, useEffect, useState } from 'react';
+import type { PropsWithChildren } from 'react';
+import React, { memo, StrictMode, useCallback, useEffect, useState } from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import setMomentFRLocale from 'shared/utils/moment-fr-locale';
 import { getProvider, getSAMLData } from 'shared/utils/utils';
@@ -108,23 +115,55 @@ export const MyApp: React.FC = () => {
 
   return (
     <BrowserRouter basename="/">
-      <APIProvider>
-        <SafeResultsProvider>
-          <QuotaProvider>
-            <AppProvider
-              preferences={myPreferences}
-              themes={myThemes}
-              sitemap={mySitemap}
-              user={myUser}
-              // search={mySearch}
-            >
-              <MyAppMain />
-            </AppProvider>
-          </QuotaProvider>
-        </SafeResultsProvider>
-      </APIProvider>
+      <AppPreferenceProvider schema={APP_PREFERENCE_SCHEMA} storageKey={APP_PREFERENCE_STORAGE_KEY}>
+        <APIProvider>
+          <SafeResultsProvider>
+            <QuotaProvider>
+              <AppProvider
+                preferences={myPreferences}
+                themes={myThemes}
+                sitemap={mySitemap}
+                user={myUser}
+                // search={mySearch}
+              >
+                <MyAppMain />
+              </AppProvider>
+            </QuotaProvider>
+          </SafeResultsProvider>
+        </APIProvider>
+      </AppPreferenceProvider>
     </BrowserRouter>
   );
 };
 
-export default MyApp;
+//*****************************************************************************************
+// App Stores
+//*****************************************************************************************
+
+const AppStores = memo(({ children }: PropsWithChildren) => (
+  <AppConfigStoreProvider data={DEFAULT_APP_CONFIG_STORE}>
+    <AppInterfaceStoreProvider data={DEFAULT_APP_INTERFACE_STORE}>
+      <AppPreferenceStoreProvider>
+        <>{children}</>
+      </AppPreferenceStoreProvider>
+    </AppInterfaceStoreProvider>
+  </AppConfigStoreProvider>
+));
+
+AppStores.displayName = 'AppStores';
+
+//*****************************************************************************************
+// App
+//*****************************************************************************************
+
+export const App = memo(() => (
+  <StrictMode>
+    <AppStores>
+      <MyApp />
+    </AppStores>
+  </StrictMode>
+));
+
+App.displayName = 'App';
+
+export default App;
