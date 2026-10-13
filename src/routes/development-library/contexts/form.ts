@@ -5,7 +5,7 @@ import { INPUTS_LIBRARY_STATE, type InputsLibraryState } from 'routes/developmen
 import { LAYOUT_LIBRARY_STATE, type LayoutLibraryState } from 'routes/development-library/sections/Layout';
 import { LIST_LIBRARY_STATE, type ListLibraryState } from 'routes/development-library/sections/List';
 import { LIST_INPUTS_LIBRARY_STATE, type ListInputsLibraryState } from 'routes/development-library/sections/ListInputs';
-import { STORE_LIBRARY_STATE, type StoreLibraryState } from 'routes/development-library/sections/Store';
+import { STORE_LIBRARY_STATE, type StoreLibraryState } from 'routes/development-library/sections/store/Store';
 
 type LibraryComponents = DateTimeLibraryState &
   InputsLibraryState &
