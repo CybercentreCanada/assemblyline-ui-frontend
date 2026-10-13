@@ -1,6 +1,6 @@
 ---
-description: "Use when creating or modifying shared TypeScript models, types, interfaces, defaults, or enums."
-applyTo: "src/**/*.models.ts, src/**/models/**/*.ts"
+description: 'Use when creating or modifying shared TypeScript models, types, interfaces, defaults, or enums.'
+applyTo: 'src/**/*.models.ts, src/**/models/**/*.ts'
 ---
 
 # Models & Types — AI Rules
@@ -36,7 +36,6 @@ applyTo: "src/**/*.models.ts, src/**/models/**/*.ts"
 | ---------------------- | ----------------------------------------------- |
 | `Props`                | Input parameters of a component or function     |
 | `ReturnType`           | Return type of a function (opposite of `Props`) |
-| `Store`                | Zustand store types                             |
 | `Config`               | Configuration types                             |
 | `SCREAMING_SNAKE_CASE` | Default constants, const arrays                 |
 | `PascalCase`           | All type names                                  |
@@ -53,7 +52,7 @@ type NavigateTo = SetStateAction<To>;
 ```
 
 - Prefer `SetStateAction<T>` over manually writing `T | ((prev: T) => T)`
-- Use it anywhere a setter accepts a value or updater callback (route navigation, store setters, etc.)
+- Use it anywhere a setter accepts a value or updater callback (route navigation, setters, etc.)
 
 ## Collection & Generic Type Naming
 
@@ -214,7 +213,7 @@ export type StoredConfig = z.infer<typeof StoredConfigSchema>;
 ```
 
 - Only for localStorage/sessionStorage parsing
-- Never for API responses, props, or store state
+- Never for API responses or props
 
 ## Hook Typing
 

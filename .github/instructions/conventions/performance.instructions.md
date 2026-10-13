@@ -1,6 +1,6 @@
 ---
-description: "Use when changing React render paths, store selectors, memoization, list rendering, or performance-sensitive TypeScript."
-applyTo: "src/**/*.ts, src/**/*.tsx"
+description: 'Use when changing React render paths, memoization, list rendering, or performance-sensitive TypeScript.'
+applyTo: 'src/**/*.ts, src/**/*.tsx'
 ---
 
 # Performance — AI Rules
@@ -10,9 +10,6 @@ applyTo: "src/**/*.ts, src/**/*.tsx"
 ## Must
 
 - Every exported component wrapped in `memo()`
-- Focused store selectors — never subscribe to entire store
-- Store selectors must access the most nested (leaf) values — never select a parent object and read its fields later
-- Update store state by mutating the changed fields in place inside the `useAppSetConfigStore` callback — never spread parent objects (see Store Mutations)
 - Functions passed as props must use `useCallback`
 - Computed arrays/objects (filter, sort, map, spread) passed as props must use `useMemo`
 - Empty array/object defaults must be module-level constants
@@ -47,43 +44,13 @@ const activeItems = useMemo(() => items.filter(i => i.active), [items]);
 // ✅ Module-level — same reference every render
 const EMPTY_SERVICES: MinimalService[] = [];
 
-export const MyComponent = memo(() => {
-  const services = useAppConfigStore(s => s?.services ?? EMPTY_SERVICES);
+export const MyComponent = memo(({ services = EMPTY_SERVICES }: MyComponentProps) => {
+  // ...
 });
 
 // ❌ Inline default — new array every render
-const services = useAppConfigStore(s => s?.services ?? []);
-```
-
-## Store Selectors — Access Leaf Values
-
-The app store's setter runs the updater, shallow-copies the root state, and notifies subscribers, but nested objects keep their references. A selector that returns a nested object therefore never sees in-place field changes, so select leaf values rather than parent objects to observe changes and avoid unrelated re-renders.
-
-```typescript
-// ❌ Selecting the parent object — won't re-render when `href` or `state` is mutated in place
-const route = useStore(s => s.routes[routeKey]);
-return <AppRoutes href={route.href} state={route.state} />;
-
-// ✅ Selecting each leaf field — re-renders only when that field changes
-const href = useStore(s => s?.routes?.[routeKey]?.href || undefined);
-const state = useStore(s => s?.routes?.[routeKey]?.state || undefined);
-return <AppRoutes href={href} state={state} />;
-```
-
-**Rule:** Always select the most deeply nested primitive or leaf value you actually need. One selector per field.
-
-## Store Mutations — Mutate In Place
-
-The app store's setter runs the updater, shallow-copies the root state, and notifies subscribers. An updater can therefore change a nested field in place without spreading every parent object, which avoids allocating new objects along the update path. Return the state so the setter can merge it into the new root. Only leaf selectors observe these changes, because unchanged nested references are retained.
-
-```typescript
-// ❌ Spreading allocates new objects along the update path
-setStore(s => ({ ...s, routes: { ...s.routes, [key]: { ...s.routes[key], href: newHref } } }));
-
-// ✅ Mutate in place — only selectors for `href` will re-render
-setStore(s => {
-  s.routes[key].href = newHref;
-  return s;
+export const MyComponent = memo(({ services = [] }: MyComponentProps) => {
+  // ...
 });
 ```
 
@@ -115,10 +82,6 @@ useEffect(() => { setFiltered(items.filter(...)); }, [items]);
 - NO `useEffect` for derived state — use `useMemo`
 - NO inline arrow functions as JSX props — use `useCallback`
 - NO computed arrays/objects inline as props — use `useMemo`
-- NO subscribing to entire store
-- NO selecting a parent object from a store and reading its fields in JSX — select each leaf field separately
-- NO spreading/replacing parent objects in store mutations — mutate fields in place
-- NO spreading parent objects in store updates — mutate the changed fields in place
 - NO `lazy()` or code splitting — everything bundled upfront
 - NO unvirtualized lists of 100+ items
 - NO MUI layout components (`Box`, `Stack`, `Grid`) — raw HTML

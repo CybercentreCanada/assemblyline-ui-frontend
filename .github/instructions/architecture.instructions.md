@@ -1,6 +1,6 @@
 ---
-description: "Use when changing application architecture, module boundaries, shared state, API access, or cross-layer dependencies."
-applyTo: "src/**/*.ts, src/**/*.tsx"
+description: 'Use when changing application architecture, module boundaries, shared state, API access, or cross-layer dependencies.'
+applyTo: 'src/**/*.ts, src/**/*.tsx'
 ---
 
 # Architecture Rules
@@ -26,43 +26,39 @@ pages → layout → features → core → models → ui
 
 These patterns are NOT allowed in this codebase:
 
-1. **React Context for shared state** — Use Zustand (`useAppConfig`) instead
-2. **Wrapper hooks for single-use mutations** — Keep mutations inline in the component
-3. **Prop drilling beyond 2 levels** — Use the store
-4. **Default exports** — Use named exports only
-5. **Redux or any Redux-like library** — We use Zustand
-6. **`style` prop on MUI components / `sx` on raw HTML** — Use `sx` on MUI components, `style` on raw HTML elements, `styled()` for reusable styles. For performance, prefer raw HTML + `style` over MUI components.
-7. **MUI layout components (`Box`, `Stack`, `Grid`) for layout** — Use raw HTML elements. MUI is only for behavior (ripple, Dialog, Typography, etc.)
-8. **Relative imports crossing module boundaries** — Use path aliases (`core/`, `features/`, etc.)
-9. **Barrel re-exports from parent folders** — Each module's `index.ts` exports only its own public API
-10. **`lazy()` or dynamic `import()` for code splitting** — The entire app is bundled upfront. No lazy loading.
-11. **Default imports** — Always destructure (`import { memo } from 'react'`, not `import React from 'react'`)
-12. **`interface` keyword** — Use `type` for all type declarations
-13. **`any` type** — Never use `any`. Use `unknown` with type narrowing when the type is truly unknown.
-14. **TypeScript `enum`** — Use `const` arrays with derived types instead
-15. **`React.FC` or `React.FunctionComponent`** — Type props directly in the function signature
-16. **Early returns for conditional rendering** — Always return a single JSX expression
-17. **Inline object/array creation in JSX props** — Breaks `memo()`. Use `useMemo`, `useCallback`, or module-level constants.
-18. **`useEffect` for derived state** — Use `useMemo` instead
-19. **Hardcoded colors, spacing, or breakpoints** — Always use theme tokens
+1. **Wrapper hooks for single-use mutations** — Keep mutations inline in the component
+2. **Prop drilling beyond 2 levels**
+3. **Default exports** — Use named exports only
+4. **`style` prop on MUI components / `sx` on raw HTML** — Use `sx` on MUI components, `style` on raw HTML elements, `styled()` for reusable styles. For performance, prefer raw HTML + `style` over MUI components.
+5. **MUI layout components (`Box`, `Stack`, `Grid`) for layout** — Use raw HTML elements. MUI is only for behavior (ripple, Dialog, Typography, etc.)
+6. **Relative imports crossing module boundaries** — Use path aliases (`core/`, `features/`, etc.)
+7. **Barrel re-exports from parent folders** — Each module's `index.ts` exports only its own public API
+8. **`lazy()` or dynamic `import()` for code splitting** — The entire app is bundled upfront. No lazy loading.
+9. **Default imports** — Always destructure (`import { memo } from 'react'`, not `import React from 'react'`)
+10. **`interface` keyword** — Use `type` for all type declarations
+11. **`any` type** — Never use `any`. Use `unknown` with type narrowing when the type is truly unknown.
+12. **TypeScript `enum`** — Use `const` arrays with derived types instead
+13. **`React.FC` or `React.FunctionComponent`** — Type props directly in the function signature
+14. **Early returns for conditional rendering** — Always return a single JSX expression
+15. **Inline object/array creation in JSX props** — Breaks `memo()`. Use `useMemo`, `useCallback`, or module-level constants.
+16. **`useEffect` for derived state** — Use `useMemo` instead
+17. **Hardcoded colors, spacing, or breakpoints** — Always use theme tokens
 
 ## Required Patterns
 
 1. **All exported components must be wrapped in `memo()`** — including `styled()` components
 2. **Every component sets `.displayName`** — for React DevTools
 3. **All component-internal functions use `useCallback`**
-4. **Components read state via `useAppConfigStore(selector)`** — not props for shared state
-5. **Components write state via `useAppSetConfigStore()`** — callback form that mutates the changed fields in place and returns the state (see performance rules)
-6. **API mutations use `useAPIMutation()`** — not raw fetch or axios
-7. **API queries use `useAPIQuery()`** — not raw useQuery
-8. **Translation keys come from per-module i18n files** — no inline strings for user-visible text
-9. **Feature files use dot-prefix naming** — `notifications.components.tsx`, not `Components.tsx`
-10. **Types live in `*.models.ts`** — not scattered in component files
-11. **Validate data when runtime guarantees are needed** — Backend responses can generally be trusted; use Zod for localStorage config or URL params via route factories when validation is needed.
-12. **Use `import type {}` for type-only imports** — the `type` keyword goes on the import statement, NOT on individual specifiers
-13. **Every shared model type has a `DEFAULT_<MODEL>` constant** — defined directly below its type
-14. **Stable references for props** — objects/arrays wrapped in `useMemo`, functions in `useCallback`, or defined as module-level constants
-15. **Empty array/object constants declared outside components** — prevents new reference creation on every render
+4. **API mutations use `useAPIMutation()`** — not raw fetch or axios
+5. **API queries use `useAPIQuery()`** — not raw useQuery
+6. **Translation keys come from per-module i18n files** — no inline strings for user-visible text
+7. **Feature files use dot-prefix naming** — `notifications.components.tsx`, not `Components.tsx`
+8. **Types live in `*.models.ts`** — not scattered in component files
+9. **Validate data when runtime guarantees are needed** — Backend responses can generally be trusted; use Zod for localStorage config or URL params via route factories when validation is needed.
+10. **Use `import type {}` for type-only imports** — the `type` keyword goes on the import statement, NOT on individual specifiers
+11. **Every shared model type has a `DEFAULT_<MODEL>` constant** — defined directly below its type
+12. **Stable references for props** — objects/arrays wrapped in `useMemo`, functions in `useCallback`, or defined as module-level constants
+13. **Empty array/object constants declared outside components** — prevents new reference creation on every render
 
 ## Core Principles
 

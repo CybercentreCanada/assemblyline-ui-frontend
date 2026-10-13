@@ -1,6 +1,6 @@
 ---
-description: "Use when creating or editing module documentation, API guides, or feature documentation in src."
-applyTo: "src/**/*.docs.md"
+description: 'Use when creating or editing module documentation, API guides, or feature documentation in src.'
+applyTo: 'src/**/*.docs.md'
 ---
 
 # Module Documentation
@@ -122,10 +122,10 @@ Include a minimal creation example after the table when configuration is not sel
 ```markdown
 ## 4. Configuration
 
-| Option | Default | Behavior |
-| ------ | ------- | -------- |
-| `enabled` | `false` | Disables the feature when false |
-| `mode` | `'safe'` | Selects the processing strategy |
+| Option    | Default  | Behavior                        |
+| --------- | -------- | ------------------------------- |
+| `enabled` | `false`  | Disables the feature when false |
+| `mode`    | `'safe'` | Selects the processing strategy |
 ```
 
 Do not invent defaults. Verify them in the model, factory, utility, or tests before documenting them.
@@ -154,14 +154,14 @@ Document the module's file responsibilities without duplicating source code.
 
 Use a table with one row per meaningful file:
 
-| File | Role |
-| ---- | ---- |
-| `<module>.models.ts` | Shared types and default values |
-| `<module>.utils.ts` | Pure module utilities |
-| `<module>.utils.test.ts` | Unit tests for the utilities |
-| `index.ts` | Explicit public exports |
+| File                     | Role                            |
+| ------------------------ | ------------------------------- |
+| `<module>.models.ts`     | Shared types and default values |
+| `<module>.utils.ts`      | Pure module utilities           |
+| `<module>.utils.test.ts` | Unit tests for the utilities    |
+| `index.ts`               | Explicit public exports         |
 
-List only files that exist and have a meaningful role. Include nested component, hook, provider, store, or test files when they are important to understanding the module.
+List only files that exist and have a meaningful role. Include nested component, hook, provider, or test files when they are important to understanding the module.
 
 ### Type Utilities
 

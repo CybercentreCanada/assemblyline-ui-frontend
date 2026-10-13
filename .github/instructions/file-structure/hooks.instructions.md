@@ -1,13 +1,12 @@
 ---
-description: "Use when creating or modifying reusable React hooks or hook modules."
-applyTo: "src/**/*.hooks.ts, src/**/*.hooks.tsx, src/**/hooks/**/*.ts, src/**/hooks/**/*.tsx"
+description: 'Use when creating or modifying reusable React hooks or hook modules.'
+applyTo: 'src/**/*.hooks.ts, src/**/*.hooks.tsx, src/**/hooks/**/*.ts, src/**/hooks/**/*.tsx'
 ---
 
 # Hooks — AI Rules
 
 ## Valid Reasons to Create a Hook
 
-- **Named store access** — semantic wrapper over a selector used by multiple components
 - **Utility-style logic** — reusable `useMemo`/`useCallback` computation with a named API
 - **Browser/frontend control** — managing a browser API (`localStorage`, `IntersectionObserver`, timers)
 
@@ -25,7 +24,6 @@ applyTo: "src/**/*.hooks.ts, src/**/*.hooks.tsx, src/**/hooks/**/*.ts, src/**/ho
 
 - NO single-use hooks — keep logic inline in the component
 - NO wrapping a single `useAPIMutation` — use it directly
-- NO wrapping a single `useAppConfigStore` selector with no added logic
 - NO complex multi-step orchestration — hooks can't be unit tested
 
 ## Template
@@ -34,12 +32,11 @@ applyTo: "src/**/*.hooks.ts, src/**/*.hooks.tsx, src/**/hooks/**/*.ts, src/**/ho
 /**
  * @name useNotificationCount
  * @description Returns unread notification count, recomputed when notifications change.
+ * @param notifications - Notifications to count
  * @returns Current unread count
  */
-export const useNotificationCount = (): number => {
-  const notifications = useAppConfigStore(c => c.notifications.items);
-  return useMemo(() => notifications.filter(n => !n.read).length, [notifications]);
-};
+export const useNotificationCount = (notifications: NotificationItem[]): number =>
+  useMemo(() => notifications.filter(n => !n.read).length, [notifications]);
 ```
 
 ## Forbidden Examples
@@ -50,7 +47,4 @@ const useMyComponentLogic = () => { ... };
 
 // ❌ Wrapper around single mutation
 export const useSaveNotification = () => useAPIMutation(() => ({ ... }));
-
-// ❌ Re-exports selector with no added logic
-export const useIsOpen = () => useAppConfigStore(c => c.layout.panel.open);
 ```

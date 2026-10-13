@@ -1,6 +1,6 @@
 ---
-description: "Use when adding, moving, or naming source files and modules in the React application."
-applyTo: "src/**"
+description: 'Use when adding, moving, or naming source files and modules in the React application.'
+applyTo: 'src/**'
 ---
 
 # File Structure
@@ -28,8 +28,7 @@ applyTo: "src/**"
 | `.utils`                | `.ts`     | Pure utility functions                                 |
 | `.utils.test`           | `.ts`     | Unit tests for utils                                   |
 | `.docs`                 | `.md`     | Module documentation                                   |
-| `.store`                | `.ts`     | Zustand store (`createAppStore`)                       |
-| `.providers`            | `.tsx`    | Context providers, store providers                     |
+| `.providers`            | `.tsx`    | Context providers                                      |
 | `.i18n.en` / `.i18n.fr` | `.json`   | Translation files                                      |
 | `.pom`                  | `.ts`     | Playwright Page Object Model                           |
 | `.spec`                 | `.ts`     | Playwright E2E tests                                   |
@@ -59,7 +58,6 @@ applyTo: "src/**"
 ├── <module>.hooks.tsx
 ├── <module>.utils.ts
 ├── <module>.utils.test.ts
-├── <module>.store.ts
 ├── <module>.providers.tsx
 ├── <module>.i18n.en.json
 ├── <module>.i18n.fr.json
@@ -80,7 +78,6 @@ Use when > 3 files OR sub-features:
 ├── utils/
 ├── pom/
 ├── spec/
-├── <module>.store.ts
 ├── <module>.providers.tsx
 ├── <module>.i18n.en.json
 ├── <module>.i18n.fr.json
@@ -110,5 +107,4 @@ Use when > 3 files OR sub-features:
 1. Create `<module>.models.ts` — types + `DEFAULT_<MODEL>`
 2. Create `<module>.components.tsx` — component(s)
 3. Add `.utils.ts` only if framework-free functions are extracted from components
-4. Add `.store.ts` + `.providers.tsx` only if feature-scoped state needed
-5. Add `.i18n.*.json` only if module has user-visible strings
+4. Add `.i18n.*.json` only if module has user-visible strings
