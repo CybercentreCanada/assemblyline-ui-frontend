@@ -9,19 +9,19 @@ import {
 } from 'routes/development-library/sections/store/StoreDemo.components';
 import { DEFAULT_STORE_DEMO_STATE } from 'routes/development-library/sections/store/store.models';
 
-const FIRST_IMPLEMENTATION = '<form.Field name="first">\nfield.handleChange(value);';
-const LAST_IMPLEMENTATION = '<form.Field name="last">\nfield.handleChange(value);';
-const CHECKED_IMPLEMENTATION = '<form.Field name="checked">\nfield.handleChange(value);';
-const RECREATE_IMPLEMENTATION = 'form.reset({ ...DEFAULT_STORE_DEMO_STATE });';
+const FIRST_IMPLEMENTATION = '<form.Field name="account.profile.name.first">\nfield.handleChange(value);';
+const LAST_IMPLEMENTATION = '<form.Field name="account.identity.family.details.last">\nfield.handleChange(value);';
+const CHECKED_IMPLEMENTATION = '<form.Field name="settings.options.consent.checked">\nfield.handleChange(value);';
+const RECREATE_IMPLEMENTATION = 'form.reset(structuredClone(DEFAULT_STORE_DEMO_STATE));';
 
 //*****************************************************************************************
 // Store Demo TanStack Form
 //*****************************************************************************************
 
 export const StoreDemoTanStackForm = memo(() => {
-  const form = useForm({ defaultValues: { ...DEFAULT_STORE_DEMO_STATE } });
+  const form = useForm({ defaultValues: structuredClone(DEFAULT_STORE_DEMO_STATE) });
 
-  const handleRecreate = useCallback(() => form.reset({ ...DEFAULT_STORE_DEMO_STATE }), [form]);
+  const handleRecreate = useCallback(() => form.reset(structuredClone(DEFAULT_STORE_DEMO_STATE)), [form]);
 
   return (
     <StoreDemoSection
@@ -34,7 +34,7 @@ export const StoreDemoTanStackForm = memo(() => {
         </form.Subscribe>
       }
     >
-      <form.Field name="first">
+      <form.Field name="account.profile.name.first">
         {field => (
           <StoreDemoTextField
             implementation={FIRST_IMPLEMENTATION}
@@ -44,7 +44,7 @@ export const StoreDemoTanStackForm = memo(() => {
           />
         )}
       </form.Field>
-      <form.Field name="last">
+      <form.Field name="account.identity.family.details.last">
         {field => (
           <StoreDemoTextField
             implementation={LAST_IMPLEMENTATION}
@@ -54,7 +54,7 @@ export const StoreDemoTanStackForm = memo(() => {
           />
         )}
       </form.Field>
-      <form.Field name="checked">
+      <form.Field name="settings.options.consent.checked">
         {field => (
           <StoreDemoCheckbox
             checked={field.state.value}

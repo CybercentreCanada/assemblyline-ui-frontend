@@ -10,21 +10,51 @@ import type { StoreDemoState } from 'routes/development-library/sections/store/s
 import { DEFAULT_STORE_DEMO_STATE } from 'routes/development-library/sections/store/store.models';
 import { create } from 'zustand';
 
-const useDemoStore = create<StoreDemoState>(() => ({ ...DEFAULT_STORE_DEMO_STATE }));
+const useDemoStore = create<StoreDemoState>(() => structuredClone(DEFAULT_STORE_DEMO_STATE));
 
-const FIRST_IMPLEMENTATION = 'useDemoStore.setState({ first: value });';
-const LAST_IMPLEMENTATION = 'useDemoStore.setState({ last: value });';
-const CHECKED_IMPLEMENTATION = 'useDemoStore.setState({ checked: value });';
-const RECREATE_IMPLEMENTATION = 'useDemoStore.setState({ ...DEFAULT_STORE_DEMO_STATE });';
+const FIRST_IMPLEMENTATION = `useDemoStore.setState(s => ({
+  account: {
+    ...s.account,
+    profile: { ...s.account.profile, name: { ...s.account.profile.name, first: value } }
+  }
+}));`;
+
+const LAST_IMPLEMENTATION = `useDemoStore.setState(s => ({
+  account: {
+    ...s.account,
+    identity: {
+      ...s.account.identity,
+      family: { ...s.account.identity.family, details: { ...s.account.identity.family.details, last: value } }
+    }
+  }
+}));`;
+
+const CHECKED_IMPLEMENTATION = `useDemoStore.setState(s => ({
+  settings: {
+    ...s.settings,
+    options: { ...s.settings.options, consent: { ...s.settings.options.consent, checked: value } }
+  }
+}));`;
+
+const RECREATE_IMPLEMENTATION = 'useDemoStore.setState(structuredClone(DEFAULT_STORE_DEMO_STATE));';
 
 //*****************************************************************************************
 // Zustand First Field
 //*****************************************************************************************
 
 const ZustandFirstField = memo(() => {
-  const value = useDemoStore(s => s.first);
+  const value = useDemoStore(s => s.account.profile.name.first);
 
-  const handleChange = useCallback((first: string) => useDemoStore.setState({ first }), []);
+  const handleChange = useCallback(
+    (first: string) =>
+      useDemoStore.setState(s => ({
+        account: {
+          ...s.account,
+          profile: { ...s.account.profile, name: { ...s.account.profile.name, first } }
+        }
+      })),
+    []
+  );
 
   return (
     <StoreDemoTextField implementation={FIRST_IMPLEMENTATION} label="First" value={value} onChange={handleChange} />
@@ -38,9 +68,21 @@ ZustandFirstField.displayName = 'ZustandFirstField';
 //*****************************************************************************************
 
 const ZustandLastField = memo(() => {
-  const value = useDemoStore(s => s.last);
+  const value = useDemoStore(s => s.account.identity.family.details.last);
 
-  const handleChange = useCallback((last: string) => useDemoStore.setState({ last }), []);
+  const handleChange = useCallback(
+    (last: string) =>
+      useDemoStore.setState(s => ({
+        account: {
+          ...s.account,
+          identity: {
+            ...s.account.identity,
+            family: { ...s.account.identity.family, details: { ...s.account.identity.family.details, last } }
+          }
+        }
+      })),
+    []
+  );
 
   return <StoreDemoTextField implementation={LAST_IMPLEMENTATION} label="Last" value={value} onChange={handleChange} />;
 });
@@ -52,9 +94,18 @@ ZustandLastField.displayName = 'ZustandLastField';
 //*****************************************************************************************
 
 const ZustandCheckedField = memo(() => {
-  const checked = useDemoStore(s => s.checked);
+  const checked = useDemoStore(s => s.settings.options.consent.checked);
 
-  const handleChange = useCallback((value: boolean) => useDemoStore.setState({ checked: value }), []);
+  const handleChange = useCallback(
+    (value: boolean) =>
+      useDemoStore.setState(s => ({
+        settings: {
+          ...s.settings,
+          options: { ...s.settings.options, consent: { ...s.settings.options.consent, checked: value } }
+        }
+      })),
+    []
+  );
 
   return (
     <StoreDemoCheckbox
@@ -73,7 +124,7 @@ ZustandCheckedField.displayName = 'ZustandCheckedField';
 //*****************************************************************************************
 
 const ZustandRecreateButton = memo(() => {
-  const handleClick = useCallback(() => useDemoStore.setState({ ...DEFAULT_STORE_DEMO_STATE }), []);
+  const handleClick = useCallback(() => useDemoStore.setState(structuredClone(DEFAULT_STORE_DEMO_STATE)), []);
 
   return (
     <StoreDemoRecreateButton

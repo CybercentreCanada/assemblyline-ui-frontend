@@ -9,7 +9,7 @@ import {
 import type { StoreDemoState } from 'routes/development-library/sections/store/store.models';
 import { DEFAULT_STORE_DEMO_STATE } from 'routes/development-library/sections/store/store.models';
 
-let state: StoreDemoState = { ...DEFAULT_STORE_DEMO_STATE };
+let state: StoreDemoState = structuredClone(DEFAULT_STORE_DEMO_STATE);
 const listeners = new Set<() => void>();
 
 const subscribe = (listener: () => void) => {
@@ -20,19 +20,43 @@ const subscribe = (listener: () => void) => {
 };
 
 const getState = () => state;
-const getFirst = () => state.first;
-const getLast = () => state.last;
-const getChecked = () => state.checked;
+const getFirst = () => state.account.profile.name.first;
+const getLast = () => state.account.identity.family.details.last;
+const getChecked = () => state.settings.options.consent.checked;
 
-const setState = (patch: Partial<StoreDemoState>) => {
-  state = { ...state, ...patch };
+const setState = (update: (state: StoreDemoState) => StoreDemoState) => {
+  state = update(state);
   listeners.forEach(listener => listener());
 };
 
-const FIRST_IMPLEMENTATION = 'setState({ first: value });';
-const LAST_IMPLEMENTATION = 'setState({ last: value });';
-const CHECKED_IMPLEMENTATION = 'setState({ checked: value });';
-const RECREATE_IMPLEMENTATION = 'setState({ ...DEFAULT_STORE_DEMO_STATE });';
+const FIRST_IMPLEMENTATION = `setState(s => ({
+  ...s,
+  account: {
+    ...s.account,
+    profile: { ...s.account.profile, name: { ...s.account.profile.name, first: value } }
+  }
+}));`;
+
+const LAST_IMPLEMENTATION = `setState(s => ({
+  ...s,
+  account: {
+    ...s.account,
+    identity: {
+      ...s.account.identity,
+      family: { ...s.account.identity.family, details: { ...s.account.identity.family.details, last: value } }
+    }
+  }
+}));`;
+
+const CHECKED_IMPLEMENTATION = `setState(s => ({
+  ...s,
+  settings: {
+    ...s.settings,
+    options: { ...s.settings.options, consent: { ...s.settings.options.consent, checked: value } }
+  }
+}));`;
+
+const RECREATE_IMPLEMENTATION = 'setState(() => structuredClone(DEFAULT_STORE_DEMO_STATE));';
 
 //*****************************************************************************************
 // Sync External Store First Field
@@ -41,7 +65,17 @@ const RECREATE_IMPLEMENTATION = 'setState({ ...DEFAULT_STORE_DEMO_STATE });';
 const SyncExternalStoreFirstField = memo(() => {
   const value = useSyncExternalStore(subscribe, getFirst);
 
-  const handleChange = useCallback((first: string) => setState({ first }), []);
+  const handleChange = useCallback(
+    (first: string) =>
+      setState(s => ({
+        ...s,
+        account: {
+          ...s.account,
+          profile: { ...s.account.profile, name: { ...s.account.profile.name, first } }
+        }
+      })),
+    []
+  );
 
   return (
     <StoreDemoTextField implementation={FIRST_IMPLEMENTATION} label="First" value={value} onChange={handleChange} />
@@ -57,7 +91,20 @@ SyncExternalStoreFirstField.displayName = 'SyncExternalStoreFirstField';
 const SyncExternalStoreLastField = memo(() => {
   const value = useSyncExternalStore(subscribe, getLast);
 
-  const handleChange = useCallback((last: string) => setState({ last }), []);
+  const handleChange = useCallback(
+    (last: string) =>
+      setState(s => ({
+        ...s,
+        account: {
+          ...s.account,
+          identity: {
+            ...s.account.identity,
+            family: { ...s.account.identity.family, details: { ...s.account.identity.family.details, last } }
+          }
+        }
+      })),
+    []
+  );
 
   return <StoreDemoTextField implementation={LAST_IMPLEMENTATION} label="Last" value={value} onChange={handleChange} />;
 });
@@ -71,7 +118,17 @@ SyncExternalStoreLastField.displayName = 'SyncExternalStoreLastField';
 const SyncExternalStoreCheckedField = memo(() => {
   const checked = useSyncExternalStore(subscribe, getChecked);
 
-  const handleChange = useCallback((value: boolean) => setState({ checked: value }), []);
+  const handleChange = useCallback(
+    (value: boolean) =>
+      setState(s => ({
+        ...s,
+        settings: {
+          ...s.settings,
+          options: { ...s.settings.options, consent: { ...s.settings.options.consent, checked: value } }
+        }
+      })),
+    []
+  );
 
   return (
     <StoreDemoCheckbox
@@ -90,7 +147,7 @@ SyncExternalStoreCheckedField.displayName = 'SyncExternalStoreCheckedField';
 //*****************************************************************************************
 
 const SyncExternalStoreRecreateButton = memo(() => {
-  const handleClick = useCallback(() => setState({ ...DEFAULT_STORE_DEMO_STATE }), []);
+  const handleClick = useCallback(() => setState(() => structuredClone(DEFAULT_STORE_DEMO_STATE)), []);
 
   return (
     <StoreDemoRecreateButton

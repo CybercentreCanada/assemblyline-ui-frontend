@@ -12,20 +12,50 @@ import { DEFAULT_STORE_DEMO_STATE } from 'routes/development-library/sections/st
 
 const { StoreProvider, useSetStore, useStore } = createAppStore<StoreDemoState>(DEFAULT_STORE_DEMO_STATE);
 
-const FIRST_IMPLEMENTATION = 'const setStore = useSetStore();\nsetStore({ first: value });';
-const LAST_IMPLEMENTATION = 'const setStore = useSetStore();\nsetStore({ last: value });';
-const CHECKED_IMPLEMENTATION = 'const setStore = useSetStore();\nsetStore({ checked: value });';
-const RECREATE_IMPLEMENTATION = 'const setStore = useSetStore();\nsetStore({ ...DEFAULT_STORE_DEMO_STATE });';
+const FIRST_IMPLEMENTATION = `setStore(s => ({
+  account: {
+    ...s.account,
+    profile: { ...s.account.profile, name: { ...s.account.profile.name, first: value } }
+  }
+}));`;
+
+const LAST_IMPLEMENTATION = `setStore(s => ({
+  account: {
+    ...s.account,
+    identity: {
+      ...s.account.identity,
+      family: { ...s.account.identity.family, details: { ...s.account.identity.family.details, last: value } }
+    }
+  }
+}));`;
+
+const CHECKED_IMPLEMENTATION = `setStore(s => ({
+  settings: {
+    ...s.settings,
+    options: { ...s.settings.options, consent: { ...s.settings.options.consent, checked: value } }
+  }
+}));`;
+
+const RECREATE_IMPLEMENTATION = 'setStore(structuredClone(DEFAULT_STORE_DEMO_STATE));';
 
 //*****************************************************************************************
-// CreateAppStore First Field
+// Create App Store First Field
 //*****************************************************************************************
 
 const CreateAppStoreFirstField = memo(() => {
-  const value = useStore(s => s.first);
+  const value = useStore(s => s.account.profile.name.first);
   const setStore = useSetStore();
 
-  const handleChange = useCallback((first: string) => setStore({ first }), [setStore]);
+  const handleChange = useCallback(
+    (first: string) =>
+      setStore(s => ({
+        account: {
+          ...s.account,
+          profile: { ...s.account.profile, name: { ...s.account.profile.name, first } }
+        }
+      })),
+    [setStore]
+  );
 
   return (
     <StoreDemoTextField implementation={FIRST_IMPLEMENTATION} label="First" value={value} onChange={handleChange} />
@@ -35,14 +65,26 @@ const CreateAppStoreFirstField = memo(() => {
 CreateAppStoreFirstField.displayName = 'CreateAppStoreFirstField';
 
 //*****************************************************************************************
-// CreateAppStore Last Field
+// Create App Store Last Field
 //*****************************************************************************************
 
 const CreateAppStoreLastField = memo(() => {
-  const value = useStore(s => s.last);
+  const value = useStore(s => s.account.identity.family.details.last);
   const setStore = useSetStore();
 
-  const handleChange = useCallback((last: string) => setStore({ last }), [setStore]);
+  const handleChange = useCallback(
+    (last: string) =>
+      setStore(s => ({
+        account: {
+          ...s.account,
+          identity: {
+            ...s.account.identity,
+            family: { ...s.account.identity.family, details: { ...s.account.identity.family.details, last } }
+          }
+        }
+      })),
+    [setStore]
+  );
 
   return <StoreDemoTextField implementation={LAST_IMPLEMENTATION} label="Last" value={value} onChange={handleChange} />;
 });
@@ -50,14 +92,23 @@ const CreateAppStoreLastField = memo(() => {
 CreateAppStoreLastField.displayName = 'CreateAppStoreLastField';
 
 //*****************************************************************************************
-// CreateAppStore Checked Field
+// Create App Store Checked Field
 //*****************************************************************************************
 
 const CreateAppStoreCheckedField = memo(() => {
-  const checked = useStore(s => s.checked);
+  const checked = useStore(s => s.settings.options.consent.checked);
   const setStore = useSetStore();
 
-  const handleChange = useCallback((value: boolean) => setStore({ checked: value }), [setStore]);
+  const handleChange = useCallback(
+    (value: boolean) =>
+      setStore(s => ({
+        settings: {
+          ...s.settings,
+          options: { ...s.settings.options, consent: { ...s.settings.options.consent, checked: value } }
+        }
+      })),
+    [setStore]
+  );
 
   return (
     <StoreDemoCheckbox
@@ -72,13 +123,13 @@ const CreateAppStoreCheckedField = memo(() => {
 CreateAppStoreCheckedField.displayName = 'CreateAppStoreCheckedField';
 
 //*****************************************************************************************
-// CreateAppStore Recreate Button
+// Create App Store Recreate Button
 //*****************************************************************************************
 
 const CreateAppStoreRecreateButton = memo(() => {
   const setStore = useSetStore();
 
-  const handleClick = useCallback(() => setStore({ ...DEFAULT_STORE_DEMO_STATE }), [setStore]);
+  const handleClick = useCallback(() => setStore(structuredClone(DEFAULT_STORE_DEMO_STATE)), [setStore]);
 
   return (
     <StoreDemoRecreateButton
@@ -92,7 +143,7 @@ const CreateAppStoreRecreateButton = memo(() => {
 CreateAppStoreRecreateButton.displayName = 'CreateAppStoreRecreateButton';
 
 //*****************************************************************************************
-// CreateAppStore Values
+// Create App Store Values
 //*****************************************************************************************
 
 const CreateAppStoreValues = memo(() => {
@@ -104,7 +155,7 @@ const CreateAppStoreValues = memo(() => {
 CreateAppStoreValues.displayName = 'CreateAppStoreValues';
 
 //*****************************************************************************************
-// Store Demo CreateAppStore
+// Store Demo Create App Store
 //*****************************************************************************************
 
 export const StoreDemoCreateAppStore = memo(() => (

@@ -12,20 +12,49 @@ import { DEFAULT_STORE_DEMO_STATE } from 'routes/development-library/sections/st
 
 const { StoreProvider, useStore } = createStoreContext<StoreDemoState>(DEFAULT_STORE_DEMO_STATE);
 
-const FIRST_IMPLEMENTATION = 'const [, setStore] = useStore(s => s.first);\nsetStore({ first: value });';
-const LAST_IMPLEMENTATION = 'const [, setStore] = useStore(s => s.last);\nsetStore({ last: value });';
-const CHECKED_IMPLEMENTATION = 'const [, setStore] = useStore(s => s.checked);\nsetStore({ checked: value });';
-const RECREATE_IMPLEMENTATION =
-  'const [, setStore] = useStore(() => null);\nsetStore({ ...DEFAULT_STORE_DEMO_STATE });';
+const FIRST_IMPLEMENTATION = `setStore(s => ({
+  account: {
+    ...s.account,
+    profile: { ...s.account.profile, name: { ...s.account.profile.name, first: value } }
+  }
+}));`;
+
+const LAST_IMPLEMENTATION = `setStore(s => ({
+  account: {
+    ...s.account,
+    identity: {
+      ...s.account.identity,
+      family: { ...s.account.identity.family, details: { ...s.account.identity.family.details, last: value } }
+    }
+  }
+}));`;
+
+const CHECKED_IMPLEMENTATION = `setStore(s => ({
+  settings: {
+    ...s.settings,
+    options: { ...s.settings.options, consent: { ...s.settings.options.consent, checked: value } }
+  }
+}));`;
+
+const RECREATE_IMPLEMENTATION = 'setStore(structuredClone(DEFAULT_STORE_DEMO_STATE));';
 
 //*****************************************************************************************
-// CreateStoreContext First Field
+// Create Store Context First Field
 //*****************************************************************************************
 
 const CreateStoreContextFirstField = memo(() => {
-  const [value, setStore] = useStore(s => s.first);
+  const [value, setStore] = useStore(s => s.account.profile.name.first);
 
-  const handleChange = useCallback((first: string) => setStore({ first }), [setStore]);
+  const handleChange = useCallback(
+    (first: string) =>
+      setStore(s => ({
+        account: {
+          ...s.account,
+          profile: { ...s.account.profile, name: { ...s.account.profile.name, first } }
+        }
+      })),
+    [setStore]
+  );
 
   return (
     <StoreDemoTextField implementation={FIRST_IMPLEMENTATION} label="First" value={value} onChange={handleChange} />
@@ -35,13 +64,25 @@ const CreateStoreContextFirstField = memo(() => {
 CreateStoreContextFirstField.displayName = 'CreateStoreContextFirstField';
 
 //*****************************************************************************************
-// CreateStoreContext Last Field
+// Create Store Context Last Field
 //*****************************************************************************************
 
 const CreateStoreContextLastField = memo(() => {
-  const [value, setStore] = useStore(s => s.last);
+  const [value, setStore] = useStore(s => s.account.identity.family.details.last);
 
-  const handleChange = useCallback((last: string) => setStore({ last }), [setStore]);
+  const handleChange = useCallback(
+    (last: string) =>
+      setStore(s => ({
+        account: {
+          ...s.account,
+          identity: {
+            ...s.account.identity,
+            family: { ...s.account.identity.family, details: { ...s.account.identity.family.details, last } }
+          }
+        }
+      })),
+    [setStore]
+  );
 
   return <StoreDemoTextField implementation={LAST_IMPLEMENTATION} label="Last" value={value} onChange={handleChange} />;
 });
@@ -49,13 +90,22 @@ const CreateStoreContextLastField = memo(() => {
 CreateStoreContextLastField.displayName = 'CreateStoreContextLastField';
 
 //*****************************************************************************************
-// CreateStoreContext Checked Field
+// Create Store Context Checked Field
 //*****************************************************************************************
 
 const CreateStoreContextCheckedField = memo(() => {
-  const [checked, setStore] = useStore(s => s.checked);
+  const [checked, setStore] = useStore(s => s.settings.options.consent.checked);
 
-  const handleChange = useCallback((value: boolean) => setStore({ checked: value }), [setStore]);
+  const handleChange = useCallback(
+    (value: boolean) =>
+      setStore(s => ({
+        settings: {
+          ...s.settings,
+          options: { ...s.settings.options, consent: { ...s.settings.options.consent, checked: value } }
+        }
+      })),
+    [setStore]
+  );
 
   return (
     <StoreDemoCheckbox
@@ -70,13 +120,13 @@ const CreateStoreContextCheckedField = memo(() => {
 CreateStoreContextCheckedField.displayName = 'CreateStoreContextCheckedField';
 
 //*****************************************************************************************
-// CreateStoreContext Recreate Button
+// Create Store Context Recreate Button
 //*****************************************************************************************
 
 const CreateStoreContextRecreateButton = memo(() => {
   const [, setStore] = useStore(() => null);
 
-  const handleClick = useCallback(() => setStore({ ...DEFAULT_STORE_DEMO_STATE }), [setStore]);
+  const handleClick = useCallback(() => setStore(structuredClone(DEFAULT_STORE_DEMO_STATE)), [setStore]);
 
   return (
     <StoreDemoRecreateButton
@@ -90,7 +140,7 @@ const CreateStoreContextRecreateButton = memo(() => {
 CreateStoreContextRecreateButton.displayName = 'CreateStoreContextRecreateButton';
 
 //*****************************************************************************************
-// CreateStoreContext Values
+// Create Store Context Values
 //*****************************************************************************************
 
 const CreateStoreContextValues = memo(() => {
@@ -102,7 +152,7 @@ const CreateStoreContextValues = memo(() => {
 CreateStoreContextValues.displayName = 'CreateStoreContextValues';
 
 //*****************************************************************************************
-// Store Demo CreateStoreContext
+// Store Demo Create Store Context
 //*****************************************************************************************
 
 export const StoreDemoCreateStoreContext = memo(() => (

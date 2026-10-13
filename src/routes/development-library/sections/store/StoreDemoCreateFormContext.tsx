@@ -14,20 +14,20 @@ const { FormProvider, useForm } = createFormContext<StoreDemoState>({
   defaultValues: structuredClone(DEFAULT_STORE_DEMO_STATE)
 });
 
-const FIRST_IMPLEMENTATION = '<form.Field name="first">\nfield.handleChange(value);';
-const LAST_IMPLEMENTATION = '<form.Field name="last">\nfield.handleChange(value);';
-const CHECKED_IMPLEMENTATION = '<form.Field name="checked">\nfield.handleChange(value);';
-const RECREATE_IMPLEMENTATION = 'form.reset({ ...DEFAULT_STORE_DEMO_STATE });';
+const FIRST_IMPLEMENTATION = '<form.Field name="account.profile.name.first">\nfield.handleChange(value);';
+const LAST_IMPLEMENTATION = '<form.Field name="account.identity.family.details.last">\nfield.handleChange(value);';
+const CHECKED_IMPLEMENTATION = '<form.Field name="settings.options.consent.checked">\nfield.handleChange(value);';
+const RECREATE_IMPLEMENTATION = 'form.reset(structuredClone(DEFAULT_STORE_DEMO_STATE));';
 
 //*****************************************************************************************
-// CreateFormContext First Field
+// Create Form Context First Field
 //*****************************************************************************************
 
 const CreateFormContextFirstField = memo(() => {
   const form = useForm();
 
   return (
-    <form.Field name="first">
+    <form.Field name="account.profile.name.first">
       {field => (
         <StoreDemoTextField
           implementation={FIRST_IMPLEMENTATION}
@@ -43,14 +43,14 @@ const CreateFormContextFirstField = memo(() => {
 CreateFormContextFirstField.displayName = 'CreateFormContextFirstField';
 
 //*****************************************************************************************
-// CreateFormContext Last Field
+// Create Form Context Last Field
 //*****************************************************************************************
 
 const CreateFormContextLastField = memo(() => {
   const form = useForm();
 
   return (
-    <form.Field name="last">
+    <form.Field name="account.identity.family.details.last">
       {field => (
         <StoreDemoTextField
           implementation={LAST_IMPLEMENTATION}
@@ -66,14 +66,14 @@ const CreateFormContextLastField = memo(() => {
 CreateFormContextLastField.displayName = 'CreateFormContextLastField';
 
 //*****************************************************************************************
-// CreateFormContext Checked Field
+// Create Form Context Checked Field
 //*****************************************************************************************
 
 const CreateFormContextCheckedField = memo(() => {
   const form = useForm();
 
   return (
-    <form.Field name="checked">
+    <form.Field name="settings.options.consent.checked">
       {field => (
         <StoreDemoCheckbox
           checked={field.state.value}
@@ -89,13 +89,13 @@ const CreateFormContextCheckedField = memo(() => {
 CreateFormContextCheckedField.displayName = 'CreateFormContextCheckedField';
 
 //*****************************************************************************************
-// CreateFormContext Recreate Button
+// Create Form Context Recreate Button
 //*****************************************************************************************
 
 const CreateFormContextRecreateButton = memo(() => {
   const form = useForm();
 
-  const handleClick = useCallback(() => form.reset({ ...DEFAULT_STORE_DEMO_STATE }), [form]);
+  const handleClick = useCallback(() => form.reset(structuredClone(DEFAULT_STORE_DEMO_STATE)), [form]);
 
   return (
     <StoreDemoRecreateButton
@@ -109,7 +109,7 @@ const CreateFormContextRecreateButton = memo(() => {
 CreateFormContextRecreateButton.displayName = 'CreateFormContextRecreateButton';
 
 //*****************************************************************************************
-// CreateFormContext Values
+// Create Form Context Values
 //*****************************************************************************************
 
 const CreateFormContextValues = memo(() => {
@@ -123,7 +123,7 @@ const CreateFormContextValues = memo(() => {
 CreateFormContextValues.displayName = 'CreateFormContextValues';
 
 //*****************************************************************************************
-// Store Demo CreateFormContext
+// Store Demo Create Form Context
 //*****************************************************************************************
 
 export const StoreDemoCreateFormContext = memo(() => (
