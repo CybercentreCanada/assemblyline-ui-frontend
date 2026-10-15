@@ -10,7 +10,8 @@ export const {
   StoreProvider: AppInterfaceStoreProvider,
   useStore: useAppInterfaceStore,
   useSetStore: useAppSetInterfaceStore,
-  useStoreApi: useAppInterfaceStoreApi
+  useStoreApi: useAppInterfaceStoreApi,
+  useSubscriberCount: useAppInterfaceStoreSubscriberCount
 } = createAppStore<AppInterfaceStore>(null);
 
 export const getAppInterfaceStateFromApi = (api: StoreApi<AppInterfaceStore>): AppInterfaceStore => {

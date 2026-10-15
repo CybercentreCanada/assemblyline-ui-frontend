@@ -1,12 +1,24 @@
-import { useAppConfigStoreApi } from 'core/config';
+import { useAppConfigStoreApi, useAppConfigStoreSubscriberCount } from 'core/config';
 import {
   getAppInterfaceStateFromApi,
   useAppInterfaceStore,
   useAppInterfaceStoreApi,
+  useAppInterfaceStoreSubscriberCount,
   useAppSetInterfaceStore
 } from 'core/interface';
-import { getAppPreferenceStateFromApi, useAppPreferenceStoreApi } from 'core/preference';
-import { useAppLocationParamStoreApi, useAppNavigationStoreApi, useAppRouterStoreApi } from 'core/router';
+import {
+  getAppPreferenceStateFromApi,
+  useAppPreferenceStoreApi,
+  useAppPreferenceStoreSubscriberCount
+} from 'core/preference';
+import {
+  useAppLocationParamStoreApi,
+  useAppLocationParamStoreSubscriberCount,
+  useAppNavigationStoreApi,
+  useAppNavigationStoreSubscriberCount,
+  useAppRouterStoreApi,
+  useAppRouterStoreSubscriberCount
+} from 'core/router';
 import type { AppDebugStoreHistory, AppDebugStoreName } from 'layout/debug';
 import { getDefaultAppDebugStoreHistory } from 'layout/debug/debug.models';
 import { serializeAppDebugState } from 'layout/debug/debug.utils';
@@ -129,4 +141,30 @@ export const useAppDebugStoreHistory = (): AppDebugStoreHistory => {
   }, [entries, interfaceApi, preferenceApi, setInterfaceStore]);
 
   return history;
+};
+
+/**
+ * @name useAppDebugStoreListenerCounts
+ * @description Reads how many listeners each application zustand store currently has.
+ * @returns Listener count keyed by store name; always 0 outside development
+ */
+export const useAppDebugStoreListenerCounts = (): Record<AppDebugStoreName, number> => {
+  const config = useAppConfigStoreSubscriberCount();
+  const interfaceStore = useAppInterfaceStoreSubscriberCount();
+  const preference = useAppPreferenceStoreSubscriberCount();
+  const router = useAppRouterStoreSubscriberCount();
+  const navigation = useAppNavigationStoreSubscriberCount();
+  const location = useAppLocationParamStoreSubscriberCount();
+
+  return useMemo(
+    () => ({
+      Config: config,
+      Interface: interfaceStore,
+      Preference: preference,
+      Router: router,
+      Navigation: navigation,
+      Location: location
+    }),
+    [config, interfaceStore, location, navigation, preference, router]
+  );
 };

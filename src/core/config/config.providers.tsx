@@ -8,7 +8,8 @@ export const {
   StoreProvider: AppConfigStoreProvider,
   useStore: useAppConfigStore,
   useSetStore: useAppSetConfigStore,
-  useStoreApi: useAppConfigStoreApi
+  useStoreApi: useAppConfigStoreApi,
+  useSubscriberCount: useAppConfigStoreSubscriberCount
 } = createAppStore<AppConfigStore>(null);
 
 export const getAppConfigStateFromApi = (api: StoreApi<AppConfigStore>): AppConfigStore => {

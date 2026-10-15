@@ -1,7 +1,12 @@
 import { List, ListItemButton, ListItemText, ListSubheader, useTheme } from '@mui/material';
 import { useAppInterfaceStore, useAppSetInterfaceStore } from 'core/interface';
 import type { AppDebugStoreName, AppDebugStoreSnapshot } from 'layout/debug';
-import { APP_DEBUG_STORE_NAMES, formatAppDebugTimestamp, useAppDebugStoreHistory } from 'layout/debug';
+import {
+  APP_DEBUG_STORE_NAMES,
+  formatAppDebugTimestamp,
+  useAppDebugStoreHistory,
+  useAppDebugStoreListenerCounts
+} from 'layout/debug';
 import { memo, useCallback, useMemo } from 'react';
 import { MonacoEditor } from 'ui/MonacoEditor';
 
@@ -15,17 +20,24 @@ const MONACO_OPTIONS = { readOnly: true, minimap: { enabled: false }, scrollBeyo
 
 type AppDebugStoreListProps = {
   counts: Record<AppDebugStoreName, number>;
+  listeners: Record<AppDebugStoreName, number>;
   selected: AppDebugStoreName;
   onSelect: (name: AppDebugStoreName) => void;
 };
 
-const AppDebugStoreList = memo(({ counts, selected, onSelect }: AppDebugStoreListProps) => (
+const AppDebugStoreList = memo(({ counts, listeners, selected, onSelect }: AppDebugStoreListProps) => (
   <List dense disablePadding subheader={<ListSubheader disableSticky>Stores</ListSubheader>}>
     {APP_DEBUG_STORE_NAMES.map(name => (
       <ListItemButton key={name} selected={name === selected} onClick={() => onSelect(name)}>
         <ListItemText
           primary={name}
-          secondary={`${counts[name] ?? 0} snapshots`}
+          secondary={
+            <>
+              {`${counts[name] ?? 0} snapshots`}
+              <br />
+              {`${listeners[name] ?? 0} listeners`}
+            </>
+          }
           sx={{ marginTop: '2px', marginBottom: '2px' }}
         />
       </ListItemButton>
@@ -70,6 +82,7 @@ AppDebugHistoryList.displayName = 'AppDebugHistoryList';
 export const AppDebugStores = memo(() => {
   const theme = useTheme();
   const history = useAppDebugStoreHistory();
+  const listeners = useAppDebugStoreListenerCounts();
 
   const store = useAppInterfaceStore(s => s.debug.store);
   const snapshotId = useAppInterfaceStore(s => s.debug.snapshotId);
@@ -120,7 +133,7 @@ export const AppDebugStores = memo(() => {
           borderRight: `1px solid ${theme.palette.divider}`
         }}
       >
-        <AppDebugStoreList counts={counts} selected={store} onSelect={handleSelectStore} />
+        <AppDebugStoreList counts={counts} listeners={listeners} selected={store} onSelect={handleSelectStore} />
       </div>
 
       <MonacoEditor value={selected?.value ?? ''} language="json" options={MONACO_OPTIONS} />
