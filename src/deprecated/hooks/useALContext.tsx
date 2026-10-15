@@ -2,13 +2,9 @@ import { useAppConfigStore } from 'core/config';
 import { useCallback, useMemo } from 'react';
 
 export const useALContext = () => {
-  const c12nDef = useAppConfigStore(s => s.c12nDef);
-  const classificationAliases = useAppConfigStore(s => s.classificationAliases);
-  const configuration = useAppConfigStore(s => s.configuration);
-  const indexes = useAppConfigStore(s => s.indexes);
-  const settings = useAppConfigStore(s => s.settings);
-  const systemMessage = useAppConfigStore(s => s.systemMessage);
-  const user = useAppConfigStore(s => s.user);
+  const [c12nDef, classificationAliases, configuration, indexes, settings, systemMessage, user] = useAppConfigStore(
+    s => [s.c12nDef, s.classificationAliases, s.configuration, s.indexes, s.settings, s.systemMessage, s.user] as const
+  );
 
   const scoreToVerdict = useCallback(
     (score: number | null) => {
