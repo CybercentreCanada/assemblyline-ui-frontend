@@ -7,7 +7,7 @@ import { useAppPageKeyStore } from 'core/router';
  * @returns Current route key, or null when no route context is available
  */
 export function useAppPageKey(): AppPageKeyStore['pageKey'] {
-  const context = useAppPageKeyStore(s => s.pageKey, true);
+  const context = useAppPageKeyStore(s => s.pageKey);
   if (context == null) return null;
   return context;
 }

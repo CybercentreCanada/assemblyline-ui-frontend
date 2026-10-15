@@ -1,71 +1,64 @@
 import type { PropsWithChildren } from 'react';
-import React, { createContext, useCallback, useContext, useEffect, useRef } from 'react';
+import { createContext, memo, useCallback, useContext, useEffect, useRef } from 'react';
 import { useStore as useZustandStore } from 'zustand';
-import { devtools } from 'zustand/middleware';
 import { useShallow } from 'zustand/react/shallow';
 import type { StoreApi } from 'zustand/vanilla';
 import { createStore } from 'zustand/vanilla';
 
-const FALLBACK_STORE = createStore(() => ({}));
-
 export const createAppStore = <Store extends object>(initialState: Store) => {
-  type StorePatch = Partial<Store> | ((state: Store) => Partial<Store>);
+  type StorePatch = Partial<Store> | ((state: Store) => Partial<Store> | undefined);
+
+  // Read-only stand-in used outside a provider; reads resolve to `initialState`.
+  const fallbackStore = createStore<Store>()(() => initialState);
+
+  const applyPatch = (store: StoreApi<Store> | null, patch: StorePatch | null) => {
+    // Only `useSetStore` can reach this without a store.
+    if (!store) {
+      if (import.meta.env.DEV) console.warn('[createAppStore] `useSetStore` called outside of StoreProvider.');
+      return;
+    }
+
+    // The provider passes `data` that can legitimately be empty.
+    if (!patch) return;
+
+    try {
+      store.setState(prev => ({ ...prev, ...(typeof patch === 'function' ? patch(prev) : patch) }));
+    } catch (error) {
+      console.error('[createAppStore] Failed to apply the store update.', error);
+    }
+  };
 
   const StoreContext = createContext<StoreApi<Store> | null>(null);
   StoreContext.displayName = 'StoreContext';
 
-  const StoreProvider = React.memo(({ children, data = null }: PropsWithChildren<{ data?: StorePatch }>) => {
-    const storeRef = useRef<StoreApi<Store> | null>(null);
-    const previousDataRef = useRef(data);
-
-    if (!storeRef.current) {
-      const patch = typeof data === 'function' ? data(initialState) : (data ?? {});
-
-      storeRef.current = createStore(devtools(() => ({ ...initialState, ...patch })));
-    }
+  const StoreProvider = memo(({ children, data = null }: PropsWithChildren<{ data?: StorePatch }>) => {
+    // One store per provider, created with `data` so the first render already includes it.
+    const store = useRef<StoreApi<Store>>(
+      createStore<Store>()(() => ({ ...initialState, ...(typeof data === 'function' ? data(initialState) : data) }))
+    );
+    // Last applied `data`, so the mount effect doesn't apply the initial `data` a second time.
+    const appliedDataRef = useRef<StorePatch | null>(data);
 
     useEffect(() => {
-      if (!storeRef.current) return;
+      if (Object.is(appliedDataRef.current, data)) return;
 
-      const previousData = previousDataRef.current;
-      previousDataRef.current = data;
-      if (!data || Object.is(previousData, data)) return;
-
-      storeRef.current.setState(prev => ({ ...prev, ...(typeof data === 'function' ? data(prev) : data) }));
+      appliedDataRef.current = data;
+      applyPatch(store.current, data);
     }, [data]);
 
-    return <StoreContext.Provider value={storeRef.current}>{children}</StoreContext.Provider>;
+    return <StoreContext.Provider value={store.current}>{children}</StoreContext.Provider>;
   });
 
-  const useStore = <T,>(selector: (state: Store) => T, hideWarnings: boolean = false): T => {
+  StoreProvider.displayName = 'StoreProvider';
+
+  // Shallow comparison keeps selectors that return new arrays or objects from re-rendering in a loop.
+  const useStore = <T,>(selector: (state: Store) => T): T =>
+    useZustandStore(useContext(StoreContext) ?? fallbackStore, useShallow(selector));
+
+  const useSetStore = () => {
     const store = useContext(StoreContext);
 
-    if (!store && !hideWarnings) {
-      console.warn('[createAppStore] `useStore` called outside of StoreProvider.');
-    }
-
-    return useZustandStore(
-      (store ?? FALLBACK_STORE) as StoreApi<Store>,
-      useShallow((state: Store) => selector(store ? state : initialState))
-    );
-  };
-
-  const useSetStore = (hideWarnings: boolean = false) => {
-    const store = useContext(StoreContext);
-
-    return useCallback(
-      (patch: StorePatch) => {
-        if (!store) {
-          if (!hideWarnings) {
-            console.warn('[createAppStore] `useSetStore` called outside of StoreProvider.');
-          }
-          return;
-        }
-
-        store.setState(prev => ({ ...prev, ...(typeof patch === 'function' ? patch(prev) : patch) }));
-      },
-      [hideWarnings, store]
-    );
+    return useCallback((patch: StorePatch) => applyPatch(store, patch), [store]);
   };
 
   const useStoreApi = (): StoreApi<Store> => useContext(StoreContext);
