@@ -14,7 +14,6 @@ Consult the applicable project rules before reporting violations:
 - [Architecture](../../../.github/instructions/architecture.instructions.md)
 - [File structure](../../../.github/instructions/file-structure.instructions.md)
 - [Accessibility](../../../.github/instructions/conventions/accessibility.instructions.md)
-- [Imports](../../../.github/instructions/conventions/imports.instructions.md)
 - [Performance](../../../.github/instructions/conventions/performance.instructions.md)
 - [React](../../../.github/instructions/conventions/react.instructions.md)
 - [Styling](../../../.github/instructions/conventions/styling.instructions.md)
