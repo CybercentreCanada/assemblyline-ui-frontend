@@ -6,7 +6,7 @@ import useMyAPI from 'core/api/hooks/useMyAPI';
 import PageContainer from 'core/template/branding/AppPageContainer';
 import { useAppUser } from 'core/template/components/app/hooks';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
-import { createSearchParams, SearchParamsProvider, useSearchParams } from 'features/SearchParams/createSearchParams';
+import { createSearchParams, SearchParamsProvider, useSearchParams } from 'features/search-params';
 import useDrawer from 'layout/drawer/drawer.hooks';
 import type { FacetResult, HistogramResult, SearchResult } from 'models/api/search';
 import type { CustomUser, IndexDefinition } from 'models/api/user';
@@ -26,18 +26,18 @@ import { DEFAULT_SUGGESTION } from 'ui/SearchBar/search-textfield';
 
 const ERROR_VIEWER_PARAMS = createSearchParams(p => ({
   query: p.string(''),
-  offset: p.number(0).min(0).origin('snapshot').ephemeral(),
-  rows: p.number(25).locked().origin('snapshot').ephemeral(),
+  offset: p.number(0).min(0).source('transient').ephemeral(),
+  rows: p.number(25).locked().source('transient').ephemeral(),
   sort: p.string('created desc').ephemeral(),
   start: p.string('now-4d'),
   end: p.string('now'),
   gap: p.string('4h'),
   filters: p.filters([]),
   track_total_hits: p.number(10000).nullable().ephemeral(),
-  mincount: p.number(0).min(0).origin('snapshot').ephemeral(),
+  mincount: p.number(0).min(0).source('transient').ephemeral(),
   use_archive: p.boolean(false),
   archive_only: p.boolean(false),
-  timeout: p.string('').origin('snapshot').ephemeral()
+  timeout: p.string('').source('transient').ephemeral()
 }));
 
 type ErrorViewerParams = typeof ERROR_VIEWER_PARAMS;

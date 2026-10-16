@@ -7,7 +7,7 @@ import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
 import PageContainer from 'core/template/branding/AppPageContainer';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
-import { createSearchParams, SearchParamsProvider, useSearchParams } from 'features/SearchParams/createSearchParams';
+import { createSearchParams, SearchParamsProvider, useSearchParams } from 'features/search-params';
 import type { IndexDefinition } from 'models/api/user';
 import type { SubmissionIndexed } from 'models/base/submission';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -27,11 +27,11 @@ type SearchResults = {
 
 export const SUBMISSION_PARAMS = createSearchParams(p => ({
   query: p.string(''),
-  offset: p.number(0).min(0).origin('snapshot').ephemeral(),
-  rows: p.number(25).locked().origin('snapshot').ephemeral(),
+  offset: p.number(0).min(0).source('transient').ephemeral(),
+  rows: p.number(25).locked().source('transient').ephemeral(),
   sort: p.string('times.submitted desc').ephemeral(),
   filters: p.filters([]),
-  track_total_hits: p.number(null).origin('snapshot').nullable().ephemeral()
+  track_total_hits: p.number(null).source('transient').nullable().ephemeral()
 }));
 
 export type SubmissionParams = typeof SUBMISSION_PARAMS;
