@@ -18,8 +18,6 @@ export const createAppStore = <Store extends object>(initialState: Store) => {
 
   const StoreProvider = React.memo(({ children, data = null }: PropsWithChildren<{ data?: StorePatch }>) => {
     const storeRef = useRef<StoreApi<Store> | null>(null);
-    // Last `data` seen, so the mount effect doesn't re-apply the data the store was created with.
-    const previousDataRef = useRef(data);
 
     // Created once per provider, with `data` applied so the first render already includes it.
     if (!storeRef.current) {
@@ -30,12 +28,8 @@ export const createAppStore = <Store extends object>(initialState: Store) => {
     }
 
     useEffect(() => {
-      if (!storeRef.current) return;
-
-      const previousData = previousDataRef.current;
-      previousDataRef.current = data;
-      // Skip an empty `data` and the mount run, where `data` is the value the store was created with.
-      if (!data || Object.is(previousData, data)) return;
+      // Skip an empty `data`
+      if (!storeRef.current || !data) return;
 
       // Spreading `prev` gives the root a new reference so subscribers are notified.
       storeRef.current.setState(prev => ({ ...prev, ...(typeof data === 'function' ? data(prev) : data) }));
