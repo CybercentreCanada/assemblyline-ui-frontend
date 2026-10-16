@@ -1,7 +1,6 @@
 import type { PropsWithChildren } from 'react';
 import React, { createContext, useCallback, useContext, useEffect, useRef } from 'react';
 import { useStore as useZustandStore } from 'zustand';
-import { devtools } from 'zustand/middleware';
 import { useShallow } from 'zustand/react/shallow';
 import type { StoreApi } from 'zustand/vanilla';
 import { createStore } from 'zustand/vanilla';
@@ -24,7 +23,7 @@ export const createAppStore = <Store extends object>(initialState: Store) => {
       const patch = typeof data === 'function' ? data(initialState) : (data ?? {});
 
       // `devtools` mirrors every state change into the Redux DevTools extension.
-      storeRef.current = createStore(devtools(() => ({ ...initialState, ...patch })));
+      storeRef.current = createStore(() => ({ ...initialState, ...patch }));
     }
 
     useEffect(() => {

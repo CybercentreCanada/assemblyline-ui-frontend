@@ -1,5 +1,6 @@
 import React from 'react';
 import { DemoContainer } from 'routes/development-library/components/DemoContainer';
+import { StoreBenchmark } from 'routes/development-library/sections/store/StoreBenchmark';
 import { StoreDemoCreateAppStore } from 'routes/development-library/sections/store/StoreDemoCreateAppStore';
 import { StoreDemoCreateFormContext } from 'routes/development-library/sections/store/StoreDemoCreateFormContext';
 import { StoreDemoCreateStoreContext } from 'routes/development-library/sections/store/StoreDemoCreateStoreContext';
@@ -35,5 +36,6 @@ export const StoreSection = React.memo(() => (
     <StoreDemoSyncExternalStore />
     <StoreDemoCreateStoreContext />
     <StoreDemoZustandMatrix />
+    <StoreBenchmark />
   </DemoContainer>
 ));

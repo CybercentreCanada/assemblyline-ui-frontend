@@ -61,6 +61,7 @@
     "moment": "^2.31.0",
     "moment-timezone": "^0.5.40",
     "monaco-editor": "^0.35.0",
+    "mutative": "^2.0.0",
     "node-fetch": "^3.3.0",
     "node-forge": "^1.4.0",
     "notistack": "^3.0.2",
