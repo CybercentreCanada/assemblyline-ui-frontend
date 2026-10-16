@@ -1,4 +1,4 @@
-import { createFormContext } from 'features/form';
+import { createFormContext } from 'features/form/form.factories';
 import type { TableOfContentAnchor, TableOfContentStore } from 'features/table-of-content';
 import type { MutableRefObject, PropsWithChildren, ReactNode, SyntheticEvent } from 'react';
 import { createContext, memo, useCallback, useContext, useEffect, useMemo, useRef } from 'react';
