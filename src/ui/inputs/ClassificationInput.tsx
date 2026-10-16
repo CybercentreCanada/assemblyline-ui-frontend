@@ -23,7 +23,7 @@ import {
   getParts,
   normalizedClassification
 } from 'features/classification/classification.utils';
-import { PropProvider, usePropStore } from 'features/prop-provider/prop-provider.providers';
+import { PropProvider, usePropStore } from 'features/prop-provider';
 import type { WhoAmI } from 'models/api/user';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
