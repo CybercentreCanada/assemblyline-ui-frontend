@@ -24,7 +24,7 @@ applyTo: 'src/**/*.hooks.ts, src/**/*.hooks.tsx, src/**/hooks/**/*.ts, src/**/ho
 
 - NO single-use hooks — keep logic inline in the component
 - NO wrapping a single `useAPIMutation` — use it directly
-- NO complex multi-step orchestration — hooks can't be unit tested
+- NO complex multi-step orchestration
 
 ## Template
 
