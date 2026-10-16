@@ -6,9 +6,11 @@ import { useShallow } from 'zustand/react/shallow';
 import type { StoreApi } from 'zustand/vanilla';
 import { createStore } from 'zustand/vanilla';
 
+// Empty stand-in so hooks can run outside a provider; reads are redirected to `initialState` below.
 const FALLBACK_STORE = createStore(() => ({}));
 
 export const createAppStore = <Store extends object>(initialState: Store) => {
+  // A partial state, or an updater that receives the current state and returns a partial state.
   type StorePatch = Partial<Store> | ((state: Store) => Partial<Store>);
 
   const StoreContext = createContext<StoreApi<Store> | null>(null);
@@ -16,11 +18,14 @@ export const createAppStore = <Store extends object>(initialState: Store) => {
 
   const StoreProvider = React.memo(({ children, data = null }: PropsWithChildren<{ data?: StorePatch }>) => {
     const storeRef = useRef<StoreApi<Store> | null>(null);
+    // Last `data` seen, so the mount effect doesn't re-apply the data the store was created with.
     const previousDataRef = useRef(data);
 
+    // Created once per provider, with `data` applied so the first render already includes it.
     if (!storeRef.current) {
       const patch = typeof data === 'function' ? data(initialState) : (data ?? {});
 
+      // `devtools` mirrors every state change into the Redux DevTools extension.
       storeRef.current = createStore(devtools(() => ({ ...initialState, ...patch })));
     }
 
@@ -29,8 +34,10 @@ export const createAppStore = <Store extends object>(initialState: Store) => {
 
       const previousData = previousDataRef.current;
       previousDataRef.current = data;
+      // Skip an empty `data` and the mount run, where `data` is the value the store was created with.
       if (!data || Object.is(previousData, data)) return;
 
+      // Spreading `prev` gives the root a new reference so subscribers are notified.
       storeRef.current.setState(prev => ({ ...prev, ...(typeof data === 'function' ? data(prev) : data) }));
     }, [data]);
 
@@ -40,10 +47,13 @@ export const createAppStore = <Store extends object>(initialState: Store) => {
   const useStore = <T,>(selector: (state: Store) => T, hideWarnings: boolean = false): T => {
     const store = useContext(StoreContext);
 
+    // `hideWarnings` is for callers that are legitimately used outside a provider.
     if (!store && !hideWarnings) {
       console.warn('[createAppStore] `useStore` called outside of StoreProvider.');
     }
 
+    // Outside a provider, read from the fallback store and run the selector on `initialState` instead.
+    // `useShallow` keeps selectors that return new arrays or objects from re-rendering in a loop.
     return useZustandStore(
       (store ?? FALLBACK_STORE) as StoreApi<Store>,
       useShallow((state: Store) => selector(store ? state : initialState))
@@ -55,6 +65,7 @@ export const createAppStore = <Store extends object>(initialState: Store) => {
 
     return useCallback(
       (patch: StorePatch) => {
+        // Without a provider there is no store to update, so the update is dropped.
         if (!store) {
           if (!hideWarnings) {
             console.warn('[createAppStore] `useSetStore` called outside of StoreProvider.');
@@ -62,12 +73,14 @@ export const createAppStore = <Store extends object>(initialState: Store) => {
           return;
         }
 
+        // The root is always copied so subscribers are notified, even when the updater only mutated in place.
         store.setState(prev => ({ ...prev, ...(typeof patch === 'function' ? patch(prev) : patch) }));
       },
       [hideWarnings, store]
     );
   };
 
+  // `null` outside a provider.
   const useStoreApi = (): StoreApi<Store> => useContext(StoreContext);
 
   return {
