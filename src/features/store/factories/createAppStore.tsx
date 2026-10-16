@@ -44,12 +44,11 @@ export const createAppStore = <Store extends object>(initialState: Store) => {
     return <StoreContext.Provider value={storeRef.current}>{children}</StoreContext.Provider>;
   });
 
-  const useStore = <T,>(selector: (state: Store) => T, hideWarnings: boolean = false): T => {
+  const useStore = <T,>(selector: (state: Store) => T): T => {
     const store = useContext(StoreContext);
 
-    // `hideWarnings` is for callers that are legitimately used outside a provider.
-    if (!store && !hideWarnings) {
-      console.warn('[createAppStore] `useStore` called outside of StoreProvider.');
+    if (!store && import.meta.env.DEV) {
+      console.error('[createAppStore] `useStore` called outside of StoreProvider.');
     }
 
     // Outside a provider, read from the fallback store and run the selector on `initialState` instead.
@@ -60,23 +59,21 @@ export const createAppStore = <Store extends object>(initialState: Store) => {
     );
   };
 
-  const useSetStore = (hideWarnings: boolean = false) => {
+  const useSetStore = () => {
     const store = useContext(StoreContext);
 
     return useCallback(
       (patch: StorePatch) => {
         // Without a provider there is no store to update, so the update is dropped.
         if (!store) {
-          if (!hideWarnings) {
-            console.warn('[createAppStore] `useSetStore` called outside of StoreProvider.');
-          }
+          if (import.meta.env.DEV) console.error('[createAppStore] `useSetStore` called outside of StoreProvider.');
           return;
         }
 
         // The root is always copied so subscribers are notified, even when the updater only mutated in place.
         store.setState(prev => ({ ...prev, ...(typeof patch === 'function' ? patch(prev) : patch) }));
       },
-      [hideWarnings, store]
+      [store]
     );
   };
 
