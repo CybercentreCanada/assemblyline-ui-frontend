@@ -1,6 +1,6 @@
-import { shallowEqual } from 'features/prop-provider';
+import { shallowEqual } from 'features/prop-provider/prop-provider.utils';
 import type { InferSearchParamValueMapFromBlueprintMap, SearchParamBlueprintMap } from 'features/search-params';
-import { SearchParamEngine, SearchParamSnapshot } from 'features/search-params';
+import { SEARCH_PARAM_BLUEPRINTS_MAP, SearchParamEngine, SearchParamSnapshot } from 'features/search-params';
 import type { SetStateAction } from 'react';
 import React, {
   createContext,
@@ -215,3 +215,12 @@ export const createSearchParamsStore = () => {
 
   return { SearchParamsProvider, useSearchParams };
 };
+
+export type SearchParams<Blueprints extends SearchParamBlueprintMap> =
+  InferSearchParamValueMapFromBlueprintMap<Blueprints>;
+
+export const createSearchParams = <Blueprints extends SearchParamBlueprintMap>(
+  input: (blueprints: typeof SEARCH_PARAM_BLUEPRINTS_MAP) => Blueprints
+): Blueprints => input(SEARCH_PARAM_BLUEPRINTS_MAP);
+
+export const { SearchParamsProvider, useSearchParams } = createSearchParamsStore();
