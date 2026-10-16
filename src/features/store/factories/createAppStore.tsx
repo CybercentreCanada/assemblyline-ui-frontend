@@ -42,7 +42,7 @@ export const createAppStore = <Store extends object>(initialState: Store) => {
     const store = useContext(StoreContext);
 
     if (!store && import.meta.env.DEV) {
-      console.error('[createAppStore] `useStore` called outside of StoreProvider.');
+      console.warn('[createAppStore] `useStore` called outside of StoreProvider.');
     }
 
     // Outside a provider, read from the fallback store and run the selector on `initialState` instead.
@@ -60,7 +60,7 @@ export const createAppStore = <Store extends object>(initialState: Store) => {
       (patch: StorePatch) => {
         // Without a provider there is no store to update, so the update is dropped.
         if (!store) {
-          if (import.meta.env.DEV) console.error('[createAppStore] `useSetStore` called outside of StoreProvider.');
+          if (import.meta.env.DEV) console.warn('[createAppStore] `useSetStore` called outside of StoreProvider.');
           return;
         }
 
