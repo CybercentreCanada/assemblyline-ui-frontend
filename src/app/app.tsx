@@ -2,7 +2,7 @@
 import { useClue } from '@cccsaurora/clue-ui';
 import { DEFAULT_APP_CONFIG_STORE } from 'app/core.config';
 import { DEFAULT_APP_INTERFACE_STORE } from 'app/core.interface';
-import { APP_PREFERENCE_SCHEMA, APP_PREFERENCE_STORAGE_KEY } from 'app/core.preference';
+import { APP_PREFERENCE_SCHEMA, APP_PREFERENCE_STORAGE_KEY, DEFAULT_APP_PREFERENCE_STORE } from 'app/core.preference';
 import Routes from 'app/routes';
 import useMyPreferences from 'app/useMyPreferences';
 import useMySitemap from 'app/useMySitemap';
@@ -29,7 +29,7 @@ import QuotaProvider from 'layout/quota/quota.providers';
 import SafeResultsProvider from 'layout/safe-results/safe-results.providers';
 import type { CustomUser } from 'models/api/user';
 import type { PropsWithChildren } from 'react';
-import React, { memo, StrictMode, useCallback, useEffect, useState } from 'react';
+import React, { memo, useCallback, useEffect, useState } from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import setMomentFRLocale from 'shared/utils/moment-fr-locale';
 import { getProvider, getSAMLData } from 'shared/utils/utils';
@@ -143,7 +143,7 @@ export const MyApp: React.FC = () => {
 const AppStores = memo(({ children }: PropsWithChildren) => (
   <AppConfigStoreProvider data={DEFAULT_APP_CONFIG_STORE}>
     <AppInterfaceStoreProvider data={DEFAULT_APP_INTERFACE_STORE}>
-      <AppPreferenceStoreProvider>
+      <AppPreferenceStoreProvider data={DEFAULT_APP_PREFERENCE_STORE}>
         <>{children}</>
       </AppPreferenceStoreProvider>
     </AppInterfaceStoreProvider>
@@ -157,11 +157,9 @@ AppStores.displayName = 'AppStores';
 //*****************************************************************************************
 
 export const App = memo(() => (
-  <StrictMode>
-    <AppStores>
-      <MyApp />
-    </AppStores>
-  </StrictMode>
+  <AppStores>
+    <MyApp />
+  </AppStores>
 ));
 
 App.displayName = 'App';

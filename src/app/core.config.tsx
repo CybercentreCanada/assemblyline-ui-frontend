@@ -82,8 +82,6 @@ const DEFAULT_USER_SETTINGS: UserSettings = {
 };
 
 export const DEFAULT_APP_CONFIG_STORE: AppConfigStore = {
-  // c12nDef: DEFAULT_CLASSIFICATION_DEFINITION,
-  // classificationAliases: DEFAULT_CLASSIFICATION_ALIASES,
   configuration: CONFIGURATION,
   indexes: DEFAULT_INDEXES,
   settings: DEFAULT_USER_SETTINGS,
