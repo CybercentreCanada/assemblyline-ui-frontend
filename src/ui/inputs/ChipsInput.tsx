@@ -1,6 +1,9 @@
 import type { AutocompleteProps, TextFieldProps } from '@mui/material';
 import { Autocomplete } from '@mui/material';
-import { PropProvider, usePropStore } from 'features/prop-provider/prop-provider.providers';
+import { PropProvider, usePropStore } from 'features/prop-provider';
+import type { ElementType } from 'react';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   InputFormControl,
   InputFormLabel,
@@ -19,9 +22,6 @@ import type {
   InputValueModel
 } from 'ui/inputs/models/inputs.model.ts';
 import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'ui/inputs/models/inputs.model.ts';
-import type { ElementType } from 'react';
-import React from 'react';
-import { useTranslation } from 'react-i18next';
 
 export type ChipsInputProps = InputValueModel<string[], React.SyntheticEvent<Element, Event>> &
   InputOptions &
