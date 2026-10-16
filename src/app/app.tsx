@@ -29,7 +29,7 @@ import QuotaProvider from 'layout/quota/quota.providers';
 import SafeResultsProvider from 'layout/safe-results/safe-results.providers';
 import type { CustomUser } from 'models/api/user';
 import type { PropsWithChildren } from 'react';
-import React, { memo, StrictMode, useCallback, useEffect, useState } from 'react';
+import React, { memo, useCallback, useEffect, useState } from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import setMomentFRLocale from 'shared/utils/moment-fr-locale';
 import { getProvider, getSAMLData } from 'shared/utils/utils';
@@ -157,11 +157,9 @@ AppStores.displayName = 'AppStores';
 //*****************************************************************************************
 
 export const App = memo(() => (
-  <StrictMode>
-    <AppStores>
-      <MyApp />
-    </AppStores>
-  </StrictMode>
+  <AppStores>
+    <MyApp />
+  </AppStores>
 ));
 
 App.displayName = 'App';
