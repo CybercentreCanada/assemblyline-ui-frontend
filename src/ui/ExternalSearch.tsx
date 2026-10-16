@@ -23,7 +23,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import Tooltip from '@mui/material/Tooltip';
 import useALContext from 'core/config/useALContext';
-import { getMaxClassification } from 'features/classification/classification.utils';
+import { getMaxClassification } from 'features/classification';
 import useExternalLookup from 'layout/external-lookup/external-lookup.hooks';
 import type { ExternalEnrichmentResult } from 'layout/external-lookup/external-lookup.providers';
 import type { DetailedItem } from 'models/base/alert';
