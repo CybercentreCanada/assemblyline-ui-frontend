@@ -15,6 +15,7 @@ import {
   AppLocationParamStoreProvider,
   AppNavigationProvider,
   AppNavigationStoreProvider,
+  AppPageKeyStoreProvider,
   AppRouterLayout,
   AppRouterPanelLayout,
   AppRouterProvider,
@@ -110,7 +111,9 @@ const AppStores = memo(({ children }: PropsWithChildren) => (
         <AppRouterStoreProvider>
           <AppNavigationStoreProvider>
             <AppLocationParamStoreProvider>
-              <>{children}</>
+              <AppPageKeyStoreProvider>
+                <>{children}</>
+              </AppPageKeyStoreProvider>
             </AppLocationParamStoreProvider>
           </AppNavigationStoreProvider>
         </AppRouterStoreProvider>
