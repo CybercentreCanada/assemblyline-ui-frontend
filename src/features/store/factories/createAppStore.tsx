@@ -1,5 +1,5 @@
 import type { PropsWithChildren } from 'react';
-import { createContext, memo, useCallback, useContext, useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { createContext, memo, useCallback, useContext, useEffect, useRef, useSyncExternalStore } from 'react';
 import { useStore as useZustandStore } from 'zustand';
 import { useShallow } from 'zustand/react/shallow';
 import type { StoreApi } from 'zustand/vanilla';
@@ -56,68 +56,69 @@ const trackSubscribers = <T,>(store: StoreApi<T>): StoreApi<T> => {
 };
 
 export const createAppStore = <Store extends object>(initialState: Store) => {
-  type StorePatch = Partial<Store> | ((state: Store) => Partial<Store> | undefined);
+  // A partial state, or an updater that receives the current state and returns a partial state.
+  type StorePatch = Partial<Store> | ((state: Store) => Partial<Store>);
 
-  // Read-only stand-in used outside a provider; reads resolve to `initialState`.
-  const fallbackStore = trackSubscribers(createStore<Store>()(() => initialState));
-
-  const applyPatch = (store: StoreApi<Store> | null, patch: StorePatch | null) => {
-    // Only `useSetStore` can reach this without a store.
-    if (!store) {
-      if (import.meta.env.DEV) console.warn('[createAppStore] `useSetStore` called outside of StoreProvider.');
-      return;
-    }
-
-    // The provider passes `data` that can legitimately be empty.
-    if (!patch) return;
-
-    try {
-      store.setState(prev => ({ ...prev, ...(typeof patch === 'function' ? patch(prev) : patch) }));
-    } catch (error) {
-      console.error('[createAppStore] Failed to apply the store update.', error);
-    }
-  };
-
+  // Each `StoreProvider` owns its own store; the hooks below only work inside one.
   const StoreContext = createContext<StoreApi<Store> | null>(null);
   StoreContext.displayName = 'StoreContext';
 
   const StoreProvider = memo(({ children, data = null }: PropsWithChildren<{ data?: StorePatch }>) => {
-    // One store per provider, created lazily with `data` so the first render already includes it.
-    const [store] = useState<StoreApi<Store>>(() =>
-      trackSubscribers(
-        createStore<Store>()(() => ({ ...initialState, ...(typeof data === 'function' ? data(initialState) : data) }))
-      )
-    );
-    // Last applied `data`, so the mount effect doesn't apply the initial `data` a second time.
-    const appliedDataRef = useRef<StorePatch | null>(data);
+    const storeRef = useRef<StoreApi<Store> | null>(null);
+
+    // Created once per provider, with `data` applied so the first render already includes it.
+    if (!storeRef.current) {
+      const patch = typeof data === 'function' ? data(initialState) : (data ?? {});
+
+      storeRef.current = trackSubscribers(createStore<Store>()(() => ({ ...initialState, ...patch })));
+    }
 
     useEffect(() => {
-      if (Object.is(appliedDataRef.current, data)) return;
+      // Re-applies `data` whenever it changes; the initial value is already in the store.
+      if (!storeRef.current || !data) return;
 
-      appliedDataRef.current = data;
-      applyPatch(store, data);
-    }, [data, store]);
+      // Spreading `prev` gives the root a new reference so subscribers are notified.
+      storeRef.current.setState(prev => ({ ...prev, ...(typeof data === 'function' ? data(prev) : data) }));
+    }, [data]);
 
-    return <StoreContext.Provider value={store}>{children}</StoreContext.Provider>;
+    return <StoreContext.Provider value={storeRef.current}>{children}</StoreContext.Provider>;
   });
 
   StoreProvider.displayName = 'StoreProvider';
 
-  // Shallow comparison keeps selectors that return new arrays or objects from re-rendering in a loop.
-  const useStore = <T,>(selector: (state: Store) => T): T =>
-    useZustandStore(useContext(StoreContext) ?? fallbackStore, useShallow(selector));
-
-  const useSetStore = () => {
+  // Throws instead of falling back, so a missing provider is caught as a setup error.
+  const useStoreContext = (hook: string): StoreApi<Store> => {
     const store = useContext(StoreContext);
+    if (!store) throw new Error(`[createAppStore] \`${hook}\` must be used within a StoreProvider.`);
 
-    return useCallback((patch: StorePatch) => applyPatch(store, patch), [store]);
+    return store;
   };
 
-  const useStoreApi = (): StoreApi<Store> => useContext(StoreContext);
+  const useStore = <T,>(selector: (state: Store) => T): T => {
+    const store = useStoreContext('useStore');
+
+    // `useShallow` stops selectors that return new arrays or objects from re-rendering on every update.
+    return useZustandStore(store, useShallow(selector));
+  };
+
+  const useSetStore = () => {
+    const store = useStoreContext('useSetStore');
+
+    return useCallback(
+      (patch: StorePatch) => {
+        // The root is always copied so subscribers are notified, even when the updater only mutated in place.
+        store.setState(prev => ({ ...prev, ...(typeof patch === 'function' ? patch(prev) : patch) }));
+      },
+      [store]
+    );
+  };
+
+  // Gives direct access to the store, for reading or subscribing outside of React renders.
+  const useStoreApi = (): StoreApi<Store> => useStoreContext('useStoreApi');
 
   // Active `subscribe` calls on this store; always 0 outside development.
   const useSubscriberCount = (): number => {
-    const counter = subscriberCounters.get(useContext(StoreContext) ?? fallbackStore) ?? NO_COUNTER;
+    const counter = subscriberCounters.get(useStoreContext('useSubscriberCount')) ?? NO_COUNTER;
 
     return useSyncExternalStore(counter.subscribe, counter.getCount);
   };
