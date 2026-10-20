@@ -1,4 +1,4 @@
-import { deepmerge } from '@mui/utils';
+import _ from 'lodash';
 import type { z } from 'zod';
 
 /**
@@ -19,7 +19,9 @@ export const loadPreferenceFromLocalStorage = (
   try {
     const raw = localStorage.getItem(key);
     const stored = raw == null ? {} : (JSON.parse(raw) as unknown);
-    const merged = deepmerge(current as Record<string, unknown>, (stored ?? {}) as Record<string, unknown>);
+    const merged = _.mergeWith({}, current, stored ?? {}, (_current: unknown, source: unknown) =>
+      Array.isArray(source) ? source : undefined
+    );
     return schema.parse(merged) as AppPreferenceStore;
   } catch {
     return schema.parse(current) as AppPreferenceStore;
