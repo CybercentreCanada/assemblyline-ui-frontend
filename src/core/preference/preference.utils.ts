@@ -7,13 +7,12 @@ import type { z } from 'zod';
  * @param schema - Zod schema to validate stored data against
  * @param store - Current store values used as the merge base
  * @param key - localStorage key
- * @returns Full preference state after merge and schema validation
+ * @returns Preference state with the same shape as `store`, after merge and schema validation
  */
-export const loadPreferenceFromLocalStorage = (
-  schema: z.ZodObject<z.ZodRawShape>,
-  store: AppPreferenceStore,
-  key: string
-): AppPreferenceStore => {
+export const loadPreferenceFromLocalStorage = function <
+  Schema extends z.ZodObject<z.ZodRawShape>,
+  Store extends z.infer<Schema> = z.infer<Schema>
+>(schema: Schema, store: Store, key: string): Store {
   const current = store !== null && typeof store === 'object' ? store : schema.parse({});
 
   try {
@@ -22,9 +21,9 @@ export const loadPreferenceFromLocalStorage = (
     const merged = _.mergeWith({}, current, stored ?? {}, (_current: unknown, source: unknown) =>
       Array.isArray(source) ? source : undefined
     );
-    return schema.parse(merged) as AppPreferenceStore;
+    return schema.parse(merged) as Store;
   } catch {
-    return schema.parse(current) as AppPreferenceStore;
+    return schema.parse(current) as Store;
   }
 };
 
@@ -57,15 +56,14 @@ const deepDiff = (current: Record<string, unknown>, defaults: Record<string, unk
  * @name savePreferenceToLocalStorage
  * @description Persists only the differences between current preference and schema defaults.
  * @param schema - Zod schema used to derive defaults
- * @param preference - Current preference state
+ * @param store - Current preference state
  * @param key - localStorage key
  * @returns void
  */
-export const savePreferenceToLocalStorage = (
-  schema: z.ZodObject<z.ZodRawShape>,
-  store: AppPreferenceStore,
-  key: string
-): void => {
+export const savePreferenceToLocalStorage = function <
+  Schema extends z.ZodObject<z.ZodRawShape>,
+  Store extends z.infer<Schema> = z.infer<Schema>
+>(schema: Schema, store: Store, key: string): void {
   const defaults = schema.parse({});
   const current = store !== null && typeof store === 'object' ? store : {};
   const diff = deepDiff(current as Record<string, unknown>, defaults);
