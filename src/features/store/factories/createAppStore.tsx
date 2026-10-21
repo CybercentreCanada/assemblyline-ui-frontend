@@ -65,6 +65,7 @@ export const createAppStore = <Store extends object>(initialState: Store) => {
 
   const StoreProvider = memo(({ children, data = null }: PropsWithChildren<{ data?: StorePatch }>) => {
     const storeRef = useRef<StoreApi<Store> | null>(null);
+    const appliedDataRef = useRef<StorePatch | null>(data);
 
     // Created once per provider, with `data` applied so the first render already includes it.
     if (!storeRef.current) {
@@ -74,7 +75,10 @@ export const createAppStore = <Store extends object>(initialState: Store) => {
     }
 
     useEffect(() => {
-      // Re-applies `data` whenever it changes; the initial value is already in the store.
+      // The initial `data` is already in the store; applying it again would undo what child effects changed.
+      if (Object.is(appliedDataRef.current, data)) return;
+
+      appliedDataRef.current = data;
       if (!storeRef.current || !data) return;
 
       // Spreading `prev` gives the root a new reference so subscribers are notified.
