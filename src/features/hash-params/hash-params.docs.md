@@ -2,15 +2,15 @@
 
 ## 1. Purpose
 
-Typed parsing and serialization for a single value in a URL hash fragment. The module defines hash blueprints, creates codecs for reading and writing hash values, and integrates with application routes through `core/routes`.
+Typed parsing and serialization for a single value in a URL hash fragment. The module defines hash blueprints and creates codecs for reading and writing a React Router `Location` hash.
 
 ## 2. Features
 
 - **Single value** - Resolves one string, number, or boolean value rather than an object of values
 - **Blueprint-based parsing** - Supports unrestricted strings and fixed enum values
-- **URL encoding** - Decodes hash values during parsing and encodes them during serialization
+- **URL encoding** - Decodes hash values during parsing and applies URI encoding during serialization
 - **Optional defaults** - Returns a configured default or `undefined` for missing and unmatched values
-- **Route integration** - Provides the codec consumed by `createAppRoute`
+- **Typed codec API** - Preserves the configured blueprint and its parse and stringify types
 
 ## 3. Concepts
 
@@ -18,9 +18,9 @@ Typed parsing and serialization for a single value in a URL hash fragment. The m
 
 `InferHashParamBlueprintFromValue<Value>` defines how one hash value is handled:
 
-- `type` is a representative value used for type inference.
-- `parse(value)` converts a decoded hash value into the typed value.
-- `stringify(value)` converts the typed value into a hash fragment value.
+- `type` is the representative value used for inference; for an enum it is the first option.
+- `parse(value)` converts decoded text to the configured value, or returns `undefined` when no value matches and no default is configured.
+- `stringify(value)` converts the typed value into hash-fragment text.
 
 ### Codec
 
@@ -30,6 +30,8 @@ Typed parsing and serialization for a single value in a URL hash fragment. The m
 - `type` - A typed value used for inference
 - `parse(location)` - Reads and converts `location.hash`
 - `stringify(value)` - Produces an encoded hash beginning with `#`
+
+Pass the allowed value union as the `Value` type argument to `createHashParamCodec`; the callback does not infer it. If omitted, `Value` widens to `HashParamValue`. `type` retains the blueprint's representative value type, `parse` uses the blueprint parser's return type (including `undefined` where applicable), and `stringify` accepts the blueprint serializer's input type.
 
 ### Hash Value
 
@@ -41,20 +43,24 @@ Typed parsing and serialization for a single value in a URL hash fragment. The m
 
 | Blueprint | Default | Behavior |
 | --- | --- | --- |
-| `string(defaultValue?)` | `''` | Returns the hash value or the default when the hash is missing |
-| `enum(values, defaultValue?)` | `undefined` | Returns a matching value or the default |
+| `string(defaultValue?)` | `''` | Returns the decoded hash value; uses the default for a missing or empty hash |
+| `enum(values, defaultValue?)` | `undefined` | Returns a matching option; uses the default for a missing, empty, or unmatched hash |
+
+Distinct enum options must not share a string representation. For example, `[1, '1']` is rejected because both options serialize to the same hash text.
 
 ### Creating A Codec
 
 ```typescript
 import { createHashParamCodec } from 'features/hash-params';
 
-const codec = createHashParamCodec()(({ enum: createEnum }) =>
+type DocumentationSection = 'overview' | 'installation' | 'usage';
+
+const codec = createHashParamCodec<DocumentationSection>()(({ enum: createEnum }) =>
   createEnum(['overview', 'installation', 'usage'])
 );
 ```
 
-The callback receives `HASH_PARAM_BLUEPRINTS`, which exposes the `string` and `enum` blueprint factories.
+The callback receives `HASH_PARAM_BLUEPRINTS`, which exposes the `string` and `enum` blueprint factories. Keep the `Value` union aligned with the blueprint's configured values.
 
 ## 5. Usage
 
@@ -72,44 +78,13 @@ const location: Location = {
 };
 
 const value = codec.parse(location);
-// value: 'overview' | 'installation' | 'usage' | undefined
+// value: DocumentationSection | undefined
 
 const hash = codec.stringify(value);
 // hash: '#usage'
 ```
 
-In the application, `createAppRoute` creates and owns the codec from its `path` and `hash` options. Route components read the parsed value through `useAppHashParams`:
-
-```typescript
-import { useAppHashParams } from 'core/router';
-import { HASH_PARAM_BLUEPRINTS } from 'features/hash-params';
-
-const documentationHash = (blueprints: typeof HASH_PARAM_BLUEPRINTS) =>
-  blueprints.enum(['overview', 'installation', 'usage']);
-
-// Passed to createAppRoute({ path: '/docs', hash: documentationHash, ... })
-
-const DocumentationPage = () => {
-  const section = useAppHashParams<'/docs'>();
-  return <div>{section}</div>;
-};
-```
-
-The route definition must also provide its component, labels, icons, and other required route options:
-
-```typescript
-import { createAppRoute } from 'core/router';
-
-const DocumentationRoute = createAppRoute({
-  component: <DocumentationPage />,
-  hash: documentationHash,
-  path: '/docs',
-  shortname: () => ['app_route.docs.shortname'],
-  fullname: () => ['app_route.docs.fullname'],
-  shorticon: () => <span />,
-  fullicon: () => <span />
-});
-```
+For an enum codec, `value` is `DocumentationSection | undefined`, and `codec.stringify(value)` accepts that same union. The `type` property is the enum's representative value at runtime and is typed as `DocumentationSection`.
 
 ## 6. Codebase (Internals)
 
@@ -133,10 +108,9 @@ const DocumentationRoute = createAppRoute({
 
 ### Data Flow And Boundaries
 
-The input boundary is a route `Location` and its hash. The codec removes the leading `#`, decodes the value, and passes it to the blueprint parser. Serialization runs the blueprint serializer and encodes the result. Missing, unmatched, or invalid values use the blueprint default or resolve to `undefined`; empty serialized values return an empty string.
+The input is a React Router `Location`. Parsing removes one leading `#`, attempts to decode the fragment, then passes the result to the blueprint parser. A string blueprint uses its default for missing or empty input; an enum uses its configured default or returns `undefined` when the value is missing or unmatched. Serialization runs the blueprint serializer; empty output becomes an empty hash, while non-empty output is passed to `encodeURIComponent` and prefixed with `#`.
 
 ## 7. Related Modules
 
-- `core/routes/` - Creates hash codecs for application routes and exposes parsed values through route hooks
 - `features/path-params/` - Provides the parallel typed codec system for path parameters
 - `features/search-params/` - Provides the parallel typed codec system for query parameters

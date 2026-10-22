@@ -25,6 +25,16 @@ describe('hash-params.codec', () => {
       expectTypeOf<Parameters<Codec['stringify']>[0]>().toEqualTypeOf<'title' | 'section-1' | undefined>();
     });
 
+    it('infers enum codec members from the configured blueprint', () => {
+      const codec = createHashParamCodec<'title' | 'section'>()(blueprint =>
+        blueprint.enum(['title', 'section'] as const)
+      );
+
+      expectTypeOf<typeof codec.type>().toEqualTypeOf<'title' | 'section'>();
+      expectTypeOf<ReturnType<typeof codec.parse>>().toEqualTypeOf<'title' | 'section' | undefined>();
+      expectTypeOf<Parameters<typeof codec.stringify>[0]>().toEqualTypeOf<'title' | 'section' | undefined>();
+    });
+
     it('rejects enum options with colliding string representations', () => {
       expect(() => HASH_PARAM_BLUEPRINTS.enum([1, '1'] as const)).toThrow(
         'Enum options must have unique string representations.'

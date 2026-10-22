@@ -1,4 +1,8 @@
-import type { HashParamValue, InferHashParamBlueprintFromValue } from 'features/hash-params';
+import type {
+  HashParamValue,
+  InferHashParamBlueprintFromValue,
+  InferHashParamCodecFromBlueprint
+} from 'features/hash-params';
 import type { Location } from 'react-router';
 
 //*****************************************************************************************
@@ -88,12 +92,12 @@ export const getDefaultHashParamBlueprint = function <
 export function createHashParamCodec<const Value extends HashParamValue>() {
   return function <const Blueprint extends InferHashParamBlueprintFromValue<Value>>(
     input: (blueprints: typeof HASH_PARAM_BLUEPRINTS) => Blueprint
-  ) {
-    const blueprint = input(HASH_PARAM_BLUEPRINTS) ?? (getDefaultHashParamBlueprint() as Blueprint);
+  ): InferHashParamCodecFromBlueprint<Blueprint> {
+    const blueprint = input(HASH_PARAM_BLUEPRINTS) ?? (getDefaultHashParamBlueprint<Value>() as Blueprint);
 
-    const type: Value = blueprint.type as never;
+    const type = blueprint.type;
 
-    const parse = (location: Location): Value => {
+    const parse = (location: Location): ReturnType<Blueprint['parse']> => {
       const hash = typeof location?.hash === 'string' ? location.hash : '';
       // Remove leading '#'
       const rawValue = hash.startsWith('#') ? hash.slice(1) : hash;
@@ -106,11 +110,11 @@ export function createHashParamCodec<const Value extends HashParamValue>() {
         decodedValue = rawValue;
       }
 
-      return blueprint.parse(decodedValue || undefined);
+      return blueprint.parse(decodedValue || undefined) as ReturnType<Blueprint['parse']>;
     };
 
-    const stringify = (value: Value): string => {
-      const stringified = blueprint.stringify(value as never);
+    const stringify = (value: Parameters<Blueprint['stringify']>[0]): string => {
+      const stringified = blueprint.stringify(value);
       if (!stringified) return '';
 
       try {
