@@ -97,7 +97,7 @@ export function createPathParamsCodec<const Path extends RoutePath>(
     const blueprintMap = blueprints as Record<string, InferPathParamBlueprintFromValue>;
     const blueprintKeys = Object.keys(blueprints || {});
 
-    const type: InferPathParamValuesFromBlueprintMap<Blueprints> = {} as never;
+    const type = Object.create(null) as InferPathParamValuesFromBlueprintMap<Blueprints>;
     for (const key of blueprintKeys) {
       type[key as keyof typeof type] = blueprintMap[key].type as never;
     }
@@ -105,7 +105,7 @@ export function createPathParamsCodec<const Path extends RoutePath>(
     const parse = (location: Location): InferPathParamValuesFromBlueprintMap<Blueprints> => {
       const safePathname = typeof location?.pathname === 'string' ? location?.pathname : '';
       const safeBasePath = typeof basePath === 'string' ? basePath : '';
-      const raw: Record<string, string | undefined> = {};
+      const raw: Record<string, string | undefined> = Object.create(null);
       const pathnameParts = safePathname.replace(/^\//, '').split('/');
       const baseParts = safeBasePath.replace(/^\//, '').split('/');
 
@@ -131,7 +131,7 @@ export function createPathParamsCodec<const Path extends RoutePath>(
         raw[paramKey] = decodedCandidate;
       }
 
-      const parsed = {} as InferPathParamValuesFromBlueprintMap<Blueprints>;
+      const parsed = Object.create(null) as InferPathParamValuesFromBlueprintMap<Blueprints>;
       for (const key of blueprintKeys) {
         const parser = blueprintMap[key];
         parsed[key as keyof typeof parsed] = parser ? (parser.parse(raw[key]) as never) : (raw[key] as never);

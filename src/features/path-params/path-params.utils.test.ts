@@ -145,6 +145,19 @@ describe('createPathParamsCodec', () => {
     expect(codec.parse(makeLocation('/item/abc'))).toEqual({ itemID: 'abc' });
   });
 
+  it('round-trips a __proto__ path parameter as an own property', () => {
+    const codec = createPathParamsCodec('/item/:__proto__')(b => ({ ['__proto__']: b.string() }));
+    const parsed = codec.parse(makeLocation('/item/abc'));
+
+    expect(Object.getPrototypeOf(codec.type)).toBe(null);
+    expect(Object.prototype.hasOwnProperty.call(codec.type, '__proto__')).toBe(true);
+    expect(codec.type['__proto__']).toBe('');
+    expect(Object.getPrototypeOf(parsed)).toBe(null);
+    expect(Object.prototype.hasOwnProperty.call(parsed, '__proto__')).toBe(true);
+    expect(parsed['__proto__']).toBe('abc');
+    expect(codec.stringify(parsed)).toBe('/item/abc');
+  });
+
   it('parses a slashless root-level route pattern', () => {
     const codec = createPathParamsCodec('item/:itemID')(b => ({ itemID: b.string() }));
     expect(codec.parse(makeLocation('/item/abc'))).toEqual({ itemID: 'abc' });
