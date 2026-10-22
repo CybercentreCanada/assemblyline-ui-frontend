@@ -33,11 +33,9 @@ describe('Test `Form Utilities`', () => {
   });
 
   it('testing the `setValueFromPath()`', () => {
-    expect(
-      (setValueFromPath as (s: object, p: never, v: never) => unknown)({ a: 1, b: 2 }, 'a' as never, 9 as never)
-    ).toEqual({ a: 9, b: 2 });
-    expect(
-      (setValueFromPath as (s: object, p: never, v: never) => unknown)({ a: { b: 1 } }, ['a', 'b'] as never, 5 as never)
-    ).toEqual({ a: { b: 5 } });
+    const nestedPath: ['a', 'b'] = ['a', 'b'];
+
+    expect(setValueFromPath({ a: 1, b: 2 }, ['a'], 9)).toEqual({ a: 9, b: 2 });
+    expect(setValueFromPath({ a: { b: 1 } }, nestedPath, 5)).toEqual({ a: { b: 5 } });
   });
 });
