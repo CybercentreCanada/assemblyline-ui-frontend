@@ -40,24 +40,36 @@ export const PATH_PARAM_BLUEPRINTS_MAP = {
   enum: <const Values extends readonly [string | boolean | number, ...(string | boolean | number)[]]>(
     values: Values,
     defaultValue: Values[number] = values[0]
-  ): InferPathParamBlueprintFromValue<Values[number]> => ({
-    type: defaultValue,
-    kind: 'enum',
-    options: values,
-    parse: value => {
-      if (value == null) return defaultValue;
-      for (const candidate of values) {
-        if (String(candidate) === value) return candidate;
+  ): InferPathParamBlueprintFromValue<Values[number]> => {
+    const optionByString = new Map<string, Values[number]>();
+
+    for (const option of values) {
+      const serialized = String(option);
+      if (optionByString.has(serialized) && !Object.is(optionByString.get(serialized), option)) {
+        throw new TypeError('Enum options must have unique string representations.');
       }
-      return defaultValue;
-    },
-    stringify: value => {
-      for (const candidate of values) {
-        if (String(candidate) === String(value)) return String(candidate);
-      }
-      return String(defaultValue);
+      optionByString.set(serialized, option);
     }
-  })
+
+    return {
+      type: defaultValue,
+      kind: 'enum',
+      options: values,
+      parse: value => {
+        if (value == null) return defaultValue;
+        for (const candidate of values) {
+          if (String(candidate) === value) return candidate;
+        }
+        return defaultValue;
+      },
+      stringify: value => {
+        for (const candidate of values) {
+          if (String(candidate) === String(value)) return String(candidate);
+        }
+        return String(defaultValue);
+      }
+    };
+  }
 };
 
 //*****************************************************************************************

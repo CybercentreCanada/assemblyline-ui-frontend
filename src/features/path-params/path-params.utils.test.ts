@@ -95,6 +95,15 @@ describe('PATH_PARAM_BLUEPRINTS_MAP.enum', () => {
     expect(blueprint.type).toBe('x');
   });
 
+  it('rejects distinct options with the same string representation', () => {
+    expect(() => PATH_PARAM_BLUEPRINTS_MAP.enum([1, '1'] as const)).toThrow(
+      'Enum options must have unique string representations.'
+    );
+    expect(() => PATH_PARAM_BLUEPRINTS_MAP.enum([true, 'true'] as const)).toThrow(
+      'Enum options must have unique string representations.'
+    );
+  });
+
   it('stringifies enum values to strings', () => {
     const blueprint = PATH_PARAM_BLUEPRINTS_MAP.enum([1, 2, 3] as const);
     expect(blueprint.stringify(2)).toBe('2');
