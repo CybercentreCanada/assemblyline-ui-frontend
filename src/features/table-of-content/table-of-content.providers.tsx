@@ -1,56 +1,73 @@
 import { createFormContext } from 'features/form';
-import React, { useCallback, useContext, useEffect, useMemo, useRef } from 'react';
+import type { TableOfContentAnchor, TableOfContentStore } from 'features/table-of-content';
+import type { MutableRefObject, PropsWithChildren, ReactNode, SyntheticEvent } from 'react';
+import { createContext, memo, useCallback, useContext, useEffect, useMemo, useRef } from 'react';
 
-export type TableOfContentAnchor = {
-  id: string;
-  label: string;
-  subheader: boolean;
-};
+//*****************************************************************************************
+// Table of Content Store
+//*****************************************************************************************
 
-export type TableOfContentStore = {
-  activeID: string | null;
-  anchors: TableOfContentAnchor[];
-};
-
-export type TableOfContentContextProps = {
-  rootRef: React.MutableRefObject<HTMLDivElement | null>;
-  headerRef: React.MutableRefObject<HTMLDivElement | null>;
-  loadAnchors: (props?: Partial<TableOfContentAnchor>) => void;
-  scrollTo: (event: React.SyntheticEvent, id: string) => void;
-  Anchors: React.FC<{ children: (anchors: TableOfContentAnchor[]) => React.ReactNode }>;
-  ActiveAnchor: React.FC<{ activeID: string | null; children: (active: boolean) => React.ReactNode }>;
-};
-
-const TABLE_OF_CONTENT_STORE: TableOfContentStore = Object.freeze({
+/** Default state for a table-of-content store. */
+export const DEFAULT_TABLE_OF_CONTENT_STORE: TableOfContentStore = {
   activeID: null,
   anchors: []
-});
+};
 
-const { FormProvider, useForm } = createFormContext<TableOfContentStore>({
-  defaultValues: structuredClone(TABLE_OF_CONTENT_STORE)
-});
+export const { FormProvider: TableOfContentFormProvider, useForm: useTableOfContentForm } =
+  createFormContext<TableOfContentStore>({
+    defaultValues: structuredClone(DEFAULT_TABLE_OF_CONTENT_STORE)
+  });
 
-export const TableOfContentContext = React.createContext<TableOfContentContextProps | null>(null);
+//*****************************************************************************************
+// Table of Content Context
+//*****************************************************************************************
+
+/** Context API exposed by the table-of-content provider. */
+export type TableOfContentContextProps = {
+  /** Ref for the scrollable content root. */
+  rootRef: MutableRefObject<HTMLDivElement | null>;
+  /** Ref for the fixed header within the content root. */
+  headerRef: MutableRefObject<HTMLDivElement | null>;
+  /** Registers or refreshes an anchor. */
+  loadAnchors: (props?: Partial<TableOfContentAnchor>) => void;
+  /** Scrolls the content root to an anchor. */
+  scrollTo: (event: SyntheticEvent, id: string) => void;
+  /** Renders registered anchors. */
+  Anchors: (props: { children: (anchors: TableOfContentAnchor[]) => ReactNode }) => ReactNode;
+  /** Renders content for the active state of an anchor. */
+  ActiveAnchor: (props: { activeID: string | null; children: (active: boolean) => ReactNode }) => ReactNode;
+};
+
+export const TableOfContentContext = createContext<TableOfContentContextProps | null>(null);
 
 export const useTableOfContent = (): TableOfContentContextProps => {
-  const ctx = useContext(TableOfContentContext);
-  if (!ctx) {
+  const context = useContext(TableOfContentContext);
+  if (!context) {
     throw new Error('useTableOfContent must be used inside <TableOfContentProvider>');
   }
-  return ctx;
+  return context;
 };
 
-export type TableOfContentProps = {
+//*****************************************************************************************
+// Table of Content Provider
+//*****************************************************************************************
+
+export type TableOfContentProviderProps = PropsWithChildren<{
+  /** Scroll behavior used when navigating to an anchor. */
   behavior?: ScrollOptions['behavior'];
-  children?: React.ReactNode;
-};
+}>;
 
-export const TableOfContent: React.FC<TableOfContentProps> = React.memo(({ behavior = 'smooth', children }) => {
-  const form = useForm();
-
+export const TableOfContentProvider = memo(({ behavior = 'smooth', children }: TableOfContentProviderProps) => {
+  const form = useTableOfContentForm();
   const rootRef = useRef<HTMLDivElement | null>(null);
   const headerRef = useRef<HTMLDivElement | null>(null);
 
+  /**
+   * @name Anchors
+   * @description Renders content with the current registered table-of-content anchors.
+   * @param props - Render callback receiving the current anchors.
+   * @returns The rendered subscribed content.
+   */
   const Anchors = useMemo<TableOfContentContextProps['Anchors']>(
     () =>
       ({ children: render }) => (
@@ -59,6 +76,12 @@ export const TableOfContent: React.FC<TableOfContentProps> = React.memo(({ behav
     [form]
   );
 
+  /**
+   * @name ActiveAnchor
+   * @description Renders content based on whether the requested anchor is currently active.
+   * @param props - Anchor identifier and render callback.
+   * @returns The rendered subscribed content.
+   */
   const ActiveAnchor = useMemo<TableOfContentContextProps['ActiveAnchor']>(
     () =>
       ({ activeID, children: render }) => (
@@ -67,27 +90,38 @@ export const TableOfContent: React.FC<TableOfContentProps> = React.memo(({ behav
     [form]
   );
 
-  const findActive = useCallback(() => {
+  /**
+   * @name findActive
+   * @description Finds the last anchor above the header boundary and stores it as active.
+   * @returns Nothing when no scrollable root or header is available.
+   */
+  const findActive = useCallback((): void => {
     const root = rootRef.current;
     const header = headerRef.current;
     if (!root || !header) return;
 
     const headerOffset = header.getBoundingClientRect().height;
     const rootTop = root.getBoundingClientRect().top;
-
     const elements = root.querySelectorAll('[data-anchor]');
-    for (let i = elements.length - 1; i >= 0; i--) {
-      const el = elements.item(i);
-      if (!el) continue;
 
-      if (el.getBoundingClientRect().top - 2 <= rootTop + headerOffset) {
-        const id = el.getAttribute('data-anchor');
+    for (let index = elements.length - 1; index >= 0; index -= 1) {
+      const element = elements.item(index);
+      if (!element) continue;
+
+      if (element.getBoundingClientRect().top - 2 <= rootTop + headerOffset) {
+        const id = element.getAttribute('data-anchor');
         if (id) form.setFieldValue('activeID', id);
         break;
       }
     }
   }, [form]);
 
+  /**
+   * @name loadAnchors
+   * @description Reads anchors from the content root and refreshes the registered anchor state.
+   * @param props - Optional anchor metadata to apply to the matching element.
+   * @returns Nothing when no scrollable root is available.
+   */
   const loadAnchors = useCallback<TableOfContentContextProps['loadAnchors']>(
     ({ id, label, subheader = false } = {}) => {
       const root = rootRef.current;
@@ -97,21 +131,15 @@ export const TableOfContent: React.FC<TableOfContentProps> = React.memo(({ behav
       const previous = form.getFieldValue('anchors');
       const next: TableOfContentAnchor[] = [];
 
-      elements.forEach(el => {
-        const anchorID = el.getAttribute('data-anchor');
+      elements.forEach(element => {
+        const anchorID = element.getAttribute('data-anchor');
         if (!anchorID) return;
 
         if (id === anchorID) {
-          // Updated anchor
-          next.push({
-            id,
-            label: label ?? '',
-            subheader
-          });
+          next.push({ id, label: label ?? '', subheader });
         } else {
-          // Existing anchor
-          const previousIndex = previous.findIndex(a => a.id === anchorID);
-          if (previousIndex >= 0) next.push(previous[previousIndex]);
+          const previousAnchor = previous.find(anchor => anchor.id === anchorID);
+          if (previousAnchor) next.push(previousAnchor);
         }
       });
 
@@ -121,6 +149,13 @@ export const TableOfContent: React.FC<TableOfContentProps> = React.memo(({ behav
     [form]
   );
 
+  /**
+   * @name scrollTo
+   * @description Scrolls the content root to an anchor while accounting for the fixed header height.
+   * @param event - Event whose default navigation and propagation should be prevented.
+   * @param id - Anchor identifier to locate and scroll into view.
+   * @returns Nothing when the root, header, or target anchor is unavailable.
+   */
   const scrollTo = useCallback<TableOfContentContextProps['scrollTo']>(
     (event, id) => {
       event.preventDefault();
@@ -130,13 +165,12 @@ export const TableOfContent: React.FC<TableOfContentProps> = React.memo(({ behav
       const header = headerRef.current;
       if (!root || !header) return;
 
-      const el = root.querySelector<HTMLDivElement>(`[data-anchor='${id}']`);
-      if (!el) return;
+      const element = root.querySelector<HTMLDivElement>(`[data-anchor='${id}']`);
+      if (!element) return;
 
       const headerOffset = header.getBoundingClientRect().height;
-
       root.scrollTo({
-        top: el.offsetTop - root.offsetTop - headerOffset,
+        top: element.offsetTop - root.offsetTop - headerOffset,
         behavior
       });
     },
@@ -152,25 +186,22 @@ export const TableOfContent: React.FC<TableOfContentProps> = React.memo(({ behav
   }, [findActive]);
 
   return (
-    <TableOfContentContext.Provider
-      value={{
-        rootRef,
-        headerRef,
-        loadAnchors,
-        scrollTo,
-        Anchors,
-        ActiveAnchor
-      }}
-    >
+    <TableOfContentContext.Provider value={{ rootRef, headerRef, loadAnchors, scrollTo, Anchors, ActiveAnchor }}>
       {children}
     </TableOfContentContext.Provider>
   );
 });
 
-export const TableOfContentProvider = React.memo((props: TableOfContentProps) => (
-  <FormProvider>
-    <TableOfContent {...props} />
-  </FormProvider>
+TableOfContentProvider.displayName = 'TableOfContentProvider';
+
+//*****************************************************************************************
+// Table of Content Layout
+//*****************************************************************************************
+
+export const TableOfContentLayout = memo(({ behavior, children }: TableOfContentProviderProps) => (
+  <TableOfContentFormProvider>
+    <TableOfContentProvider behavior={behavior}>{children}</TableOfContentProvider>
+  </TableOfContentFormProvider>
 ));
 
-export default TableOfContentProvider;
+TableOfContentLayout.displayName = 'TableOfContentLayout';
