@@ -1,7 +1,7 @@
 import type { NestedTypeUsingTuplesAgain2, ValidPathTuples } from 'features/form';
 
 /** Represents a recursively addressable form value with a path resolver. */
-export type FieldPath<Data> = Data extends unknown[]
+export type FieldPath<Data> = Data extends readonly unknown[]
   ? { [K in keyof Data]: FieldPath<Data[K]> }
   : Data extends object
     ? { [K in keyof Data]: FieldPath<Data[K]> } & { toPath: () => string }
