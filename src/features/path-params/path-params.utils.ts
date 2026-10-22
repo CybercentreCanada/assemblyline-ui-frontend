@@ -3,14 +3,11 @@ import type {
   InferPathParamBlueprintMapFromPath,
   InferPathParamStringifyValuesFromBlueprintMap,
   InferPathParamValuesFromBlueprintMap,
-  PathAssignment,
-  PathMatch,
-  PathMatchContext,
-  PathMatchFinder,
   PathPattern,
   PathPatternSegment,
   RoutePath,
-  RoutePathWithoutOptionalStaticSegments
+  RoutePathWithoutOptionalStaticSegments,
+  RoutePathWithTrailingOptionalParamsOnly
 } from 'features/path-params';
 import type { Location } from 'react-router';
 
@@ -146,29 +143,24 @@ export const splitPathname = (pathname: string): string[] =>
   (pathname.startsWith('/') ? pathname.slice(1) : pathname).split('/');
 
 /**
- * @name createPathMatchContext
- * @description Creates the state shared by every step of one pathname match.
+ * @name assertSupportedPathPattern
+ * @description Throws for patterns the codec cannot handle: optional static segments, and optional params that are followed by a required segment. Optional params are only supported at the end of the path.
  * @param pattern - Pattern created by `parsePathPattern`
- * @param pathname - Location pathname to match
- * @returns A fresh match context with an empty memo
+ * @returns Nothing; throws a `TypeError` for unsupported patterns
  */
-export const createPathMatchContext = (pattern: PathPattern, pathname: string): PathMatchContext => ({
-  segments: pattern.segments,
-  pathParts: splitPathname(pathname),
-  isRoot: pathname === '/',
-  decodedParts: [],
-  memo: new Map()
-});
-
-/**
- * @name getDecodedPathPart
- * @description Decodes a pathname segment once and caches it on the context.
- * @param context - Match context
- * @param index - Index into the pathname segments
- * @returns The decoded segment
- */
-export const getDecodedPathPart = (context: PathMatchContext, index: number): string =>
-  (context.decodedParts[index] ??= decodePathSegment(context.pathParts[index]));
+export const assertSupportedPathPattern = (pattern: PathPattern): void => {
+  let optionalParamSeen = false;
+  for (const segment of pattern.segments) {
+    if (segment.kind === 'static' && segment.raw.endsWith('?')) {
+      throw new TypeError('Optional static path segments are not supported.');
+    }
+    if (segment.kind === 'param' && segment.optional) {
+      optionalParamSeen = true;
+    } else if (optionalParamSeen) {
+      throw new TypeError('Optional path parameters are only supported at the end of the path.');
+    }
+  }
+};
 
 /**
  * @name isPathConsumed
@@ -181,129 +173,35 @@ export const isPathConsumed = (pathParts: string[], pathIndex: number): boolean 
   pathIndex === pathParts.length || (pathIndex === pathParts.length - 1 && pathParts[pathIndex] === '');
 
 /**
- * @name prependPathAssignment
- * @description Adds one parameter assignment in front of an already matched suffix.
- * @param rest - Match of the remaining pattern, or `null` when it did not match
- * @param key - Parameter key
- * @param value - Raw decoded value, or `undefined` when the parameter was omitted
- * @param missing - Number of missing required parameters this assignment adds
- * @returns The extended match, or `null` when `rest` is `null`
- */
-export const prependPathAssignment = (
-  rest: PathMatch | null,
-  key: string,
-  value: string | undefined,
-  missing: number
-): PathMatch | null =>
-  rest && {
-    missingRequired: rest.missingRequired + missing,
-    assignments: { key, value, next: rest.assignments }
-  };
-
-/**
- * @name selectPathMatch
- * @description Chooses between consuming a segment as an optional parameter and omitting it. The match with fewer missing required parameters wins; ties go to the consuming match.
- * @param included - Match that consumed the segment, or `null`
- * @param omitted - Match that omitted the parameter, or `null`
- * @returns The preferred match, or `null` when neither matched
- */
-export const selectPathMatch = (included: PathMatch | null, omitted: PathMatch | null): PathMatch | null => {
-  if (!included) return omitted;
-  if (!omitted) return included;
-  return omitted.missingRequired < included.missingRequired ? omitted : included;
-};
-
-/**
- * @name resolvePathMatch
- * @description Matches the pattern suffix from `segmentIndex` against the pathname suffix from `pathIndex`, without memoization. Recursion goes through `find` so callers can memoize it.
- * @param context - Match context
- * @param segmentIndex - Index of the next pattern segment
- * @param pathIndex - Index of the next pathname segment
- * @param find - Finder used for the remaining suffix
- * @returns The best match, or `null` when the suffixes do not match
- */
-export const resolvePathMatch = (
-  context: PathMatchContext,
-  segmentIndex: number,
-  pathIndex: number,
-  find: PathMatchFinder
-): PathMatch | null => {
-  const { segments, pathParts, isRoot } = context;
-  if (segmentIndex === segments.length) {
-    return isPathConsumed(pathParts, pathIndex) ? { missingRequired: 0, assignments: null } : null;
-  }
-
-  const segment = segments[segmentIndex];
-  if (segment.kind === 'static') {
-    if (pathIndex >= pathParts.length || segment.normalized !== getDecodedPathPart(context, pathIndex).toLowerCase()) {
-      return null;
-    }
-    return find(context, segmentIndex + 1, pathIndex + 1);
-  }
-
-  const { key, optional } = segment;
-  if (pathIndex >= pathParts.length) {
-    return prependPathAssignment(find(context, segmentIndex + 1, pathIndex), key, undefined, optional ? 0 : 1);
-  }
-  if (optional && isRoot && pathIndex === 0) {
-    return prependPathAssignment(find(context, segmentIndex + 1, pathIndex), key, undefined, 0);
-  }
-
-  const included = prependPathAssignment(
-    find(context, segmentIndex + 1, pathIndex + 1),
-    key,
-    getDecodedPathPart(context, pathIndex),
-    0
-  );
-  if (!optional) return included;
-
-  const omitted = prependPathAssignment(find(context, segmentIndex + 1, pathIndex), key, undefined, 0);
-  return selectPathMatch(included, omitted);
-};
-
-/**
- * @name findPathMatch
- * @description Memoized `resolvePathMatch`, so consecutive optional parameters cannot branch exponentially.
- * @param context - Match context; its memo is updated
- * @param segmentIndex - Index of the next pattern segment
- * @param pathIndex - Index of the next pathname segment
- * @returns The best match, or `null` when the suffixes do not match
- */
-export const findPathMatch: PathMatchFinder = (context, segmentIndex, pathIndex) => {
-  const memoKey = segmentIndex * (context.pathParts.length + 1) + pathIndex;
-  const cached = context.memo.get(memoKey);
-  if (cached !== undefined) return cached;
-
-  const result = resolvePathMatch(context, segmentIndex, pathIndex, findPathMatch);
-  context.memo.set(memoKey, result);
-  return result;
-};
-
-/**
- * @name collectPathParams
- * @description Converts the assignments of the selected match into a null-prototype record, validating supplied values. Validation happens only here so abandoned branches cannot reject a valid omitted-parameter match.
- * @param assignments - Assignments of the selected match
- * @returns Raw values keyed by parameter name; omitted parameters are `undefined`. Throws a `TypeError` for supplied values that are empty or `.` / `..`.
- */
-export const collectPathParams = (assignments: PathAssignment | null): Record<string, string | undefined> => {
-  const params = Object.create(null) as Record<string, string | undefined>;
-  for (let node = assignments; node; node = node.next) {
-    if (node.value !== undefined) assertValidPathParam(node.value);
-    params[node.key] = node.value;
-  }
-  return params;
-};
-
-/**
  * @name matchPathPattern
- * @description Matches a pathname against a parsed pattern and extracts raw parameter values. Static segments compare decoded and case-insensitively. Optional parameters may be omitted; when that makes several matches possible, the one supplying the most required parameters wins.
+ * @description Matches a pathname against a parsed pattern and extracts raw parameter values. Static segments compare decoded and case-insensitively. Missing params, which can only be optional ones at the end, are `undefined`; the root pathname `/` omits a leading optional param.
  * @param pattern - Pattern created by `parsePathPattern`
  * @param pathname - Location pathname to match
- * @returns Raw values keyed by parameter name (`undefined` for omitted parameters), or `null` when the pathname does not match. Throws a `TypeError` for supplied values that are empty or `.` / `..`.
+ * @returns Raw values keyed by parameter name, or `null` when the pathname does not match. Throws a `TypeError` for supplied values that are empty or `.` / `..`.
  */
 export const matchPathPattern = (pattern: PathPattern, pathname: string): Record<string, string | undefined> | null => {
-  const result = findPathMatch(createPathMatchContext(pattern, pathname), 0, 0);
-  return result && collectPathParams(result.assignments);
+  const pathParts = splitPathname(pathname);
+  const isRoot = pathname === '/';
+  const params = Object.create(null) as Record<string, string | undefined>;
+  let pathIndex = 0;
+
+  for (const segment of pattern.segments) {
+    const pathPart = pathParts[pathIndex];
+
+    if (segment.kind === 'static') {
+      if (pathPart === undefined || segment.normalized !== decodePathSegment(pathPart).toLowerCase()) return null;
+      pathIndex += 1;
+    } else if (pathPart === undefined || (segment.optional && isRoot)) {
+      params[segment.key] = undefined;
+    } else {
+      const value = decodePathSegment(pathPart);
+      assertValidPathParam(value);
+      params[segment.key] = value;
+      pathIndex += 1;
+    }
+  }
+
+  return isPathConsumed(pathParts, pathIndex) ? params : null;
 };
 
 /**
@@ -321,192 +219,77 @@ export const serializePathParam = (blueprint: InferPathParamBlueprintFromValue, 
 };
 
 /**
- * @name getSegmentBlueprints
- * @description Looks up the blueprint of every pattern segment, reading only own properties of `blueprints`.
+ * @name findLastSuppliedParamIndex
+ * @description Finds the last optional parameter that has a value. Omitted optionals before it must still be written, or it would shift into an earlier slot.
  * @param pattern - Pattern created by `parsePathPattern`
- * @param blueprints - Blueprints keyed by parameter name
- * @returns One entry per pattern segment; `undefined` for static segments and params without a blueprint
+ * @param values - Parameter values; only own properties are read
+ * @returns The segment index, or `-1` when no optional parameter has a value
  */
-export const getSegmentBlueprints = (
-  pattern: PathPattern,
-  blueprints: Record<string, InferPathParamBlueprintFromValue>
-): (InferPathParamBlueprintFromValue | undefined)[] =>
-  pattern.segments.map(segment => (segment.kind === 'param' ? getOwnValue(blueprints, segment.key) : undefined));
+export const findLastSuppliedParamIndex = (pattern: PathPattern, values: Record<string, unknown>): number =>
+  pattern.segments.findLastIndex(
+    segment => segment.kind === 'param' && segment.optional && getOwnValue(values, segment.key) != null
+  );
 
 /**
  * @name serializePathSegments
- * @description Serializes every pattern segment. Static segments are kept as written and a param without a blueprint keeps its `:param` text.
+ * @description Serializes every pattern segment. Omitted optionals after the last supplied one are dropped; earlier ones are written with their blueprint default. A param without a blueprint keeps its `:param` text.
  * @param pattern - Pattern created by `parsePathPattern`
  * @param values - Parameter values; only own properties are read
- * @param segmentBlueprints - Result of `getSegmentBlueprints`
- * @returns One entry per pattern segment; `null` marks an omitted optional parameter. Throws a `TypeError` for empty or `.` / `..` values and a `URIError` for values that cannot be encoded.
+ * @param blueprints - Blueprints keyed by parameter name; only own properties are read
+ * @returns The encoded segments in pattern order. Throws a `TypeError` for empty or `.` / `..` values, including a default that is not a valid path value, and a `URIError` for values that cannot be encoded.
  */
 export const serializePathSegments = (
   pattern: PathPattern,
   values: Record<string, unknown>,
-  segmentBlueprints: (InferPathParamBlueprintFromValue | undefined)[]
-): (string | null)[] =>
-  pattern.segments.map((segment, index): string | null => {
-    if (segment.kind === 'static') return segment.raw;
+  blueprints: Record<string, InferPathParamBlueprintFromValue>
+): string[] => {
+  const lastSuppliedIndex = findLastSuppliedParamIndex(pattern, values);
 
+  return pattern.segments.flatMap((segment, index) => {
+    if (segment.kind === 'static') return [segment.raw];
+
+    const blueprint = getOwnValue(blueprints, segment.key);
     const value = getOwnValue(values, segment.key);
-    if (segment.optional && value == null) return null;
+    const omitted = segment.optional && value == null;
+    if (omitted && index > lastSuppliedIndex) return [];
+    if (!blueprint) return [segment.raw];
 
-    const blueprint = segmentBlueprints[index];
-    return blueprint ? serializePathParam(blueprint, value) : segment.raw;
+    return [serializePathParam(blueprint, omitted ? blueprint.parse(undefined) : value)];
   });
-
-/**
- * @name getOmittedParamIndexes
- * @description Finds the omitted optional parameters that have a blueprint, which are the only ones whose default can be written.
- * @param encodedParts - Result of `serializePathSegments`
- * @param segmentBlueprints - Result of `getSegmentBlueprints`
- * @returns Segment indexes in pattern order
- */
-export const getOmittedParamIndexes = (
-  encodedParts: (string | null)[],
-  segmentBlueprints: (InferPathParamBlueprintFromValue | undefined)[]
-): number[] => encodedParts.flatMap((part, index) => (part === null && segmentBlueprints[index] ? [index] : []));
-
-/**
- * @name getDefaultPathParam
- * @description Serializes the value a blueprint produces for an omitted parameter.
- * @param blueprint - Blueprint of the parameter
- * @returns The encoded default, or `null` when the default itself is not a valid path value (such as `''`)
- */
-export const getDefaultPathParam = (blueprint: InferPathParamBlueprintFromValue): string | null => {
-  try {
-    return serializePathParam(blueprint, blueprint.parse(undefined));
-  } catch (error) {
-    if (error instanceof TypeError) return null;
-    throw error;
-  }
-};
-
-/**
- * @name getFillableParamIndexes
- * @description Keeps the omitted parameters whose blueprint default is a valid path value; the others can only stay omitted.
- * @param indexes - Segment indexes of omitted parameters, such as the result of `getOmittedParamIndexes`
- * @param segmentBlueprints - Result of `getSegmentBlueprints`
- * @returns The fillable segment indexes, in the order given
- */
-export const getFillableParamIndexes = (
-  indexes: number[],
-  segmentBlueprints: (InferPathParamBlueprintFromValue | undefined)[]
-): number[] => indexes.filter(index => getDefaultPathParam(segmentBlueprints[index]) !== null);
-
-/**
- * @name fillOmittedDefaults
- * @description Returns a copy of the serialized parts in which the listed omitted parameters hold their blueprint default.
- * @param encodedParts - Result of `serializePathSegments`; not modified
- * @param segmentBlueprints - Result of `getSegmentBlueprints`
- * @param indexes - Segment indexes of the omitted parameters to fill
- * @returns The filled parts, or `null` when one of the defaults cannot be serialized
- */
-export const fillOmittedDefaults = (
-  encodedParts: (string | null)[],
-  segmentBlueprints: (InferPathParamBlueprintFromValue | undefined)[],
-  indexes: number[]
-): (string | null)[] | null => {
-  const filled = [...encodedParts];
-  for (const index of indexes) {
-    const defaultPart = getDefaultPathParam(segmentBlueprints[index]);
-    if (defaultPart === null) return null;
-    filled[index] = defaultPart;
-  }
-  return filled;
 };
 
 /**
  * @name joinPathParts
- * @description Joins serialized segments into a pathname, skipping omitted (`null`) ones.
+ * @description Joins serialized segments into a pathname.
  * @param pattern - Pattern created by `parsePathPattern`; decides whether the pathname starts with `/`
  * @param parts - Serialized segments
  * @returns The pathname
  */
-export const joinPathParts = (pattern: PathPattern, parts: (string | null)[]): string =>
-  (pattern.absolute ? '/' : '') + parts.filter(part => part !== null).join('/');
-
-/**
- * @name pathnameRoundTrips
- * @description Checks that parsing a pathname gives back every value that was serialized into it, so a supplied value is never read as a different parameter.
- * @param pattern - Pattern created by `parsePathPattern`
- * @param pathname - Candidate pathname
- * @param encodedParts - Result of `serializePathSegments` for the supplied values
- * @param segmentBlueprints - Result of `getSegmentBlueprints`
- * @returns `true` when the pathname matches the pattern and every parameter parses to its intended value
- */
-export const pathnameRoundTrips = (
-  pattern: PathPattern,
-  pathname: string,
-  encodedParts: (string | null)[],
-  segmentBlueprints: (InferPathParamBlueprintFromValue | undefined)[]
-): boolean => {
-  let params: Record<string, string | undefined> | null;
-  try {
-    params = matchPathPattern(pattern, pathname);
-  } catch (error) {
-    if (error instanceof TypeError) return false;
-    throw error;
-  }
-  if (!params) return false;
-
-  return pattern.segments.every((segment, index) => {
-    const blueprint = segmentBlueprints[index];
-    if (segment.kind === 'static' || !blueprint) return true;
-
-    const encoded = encodedParts[index];
-    const expected = encoded === null ? undefined : decodePathSegment(encoded);
-    return Object.is(blueprint.parse(params[segment.key]), blueprint.parse(expected));
-  });
-};
+export const joinPathParts = (pattern: PathPattern, parts: string[]): string =>
+  (pattern.absolute ? '/' : '') + parts.join('/');
 
 /**
  * @name stringifyPathPattern
- * @description Builds a pathname from a parsed pattern. Omitted optional parameters are dropped when the result still parses back to the same values. Otherwise the blueprint defaults of a growing set of omitted optionals are written, starting with the last one and skipping those whose default is not a valid path value, until it does. A supplied value is therefore never read as a different parameter.
+ * @description Builds a pathname from a parsed pattern and parameter values.
  * @param pattern - Pattern created by `parsePathPattern`
  * @param values - Parameter values; only own properties are read
  * @param blueprints - Blueprints keyed by parameter name; only own properties are read
- * @returns The encoded pathname. Throws a `TypeError` for empty or `.` / `..` values, or when no unambiguous pathname exists, and a `URIError` for values that cannot be encoded.
+ * @returns The encoded pathname. Throws a `TypeError` for empty or `.` / `..` values and a `URIError` for values that cannot be encoded.
  */
 export const stringifyPathPattern = (
   pattern: PathPattern,
   values: Record<string, unknown>,
   blueprints: Record<string, InferPathParamBlueprintFromValue>
-): string => {
-  const segmentBlueprints = getSegmentBlueprints(pattern, blueprints);
-  const encodedParts = serializePathSegments(pattern, values, segmentBlueprints);
-  const omitted = getOmittedParamIndexes(encodedParts, segmentBlueprints);
-  if (omitted.length === 0) return joinPathParts(pattern, encodedParts);
-
-  const fillable = getFillableParamIndexes(omitted, segmentBlueprints);
-
-  // Filling from the last omission backwards keeps earlier, unrelated omissions out of the path.
-  for (let defaultCount = 0; defaultCount <= fillable.length; defaultCount += 1) {
-    const candidate = fillOmittedDefaults(
-      encodedParts,
-      segmentBlueprints,
-      fillable.slice(fillable.length - defaultCount)
-    );
-    if (!candidate) continue;
-
-    const pathname = joinPathParts(pattern, candidate);
-    if (pathnameRoundTrips(pattern, pathname, encodedParts, segmentBlueprints)) return pathname;
-  }
-
-  throw new TypeError('Optional path parameters cannot be serialized without changing their values.');
-};
+): string => joinPathParts(pattern, serializePathSegments(pattern, values, blueprints));
 
 //*****************************************************************************************
 // Create Path Param Codec
 //*****************************************************************************************
 export const createPathParamsCodec = <const Path extends RoutePath>(
-  basePath: Path & RoutePathWithoutOptionalStaticSegments<Path>
+  basePath: Path & RoutePathWithoutOptionalStaticSegments<Path> & RoutePathWithTrailingOptionalParamsOnly<Path>
 ) => {
   const pattern = parsePathPattern(typeof basePath === 'string' ? basePath : '');
-  if (pattern.segments.some(segment => segment.kind === 'static' && segment.raw.endsWith('?'))) {
-    throw new TypeError('Optional static path segments are not supported.');
-  }
+  assertSupportedPathPattern(pattern);
 
   return <
     const Blueprints extends InferPathParamBlueprintMapFromPath<Path> & Record<string, InferPathParamBlueprintFromValue>

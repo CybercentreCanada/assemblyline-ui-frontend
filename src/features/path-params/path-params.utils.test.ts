@@ -1,38 +1,27 @@
 import type {
   InferOptionalPathParamKeyFromPath,
   InferPathParamKeyFromPath,
-  PathMatch,
-  RoutePath
+  RoutePath,
+  RoutePathWithTrailingOptionalParamsOnly
 } from 'features/path-params';
 import { createPathParamsCodec, PATH_PARAM_BLUEPRINTS_MAP } from 'features/path-params';
 import {
+  assertSupportedPathPattern,
   assertValidPathParam,
-  collectPathParams,
-  createPathMatchContext,
   decodePathSegment,
-  fillOmittedDefaults,
-  findPathMatch,
-  getDecodedPathPart,
-  getDefaultPathParam,
-  getFillableParamIndexes,
-  getOmittedParamIndexes,
+  findLastSuppliedParamIndex,
   getOwnValue,
-  getSegmentBlueprints,
   isPathConsumed,
   joinPathParts,
   matchPathPattern,
   parsePathPattern,
-  pathnameRoundTrips,
-  prependPathAssignment,
-  resolvePathMatch,
-  selectPathMatch,
   serializePathParam,
   serializePathSegments,
   splitPathname,
   stringifyPathPattern
 } from 'features/path-params/path-params.utils';
 import type { Location } from 'react-router';
-import { describe, expect, expectTypeOf, it, vi } from 'vitest';
+import { describe, expect, expectTypeOf, it } from 'vitest';
 
 //*****************************************************************************************
 // PATH_PARAM_BLUEPRINTS_MAP
@@ -185,6 +174,38 @@ describe('createPathParamsCodec', () => {
     }).toThrow('Optional static path segments are not supported.');
   });
 
+  it('only allows optional params at the end of the path', () => {
+    const allowed: string[] = ['/path/:param', '/path/:param?', '/path/:param?/:other?', '/path/:id/:tab?'];
+    const rejected: string[] = [
+      '/path/:param?/:other',
+      '/path/:param?/:other/:next?',
+      '/path/:param?/file',
+      '/path/:param?/'
+    ];
+
+    for (const path of allowed) {
+      expect(() => createPathParamsCodec(path)).not.toThrow();
+    }
+    for (const path of rejected) {
+      expect(() => createPathParamsCodec(path)).toThrow(
+        'Optional path parameters are only supported at the end of the path.'
+      );
+    }
+  });
+
+  it('rejects optional params followed by a required segment at the type level', () => {
+    expectTypeOf<
+      RoutePathWithTrailingOptionalParamsOnly<'/path/:param?/:other?'>
+    >().toEqualTypeOf<'/path/:param?/:other?'>();
+    expectTypeOf<RoutePathWithTrailingOptionalParamsOnly<'/path/:param?/:other'>>().toEqualTypeOf<never>();
+    expectTypeOf<RoutePathWithTrailingOptionalParamsOnly<'/path/:param?/:other/:next?'>>().toEqualTypeOf<never>();
+
+    expect(() => {
+      // @ts-expect-error An optional param cannot be followed by a required param.
+      createPathParamsCodec('/path/:param?/:other');
+    }).toThrow('Optional path parameters are only supported at the end of the path.');
+  });
+
   it('requires extra callback entries to be path-param blueprints', () => {
     const createInvalidCodec = () => {
       // @ts-expect-error Every callback entry must be a path-param blueprint.
@@ -265,17 +286,6 @@ describe('createPathParamsCodec', () => {
     expect(codec.stringify({ itemID: 'abc', tab: 'hex' })).toBe('/item/abc/hex');
   });
 
-  it('prefers a match that supplies required params over a consumed optional param', () => {
-    const codec = createPathParamsCodec('/item/:tab?/:id')(b => ({
-      tab: b.string('default-tab'),
-      id: b.string('default-id')
-    }));
-    const pathname = codec.stringify({ id: 'abc' });
-
-    expect(pathname).toBe('/item/abc');
-    expect(codec.parse(makeLocation(pathname))).toEqual({ tab: 'default-tab', id: 'abc' });
-  });
-
   it('uses blueprint defaults to disambiguate omitted adjacent optional params', () => {
     const codec = createPathParamsCodec('/item/:view?/:tab?')(b => ({
       view: b.enum(['ascii', 'hex'] as const, 'ascii'),
@@ -287,83 +297,37 @@ describe('createPathParamsCodec', () => {
     expect(codec.parse(makeLocation(pathname))).toEqual({ view: 'ascii', tab: 'hex' });
   });
 
-  it('round-trips an omitted optional param before a trailing static segment', () => {
-    const codec = createPathParamsCodec('/item/:id?/')(b => ({ id: b.string('default-id') }));
-    const pathname = codec.stringify({});
-
-    expect(pathname).toBe('/item/');
-    expect(codec.parse(makeLocation(pathname))).toEqual({ id: 'default-id' });
-  });
-
-  it('does not reject a valid omitted match because an abandoned branch consumed an empty segment', () => {
-    const codec = createPathParamsCodec('/item/:a?/:b?/file/')(b => ({
-      a: b.string('default-a'),
-      b: b.string('default-b')
+  it('parses trailing optional params left to right', () => {
+    const codec = createPathParamsCodec('/path/:param?/:other?')(b => ({
+      param: b.string('default-param'),
+      other: b.string('default-other')
     }));
 
-    expect(codec.parse(makeLocation('/item/file/'))).toEqual({ a: 'default-a', b: 'default-b' });
-    expect(codec.parse(makeLocation(codec.stringify({})))).toEqual({ a: 'default-a', b: 'default-b' });
+    expect(codec.parse(makeLocation('/path'))).toEqual({ param: 'default-param', other: 'default-other' });
+    expect(codec.parse(makeLocation('/path/x'))).toEqual({ param: 'x', other: 'default-other' });
+    expect(codec.parse(makeLocation('/path/x/y'))).toEqual({ param: 'x', other: 'y' });
   });
 
-  it('writes the omitted default when a required segment sits between optionals', () => {
-    const codec = createPathParamsCodec('/item/:view?/:id/:tab?')(b => ({
-      view: b.string('summary'),
-      id: b.string(),
-      tab: b.string('main')
-    }));
-    const pathname = codec.stringify({ id: 'abc', tab: 'hex' });
-
-    expect(pathname).toBe('/item/summary/abc/hex');
-    expect(codec.parse(makeLocation(pathname))).toEqual({ view: 'summary', id: 'abc', tab: 'hex' });
-    expect(codec.stringify({ id: 'abc' })).toBe('/item/abc');
-  });
-
-  it('writes the omitted default when a static separator collides with a supplied value', () => {
-    const codec = createPathParamsCodec('/item/:view?/file/:tab?')(b => ({
-      view: b.string('summary'),
-      tab: b.string('main')
-    }));
-    const pathname = codec.stringify({ tab: 'file' });
-
-    expect(pathname).toBe('/item/summary/file/file');
-    expect(codec.parse(makeLocation(pathname))).toEqual({ view: 'summary', tab: 'file' });
-  });
-
-  it('rejects serialization that cannot be made unambiguous instead of changing values', () => {
-    const codec = createPathParamsCodec('/item/:view?/:id/:tab?')(b => ({
-      view: b.string(),
-      id: b.string(),
-      tab: b.string('main')
+  it('writes the default of an omitted optional param before a supplied one', () => {
+    const codec = createPathParamsCodec('/path/:param?/:other?')(b => ({
+      param: b.string('default-param'),
+      other: b.string('default-other')
     }));
 
-    expect(() => codec.stringify({ id: 'abc', tab: 'hex' })).toThrow(TypeError);
+    expect(codec.stringify({})).toBe('/path');
+    expect(codec.stringify({ param: 'x' })).toBe('/path/x');
+    expect(codec.stringify({ other: 'y' })).toBe('/path/default-param/y');
+    expect(codec.parse(makeLocation(codec.stringify({ other: 'y' })))).toEqual({ param: 'default-param', other: 'y' });
   });
 
-  it('fills only the omissions that are needed when an unrelated earlier optional has an empty default', () => {
-    const codec = createPathParamsCodec('/item/:view?/file/:section?/:tab?')(b => ({
-      view: b.string(),
-      section: b.string('summary'),
-      tab: b.string('main')
-    }));
-    const pathname = codec.stringify({ tab: 'hex' });
+  it('rejects a default that cannot be written when a later optional param is supplied', () => {
+    const codec = createPathParamsCodec('/item/:view?/:tab?')(b => ({ view: b.string(), tab: b.string('main') }));
 
-    expect(pathname).toBe('/item/file/summary/hex');
-    expect(codec.parse(makeLocation(pathname))).toEqual({ view: '', section: 'summary', tab: 'hex' });
+    expect(codec.stringify({})).toBe('/item');
+    expect(() => codec.stringify({ tab: 'hex' })).toThrow(TypeError);
   });
 
-  it('does not fill earlier omitted optionals when a later omission is enough', () => {
-    const codec = createPathParamsCodec('/item/:view?/file/:section?/:tab?')(b => ({
-      view: b.string('overview'),
-      section: b.string('summary'),
-      tab: b.string('main')
-    }));
-    const pathname = codec.stringify({ tab: 'hex' });
-
-    expect(pathname).toBe('/item/file/summary/hex');
-    expect(codec.parse(makeLocation(pathname))).toEqual({ view: 'overview', section: 'summary', tab: 'hex' });
-  });
-
-  it('fills earlier omitted optionals only when the later ones are not enough', () => {
+  it('writes the defaults of every omitted optional before the last supplied one', () => {
     const codec = createPathParamsCodec('/:a?/:b?/:c?')(b => ({
       a: b.string('da'),
       b: b.string('db'),
@@ -392,16 +356,6 @@ describe('createPathParamsCodec', () => {
     expect(codec.parse(makeLocation('/item/abc'))).toEqual({ itemID: 'abc', tab: 'fallback' });
     expect(() => codec.parse(makeLocation('/item/abc/'))).toThrow(TypeError);
     expect(() => codec.stringify({ itemID: 'abc', tab: '' })).toThrow(TypeError);
-  });
-
-  it('parses an omitted optional parameter before a required segment', () => {
-    const codec = createPathParamsCodec('/item/:tab?/file/:fileID')(b => ({
-      tab: b.enum(['ascii', 'hex'] as const, 'ascii'),
-      fileID: b.string()
-    }));
-
-    expect(codec.parse(makeLocation('/item/file/abc'))).toEqual({ tab: 'ascii', fileID: 'abc' });
-    expect(codec.stringify({ fileID: 'abc' })).toBe('/item/file/abc');
   });
 
   it('decodes URI-encoded path segments', () => {
@@ -502,18 +456,18 @@ describe('createPathParamsCodec', () => {
     expect(codec.parse(makeLocation('/item'))).toEqual({ constructor: 'fallback' });
   });
 
-  it('matches many consecutive optional params without exponential backtracking', () => {
-    const path = `/item/${Array.from({ length: 24 }, (_, index) => `:p${index}?`).join('/')}/:id`;
+  it('parses many trailing optional params', () => {
+    const path = `/item/:id/${Array.from({ length: 24 }, (_, index) => `:p${index}?`).join('/')}`;
     const codec = createPathParamsCodec(path)(
       b =>
         Object.fromEntries([
-          ...Array.from({ length: 24 }, (_, index) => [`p${index}`, b.string('d')]),
-          ['id', b.string()]
+          ['id', b.string()],
+          ...Array.from({ length: 24 }, (_, index) => [`p${index}`, b.string('d')])
         ]) as never
     );
 
     expect(codec.parse(makeLocation('/item/abc'))).toMatchObject({ id: 'abc', p0: 'd', p23: 'd' });
-    expect(codec.parse(makeLocation('/item/x/abc'))).toMatchObject({ id: 'abc', p0: 'x', p1: 'd' });
+    expect(codec.parse(makeLocation('/item/abc/x'))).toMatchObject({ id: 'abc', p0: 'x', p1: 'd' });
   });
 });
 
@@ -550,6 +504,38 @@ describe('matchPathPattern', () => {
     expect(matchPathPattern(parsePathPattern('/item/:id'), '/other/abc')).toBeNull();
     expect(matchPathPattern(parsePathPattern('/item/:id'), '/item/abc/extra')).toBeNull();
   });
+
+  it('fills trailing optional params left to right and leaves omitted ones undefined', () => {
+    const pattern = parsePathPattern('/item/:id/:view?/:tab?');
+
+    expect(matchPathPattern(pattern, '/item/abc')).toEqual({ id: 'abc', view: undefined, tab: undefined });
+    expect(matchPathPattern(pattern, '/item/abc/x')).toEqual({ id: 'abc', view: 'x', tab: undefined });
+    expect(matchPathPattern(pattern, '/item/abc/x/y')).toEqual({ id: 'abc', view: 'x', tab: 'y' });
+    expect(matchPathPattern(pattern, '/item/abc/x/y/z')).toBeNull();
+  });
+
+  it('treats a missing required param as undefined', () => {
+    expect(matchPathPattern(parsePathPattern('/item/:id'), '/item')).toEqual({ id: undefined });
+  });
+
+  it('omits a leading optional param at the root pathname', () => {
+    expect(matchPathPattern(parsePathPattern('/:id?'), '/')).toEqual({ id: undefined });
+  });
+
+  it('allows a trailing slash after the last segment and rejects an empty param value', () => {
+    expect(matchPathPattern(parsePathPattern('/item/:id'), '/item/abc/')).toEqual({ id: 'abc' });
+    expect(() => matchPathPattern(parsePathPattern('/item/:id'), '/item/')).toThrow(TypeError);
+    expect(() => matchPathPattern(parsePathPattern('/item/:id/:tab?'), '/item/abc/')).toThrow(TypeError);
+  });
+
+  it('rejects dot-segment values', () => {
+    expect(() => matchPathPattern(parsePathPattern('/item/:id'), '/item/.')).toThrow(TypeError);
+    expect(() => matchPathPattern(parsePathPattern('/item/:id'), '/item/%2E%2E')).toThrow(TypeError);
+  });
+
+  it('compares static segments decoded and case-insensitively', () => {
+    expect(matchPathPattern(parsePathPattern('/café/:id'), '/CAF%C3%A9/abc')).toEqual({ id: 'abc' });
+  });
 });
 
 describe('stringifyPathPattern', () => {
@@ -560,27 +546,16 @@ describe('stringifyPathPattern', () => {
     expect(stringifyPathPattern(parsePathPattern('/item/:toString?'), {}, blueprints)).toBe('/item');
   });
 
-  it('writes only the defaults needed to keep supplied values in place', () => {
-    const pattern = parsePathPattern('/item/:view?/:id/:tab?');
+  it('drops omitted optionals and writes defaults before the last supplied one', () => {
+    const pattern = parsePathPattern('/item/:view?/:tab?');
     const blueprints = {
       view: PATH_PARAM_BLUEPRINTS_MAP.string('summary'),
-      id: PATH_PARAM_BLUEPRINTS_MAP.string(),
       tab: PATH_PARAM_BLUEPRINTS_MAP.string('main')
     };
 
-    expect(stringifyPathPattern(pattern, { id: 'abc' }, blueprints)).toBe('/item/abc');
-    expect(stringifyPathPattern(pattern, { id: 'abc', tab: 'hex' }, blueprints)).toBe('/item/summary/abc/hex');
-  });
-
-  it('throws when no unambiguous pathname exists', () => {
-    const pattern = parsePathPattern('/item/:view?/:id/:tab?');
-    const blueprints = {
-      view: PATH_PARAM_BLUEPRINTS_MAP.string(),
-      id: PATH_PARAM_BLUEPRINTS_MAP.string(),
-      tab: PATH_PARAM_BLUEPRINTS_MAP.string('main')
-    };
-
-    expect(() => stringifyPathPattern(pattern, { id: 'abc', tab: 'hex' }, blueprints)).toThrow(TypeError);
+    expect(stringifyPathPattern(pattern, {}, blueprints)).toBe('/item');
+    expect(stringifyPathPattern(pattern, { view: 'x' }, blueprints)).toBe('/item/x');
+    expect(stringifyPathPattern(pattern, { tab: 'y' }, blueprints)).toBe('/item/summary/y');
   });
 });
 
@@ -671,41 +646,33 @@ describe('splitPathname', () => {
   });
 });
 
-describe('createPathMatchContext', () => {
-  it('creates a fresh context for a pattern and pathname', () => {
-    const pattern = parsePathPattern('/item/:id');
-    const context = createPathMatchContext(pattern, '/item/abc');
-
-    expect(context.segments).toBe(pattern.segments);
-    expect(context.pathParts).toEqual(['item', 'abc']);
-    expect(context.isRoot).toBe(false);
-    expect(context.decodedParts).toEqual([]);
-    expect(context.memo.size).toBe(0);
+describe('assertSupportedPathPattern', () => {
+  it('accepts required params and trailing optional params', () => {
+    for (const path of ['/path', '/path/:param', '/path/:param?', '/path/:param?/:other?', '/path/:id/:tab?']) {
+      expect(() => assertSupportedPathPattern(parsePathPattern(path))).not.toThrow();
+    }
   });
 
-  it('flags only the exact root pathname', () => {
-    const pattern = parsePathPattern('/:id?');
-
-    expect(createPathMatchContext(pattern, '/').isRoot).toBe(true);
-    expect(createPathMatchContext(pattern, '').isRoot).toBe(false);
-  });
-});
-
-describe('getDecodedPathPart', () => {
-  it('decodes a pathname segment and caches it', () => {
-    const context = createPathMatchContext(parsePathPattern('/item/:id'), '/item/a%20b');
-
-    expect(getDecodedPathPart(context, 1)).toBe('a b');
-    expect(context.decodedParts[1]).toBe('a b');
-
-    context.pathParts[1] = 'changed';
-    expect(getDecodedPathPart(context, 1)).toBe('a b');
+  it('rejects an optional param followed by a required segment', () => {
+    for (const path of [
+      '/path/:param?/:other',
+      '/path/:param?/:other/:next?',
+      '/path/:param?/file',
+      '/path/:param?/'
+    ]) {
+      expect(() => assertSupportedPathPattern(parsePathPattern(path))).toThrow(
+        'Optional path parameters are only supported at the end of the path.'
+      );
+    }
   });
 
-  it('keeps malformed escapes literal', () => {
-    const context = createPathMatchContext(parsePathPattern('/item/:id'), '/item/caf%ZZ');
-
-    expect(getDecodedPathPart(context, 1)).toBe('caf%ZZ');
+  it('rejects optional static segments', () => {
+    expect(() => assertSupportedPathPattern(parsePathPattern('/items/view?/:id'))).toThrow(
+      'Optional static path segments are not supported.'
+    );
+    expect(() => assertSupportedPathPattern(parsePathPattern('/items/:id?/view?'))).toThrow(
+      'Optional static path segments are not supported.'
+    );
   });
 });
 
@@ -726,320 +693,74 @@ describe('isPathConsumed', () => {
   });
 });
 
-describe('prependPathAssignment', () => {
-  it('returns null when the remaining pattern did not match', () => {
-    expect(prependPathAssignment(null, 'id', 'abc', 0)).toBeNull();
+describe('findLastSuppliedParamIndex', () => {
+  const pattern = parsePathPattern('/item/:id/:view?/:tab?');
+
+  it('returns the index of the last optional param with a value', () => {
+    expect(findLastSuppliedParamIndex(pattern, { id: 'a', view: 'x', tab: 'y' })).toBe(3);
+    expect(findLastSuppliedParamIndex(pattern, { id: 'a', view: 'x' })).toBe(2);
   });
 
-  it('adds the assignment in front and accumulates missing required params', () => {
-    const rest: PathMatch = { missingRequired: 1, assignments: null };
-    const match = prependPathAssignment(rest, 'id', 'abc', 2);
-
-    expect(match).toEqual({ missingRequired: 3, assignments: { key: 'id', value: 'abc', next: null } });
+  it('ignores required params and null or missing values', () => {
+    expect(findLastSuppliedParamIndex(pattern, { id: 'a' })).toBe(-1);
+    expect(findLastSuppliedParamIndex(pattern, { id: 'a', view: null, tab: undefined })).toBe(-1);
   });
 
-  it('links to the existing assignments without copying them', () => {
-    const rest = prependPathAssignment({ missingRequired: 0, assignments: null }, 'b', undefined, 0);
-    const match = prependPathAssignment(rest, 'a', 'x', 0);
-
-    expect(match.assignments?.next).toBe(rest.assignments);
-  });
-});
-
-describe('selectPathMatch', () => {
-  const none: PathMatch = { missingRequired: 0, assignments: null };
-  const oneMissing: PathMatch = { missingRequired: 1, assignments: null };
-
-  it('returns null when neither matched', () => {
-    expect(selectPathMatch(null, null)).toBeNull();
-  });
-
-  it('returns the only match', () => {
-    expect(selectPathMatch(none, null)).toBe(none);
-    expect(selectPathMatch(null, none)).toBe(none);
-  });
-
-  it('prefers the match with fewer missing required params', () => {
-    expect(selectPathMatch(oneMissing, none)).toBe(none);
-    expect(selectPathMatch(none, oneMissing)).toBe(none);
-  });
-
-  it('prefers consuming the segment on a tie', () => {
-    const other: PathMatch = { missingRequired: 0, assignments: null };
-
-    expect(selectPathMatch(none, other)).toBe(none);
-  });
-});
-
-describe('resolvePathMatch', () => {
-  const matched: PathMatch = { missingRequired: 0, assignments: null };
-
-  it('matches when the pattern is exhausted and the pathname consumed', () => {
-    const find = vi.fn();
-    const context = createPathMatchContext(parsePathPattern('/item/:id'), '/item/abc');
-
-    expect(resolvePathMatch(context, 2, 2, find)).toEqual(matched);
-    expect(resolvePathMatch(context, 2, 1, find)).toBeNull();
-    expect(find).not.toHaveBeenCalled();
-  });
-
-  it('compares static segments decoded and case-insensitively', () => {
-    const find = vi.fn(() => matched);
-    const context = createPathMatchContext(parsePathPattern('/café/:id'), '/CAF%C3%A9/abc');
-
-    expect(resolvePathMatch(context, 0, 0, find)).toBe(matched);
-    expect(find).toHaveBeenCalledWith(context, 1, 1);
-  });
-
-  it('returns null for a static mismatch without recursing', () => {
-    const find = vi.fn(() => matched);
-    const context = createPathMatchContext(parsePathPattern('/item/:id'), '/other/abc');
-
-    expect(resolvePathMatch(context, 0, 0, find)).toBeNull();
-    expect(find).not.toHaveBeenCalled();
-  });
-
-  it('counts a missing required param and not a missing optional one', () => {
-    const find = vi.fn(() => matched);
-    const required = createPathMatchContext(parsePathPattern('/item/:id'), '/item');
-    const optional = createPathMatchContext(parsePathPattern('/item/:id?'), '/item');
-
-    expect(resolvePathMatch(required, 1, 1, find)).toEqual({
-      missingRequired: 1,
-      assignments: { key: 'id', value: undefined, next: null }
-    });
-    expect(resolvePathMatch(optional, 1, 1, find)).toEqual({
-      missingRequired: 0,
-      assignments: { key: 'id', value: undefined, next: null }
-    });
-  });
-
-  it('omits an optional param at the root pathname', () => {
-    const find = vi.fn(() => matched);
-    const context = createPathMatchContext(parsePathPattern('/:id?'), '/');
-
-    expect(resolvePathMatch(context, 0, 0, find)).toEqual({
-      missingRequired: 0,
-      assignments: { key: 'id', value: undefined, next: null }
-    });
-    expect(find).toHaveBeenCalledWith(context, 1, 0);
-  });
-
-  it('consumes the segment as a required param and defers validation', () => {
-    const find = vi.fn(() => matched);
-    const context = createPathMatchContext(parsePathPattern('/item/:id'), '/item/');
-
-    expect(resolvePathMatch(context, 1, 1, find)).toEqual({
-      missingRequired: 0,
-      assignments: { key: 'id', value: '', next: null }
-    });
-  });
-
-  it('falls back to omitting an optional param when consuming the segment fails', () => {
-    const find = vi.fn((_context, _segmentIndex: number, pathIndex: number) => (pathIndex === 1 ? matched : null));
-    const context = createPathMatchContext(parsePathPattern('/item/:id?/file'), '/item/file');
-
-    expect(resolvePathMatch(context, 1, 1, find)).toEqual({
-      missingRequired: 0,
-      assignments: { key: 'id', value: undefined, next: null }
-    });
-  });
-
-  it('prefers consuming the segment as an optional param when both match', () => {
-    const find = vi.fn(() => matched);
-    const context = createPathMatchContext(parsePathPattern('/item/:id?'), '/item/abc');
-
-    expect(resolvePathMatch(context, 1, 1, find)).toEqual({
-      missingRequired: 0,
-      assignments: { key: 'id', value: 'abc', next: null }
-    });
-  });
-});
-
-describe('findPathMatch', () => {
-  it('finds the best match and memoizes it', () => {
-    const context = createPathMatchContext(parsePathPattern('/item/:id'), '/item/abc');
-    const first = findPathMatch(context, 0, 0);
-
-    expect(first).toEqual({ missingRequired: 0, assignments: { key: 'id', value: 'abc', next: null } });
-    expect(context.memo.size).toBeGreaterThan(0);
-    expect(findPathMatch(context, 0, 0)).toBe(first);
-  });
-
-  it('memoizes a non-match as null', () => {
-    const context = createPathMatchContext(parsePathPattern('/item/:id'), '/other/abc');
-
-    expect(findPathMatch(context, 0, 0)).toBeNull();
-    expect(context.memo.get(0)).toBeNull();
-    expect(findPathMatch(context, 0, 0)).toBeNull();
-  });
-
-  it('prefers the match that supplies required params', () => {
-    const context = createPathMatchContext(parsePathPattern('/item/:tab?/:id'), '/item/abc');
-
-    expect(findPathMatch(context, 0, 0)).toEqual({
-      missingRequired: 0,
-      assignments: {
-        key: 'tab',
-        value: undefined,
-        next: { key: 'id', value: 'abc', next: null }
-      }
-    });
-  });
-});
-
-describe('collectPathParams', () => {
-  it('returns an empty null-prototype record for no assignments', () => {
-    const params = collectPathParams(null);
-
-    expect(Object.getPrototypeOf(params)).toBe(null);
-    expect(params).toEqual({});
-  });
-
-  it('collects values in order, including omitted params', () => {
-    const params = collectPathParams({ key: 'a', value: 'x', next: { key: 'b', value: undefined, next: null } });
-
-    expect(params).toEqual({ a: 'x', b: undefined });
-    expect(Object.keys(params)).toEqual(['a', 'b']);
-  });
-
-  it('keeps __proto__ as an own property', () => {
-    const params = collectPathParams({ key: '__proto__', value: 'x', next: null });
-
-    expect(Object.prototype.hasOwnProperty.call(params, '__proto__')).toBe(true);
-    expect(params['__proto__']).toBe('x');
-  });
-
-  it('rejects supplied empty and dot-segment values', () => {
-    for (const value of ['', '.', '..']) {
-      expect(() => collectPathParams({ key: 'id', value, next: null })).toThrow(TypeError);
-    }
-  });
-});
-
-//*****************************************************************************************
-// Path Stringify Helpers
-//*****************************************************************************************
-
-describe('getSegmentBlueprints', () => {
-  it('returns one entry per segment and leaves static segments undefined', () => {
-    const id = PATH_PARAM_BLUEPRINTS_MAP.string();
-
-    expect(getSegmentBlueprints(parsePathPattern('/item/:id/:other?'), { id })).toEqual([undefined, id, undefined]);
-  });
-
-  it('reads only own properties of the blueprint map', () => {
-    expect(getSegmentBlueprints(parsePathPattern('/item/:toString'), {})).toEqual([undefined, undefined]);
+  it('reads only own properties', () => {
+    expect(findLastSuppliedParamIndex(parsePathPattern('/item/:constructor?'), {})).toBe(-1);
   });
 });
 
 describe('serializePathSegments', () => {
-  const pattern = parsePathPattern('/item/:id/:tab?');
+  const pattern = parsePathPattern('/item/:id/:view?/:tab?');
   const blueprints = {
     id: PATH_PARAM_BLUEPRINTS_MAP.string(),
-    tab: PATH_PARAM_BLUEPRINTS_MAP.enum(['ascii', 'hex'] as const, 'ascii')
+    view: PATH_PARAM_BLUEPRINTS_MAP.string('summary'),
+    tab: PATH_PARAM_BLUEPRINTS_MAP.string('main')
   };
 
   it('keeps static segments and encodes param values', () => {
-    const parts = serializePathSegments(pattern, { id: 'a b', tab: 'hex' }, getSegmentBlueprints(pattern, blueprints));
-
-    expect(parts).toEqual(['item', 'a%20b', 'hex']);
-  });
-
-  it('marks omitted optional params as null', () => {
-    const segmentBlueprints = getSegmentBlueprints(pattern, blueprints);
-
-    expect(serializePathSegments(pattern, { id: 'abc' }, segmentBlueprints)).toEqual(['item', 'abc', null]);
-    expect(serializePathSegments(pattern, { id: 'abc', tab: null }, segmentBlueprints)).toEqual(['item', 'abc', null]);
-  });
-
-  it('keeps the :param text for a param without a blueprint', () => {
-    const noBlueprints = getSegmentBlueprints(parsePathPattern('/item/:id'), {});
-
-    expect(serializePathSegments(parsePathPattern('/item/:id'), { id: 'abc' }, noBlueprints)).toEqual(['item', ':id']);
-  });
-
-  it('rejects empty and dot-segment values', () => {
-    const segmentBlueprints = getSegmentBlueprints(pattern, blueprints);
-
-    expect(() => serializePathSegments(pattern, { id: '' }, segmentBlueprints)).toThrow(TypeError);
-    expect(() => serializePathSegments(pattern, { id: '..' }, segmentBlueprints)).toThrow(TypeError);
-  });
-});
-
-describe('getOmittedParamIndexes', () => {
-  it('lists omitted params that have a blueprint', () => {
-    const blueprint = PATH_PARAM_BLUEPRINTS_MAP.string();
-
-    expect(getOmittedParamIndexes(['item', null, 'abc', null], [undefined, blueprint, blueprint, blueprint])).toEqual([
-      1, 3
+    expect(serializePathSegments(pattern, { id: 'a b', view: 'x', tab: 'y' }, blueprints)).toEqual([
+      'item',
+      'a%20b',
+      'x',
+      'y'
     ]);
   });
 
-  it('ignores omitted params without a blueprint', () => {
-    expect(getOmittedParamIndexes(['item', null], [undefined, undefined])).toEqual([]);
+  it('drops omitted optionals after the last supplied one', () => {
+    expect(serializePathSegments(pattern, { id: 'abc' }, blueprints)).toEqual(['item', 'abc']);
+    expect(serializePathSegments(pattern, { id: 'abc', view: 'x' }, blueprints)).toEqual(['item', 'abc', 'x']);
+    expect(serializePathSegments(pattern, { id: 'abc', view: null, tab: null }, blueprints)).toEqual(['item', 'abc']);
   });
 
-  it('returns an empty list when nothing was omitted', () => {
-    expect(getOmittedParamIndexes(['item', 'abc'], [undefined, PATH_PARAM_BLUEPRINTS_MAP.string()])).toEqual([]);
-  });
-});
-
-describe('getFillableParamIndexes', () => {
-  const blueprints = [
-    undefined,
-    PATH_PARAM_BLUEPRINTS_MAP.string(),
-    PATH_PARAM_BLUEPRINTS_MAP.string('summary'),
-    PATH_PARAM_BLUEPRINTS_MAP.string('..')
-  ];
-
-  it('keeps only omitted params whose default is a valid path value', () => {
-    expect(getFillableParamIndexes([1, 2, 3], blueprints)).toEqual([2]);
+  it('writes the default of an omitted optional before a supplied one', () => {
+    expect(serializePathSegments(pattern, { id: 'abc', tab: 'y' }, blueprints)).toEqual([
+      'item',
+      'abc',
+      'summary',
+      'y'
+    ]);
   });
 
-  it('keeps the given order and returns an empty list for no indexes', () => {
-    expect(getFillableParamIndexes([2, 1], blueprints)).toEqual([2]);
-    expect(getFillableParamIndexes([], blueprints)).toEqual([]);
-  });
-});
-
-describe('getDefaultPathParam', () => {
-  it('serializes the blueprint default', () => {
-    expect(getDefaultPathParam(PATH_PARAM_BLUEPRINTS_MAP.string('summary'))).toBe('summary');
-    expect(getDefaultPathParam(PATH_PARAM_BLUEPRINTS_MAP.number(7))).toBe('7');
-    expect(getDefaultPathParam(PATH_PARAM_BLUEPRINTS_MAP.enum(['a', 'b'] as const, 'b'))).toBe('b');
+  it('keeps the :param text for a param without a blueprint', () => {
+    expect(serializePathSegments(parsePathPattern('/item/:id'), { id: 'abc' }, {})).toEqual(['item', ':id']);
   });
 
-  it('returns null when the default is not a valid path value', () => {
-    expect(getDefaultPathParam(PATH_PARAM_BLUEPRINTS_MAP.string())).toBeNull();
-    expect(getDefaultPathParam(PATH_PARAM_BLUEPRINTS_MAP.string('..'))).toBeNull();
+  it('rejects empty and dot-segment values', () => {
+    expect(() => serializePathSegments(pattern, { id: '' }, blueprints)).toThrow(TypeError);
+    expect(() => serializePathSegments(pattern, { id: '..' }, blueprints)).toThrow(TypeError);
   });
 
-  it('does not swallow encoding errors', () => {
-    expect(() => getDefaultPathParam(PATH_PARAM_BLUEPRINTS_MAP.string('a\uD800'))).toThrow(URIError);
-  });
-});
+  it('rejects a default that is not a valid path value only when it must be written', () => {
+    const emptyDefault = { ...blueprints, view: PATH_PARAM_BLUEPRINTS_MAP.string() };
 
-describe('fillOmittedDefaults', () => {
-  const blueprints = [undefined, PATH_PARAM_BLUEPRINTS_MAP.string('summary'), undefined];
-
-  it('fills only the listed omitted params without modifying the input', () => {
-    const parts = ['item', null, 'hex'];
-
-    expect(fillOmittedDefaults(parts, blueprints, [1])).toEqual(['item', 'summary', 'hex']);
-    expect(parts).toEqual(['item', null, 'hex']);
+    expect(serializePathSegments(pattern, { id: 'abc' }, emptyDefault)).toEqual(['item', 'abc']);
+    expect(() => serializePathSegments(pattern, { id: 'abc', tab: 'y' }, emptyDefault)).toThrow(TypeError);
   });
 
-  it('returns an equal copy when nothing is listed', () => {
-    const parts = ['item', null, 'hex'];
-    const filled = fillOmittedDefaults(parts, blueprints, []);
-
-    expect(filled).toEqual(parts);
-    expect(filled).not.toBe(parts);
-  });
-
-  it('returns null when a default cannot be serialized', () => {
-    expect(fillOmittedDefaults(['item', null], [undefined, PATH_PARAM_BLUEPRINTS_MAP.string()], [1])).toBeNull();
+  it('only reads own properties of values and blueprints', () => {
+    expect(serializePathSegments(parsePathPattern('/item/:toString?'), {}, blueprints)).toEqual(['item']);
   });
 });
 
@@ -1049,52 +770,8 @@ describe('joinPathParts', () => {
     expect(joinPathParts(parsePathPattern('item/:id'), ['item', 'abc'])).toBe('item/abc');
   });
 
-  it('skips omitted parts', () => {
-    expect(joinPathParts(parsePathPattern('/item/:id?'), ['item', null])).toBe('/item');
-  });
-
-  it('handles patterns where every part is omitted', () => {
-    expect(joinPathParts(parsePathPattern('/:id?'), [null])).toBe('/');
-    expect(joinPathParts(parsePathPattern(':id?'), [null])).toBe('');
-  });
-
-  it('keeps empty static segments', () => {
-    expect(joinPathParts(parsePathPattern('/item/:id?/'), ['item', null, ''])).toBe('/item/');
-  });
-});
-
-describe('pathnameRoundTrips', () => {
-  const pattern = parsePathPattern('/item/:view?/:id/:tab?');
-  const blueprints = getSegmentBlueprints(pattern, {
-    view: PATH_PARAM_BLUEPRINTS_MAP.string('summary'),
-    id: PATH_PARAM_BLUEPRINTS_MAP.string(),
-    tab: PATH_PARAM_BLUEPRINTS_MAP.string('main')
-  });
-  const encodedParts = ['item', null, 'abc', 'hex'];
-
-  it('is true when every value parses back unchanged', () => {
-    expect(pathnameRoundTrips(pattern, '/item/summary/abc/hex', encodedParts, blueprints)).toBe(true);
-  });
-
-  it('is false when a supplied value would be read as a different parameter', () => {
-    expect(pathnameRoundTrips(pattern, '/item/abc/hex', encodedParts, blueprints)).toBe(false);
-  });
-
-  it('is false when the pathname does not match the pattern', () => {
-    expect(pathnameRoundTrips(pattern, '/other/abc', encodedParts, blueprints)).toBe(false);
-  });
-
-  it('is false when the pathname contains an invalid parameter value', () => {
-    const idPattern = parsePathPattern('/item/:id');
-    const idBlueprints = getSegmentBlueprints(idPattern, { id: PATH_PARAM_BLUEPRINTS_MAP.string() });
-
-    expect(pathnameRoundTrips(idPattern, '/item/', ['item', 'abc'], idBlueprints)).toBe(false);
-  });
-
-  it('is true for an omitted optional param that parses to its default', () => {
-    const optionalPattern = parsePathPattern('/item/:id?');
-    const optionalBlueprints = getSegmentBlueprints(optionalPattern, { id: PATH_PARAM_BLUEPRINTS_MAP.string('x') });
-
-    expect(pathnameRoundTrips(optionalPattern, '/item', ['item', null], optionalBlueprints)).toBe(true);
+  it('returns the root for an absolute pattern with no parts and nothing for a relative one', () => {
+    expect(joinPathParts(parsePathPattern('/:id?'), [])).toBe('/');
+    expect(joinPathParts(parsePathPattern(':id?'), [])).toBe('');
   });
 });
