@@ -384,6 +384,18 @@ export const getDefaultPathParam = (blueprint: InferPathParamBlueprintFromValue)
 };
 
 /**
+ * @name getFillableParamIndexes
+ * @description Keeps the omitted parameters whose blueprint default is a valid path value; the others can only stay omitted.
+ * @param indexes - Segment indexes of omitted parameters, such as the result of `getOmittedParamIndexes`
+ * @param segmentBlueprints - Result of `getSegmentBlueprints`
+ * @returns The fillable segment indexes, in the order given
+ */
+export const getFillableParamIndexes = (
+  indexes: number[],
+  segmentBlueprints: (InferPathParamBlueprintFromValue | undefined)[]
+): number[] => indexes.filter(index => getDefaultPathParam(segmentBlueprints[index]) !== null);
+
+/**
  * @name fillOmittedDefaults
  * @description Returns a copy of the serialized parts in which the listed omitted parameters hold their blueprint default.
  * @param encodedParts - Result of `serializePathSegments`; not modified
@@ -451,7 +463,7 @@ export const pathnameRoundTrips = (
 
 /**
  * @name stringifyPathPattern
- * @description Builds a pathname from a parsed pattern. Omitted optional parameters are dropped when the result still parses back to the same values. Otherwise the blueprint defaults of the leading omitted optionals are written until it does, so a supplied value can never be read as a different parameter.
+ * @description Builds a pathname from a parsed pattern. Omitted optional parameters are dropped when the result still parses back to the same values. Otherwise the blueprint defaults of a growing set of omitted optionals are written, starting with the last one and skipping those whose default is not a valid path value, until it does. A supplied value is therefore never read as a different parameter.
  * @param pattern - Pattern created by `parsePathPattern`
  * @param values - Parameter values; only own properties are read
  * @param blueprints - Blueprints keyed by parameter name; only own properties are read
@@ -467,9 +479,15 @@ export const stringifyPathPattern = (
   const omitted = getOmittedParamIndexes(encodedParts, segmentBlueprints);
   if (omitted.length === 0) return joinPathParts(pattern, encodedParts);
 
-  // Writing every default is always unambiguous, so this fails only when a default itself is unserializable.
-  for (let defaultCount = 0; defaultCount <= omitted.length; defaultCount += 1) {
-    const candidate = fillOmittedDefaults(encodedParts, segmentBlueprints, omitted.slice(0, defaultCount));
+  const fillable = getFillableParamIndexes(omitted, segmentBlueprints);
+
+  // Filling from the last omission backwards keeps earlier, unrelated omissions out of the path.
+  for (let defaultCount = 0; defaultCount <= fillable.length; defaultCount += 1) {
+    const candidate = fillOmittedDefaults(
+      encodedParts,
+      segmentBlueprints,
+      fillable.slice(fillable.length - defaultCount)
+    );
     if (!candidate) continue;
 
     const pathname = joinPathParts(pattern, candidate);

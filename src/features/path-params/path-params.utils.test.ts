@@ -14,6 +14,7 @@ import {
   findPathMatch,
   getDecodedPathPart,
   getDefaultPathParam,
+  getFillableParamIndexes,
   getOmittedParamIndexes,
   getOwnValue,
   getSegmentBlueprints,
@@ -336,6 +337,42 @@ describe('createPathParamsCodec', () => {
     }));
 
     expect(() => codec.stringify({ id: 'abc', tab: 'hex' })).toThrow(TypeError);
+  });
+
+  it('fills only the omissions that are needed when an unrelated earlier optional has an empty default', () => {
+    const codec = createPathParamsCodec('/item/:view?/file/:section?/:tab?')(b => ({
+      view: b.string(),
+      section: b.string('summary'),
+      tab: b.string('main')
+    }));
+    const pathname = codec.stringify({ tab: 'hex' });
+
+    expect(pathname).toBe('/item/file/summary/hex');
+    expect(codec.parse(makeLocation(pathname))).toEqual({ view: '', section: 'summary', tab: 'hex' });
+  });
+
+  it('does not fill earlier omitted optionals when a later omission is enough', () => {
+    const codec = createPathParamsCodec('/item/:view?/file/:section?/:tab?')(b => ({
+      view: b.string('overview'),
+      section: b.string('summary'),
+      tab: b.string('main')
+    }));
+    const pathname = codec.stringify({ tab: 'hex' });
+
+    expect(pathname).toBe('/item/file/summary/hex');
+    expect(codec.parse(makeLocation(pathname))).toEqual({ view: 'overview', section: 'summary', tab: 'hex' });
+  });
+
+  it('fills earlier omitted optionals only when the later ones are not enough', () => {
+    const codec = createPathParamsCodec('/:a?/:b?/:c?')(b => ({
+      a: b.string('da'),
+      b: b.string('db'),
+      c: b.string('dc')
+    }));
+    const pathname = codec.stringify({ c: 'x' });
+
+    expect(pathname).toBe('/da/db/x');
+    expect(codec.parse(makeLocation(pathname))).toEqual({ a: 'da', b: 'db', c: 'x' });
   });
 
   it('normalizes an omitted root optional param in both directions', () => {
@@ -945,6 +982,24 @@ describe('getOmittedParamIndexes', () => {
 
   it('returns an empty list when nothing was omitted', () => {
     expect(getOmittedParamIndexes(['item', 'abc'], [undefined, PATH_PARAM_BLUEPRINTS_MAP.string()])).toEqual([]);
+  });
+});
+
+describe('getFillableParamIndexes', () => {
+  const blueprints = [
+    undefined,
+    PATH_PARAM_BLUEPRINTS_MAP.string(),
+    PATH_PARAM_BLUEPRINTS_MAP.string('summary'),
+    PATH_PARAM_BLUEPRINTS_MAP.string('..')
+  ];
+
+  it('keeps only omitted params whose default is a valid path value', () => {
+    expect(getFillableParamIndexes([1, 2, 3], blueprints)).toEqual([2]);
+  });
+
+  it('keeps the given order and returns an empty list for no indexes', () => {
+    expect(getFillableParamIndexes([2, 1], blueprints)).toEqual([2]);
+    expect(getFillableParamIndexes([], blueprints)).toEqual([]);
   });
 });
 
