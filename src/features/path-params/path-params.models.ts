@@ -11,17 +11,41 @@ export type RoutePath = RouteProps['path'];
 /** The set of primitive value types a path parameter can hold. */
 export type PathParamValue = string | number | boolean;
 
+type PathSegments<Path extends string> = Path extends `${infer Segment}/${infer Rest}`
+  ? Segment | PathSegments<Rest>
+  : Path;
+
+type OptionalPathParamSegments<Path extends string> = Extract<PathSegments<Path>, `:${string}?`>;
+
+type PathParamKeyFromSegments<Segments> = Segments extends string
+  ? Segments extends `:${infer Key}`
+    ? Key extends `${string}?`
+      ? never
+      : Key
+    : never
+  : never;
+
+/** Resolves to `never` for literal route paths containing optional parameter segments. */
+export type RoutePathWithoutOptionalParams<Path extends RoutePath> = Path extends string
+  ? string extends Path
+    ? Path
+    : OptionalPathParamSegments<Path> extends never
+      ? Path
+      : never
+  : never;
+
 /**
- * Recursively extracts `:param` keys from a route path literal.
+ * Extracts keys only from complete `:param` segments in a route path literal.
  * E.g. `'/users/:id/posts/:postId'` → `'id' | 'postId'`.
+ * Optional parameter segments are unsupported and resolve to `never`.
  */
 export type InferPathParamKeyFromPath<Path extends RoutePath> = string extends Path
   ? string
-  : Path extends `${string}:${infer Param}/${infer Rest}`
-    ? Param | InferPathParamKeyFromPath<`/${Rest}`>
-    : Path extends `${string}:${infer Param}`
-      ? Param
-      : never;
+  : Path extends string
+    ? OptionalPathParamSegments<Path> extends never
+      ? PathParamKeyFromSegments<PathSegments<Path>>
+      : never
+    : never;
 
 //*****************************************************************************************
 // Path Params Blueprints

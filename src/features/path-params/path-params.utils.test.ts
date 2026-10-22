@@ -1,6 +1,7 @@
+import type { InferPathParamKeyFromPath, RoutePath } from 'features/path-params';
 import { createPathParamsCodec, PATH_PARAM_BLUEPRINTS_MAP } from 'features/path-params';
 import type { Location } from 'react-router';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, expectTypeOf, it } from 'vitest';
 
 //*****************************************************************************************
 // PATH_PARAM_BLUEPRINTS_MAP
@@ -123,6 +124,22 @@ describe('PATH_PARAM_BLUEPRINTS_MAP.enum', () => {
 const makeLocation = (pathname: string): Location => ({ pathname, search: '', hash: '', state: null, key: 'default' });
 
 describe('createPathParamsCodec', () => {
+  it('extracts keys only from colon-prefixed path segments', () => {
+    expectTypeOf<InferPathParamKeyFromPath<'/items/:itemID/version:latest'>>().toEqualTypeOf<'itemID'>();
+    expectTypeOf<InferPathParamKeyFromPath<'/items/version:latest'>>().toEqualTypeOf<never>();
+  });
+
+  it('rejects optional route parameters', () => {
+    const optionalPath: RoutePath = '/item/:itemID?';
+    expect(() => createPathParamsCodec(optionalPath)).toThrow('Optional path parameters are not supported.');
+    expectTypeOf<InferPathParamKeyFromPath<'/item/:itemID?'>>().toEqualTypeOf<never>();
+
+    expect(() => {
+      // @ts-expect-error Optional route parameter syntax is unsupported.
+      createPathParamsCodec('/item/:itemID?');
+    }).toThrow('Optional path parameters are not supported.');
+  });
+
   it('parses a single string path param from the location', () => {
     const codec = createPathParamsCodec('/item/:itemID')(b => ({ itemID: b.string() }));
     expect(codec.parse(makeLocation('/item/abc'))).toEqual({ itemID: 'abc' });
@@ -141,25 +158,21 @@ describe('createPathParamsCodec', () => {
     expect(codec.parse(makeLocation('/item/abc/page/3'))).toEqual({ itemID: 'abc', pageNumber: 3 });
   });
 
-  it('round-trips an empty parameter before a subsequent parameter', () => {
+  it('rejects an empty parameter before a subsequent parameter', () => {
     const codec = createPathParamsCodec('/item/:itemID/page/:pageNumber')(b => ({
       itemID: b.string(),
       pageNumber: b.number(0)
     }));
-    const params = { itemID: '', pageNumber: 3 };
-    const pathname = codec.stringify(params);
 
-    expect(pathname).toBe('/item//page/3');
-    expect(codec.parse(makeLocation(pathname))).toEqual(params);
+    expect(() => codec.stringify({ itemID: '', pageNumber: 3 })).toThrow(TypeError);
+    expect(() => codec.parse(makeLocation('/item//page/3'))).toThrow(TypeError);
   });
 
-  it('round-trips an empty trailing parameter', () => {
+  it('rejects an empty trailing parameter', () => {
     const codec = createPathParamsCodec('/item/:itemID')(b => ({ itemID: b.string() }));
-    const params = { itemID: '' };
-    const pathname = codec.stringify(params);
 
-    expect(pathname).toBe('/item/');
-    expect(codec.parse(makeLocation(pathname))).toEqual(params);
+    expect(() => codec.stringify({ itemID: '' })).toThrow(TypeError);
+    expect(() => codec.parse(makeLocation('/item/'))).toThrow(TypeError);
   });
 
   it('uses default values when the pathname segment is missing', () => {
@@ -180,9 +193,29 @@ describe('createPathParamsCodec', () => {
     expect(codec.stringify({ itemID: 'abc', pageNumber: 3 })).toBe('/item/abc/page/3');
   });
 
-  it('encodes values when stringifying', () => {
+  it('encodes special characters within a single path segment', () => {
     const codec = createPathParamsCodec('/item/:itemID')(b => ({ itemID: b.string() }));
-    expect(codec.stringify({ itemID: 'a b' })).toBe('/item/a%20b');
+    const pathname = codec.stringify({ itemID: 'a b/a' });
+    expect(pathname).toBe('/item/a%20b%2Fa');
+    expect(codec.parse(makeLocation(pathname))).toEqual({ itemID: 'a b/a' });
+  });
+
+  it('allows punctuation other than standalone dot segments', () => {
+    const codec = createPathParamsCodec('/item/:itemID')(b => ({ itemID: b.string() }));
+
+    expect(codec.stringify({ itemID: 'a-b_1' })).toBe('/item/a-b_1');
+    expect(codec.parse(makeLocation('/item/a-b_1'))).toEqual({ itemID: 'a-b_1' });
+    expect(codec.stringify({ itemID: '...' })).toBe('/item/...');
+  });
+
+  it('rejects empty and dot-segment values when parsing or stringifying', () => {
+    const codec = createPathParamsCodec('/item/:itemID')(b => ({ itemID: b.string() }));
+
+    expect(() => codec.parse(makeLocation('/item/'))).toThrow(TypeError);
+    expect(() => codec.stringify({ itemID: '.' })).toThrow(TypeError);
+    expect(() => codec.stringify({ itemID: '..' })).toThrow(TypeError);
+    expect(() => codec.parse(makeLocation('/item/.'))).toThrow(TypeError);
+    expect(() => codec.parse(makeLocation('/item/%2E%2E'))).toThrow(TypeError);
   });
 
   it('throws instead of emitting an unencoded value with malformed Unicode', () => {

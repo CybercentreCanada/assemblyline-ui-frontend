@@ -6,17 +6,18 @@ Type-safe URL path parameter extraction and serialization. The module derives pa
 
 ## 2. Features
 
-- **Typed parameter keys** - Derives `:param` keys from a path literal at compile time
+- **Typed parameter keys** - Derives keys only from complete `:param` path segments
 - **Blueprint-based parsing** - Supports string, number, boolean, and enum parameter values
 - **URL encoding** - Decodes path values during parsing and encodes them during serialization
-- **Default values** - Resolves missing or invalid values to the configured blueprint default
+- **Safe path segments** - Rejects empty values and exact `.` or `..` segments while allowing other encoded characters
+- **Default values** - Resolves missing parameters and blueprint-unrecognized values to the configured default
 - **Route integration** - Provides the codec consumed by `createAppRoute`
 
 ## 3. Concepts
 
 ### Route Path
 
-`RoutePath` represents a route pattern that may contain `:param` segments, such as `/alerts/:id`.
+`RoutePath` represents a route pattern that may contain complete `:param` segments, such as `/alerts/:id`. A parameter is recognized only when its segment starts with `:`; a colon within a static segment does not define a parameter. Optional parameter segments such as `:id?` are unsupported and rejected.
 
 ### Blueprint
 
@@ -25,6 +26,7 @@ Type-safe URL path parameter extraction and serialization. The module derives pa
 - `type` is a representative value used for type inference.
 - `parse(value)` converts a raw path segment into the typed value.
 - `stringify(value)` converts the typed value into a path segment.
+- Values are URI-decoded during parsing and URI-encoded during serialization. Empty values and values that decode/stringify to exactly `.` or `..` are rejected; other punctuation is allowed.
 
 ### Blueprint Map
 
@@ -127,7 +129,7 @@ const AlertPage = () => {
 
 ### Data Flow And Boundaries
 
-The input boundary is a route `Location` and its pathname. The codec locates each `:param` segment, decodes the corresponding value, and passes it through the configured blueprint parser. Serialization reverses the process and encodes each blueprint value into the path. Missing or invalid values are handled by the blueprint defaults.
+The input boundary is a route `Location` and its pathname. The codec locates each complete `:param` segment, decodes the corresponding value, rejects empty and exact dot-segment values, and passes valid values through the configured blueprint parser. Serialization applies the same value checks and URI-encodes each blueprint value into one path segment. Missing parameters and values not recognized by a blueprint use its configured default.
 
 ## 7. Related Modules
 

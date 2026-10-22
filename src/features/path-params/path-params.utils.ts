@@ -5,6 +5,13 @@ import type {
   RoutePath
 } from 'features/path-params';
 import type { Location } from 'react-router';
+import type { RoutePathWithoutOptionalParams } from './path-params.models';
+
+const assertValidPathParam = (value: string): void => {
+  if (value === '' || value === '.' || value === '..') {
+    throw new TypeError('Path parameter values must not be empty, "." or "..".');
+  }
+};
 
 //*****************************************************************************************
 // Path Param Blueprints
@@ -75,7 +82,14 @@ export const PATH_PARAM_BLUEPRINTS_MAP = {
 //*****************************************************************************************
 // Create Path Param Codec
 //*****************************************************************************************
-export function createPathParamsCodec<const Path extends RoutePath>(basePath: Path) {
+export function createPathParamsCodec<const Path extends RoutePath>(
+  basePath: Path & RoutePathWithoutOptionalParams<Path>
+) {
+  const initialBasePath = typeof basePath === 'string' ? basePath : '';
+  if (initialBasePath.split('/').some(segment => segment.startsWith(':') && segment.endsWith('?'))) {
+    throw new TypeError('Optional path parameters are not supported.');
+  }
+
   return function <const Blueprints extends InferPathParamBlueprintMapFromPath<Path>>(
     input: (blueprints: typeof PATH_PARAM_BLUEPRINTS_MAP) => Blueprints
   ) {
@@ -106,11 +120,15 @@ export function createPathParamsCodec<const Path extends RoutePath>(basePath: Pa
           continue;
         }
 
+        let decodedCandidate: string;
         try {
-          raw[paramKey] = decodeURIComponent(candidate);
+          decodedCandidate = decodeURIComponent(candidate);
         } catch {
-          raw[paramKey] = candidate;
+          decodedCandidate = candidate;
         }
+
+        assertValidPathParam(decodedCandidate);
+        raw[paramKey] = decodedCandidate;
       }
 
       const parsed = {} as InferPathParamValuesFromBlueprintMap<Blueprints>;
@@ -135,7 +153,10 @@ export function createPathParamsCodec<const Path extends RoutePath>(basePath: Pa
         const value = safeParams[key as keyof typeof safeParams];
         if (!parser) continue;
 
-        parts[index] = encodeURIComponent(parser.stringify(value as never));
+        const serializedValue = parser.stringify(value as never);
+        const encodedValue = encodeURIComponent(serializedValue);
+        assertValidPathParam(serializedValue);
+        parts[index] = encodedValue;
       }
 
       return parts.join('/');
