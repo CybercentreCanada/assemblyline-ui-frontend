@@ -1,7 +1,7 @@
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import type { ButtonProps, FormControlLabelProps, TypographyProps } from '@mui/material';
 import { Button, FormControlLabel, Skeleton, Typography, useTheme } from '@mui/material';
-import { usePropStore } from 'features/prop-provider/prop-provider.providers';
+import { usePropStore } from 'features/prop-provider';
 import React, { useMemo } from 'react';
 import { InputRequiredBadge } from 'ui/inputs/components/inputs.component.form.tsx';
 import {
