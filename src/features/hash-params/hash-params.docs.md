@@ -47,6 +47,7 @@ Pass the allowed value union as the `Value` type argument to `createHashParamCod
 | `enum(values, defaultValue?)` | `undefined` | Returns a matching option; uses the default for a missing, empty, or unmatched hash |
 
 Distinct enum options must not share a string representation. For example, `[1, '1']` is rejected because both options serialize to the same hash text.
+An empty string option is accepted only when `''` is explicitly configured as the enum default, because an empty hash represents the default value.
 
 ### Creating A Codec
 
@@ -108,7 +109,7 @@ For an enum codec, `value` is `DocumentationSection | undefined`, and `codec.str
 
 ### Data Flow And Boundaries
 
-The input is a React Router `Location`. Parsing removes one leading `#`, attempts to decode the fragment, then passes the result to the blueprint parser. A string blueprint uses its default for missing or empty input; an enum uses its configured default or returns `undefined` when the value is missing or unmatched. Serialization runs the blueprint serializer; empty output becomes an empty hash, while non-empty output is passed to `encodeURIComponent` and prefixed with `#`.
+The input is a React Router `Location`. Parsing removes one leading `#`, attempts to decode the fragment, then passes the result to the blueprint parser. A string blueprint uses its default for missing or empty input; an enum uses its configured default or returns `undefined` when the value is missing or unmatched. Serialization runs the blueprint serializer; empty output becomes an empty hash, while non-empty output is passed to `encodeURIComponent` and prefixed with `#`. If the output contains malformed UTF-16, such as a lone surrogate, `encodeURIComponent` throws `URIError` rather than emitting a fragment that cannot round-trip.
 
 ## 7. Related Modules
 

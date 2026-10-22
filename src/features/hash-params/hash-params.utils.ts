@@ -39,6 +39,10 @@ export const HASH_PARAM_BLUEPRINTS = {
     const optionByString = new Map<string, Values[number]>();
 
     for (const option of values) {
+      if (option === '' && option !== defaultValue) {
+        throw new TypeError('Empty enum options must be the configured default.');
+      }
+
       const serialized = String(option);
       if (optionByString.has(serialized) && !Object.is(optionByString.get(serialized), option)) {
         throw new TypeError('Enum options must have unique string representations.');
@@ -117,11 +121,7 @@ export function createHashParamCodec<const Value extends HashParamValue>() {
       const stringified = blueprint.stringify(value);
       if (!stringified) return '';
 
-      try {
-        return `#${encodeURIComponent(stringified)}`;
-      } catch {
-        return `#${stringified}`;
-      }
+      return `#${encodeURIComponent(stringified)}`;
     };
 
     return { blueprint, type, parse, stringify };

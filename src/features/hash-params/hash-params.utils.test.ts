@@ -44,6 +44,30 @@ describe('hash-params.codec', () => {
       );
     });
 
+    it('rejects empty enum options unless empty is the configured default', () => {
+      expect(() => HASH_PARAM_BLUEPRINTS.enum(['', 'section'] as const)).toThrow(
+        'Empty enum options must be the configured default.'
+      );
+      expect(() => HASH_PARAM_BLUEPRINTS.enum(['section', ''] as const, 'section')).toThrow(
+        'Empty enum options must be the configured default.'
+      );
+
+      const codec = createHashParamCodec()(blueprint => blueprint.enum(['', 'section'] as const, ''));
+      const emptyLocation: Location = { pathname: '/test', hash: '', search: '', state: null, key: 'default' };
+      const sectionLocation: Location = {
+        pathname: '/test',
+        hash: '#section',
+        search: '',
+        state: null,
+        key: 'default'
+      };
+
+      expect(codec.stringify('')).toBe('');
+      expect(codec.parse(emptyLocation)).toBe('');
+      expect(codec.stringify('section')).toBe('#section');
+      expect(codec.parse(sectionLocation)).toBe('section');
+    });
+
     it('should parse enum hash values correctly', () => {
       const codec = createHashParamCodec()(blueprint => blueprint.enum(['title', 'section-1', 'section-2']));
 
@@ -87,6 +111,13 @@ describe('hash-params.codec', () => {
 
       const location: Location = { pathname: '/test', hash: encoded, search: '', state: null, key: 'default' };
       expect(codec.parse(location)).toBe('my section/#%');
+    });
+
+    it('throws for malformed Unicode instead of emitting an unencoded hash', () => {
+      const malformedValue = '\uD800%41';
+      const codec = createHashParamCodec()(blueprint => blueprint.enum([malformedValue, 'other-section'] as const));
+
+      expect(() => codec.stringify(malformedValue)).toThrow(URIError);
     });
 
     it('should provide a type property for compile-time inference', () => {
