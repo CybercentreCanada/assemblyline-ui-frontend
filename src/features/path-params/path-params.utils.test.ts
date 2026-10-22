@@ -150,6 +150,13 @@ describe('createPathParamsCodec', () => {
     expect(codec.stringify({ itemID: 'a b' })).toBe('/item/a%20b');
   });
 
+  it('throws instead of emitting an unencoded value with malformed Unicode', () => {
+    const codec = createPathParamsCodec('/item/:itemID')(b => ({ itemID: b.string() }));
+    const itemID = 'a\uD800/other?x=1#frag';
+
+    expect(() => codec.stringify({ itemID })).toThrow(URIError);
+  });
+
   it('stringifies null enum values to the configured default', () => {
     const codec = createPathParamsCodec('/file/viewer/:id/:tab')(b => ({
       id: b.string(),

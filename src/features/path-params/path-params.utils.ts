@@ -123,11 +123,7 @@ export function createPathParamsCodec<const Path extends RoutePath>(basePath: Pa
         const value = safeParams[key as keyof typeof safeParams];
         if (!parser) continue;
 
-        try {
-          parts[index] = encodeURIComponent(parser.stringify(value as never));
-        } catch {
-          parts[index] = String(value ?? '');
-        }
+        parts[index] = encodeURIComponent(parser.stringify(value as never));
       }
 
       return parts.join('/');
