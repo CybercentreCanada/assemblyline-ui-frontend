@@ -136,6 +136,27 @@ describe('createPathParamsCodec', () => {
     expect(codec.parse(makeLocation('/item/abc/page/3'))).toEqual({ itemID: 'abc', pageNumber: 3 });
   });
 
+  it('round-trips an empty parameter before a subsequent parameter', () => {
+    const codec = createPathParamsCodec('/item/:itemID/page/:pageNumber')(b => ({
+      itemID: b.string(),
+      pageNumber: b.number(0)
+    }));
+    const params = { itemID: '', pageNumber: 3 };
+    const pathname = codec.stringify(params);
+
+    expect(pathname).toBe('/item//page/3');
+    expect(codec.parse(makeLocation(pathname))).toEqual(params);
+  });
+
+  it('round-trips an empty trailing parameter', () => {
+    const codec = createPathParamsCodec('/item/:itemID')(b => ({ itemID: b.string() }));
+    const params = { itemID: '' };
+    const pathname = codec.stringify(params);
+
+    expect(pathname).toBe('/item/');
+    expect(codec.parse(makeLocation(pathname))).toEqual(params);
+  });
+
   it('uses default values when the pathname segment is missing', () => {
     const codec = createPathParamsCodec('/item/:itemID')(b => ({ itemID: b.string('none') }));
     expect(codec.parse(makeLocation('/item'))).toEqual({ itemID: 'none' });

@@ -92,8 +92,8 @@ export function createPathParamsCodec<const Path extends RoutePath>(basePath: Pa
       const safePathname = typeof location?.pathname === 'string' ? location?.pathname : '';
       const safeBasePath = typeof basePath === 'string' ? basePath : '';
       const raw: Record<string, string | undefined> = {};
-      const pathnameParts = safePathname.split('/').filter(Boolean);
-      const baseParts = safeBasePath.split('/').filter(Boolean);
+      const pathnameParts = safePathname.split('/');
+      const baseParts = safeBasePath.split('/');
 
       for (let index = 0; index < baseParts.length; index += 1) {
         const part = baseParts[index];
