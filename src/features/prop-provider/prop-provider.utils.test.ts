@@ -1,10 +1,4 @@
-import {
-  deepReconcile,
-  isValidNumber,
-  isValidValue,
-  shallowEqual,
-  shallowReconcile
-} from 'features/prop-provider/prop-provider.utils.ts';
+import { deepReconcile, isValidNumber, isValidValue, shallowEqual, shallowReconcile } from 'features/prop-provider';
 import { describe, expect, it } from 'vitest';
 
 describe('isValidValue', () => {

@@ -1,5 +1,6 @@
 import { Switch } from '@mui/material';
-import { PropProvider, usePropStore } from 'features/prop-provider/prop-provider.providers';
+import { PropProvider, usePropStore } from 'features/prop-provider';
+import React from 'react';
 import {
   HelpInputAdornment,
   PasswordInputAdornment,
@@ -20,7 +21,6 @@ import {
 } from 'ui/list-inputs/lib/listinputs.components.tsx';
 import type { ListInputOptions, ListInputSlotProps } from 'ui/list-inputs/lib/listinputs.model.ts';
 import { DEFAULT_LIST_INPUT_CONTROLLER_PROPS } from 'ui/list-inputs/lib/listinputs.model.ts';
-import React from 'react';
 
 export type SwitchListInputProps = InputValueModel<boolean, React.MouseEvent<HTMLDivElement, MouseEvent>> &
   ListInputOptions &
