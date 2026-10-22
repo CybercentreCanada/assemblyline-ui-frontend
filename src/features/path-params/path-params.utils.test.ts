@@ -128,6 +128,11 @@ describe('createPathParamsCodec', () => {
     expect(codec.parse(makeLocation('/item/abc'))).toEqual({ itemID: 'abc' });
   });
 
+  it('parses a slashless root-level route pattern', () => {
+    const codec = createPathParamsCodec('item/:itemID')(b => ({ itemID: b.string() }));
+    expect(codec.parse(makeLocation('/item/abc'))).toEqual({ itemID: 'abc' });
+  });
+
   it('parses multiple typed path params from the location', () => {
     const codec = createPathParamsCodec('/item/:itemID/page/:pageNumber')(b => ({
       itemID: b.string(),
