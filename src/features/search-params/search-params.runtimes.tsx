@@ -1,19 +1,22 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { BaseBlueprint } from 'features/search-params/search-params.blueprints.tsx';
+import type { BaseSearchParamBlueprint, SearchParamValue } from 'features/search-params';
 import {
-  BooleanBlueprint,
-  EnumBlueprint,
-  FiltersBlueprint,
-  NumberBlueprint,
-  StringBlueprint
-} from 'features/search-params/search-params.blueprints.tsx';
-import type { ParamValues } from 'features/SearchParams/lib/search_params.model';
+  BooleanSearchParamBlueprint,
+  EnumSearchParamBlueprint,
+  FiltersSearchParamBlueprint,
+  NumberSearchParamBlueprint,
+  ObjectSearchParamBlueprint,
+  StringSearchParamBlueprint
+} from 'features/search-params';
 
 /**
  * Factory that wraps a blueprint class and re-exposes its
  * protected methods as public runtime utilities.
  */
-export function Runtime<T extends ParamValues, B extends abstract new (...args: any[]) => BaseBlueprint<T>>(Base: B) {
+export function SearchParamRuntimeFactory<
+  T extends SearchParamValue,
+  B extends abstract new (...args: any[]) => BaseSearchParamBlueprint<T>
+>(Base: B) {
   abstract class Accessor extends Base {
     // Getters
     public override getDefaultValue = super.getDefaultValue;
@@ -21,7 +24,11 @@ export function Runtime<T extends ParamValues, B extends abstract new (...args: 
     public override isIgnored = super.isIgnored;
     public override isLocked = super.isLocked;
     public override isNullable = super.isNullable;
-    public override getOrigin = super.getOrigin;
+    public override getSource = super.getSource;
+
+    // Introspection
+    public override getKind = super.getKind;
+    public override describe = super.describe;
 
     // Setters
     public override setDefaultValue = super.setDefaultValue;
@@ -34,6 +41,7 @@ export function Runtime<T extends ParamValues, B extends abstract new (...args: 
     public override full = super.full;
     public override delta = super.delta;
     public override fromLocation = super.fromLocation;
+    public override fromRoute = super.fromRoute;
 
     // Resolvers
     public override toParams = super.toParams;
@@ -42,15 +50,14 @@ export function Runtime<T extends ParamValues, B extends abstract new (...args: 
   return Accessor;
 }
 
-export type ParamRuntime = InstanceType<ReturnType<typeof Runtime>>;
-
 /**
  * Collection of runtime wrappers for each blueprint type.
  */
-export const PARAM_RUNTIMES = {
-  boolean: Runtime(BooleanBlueprint),
-  number: Runtime(NumberBlueprint),
-  string: Runtime(StringBlueprint),
-  filters: Runtime(FiltersBlueprint),
-  enum: Runtime(EnumBlueprint)
+export const SEARCH_PARAM_RUNTIME_MAP = {
+  boolean: SearchParamRuntimeFactory(BooleanSearchParamBlueprint),
+  number: SearchParamRuntimeFactory(NumberSearchParamBlueprint),
+  string: SearchParamRuntimeFactory(StringSearchParamBlueprint),
+  filters: SearchParamRuntimeFactory(FiltersSearchParamBlueprint),
+  object: SearchParamRuntimeFactory(ObjectSearchParamBlueprint),
+  enum: SearchParamRuntimeFactory(EnumSearchParamBlueprint)
 } as const;
