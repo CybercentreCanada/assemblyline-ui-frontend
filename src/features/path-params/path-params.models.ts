@@ -143,3 +143,23 @@ export type PathPattern = {
   absolute: boolean;
   segments: PathPatternSegment[];
 };
+
+/** A linked list of matched parameter values, ordered from the first pattern segment to the last. */
+export type PathAssignment = { key: string; value: string | undefined; next: PathAssignment | null };
+
+/** A complete match of a pathname against a pattern; `missingRequired` counts required params that had no segment. */
+export type PathMatch = { missingRequired: number; assignments: PathAssignment | null };
+
+/** Working state shared by every step of one pathname match. */
+export type PathMatchContext = {
+  segments: PathPatternSegment[];
+  pathParts: string[];
+  isRoot: boolean;
+  /** Lazily decoded pathname segments, indexed like `pathParts`. */
+  decodedParts: (string | undefined)[];
+  /** Memoized results keyed by pattern and pathname position; `null` means no match. */
+  memo: Map<number, PathMatch | null>;
+};
+
+/** Finds the best match of the pattern suffix from `segmentIndex` against the pathname suffix from `pathIndex`. */
+export type PathMatchFinder = (context: PathMatchContext, segmentIndex: number, pathIndex: number) => PathMatch | null;
