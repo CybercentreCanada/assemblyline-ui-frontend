@@ -15,34 +15,52 @@ type PathSegments<Path extends string> = Path extends `${infer Segment}/${infer 
   ? Segment | PathSegments<Rest>
   : Path;
 
-type OptionalPathParamSegments<Path extends string> = Extract<PathSegments<Path>, `:${string}?`>;
+type OptionalStaticPathSegments<Path extends string> = Exclude<
+  Extract<PathSegments<Path>, `${string}?`>,
+  Extract<PathSegments<Path>, `:${string}?`>
+>;
 
 type PathParamKeyFromSegments<Segments> = Segments extends string
   ? Segments extends `:${infer Key}`
     ? Key extends `${string}?`
-      ? never
+      ? Key extends `${infer RequiredKey}?`
+        ? RequiredKey
+        : never
       : Key
     : never
   : never;
 
-/** Resolves to `never` for literal route paths containing optional parameter segments. */
-export type RoutePathWithoutOptionalParams<Path extends RoutePath> = Path extends string
+type OptionalPathParamKeyFromSegments<Segments> = Segments extends string
+  ? Segments extends `:${infer Key}?`
+    ? Key
+    : never
+  : never;
+
+/** Resolves to `never` for literal route paths containing optional static segments. */
+export type RoutePathWithoutOptionalStaticSegments<Path extends RoutePath> = Path extends string
   ? string extends Path
     ? Path
-    : OptionalPathParamSegments<Path> extends never
+    : OptionalStaticPathSegments<Path> extends never
       ? Path
       : never
   : never;
 
+/** Extracts the keys of optional `:param?` segments from a route path literal. */
+export type InferOptionalPathParamKeyFromPath<Path extends RoutePath> = string extends Path
+  ? never
+  : Path extends string
+    ? OptionalPathParamKeyFromSegments<PathSegments<Path>>
+    : never;
+
 /**
  * Extracts keys only from complete `:param` segments in a route path literal.
  * E.g. `'/users/:id/posts/:postId'` → `'id' | 'postId'`.
- * Optional parameter segments are unsupported and resolve to `never`.
+ * Optional path segments are unsupported and resolve to `never`.
  */
 export type InferPathParamKeyFromPath<Path extends RoutePath> = string extends Path
   ? string
   : Path extends string
-    ? OptionalPathParamSegments<Path> extends never
+    ? OptionalStaticPathSegments<Path> extends never
       ? PathParamKeyFromSegments<PathSegments<Path>>
       : never
     : never;
@@ -89,6 +107,16 @@ export type InferPathParamBlueprintMapFromPath<Path extends RoutePath = RoutePat
  */
 export type InferPathParamValuesFromBlueprintMap<Blueprints extends InferPathParamBlueprintMapFromPath> = {
   -readonly [K in keyof Blueprints]: Blueprints[K] extends InferPathParamBlueprintFromValue<infer V> ? V : never;
+};
+
+/** Values accepted by stringify; optional path parameters may be omitted or set to null. */
+export type InferPathParamStringifyValuesFromBlueprintMap<
+  Path extends RoutePath,
+  Blueprints extends InferPathParamBlueprintMapFromPath<Path>
+> = Omit<InferPathParamValuesFromBlueprintMap<Blueprints>, InferOptionalPathParamKeyFromPath<Path>> & {
+  [Key in Extract<keyof Blueprints, InferOptionalPathParamKeyFromPath<Path>>]?:
+    | InferPathParamValuesFromBlueprintMap<Blueprints>[Key]
+    | null;
 };
 
 //*****************************************************************************************

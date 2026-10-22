@@ -17,7 +17,7 @@ Type-safe URL path parameter extraction and serialization. The module derives pa
 
 ### Route Path
 
-`RoutePath` represents a route pattern that may contain complete `:param` segments, such as `/alerts/:id`. A parameter is recognized only when its segment starts with `:`; a colon within a static segment does not define a parameter. Optional parameter segments such as `:id?` are unsupported and rejected.
+`RoutePath` represents a route pattern that may contain required `:param` or optional `:param?` segments, such as `/alerts/:id/:tab?`. Optional parameters still require a blueprint; when the URL omits the segment, the blueprint parses `undefined` and supplies its configured default. A parameter is recognized only when its segment starts with `:`; a colon within a static segment does not define a parameter. Optional static segments such as `view?` remain unsupported.
 
 ### Blueprint
 
@@ -30,7 +30,7 @@ Type-safe URL path parameter extraction and serialization. The module derives pa
 
 ### Blueprint Map
 
-`InferPathParamBlueprintMapFromPath<Path>` maps every parameter key extracted from `Path` to a blueprint. A path without parameters resolves to `never`.
+`InferPathParamBlueprintMapFromPath<Path>` maps every parameter key extracted from `Path` to a blueprint, removing the `?` marker from optional parameter keys. A path without parameters resolves to `never`. Every entry returned by the codec's blueprint callback must be a path-param blueprint.
 
 ### Codec
 
@@ -39,7 +39,7 @@ Type-safe URL path parameter extraction and serialization. The module derives pa
 - `blueprints` - The configured parameter blueprints
 - `type` - A typed object used for inference
 - `parse(location)` - Reads and converts values from `location.pathname`
-- `stringify(params)` - Replaces `:param` segments with encoded values
+- `stringify(params)` - Replaces required `:param` segments with encoded values and omits optional segments when their values are omitted or `null`
 
 ## 4. Configuration
 
@@ -62,7 +62,7 @@ const codec = createPathParamsCodec('/alerts/:id')(blueprints => ({
 }));
 ```
 
-The path literal determines the required blueprint keys. Each key must have a matching blueprint in the callback result.
+The path literal determines the required blueprint keys, including a blueprint for every optional parameter. Each key must have a matching blueprint in the callback result, and every callback entry must be a blueprint.
 
 ## 5. Usage
 
@@ -122,9 +122,11 @@ const AlertPage = () => {
 | `RoutePath` | Route path pattern type |
 | `PathParamValue` | Allowed string, number, and boolean values |
 | `InferPathParamKeyFromPath<Path>` | Extracts parameter keys from a path literal |
+| `InferOptionalPathParamKeyFromPath<Path>` | Extracts keys for optional dynamic segments |
 | `InferPathParamBlueprintFromValue<Value>` | Defines one parameter blueprint |
 | `InferPathParamBlueprintMapFromPath<Path>` | Maps extracted keys to blueprints |
 | `InferPathParamValuesFromBlueprintMap<Blueprints>` | Resolves blueprint values into an object type |
+| `InferPathParamStringifyValuesFromBlueprintMap<Path, Blueprints>` | Allows optional path parameters to be omitted during serialization |
 | `InferPathParamCodecFromPath<Path>` | Describes the inferred codec type for a path |
 
 ### Data Flow And Boundaries

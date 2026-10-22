@@ -1,11 +1,12 @@
 import type {
   InferPathParamBlueprintFromValue,
   InferPathParamBlueprintMapFromPath,
+  InferPathParamStringifyValuesFromBlueprintMap,
   InferPathParamValuesFromBlueprintMap,
-  RoutePath
+  RoutePath,
+  RoutePathWithoutOptionalStaticSegments
 } from 'features/path-params';
 import type { Location } from 'react-router';
-import type { RoutePathWithoutOptionalParams } from './path-params.models';
 
 const assertValidPathParam = (value: string): void => {
   if (value === '' || value === '.' || value === '..') {
@@ -71,7 +72,7 @@ export const PATH_PARAM_BLUEPRINTS_MAP = {
       },
       stringify: value => {
         for (const candidate of values) {
-          if (String(candidate) === String(value)) return String(candidate);
+          if (Object.is(candidate, value)) return String(candidate);
         }
         return String(defaultValue);
       }
@@ -83,16 +84,16 @@ export const PATH_PARAM_BLUEPRINTS_MAP = {
 // Create Path Param Codec
 //*****************************************************************************************
 export function createPathParamsCodec<const Path extends RoutePath>(
-  basePath: Path & RoutePathWithoutOptionalParams<Path>
+  basePath: Path & RoutePathWithoutOptionalStaticSegments<Path>
 ) {
   const initialBasePath = typeof basePath === 'string' ? basePath : '';
-  if (initialBasePath.split('/').some(segment => segment.startsWith(':') && segment.endsWith('?'))) {
-    throw new TypeError('Optional path parameters are not supported.');
+  if (initialBasePath.split('/').some(segment => segment.endsWith('?') && !segment.startsWith(':'))) {
+    throw new TypeError('Optional static path segments are not supported.');
   }
 
-  return function <const Blueprints extends InferPathParamBlueprintMapFromPath<Path>>(
-    input: (blueprints: typeof PATH_PARAM_BLUEPRINTS_MAP) => Blueprints
-  ) {
+  return function <
+    const Blueprints extends InferPathParamBlueprintMapFromPath<Path> & Record<string, InferPathParamBlueprintFromValue>
+  >(input: (blueprints: typeof PATH_PARAM_BLUEPRINTS_MAP) => Blueprints) {
     const blueprints = input(PATH_PARAM_BLUEPRINTS_MAP);
     const blueprintMap = blueprints as Record<string, InferPathParamBlueprintFromValue>;
     const blueprintKeys = Object.keys(blueprints || {});
@@ -105,19 +106,39 @@ export function createPathParamsCodec<const Path extends RoutePath>(
     const parse = (location: Location): InferPathParamValuesFromBlueprintMap<Blueprints> => {
       const safePathname = typeof location?.pathname === 'string' ? location?.pathname : '';
       const safeBasePath = typeof basePath === 'string' ? basePath : '';
-      const raw: Record<string, string | undefined> = Object.create(null);
       const pathnameParts = safePathname.replace(/^\//, '').split('/');
       const baseParts = safeBasePath.replace(/^\//, '').split('/');
 
-      for (let index = 0; index < baseParts.length; index += 1) {
-        const part = baseParts[index];
-        if (!part || part[0] !== ':') continue;
+      const matchSegments = (
+        baseIndex: number,
+        pathnameIndex: number,
+        params: Record<string, string | undefined>
+      ): Record<string, string | undefined> | null => {
+        if (baseIndex === baseParts.length) {
+          return pathnameIndex === pathnameParts.length ||
+            (pathnameIndex === pathnameParts.length - 1 && pathnameParts[pathnameIndex] === '')
+            ? params
+            : null;
+        }
 
-        const paramKey = part.slice(1);
-        const candidate = pathnameParts[index];
+        const part = baseParts[baseIndex];
+        if (!part || part[0] !== ':') {
+          if (
+            pathnameIndex >= pathnameParts.length ||
+            part.toLowerCase() !== pathnameParts[pathnameIndex].toLowerCase()
+          ) {
+            return null;
+          }
+          return matchSegments(baseIndex + 1, pathnameIndex + 1, params);
+        }
+
+        const optional = part.endsWith('?');
+        const paramKey = part.slice(1, optional ? -1 : undefined);
+        const candidate = pathnameParts[pathnameIndex];
         if (candidate === undefined) {
-          raw[paramKey] = undefined;
-          continue;
+          const missingParams = Object.assign(Object.create(null), params) as Record<string, string | undefined>;
+          missingParams[paramKey] = undefined;
+          return matchSegments(baseIndex + 1, pathnameIndex, missingParams);
         }
 
         let decodedCandidate: string;
@@ -128,8 +149,17 @@ export function createPathParamsCodec<const Path extends RoutePath>(
         }
 
         assertValidPathParam(decodedCandidate);
-        raw[paramKey] = decodedCandidate;
-      }
+        const includedParams = Object.assign(Object.create(null), params) as Record<string, string | undefined>;
+        includedParams[paramKey] = decodedCandidate;
+        const includedMatch = matchSegments(baseIndex + 1, pathnameIndex + 1, includedParams);
+        if (includedMatch || !optional) return includedMatch;
+
+        const omittedParams = Object.assign(Object.create(null), params) as Record<string, string | undefined>;
+        omittedParams[paramKey] = undefined;
+        return matchSegments(baseIndex + 1, pathnameIndex, omittedParams);
+      };
+
+      const raw = matchSegments(0, 0, Object.create(null)) ?? Object.create(null);
 
       const parsed = Object.create(null) as InferPathParamValuesFromBlueprintMap<Blueprints>;
       for (const key of blueprintKeys) {
@@ -139,24 +169,31 @@ export function createPathParamsCodec<const Path extends RoutePath>(
       return parsed;
     };
 
-    const stringify = (params: InferPathParamValuesFromBlueprintMap<Blueprints>): string => {
+    const stringify = (params: InferPathParamStringifyValuesFromBlueprintMap<Path, Blueprints>): string => {
       const safeBasePath = typeof basePath === 'string' ? basePath : '';
       const safeParams = (params ?? {}) as Partial<InferPathParamValuesFromBlueprintMap<Blueprints>>;
-      const parts = safeBasePath.split('/');
+      const parts: string[] = [];
 
-      for (let index = 0; index < parts.length; index += 1) {
-        const part = parts[index];
-        if (!part || part[0] !== ':') continue;
+      for (const part of safeBasePath.split('/')) {
+        if (!part || part[0] !== ':') {
+          parts.push(part);
+          continue;
+        }
 
-        const key = part.slice(1);
+        const optional = part.endsWith('?');
+        const key = part.slice(1, optional ? -1 : undefined);
         const parser = blueprintMap[key];
         const value = safeParams[key as keyof typeof safeParams];
-        if (!parser) continue;
+        if (optional && value == null) continue;
+        if (!parser) {
+          parts.push(part);
+          continue;
+        }
 
         const serializedValue = parser.stringify(value as never);
         const encodedValue = encodeURIComponent(serializedValue);
         assertValidPathParam(serializedValue);
-        parts[index] = encodedValue;
+        parts.push(encodedValue);
       }
 
       return parts.join('/');

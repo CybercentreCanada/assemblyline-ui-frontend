@@ -1,4 +1,4 @@
-import type { InferPathParamKeyFromPath, RoutePath } from 'features/path-params';
+import type { InferOptionalPathParamKeyFromPath, InferPathParamKeyFromPath, RoutePath } from 'features/path-params';
 import { createPathParamsCodec, PATH_PARAM_BLUEPRINTS_MAP } from 'features/path-params';
 import type { Location } from 'react-router';
 import { describe, expect, expectTypeOf, it } from 'vitest';
@@ -115,6 +115,14 @@ describe('PATH_PARAM_BLUEPRINTS_MAP.enum', () => {
     expect(blueprint.stringify(null as never)).toBe('ascii');
     expect(blueprint.stringify('invalid' as never)).toBe('ascii');
   });
+
+  it('does not match invalid values to enum options by string representation', () => {
+    const nullBlueprint = PATH_PARAM_BLUEPRINTS_MAP.enum(['ascii', 'null'] as const, 'ascii');
+    const undefinedBlueprint = PATH_PARAM_BLUEPRINTS_MAP.enum(['ascii', 'undefined'] as const, 'ascii');
+
+    expect(nullBlueprint.stringify(null as never)).toBe('ascii');
+    expect(undefinedBlueprint.stringify(undefined as never)).toBe('ascii');
+  });
 });
 
 //*****************************************************************************************
@@ -129,15 +137,30 @@ describe('createPathParamsCodec', () => {
     expectTypeOf<InferPathParamKeyFromPath<'/items/version:latest'>>().toEqualTypeOf<never>();
   });
 
-  it('rejects optional route parameters', () => {
-    const optionalPath: RoutePath = '/item/:itemID?';
-    expect(() => createPathParamsCodec(optionalPath)).toThrow('Optional path parameters are not supported.');
-    expectTypeOf<InferPathParamKeyFromPath<'/item/:itemID?'>>().toEqualTypeOf<never>();
+  it('extracts optional dynamic keys without their marker', () => {
+    expectTypeOf<InferPathParamKeyFromPath<'/item/:itemID/:tab?'>>().toEqualTypeOf<'itemID' | 'tab'>();
+    expectTypeOf<InferOptionalPathParamKeyFromPath<'/item/:itemID/:tab?'>>().toEqualTypeOf<'tab'>();
+  });
 
+  it('rejects optional static route segments', () => {
+    const optionalPath: RoutePath = '/item/:itemID?';
+    expect(() => createPathParamsCodec(optionalPath)(b => ({ itemID: b.string() }))).not.toThrow();
+
+    const optionalStaticPath: RoutePath = '/items/view?/:id';
+    expect(() => createPathParamsCodec(optionalStaticPath)).toThrow('Optional static path segments are not supported.');
     expect(() => {
-      // @ts-expect-error Optional route parameter syntax is unsupported.
-      createPathParamsCodec('/item/:itemID?');
-    }).toThrow('Optional path parameters are not supported.');
+      // @ts-expect-error Optional static route segment syntax is unsupported.
+      createPathParamsCodec('/items/view?/:id');
+    }).toThrow('Optional static path segments are not supported.');
+  });
+
+  it('requires extra callback entries to be path-param blueprints', () => {
+    const createInvalidCodec = () => {
+      // @ts-expect-error Every callback entry must be a path-param blueprint.
+      createPathParamsCodec('/item/:id')(b => ({ id: b.string(), extra: 42 }));
+    };
+
+    expectTypeOf(createInvalidCodec).returns.toBeVoid();
   });
 
   it('parses a single string path param from the location', () => {
@@ -191,6 +214,39 @@ describe('createPathParamsCodec', () => {
   it('uses default values when the pathname segment is missing', () => {
     const codec = createPathParamsCodec('/item/:itemID')(b => ({ itemID: b.string('none') }));
     expect(codec.parse(makeLocation('/item'))).toEqual({ itemID: 'none' });
+  });
+
+  it('uses blueprint defaults for omitted optional params and omits them when stringifying', () => {
+    const codec = createPathParamsCodec('/item/:itemID/:tab?')(b => ({
+      itemID: b.string(),
+      tab: b.enum(['ascii', 'hex'] as const, 'ascii')
+    }));
+
+    expect(codec.parse(makeLocation('/item/abc'))).toEqual({ itemID: 'abc', tab: 'ascii' });
+    expect(codec.stringify({ itemID: 'abc' })).toBe('/item/abc');
+    expect(codec.stringify({ itemID: 'abc', tab: null })).toBe('/item/abc');
+    expect(codec.stringify({ itemID: 'abc', tab: 'hex' })).toBe('/item/abc/hex');
+  });
+
+  it('rejects empty trailing values for optional params', () => {
+    const codec = createPathParamsCodec('/item/:itemID/:tab?')(b => ({
+      itemID: b.string(),
+      tab: b.string('fallback')
+    }));
+
+    expect(codec.parse(makeLocation('/item/abc'))).toEqual({ itemID: 'abc', tab: 'fallback' });
+    expect(() => codec.parse(makeLocation('/item/abc/'))).toThrow(TypeError);
+    expect(() => codec.stringify({ itemID: 'abc', tab: '' })).toThrow(TypeError);
+  });
+
+  it('parses an omitted optional parameter before a required segment', () => {
+    const codec = createPathParamsCodec('/item/:tab?/file/:fileID')(b => ({
+      tab: b.enum(['ascii', 'hex'] as const, 'ascii'),
+      fileID: b.string()
+    }));
+
+    expect(codec.parse(makeLocation('/item/file/abc'))).toEqual({ tab: 'ascii', fileID: 'abc' });
+    expect(codec.stringify({ fileID: 'abc' })).toBe('/item/file/abc');
   });
 
   it('decodes URI-encoded path segments', () => {
