@@ -1,5 +1,6 @@
 import type { InferOptionalPathParamKeyFromPath, InferPathParamKeyFromPath, RoutePath } from 'features/path-params';
 import { createPathParamsCodec, PATH_PARAM_BLUEPRINTS_MAP } from 'features/path-params';
+import { matchPathPattern, parsePathPattern, stringifyPathPattern } from 'features/path-params/path-params.utils';
 import type { Location } from 'react-router';
 import { describe, expect, expectTypeOf, it } from 'vitest';
 
@@ -181,6 +182,12 @@ describe('createPathParamsCodec', () => {
     expect(codec.stringify(parsed)).toBe('/item/abc');
   });
 
+  it('omits an optional __proto__ parameter without reading an inherited value', () => {
+    const codec = createPathParamsCodec('/item/:__proto__?')(b => ({ ['__proto__']: b.string() }));
+
+    expect(codec.stringify({})).toBe('/item');
+  });
+
   it('parses a slashless root-level route pattern', () => {
     const codec = createPathParamsCodec('item/:itemID')(b => ({ itemID: b.string() }));
     expect(codec.parse(makeLocation('/item/abc'))).toEqual({ itemID: 'abc' });
@@ -228,6 +235,36 @@ describe('createPathParamsCodec', () => {
     expect(codec.stringify({ itemID: 'abc', tab: 'hex' })).toBe('/item/abc/hex');
   });
 
+  it('prefers a match that supplies required params over a consumed optional param', () => {
+    const codec = createPathParamsCodec('/item/:tab?/:id')(b => ({
+      tab: b.string('default-tab'),
+      id: b.string('default-id')
+    }));
+    const pathname = codec.stringify({ id: 'abc' });
+
+    expect(pathname).toBe('/item/abc');
+    expect(codec.parse(makeLocation(pathname))).toEqual({ tab: 'default-tab', id: 'abc' });
+  });
+
+  it('uses blueprint defaults to disambiguate omitted adjacent optional params', () => {
+    const codec = createPathParamsCodec('/item/:view?/:tab?')(b => ({
+      view: b.enum(['ascii', 'hex'] as const, 'ascii'),
+      tab: b.enum(['ascii', 'hex'] as const, 'ascii')
+    }));
+    const pathname = codec.stringify({ tab: 'hex' });
+
+    expect(pathname).toBe('/item/ascii/hex');
+    expect(codec.parse(makeLocation(pathname))).toEqual({ view: 'ascii', tab: 'hex' });
+  });
+
+  it('normalizes an omitted root optional param in both directions', () => {
+    const codec = createPathParamsCodec('/:id?')(b => ({ id: b.string('default-id') }));
+
+    expect(codec.parse(makeLocation('/'))).toEqual({ id: 'default-id' });
+    expect(codec.stringify({})).toBe('/');
+    expect(() => codec.stringify({ id: '' })).toThrow(TypeError);
+  });
+
   it('rejects empty trailing values for optional params', () => {
     const codec = createPathParamsCodec('/item/:itemID/:tab?')(b => ({
       itemID: b.string(),
@@ -252,6 +289,21 @@ describe('createPathParamsCodec', () => {
   it('decodes URI-encoded path segments', () => {
     const codec = createPathParamsCodec('/item/:itemID')(b => ({ itemID: b.string() }));
     expect(codec.parse(makeLocation('/item/a%20b'))).toEqual({ itemID: 'a b' });
+  });
+
+  it('matches encoded and unencoded static path segments consistently', () => {
+    const unencodedPatternCodec = createPathParamsCodec('/café/:id')(b => ({ id: b.string('missing') }));
+    const encodedPatternCodec = createPathParamsCodec('/caf%C3%A9/:id')(b => ({ id: b.string('missing') }));
+
+    expect(unencodedPatternCodec.parse(makeLocation('/caf%C3%A9/abc'))).toEqual({ id: 'abc' });
+    expect(encodedPatternCodec.parse(makeLocation('/café/abc'))).toEqual({ id: 'abc' });
+    expect(encodedPatternCodec.parse(makeLocation('/caf%C3%A9/abc'))).toEqual({ id: 'abc' });
+  });
+
+  it('preserves malformed escapes in static segments as literal text', () => {
+    const codec = createPathParamsCodec('/caf%ZZ/:id')(b => ({ id: b.string('missing') }));
+
+    expect(codec.parse(makeLocation('/caf%ZZ/abc'))).toEqual({ id: 'abc' });
   });
 
   it('stringifies path params back into a pathname', () => {
@@ -312,5 +364,81 @@ describe('createPathParamsCodec', () => {
   it('exposes a type property used as a compile-time type marker', () => {
     const codec = createPathParamsCodec('/item/:itemID')(b => ({ itemID: b.string('default') }));
     expect(codec.type).toEqual({ itemID: '' });
+  });
+
+  it('uses the configured string default, not the type marker, to disambiguate adjacent optionals', () => {
+    const codec = createPathParamsCodec('/item/:view?/:tab?')(b => ({
+      view: b.string('summary'),
+      tab: b.string('main')
+    }));
+    const pathname = codec.stringify({ tab: 'raw' });
+
+    expect(pathname).toBe('/item/summary/raw');
+    expect(codec.parse(makeLocation(pathname))).toEqual({ view: 'summary', tab: 'raw' });
+  });
+
+  it('ignores inherited properties on the params and blueprint objects', () => {
+    const codec = createPathParamsCodec('/item/:constructor?')(b => ({ constructor: b.string('fallback') }));
+
+    expect(codec.stringify({} as never)).toBe('/item');
+    expect(codec.parse(makeLocation('/item'))).toEqual({ constructor: 'fallback' });
+  });
+
+  it('matches many consecutive optional params without exponential backtracking', () => {
+    const path = `/item/${Array.from({ length: 24 }, (_, index) => `:p${index}?`).join('/')}/:id`;
+    const codec = createPathParamsCodec(path)(
+      b =>
+        Object.fromEntries([
+          ...Array.from({ length: 24 }, (_, index) => [`p${index}`, b.string('d')]),
+          ['id', b.string()]
+        ]) as never
+    );
+
+    expect(codec.parse(makeLocation('/item/abc'))).toMatchObject({ id: 'abc', p0: 'd', p23: 'd' });
+    expect(codec.parse(makeLocation('/item/x/abc'))).toMatchObject({ id: 'abc', p0: 'x', p1: 'd' });
+  });
+});
+
+//*****************************************************************************************
+// Path Pattern Helpers
+//*****************************************************************************************
+
+describe('parsePathPattern', () => {
+  it('splits a pattern into static and param segments', () => {
+    expect(parsePathPattern('/Item/:id/:tab?')).toEqual({
+      absolute: true,
+      segments: [
+        { kind: 'static', raw: 'Item', normalized: 'item' },
+        { kind: 'param', raw: ':id', key: 'id', optional: false },
+        { kind: 'param', raw: ':tab?', key: 'tab', optional: true }
+      ]
+    });
+  });
+
+  it('tracks a slashless pattern as not absolute', () => {
+    expect(parsePathPattern('item/:id').absolute).toBe(false);
+  });
+});
+
+describe('matchPathPattern', () => {
+  it('returns raw values and null-prototype params', () => {
+    const params = matchPathPattern(parsePathPattern('/item/:id'), '/ITEM/a%20b');
+
+    expect(Object.getPrototypeOf(params)).toBe(null);
+    expect(params).toEqual({ id: 'a b' });
+  });
+
+  it('returns null when the pathname does not match', () => {
+    expect(matchPathPattern(parsePathPattern('/item/:id'), '/other/abc')).toBeNull();
+    expect(matchPathPattern(parsePathPattern('/item/:id'), '/item/abc/extra')).toBeNull();
+  });
+});
+
+describe('stringifyPathPattern', () => {
+  it('only reads own properties of values and blueprints', () => {
+    const blueprints = { id: PATH_PARAM_BLUEPRINTS_MAP.string() };
+
+    expect(stringifyPathPattern(parsePathPattern('/item/:id'), { id: 'abc' }, blueprints)).toBe('/item/abc');
+    expect(stringifyPathPattern(parsePathPattern('/item/:toString?'), {}, blueprints)).toBe('/item');
   });
 });

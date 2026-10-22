@@ -8,6 +8,8 @@ export type {
   InferPathParamValuesFromBlueprintMap,
   PathParamBlueprintKind,
   PathParamValue,
+  PathPattern,
+  PathPatternSegment,
   RoutePath,
   RoutePathWithoutOptionalStaticSegments
 } from './path-params.models';

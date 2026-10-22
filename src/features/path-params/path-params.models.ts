@@ -127,3 +127,19 @@ export type InferPathParamStringifyValuesFromBlueprintMap<
 export type InferPathParamCodecFromPath<Path extends RoutePath> = ReturnType<
   ReturnType<typeof createPathParamsCodec<Path>>
 >;
+
+//*****************************************************************************************
+// Path Pattern
+//*****************************************************************************************
+
+/** One segment of a parsed route pattern; `normalized` is the decoded, lower-cased form used for matching. */
+export type PathPatternSegment =
+  | { kind: 'static'; raw: string; normalized: string }
+  | { kind: 'param'; raw: string; key: string; optional: boolean };
+
+/** A route pattern split into segments once so parsing and serialization do not re-split it on every call. */
+export type PathPattern = {
+  /** Whether the pattern starts with `/`; the leading slash is not represented in `segments`. */
+  absolute: boolean;
+  segments: PathPatternSegment[];
+};

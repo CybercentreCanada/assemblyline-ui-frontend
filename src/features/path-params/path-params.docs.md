@@ -8,16 +8,17 @@ Type-safe URL path parameter extraction and serialization. The module derives pa
 
 - **Typed parameter keys** - Derives keys only from complete `:param` path segments
 - **Blueprint-based parsing** - Supports string, number, boolean, and enum parameter values
-- **URL encoding** - Decodes path values during parsing and encodes them during serialization
-- **Safe path segments** - Rejects empty values and exact `.` or `..` segments while allowing other encoded characters
+- **URL encoding** - Decodes dynamic and static path segments during parsing and encodes dynamic values during serialization; malformed escapes are preserved as literal text
+- **Safe path segments** - Rejects empty parameter values and exact `.` or `..` segments while allowing other encoded characters
 - **Default values** - Resolves missing parameters and blueprint-unrecognized values to the configured default
+- **Optional path matching** - Supports omitted dynamic segments, prioritizes matches that supply required parameters, and disambiguates adjacent optional values during serialization
 - **Route integration** - Provides the codec consumed by `createAppRoute`
 
 ## 3. Concepts
 
 ### Route Path
 
-`RoutePath` represents a route pattern that may contain required `:param` or optional `:param?` segments, such as `/alerts/:id/:tab?`. Optional parameters still require a blueprint; when the URL omits the segment, the blueprint parses `undefined` and supplies its configured default. A parameter is recognized only when its segment starts with `:`; a colon within a static segment does not define a parameter. Optional static segments such as `view?` remain unsupported.
+`RoutePath` represents a route pattern that may contain required `:param` or optional `:param?` segments, such as `/alerts/:id/:tab?`. Optional parameters still require a blueprint; when the URL omits the segment, the blueprint parses `undefined` and supplies its configured default. For a root pattern such as `/:id?`, `/` represents the omitted parameter. Empty parameter values are otherwise invalid. When optional segments could consume a required parameter, parsing prefers the match that supplies more required parameters. A parameter is recognized only when its segment starts with `:`; a colon within a static segment does not define a parameter. Optional static segments such as `view?` remain unsupported.
 
 ### Blueprint
 
@@ -26,7 +27,7 @@ Type-safe URL path parameter extraction and serialization. The module derives pa
 - `type` is a representative value used for type inference.
 - `parse(value)` converts a raw path segment into the typed value.
 - `stringify(value)` converts the typed value into a path segment.
-- Values are URI-decoded during parsing and URI-encoded during serialization. Empty values and values that decode/stringify to exactly `.` or `..` are rejected; other punctuation is allowed.
+- Dynamic values are URI-decoded during parsing and URI-encoded during serialization. Empty values and values that decode/stringify to exactly `.` or `..` are rejected; other punctuation is allowed. Static pattern and pathname segments are also decoded before comparison, with malformed escapes treated literally.
 
 ### Blueprint Map
 
@@ -39,7 +40,7 @@ Type-safe URL path parameter extraction and serialization. The module derives pa
 - `blueprints` - The configured parameter blueprints
 - `type` - A typed object used for inference
 - `parse(location)` - Reads and converts values from `location.pathname`
-- `stringify(params)` - Replaces required `:param` segments with encoded values and omits optional segments when their values are omitted or `null`
+- `stringify(params)` - Replaces required `:param` segments with encoded values and omits optional segments when their values are omitted or `null`. If a later optional value is supplied within a consecutive optional group, preceding omitted params are serialized using their blueprint defaults to preserve their positions. Omitting the parameter in a root pattern such as `/:id?` serializes as `/`.
 
 ## 4. Configuration
 
@@ -131,7 +132,7 @@ const AlertPage = () => {
 
 ### Data Flow And Boundaries
 
-The input boundary is a route `Location` and its pathname. The codec locates each complete `:param` segment, decodes the corresponding value, rejects empty and exact dot-segment values, and passes valid values through the configured blueprint parser. Serialization applies the same value checks and URI-encodes each blueprint value into one path segment. Missing parameters and values not recognized by a blueprint use its configured default.
+The input boundary is a route `Location` and its pathname. The codec compares static segments after decoding both the pattern and pathname, preserving malformed escapes literally. It locates each complete `:param` segment, decodes the corresponding value, rejects empty and exact dot-segment values, and passes valid values through the configured blueprint parser. When optional segments create multiple possible matches, the codec prefers the match with fewer missing required parameters. Serialization applies the same value checks and URI-encodes each blueprint value into one path segment; it reads only own properties from the supplied params object. Missing parameters and values not recognized by a blueprint use its configured default.
 
 ## 7. Related Modules
 
