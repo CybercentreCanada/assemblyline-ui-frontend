@@ -50,8 +50,12 @@ export const OutPortal = memo(({ node }: OutPortalProps) => {
   const outletRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    node.setOutlet(outletRef.current);
-    return () => node.setOutlet(null);
+    const outlet = outletRef.current;
+    node.setOutlet(outlet);
+
+    return () => {
+      if (node.hostEl.parentElement === outlet) node.setOutlet(null);
+    };
   }, [node]);
 
   return <div data-testid="reverse-portal-outlet" ref={outletRef} style={{ display: 'contents' }} />;
