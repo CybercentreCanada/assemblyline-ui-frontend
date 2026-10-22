@@ -31,22 +31,34 @@ export const HASH_PARAM_BLUEPRINTS = {
   enum: <const Values extends readonly [HashParamValue, ...HashParamValue[]]>(
     values: Values,
     defaultValue?: Values[number]
-  ): InferHashParamBlueprintFromValue<Values[number]> => ({
-    type: values[0],
-    kind: 'enum',
-    options: values,
-    parse: value => {
-      if (value == null || value === '') return defaultValue;
-      for (const candidate of values) {
-        if (String(candidate) === value) return candidate;
+  ): InferHashParamBlueprintFromValue<Values[number]> => {
+    const optionByString = new Map<string, Values[number]>();
+
+    for (const option of values) {
+      const serialized = String(option);
+      if (optionByString.has(serialized) && !Object.is(optionByString.get(serialized), option)) {
+        throw new TypeError('Enum options must have unique string representations.');
       }
-      return defaultValue;
-    },
-    stringify: value => {
-      if (value == null || value === defaultValue) return '';
-      return String(value);
+      optionByString.set(serialized, option);
     }
-  })
+
+    return {
+      type: values[0],
+      kind: 'enum',
+      options: values,
+      parse: value => {
+        if (value == null || value === '') return defaultValue;
+        for (const candidate of values) {
+          if (String(candidate) === value) return candidate;
+        }
+        return defaultValue;
+      },
+      stringify: value => {
+        if (value == null || value === defaultValue) return '';
+        return String(value);
+      }
+    };
+  }
 };
 
 /**
