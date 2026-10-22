@@ -80,13 +80,13 @@ describe('hash-params.codec', () => {
     });
 
     it('should handle URL encoding/decoding', () => {
-      const codec = createHashParamCodec()(blueprint => blueprint.enum(['my-section', 'other-section']));
+      const codec = createHashParamCodec()(blueprint => blueprint.enum(['my section/#%', 'other-section']));
 
-      const encoded = codec.stringify('my-section');
-      expect(encoded).toBe('#my-section');
+      const encoded = codec.stringify('my section/#%');
+      expect(encoded).toBe('#my%20section%2F%23%25');
 
       const location: Location = { pathname: '/test', hash: encoded, search: '', state: null, key: 'default' };
-      expect(codec.parse(location)).toBe('my-section');
+      expect(codec.parse(location)).toBe('my section/#%');
     });
 
     it('should provide a type property for compile-time inference', () => {
