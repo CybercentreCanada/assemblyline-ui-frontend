@@ -16,7 +16,7 @@ Provides a scroll-aware table-of-content context for registering document anchor
 
 ### TableOfContentProvider
 
-`TableOfContentProvider` creates the form-backed store and provides the table-of-content context to descendants. It accepts an optional scroll behavior and child content.
+`TableOfContentFormProvider` owns the form-backed store. `TableOfContentProvider` consumes that store and provides the table-of-content context, including the scroll-root and header refs. `TableOfContentLayout` composes both providers in the required order and accepts an optional scroll behavior.
 
 ### Anchor
 
@@ -24,7 +24,7 @@ Provides a scroll-aware table-of-content context for registering document anchor
 
 ### TableOfContentContext
 
-The context exposes:
+The context exposed by `TableOfContentProvider` exposes:
 
 - `rootRef` - Scrollable content root reference
 - `headerRef` - Header reference used to offset navigation and active-section detection
@@ -56,7 +56,7 @@ The context exposes:
 ## 5. Usage
 
 ```tsx
-import { Anchor, TableOfContentProvider, useTableOfContent } from 'features/table-of-content';
+import { Anchor, TableOfContentLayout, useTableOfContent } from 'features/table-of-content';
 
 const Navigation = () => {
   const { ActiveAnchor, Anchors, scrollTo } = useTableOfContent();
@@ -80,22 +80,34 @@ const Navigation = () => {
   );
 };
 
+const DocumentContent = () => {
+  const { rootRef, headerRef } = useTableOfContent();
+
+  return (
+    <div ref={rootRef} style={{ height: '100vh', overflowY: 'auto' }}>
+      <header ref={headerRef} style={{ position: 'sticky', top: 0 }}>
+        <Navigation />
+      </header>
+      <main>
+        <Anchor anchor="overview" label="Overview">
+          <section>Overview</section>
+        </Anchor>
+        <Anchor anchor="details" label="Details" subheader>
+          <section>Details</section>
+        </Anchor>
+      </main>
+    </div>
+  );
+};
+
 const Document = () => (
-  <TableOfContentProvider>
-    <Navigation />
-    <main>
-      <Anchor anchor="overview" label="Overview">
-        <section>Overview</section>
-      </Anchor>
-      <Anchor anchor="details" label="Details" subheader>
-        <section>Details</section>
-      </Anchor>
-    </main>
-  </TableOfContentProvider>
+  <TableOfContentLayout>
+    <DocumentContent />
+  </TableOfContentLayout>
 );
 ```
 
-`useTableOfContent` must be called below `TableOfContentProvider`. The `rootRef` and `headerRef` from the context must be attached by the consumer to the scrollable root and its header for active tracking and offset scrolling to work.
+Use `TableOfContentLayout` for standalone usage; it mounts `TableOfContentFormProvider` above `TableOfContentProvider`. Call `useTableOfContent` from a descendant of the layout, then attach `rootRef` to the scrollable element containing the anchors and `headerRef` to its fixed or sticky header. Anchor registration, active-section tracking, and scrolling depend on those refs being attached.
 
 ## 6. Codebase (Internals)
 
@@ -111,7 +123,7 @@ const Document = () => (
 
 ### Data Flow And Boundaries
 
-`TableOfContentProvider` creates the state store and context. `Anchor` components discover the nearest context and register themselves after mounting. The root component scans registered DOM anchors when an anchor changes and stores their order. Scroll events calculate the active anchor from the root and header geometry, while `scrollTo` navigates to a selected anchor.
+`TableOfContentFormProvider` creates and owns the form store. `TableOfContentLayout` composes it above `TableOfContentProvider`, which consumes the store and exposes the table-of-content context. Descendants call `useTableOfContent` to access that context and attach its refs to the scroll root and header. Each `Anchor` discovers the nearest context and registers after mounting; registration scans the root for anchor elements and updates the form store. Scroll events use the root and header geometry to update the active anchor, while `scrollTo` navigates within that root.
 
 ## 7. Related Modules
 
