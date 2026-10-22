@@ -1,6 +1,7 @@
-import { createHashParamCodec, getDefaultHashParamBlueprint } from 'features/hash-params';
+import type { InferHashParamCodecFromBlueprint } from 'features/hash-params';
+import { createHashParamCodec, getDefaultHashParamBlueprint, HASH_PARAM_BLUEPRINTS } from 'features/hash-params';
 import type { Location } from 'react-router';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, expectTypeOf, it } from 'vitest';
 
 describe('hash-params.codec', () => {
   describe('getDefaultHashParamBlueprint', () => {
@@ -14,6 +15,16 @@ describe('hash-params.codec', () => {
   });
 
   describe('createHashParamCodec', () => {
+    it('preserves the configured blueprint types in the codec type', () => {
+      const blueprint = HASH_PARAM_BLUEPRINTS.enum(['title', 'section-1'] as const);
+      type Codec = InferHashParamCodecFromBlueprint<typeof blueprint>;
+
+      expectTypeOf<Codec['blueprint']>().toEqualTypeOf<typeof blueprint>();
+      expectTypeOf<Codec['type']>().toEqualTypeOf<'title' | 'section-1'>();
+      expectTypeOf<ReturnType<Codec['parse']>>().toEqualTypeOf<'title' | 'section-1' | undefined>();
+      expectTypeOf<Parameters<Codec['stringify']>[0]>().toEqualTypeOf<'title' | 'section-1' | undefined>();
+    });
+
     it('should parse enum hash values correctly', () => {
       const codec = createHashParamCodec()(blueprint => blueprint.enum(['title', 'section-1', 'section-2']));
 
