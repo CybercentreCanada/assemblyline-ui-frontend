@@ -1,33 +1,34 @@
 import type { PropsWithChildren } from 'react';
-import React, { createContext, useCallback, useContext, useEffect, useRef } from 'react';
+import { createContext, memo, useCallback, useContext, useEffect, useRef } from 'react';
 import { useStore as useZustandStore } from 'zustand';
 import { useShallow } from 'zustand/react/shallow';
 import type { StoreApi } from 'zustand/vanilla';
 import { createStore } from 'zustand/vanilla';
 
-// Empty stand-in so hooks can run outside a provider; reads are redirected to `initialState` below.
-const FALLBACK_STORE = createStore(() => ({}));
-
 export const createAppStore = <Store extends object>(initialState: Store) => {
   // A partial state, or an updater that receives the current state and returns a partial state.
   type StorePatch = Partial<Store> | ((state: Store) => Partial<Store>);
 
+  // Each `StoreProvider` owns its own store; the hooks below only work inside one.
   const StoreContext = createContext<StoreApi<Store> | null>(null);
   StoreContext.displayName = 'StoreContext';
 
-  const StoreProvider = React.memo(({ children, data = null }: PropsWithChildren<{ data?: StorePatch }>) => {
+  const StoreProvider = memo(({ children, data = null }: PropsWithChildren<{ data?: StorePatch }>) => {
     const storeRef = useRef<StoreApi<Store> | null>(null);
+    const appliedDataRef = useRef<StorePatch | null>(data);
 
     // Created once per provider, with `data` applied so the first render already includes it.
     if (!storeRef.current) {
       const patch = typeof data === 'function' ? data(initialState) : (data ?? {});
 
-      // `devtools` mirrors every state change into the Redux DevTools extension.
       storeRef.current = createStore(() => ({ ...initialState, ...patch }));
     }
 
     useEffect(() => {
-      // Skip an empty `data`
+      // The initial `data` is already in the store; applying it again would undo what child effects changed.
+      if (Object.is(appliedDataRef.current, data)) return;
+
+      appliedDataRef.current = data;
       if (!storeRef.current || !data) return;
 
       // Spreading `prev` gives the root a new reference so subscribers are notified.
@@ -37,32 +38,26 @@ export const createAppStore = <Store extends object>(initialState: Store) => {
     return <StoreContext.Provider value={storeRef.current}>{children}</StoreContext.Provider>;
   });
 
-  const useStore = <T,>(selector: (state: Store) => T): T => {
+  // Throws instead of falling back, so a missing provider is caught as a setup error.
+  const useStoreContext = (hook: string): StoreApi<Store> => {
     const store = useContext(StoreContext);
+    if (!store) throw new Error(`[createAppStore] \`${hook}\` must be used within a StoreProvider.`);
 
-    if (!store && import.meta.env.DEV) {
-      console.warn('[createAppStore] `useStore` called outside of StoreProvider.');
-    }
+    return store;
+  };
 
-    // Outside a provider, read from the fallback store and run the selector on `initialState` instead.
-    // `useShallow` keeps selectors that return new arrays or objects from re-rendering in a loop.
-    return useZustandStore(
-      (store ?? FALLBACK_STORE) as StoreApi<Store>,
-      useShallow((state: Store) => selector(store ? state : initialState))
-    );
+  const useStore = <T,>(selector: (state: Store) => T): T => {
+    const store = useStoreContext('useStore');
+
+    // `useShallow` stops selectors that return new arrays or objects from re-rendering on every update.
+    return useZustandStore(store, useShallow(selector));
   };
 
   const useSetStore = () => {
-    const store = useContext(StoreContext);
+    const store = useStoreContext('useSetStore');
 
     return useCallback(
       (patch: StorePatch) => {
-        // Without a provider there is no store to update, so the update is dropped.
-        if (!store) {
-          if (import.meta.env.DEV) console.warn('[createAppStore] `useSetStore` called outside of StoreProvider.');
-          return;
-        }
-
         // The root is always copied so subscribers are notified, even when the updater only mutated in place.
         store.setState(prev => ({ ...prev, ...(typeof patch === 'function' ? patch(prev) : patch) }));
       },
@@ -70,8 +65,8 @@ export const createAppStore = <Store extends object>(initialState: Store) => {
     );
   };
 
-  // `null` outside a provider.
-  const useStoreApi = (): StoreApi<Store> => useContext(StoreContext);
+  // Gives direct access to the store, for reading or subscribing outside of React renders.
+  const useStoreApi = (): StoreApi<Store> => useStoreContext('useStoreApi');
 
   return {
     StoreProvider,
