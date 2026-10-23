@@ -1,4 +1,3 @@
-// TODO: change syntax to "import type {theme}" to avoid potential problems like type-only imports being incorrectly bundled.
 import { useClue } from '@cccsaurora/clue-ui';
 import { DEFAULT_APP_CONFIG_STORE } from 'app/core.config';
 import { DEFAULT_APP_INTERFACE_STORE } from 'app/core.interface';
@@ -11,6 +10,7 @@ import { useBootstrapQuery } from 'core/api/hooks/useBootstrapQuery';
 import type { LoginParamsProps } from 'core/api/hooks/useMyAPI';
 import { AppConfigStoreProvider } from 'core/config';
 import useALContext from 'core/config/useALContext';
+import { AppFeatureFlagProvider, AppFeatureFlagStoreProvider } from 'core/feature-flags/feature-flags.providers';
 import { AppInterfaceStoreProvider } from 'core/interface';
 import { AppPreferenceProvider, AppPreferenceStoreProvider } from 'core/preference';
 import QuotaExceeded from 'core/template/branding/AppVerticalBanner';
@@ -33,6 +33,7 @@ import React, { memo, useCallback, useEffect, useState } from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import setMomentFRLocale from 'shared/utils/moment-fr-locale';
 import { getProvider, getSAMLData } from 'shared/utils/utils';
+import { DEFAULT_FEATURE_FLAG_STATE, FEATURE_FLAGS_STORAGE_KEY } from './core.feature-flags';
 
 type PossibleApps = 'load' | 'locked' | 'login' | 'routes' | 'tos' | 'quota';
 
@@ -119,15 +120,17 @@ export const MyApp: React.FC = () => {
         <APIProvider>
           <SafeResultsProvider>
             <QuotaProvider>
-              <AppProvider
-                preferences={myPreferences}
-                themes={myThemes}
-                sitemap={mySitemap}
-                user={myUser}
-                // search={mySearch}
-              >
-                <MyAppMain />
-              </AppProvider>
+              <AppFeatureFlagProvider storageKey={FEATURE_FLAGS_STORAGE_KEY} defaultState={DEFAULT_FEATURE_FLAG_STATE}>
+                <AppProvider
+                  preferences={myPreferences}
+                  themes={myThemes}
+                  sitemap={mySitemap}
+                  user={myUser}
+                  // search={mySearch}
+                >
+                  <MyAppMain />
+                </AppProvider>
+              </AppFeatureFlagProvider>
             </QuotaProvider>
           </SafeResultsProvider>
         </APIProvider>
@@ -144,7 +147,7 @@ const AppStores = memo(({ children }: PropsWithChildren) => (
   <AppConfigStoreProvider data={DEFAULT_APP_CONFIG_STORE}>
     <AppInterfaceStoreProvider data={DEFAULT_APP_INTERFACE_STORE}>
       <AppPreferenceStoreProvider data={DEFAULT_APP_PREFERENCE_STORE}>
-        <>{children}</>
+        <AppFeatureFlagStoreProvider>{children}</AppFeatureFlagStoreProvider>
       </AppPreferenceStoreProvider>
     </AppInterfaceStoreProvider>
   </AppConfigStoreProvider>
