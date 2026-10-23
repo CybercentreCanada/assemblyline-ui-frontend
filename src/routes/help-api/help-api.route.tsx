@@ -1,19 +1,7 @@
 import CheckOutlinedIcon from '@mui/icons-material/CheckOutlined';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import {
-  Box,
-  Card,
-  Collapse,
-  Grid,
-  MenuItem,
-  Select,
-  styled,
-  Typography,
-  useMediaQuery,
-  useTheme
-} from '@mui/material';
-import FormControl from '@mui/material/FormControl';
+import { Box, Card, Collapse, Grid, styled, Typography, useMediaQuery, useTheme } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
@@ -41,15 +29,15 @@ const Expand = memo(
 
 export default function ApiDoc() {
   const { apiCall } = useMyAPI();
-  const [apiList, setApiList] = useState(null);
-  const [apiSelected, setApiSelected] = useState(null);
+  const [apiSelected, setApiSelected] = useState<string | null>(null);
   const [apiDefinition, setApiDefinition] = useState(null);
   const { configuration } = useALContext();
   const [expandMap, setExpandMap] = useState({});
   const theme = useTheme();
-  const { t } = useTranslation(['helpAPI']);
+  const { t } = useTranslation(['helpAPI', 'translation']);
   const sp1 = theme.spacing(1);
   const sp2 = theme.spacing(2);
+  const coreVersion = configuration.system.version;
 
   const downSM = useMediaQuery(theme.breakpoints.down('md'));
   const xs = useMediaQuery(theme.breakpoints.only('xs'));
@@ -125,23 +113,23 @@ export default function ApiDoc() {
   }
 
   useEffect(() => {
-    if (apiList) {
+    apiCall({
+      url: '/api/',
+      onSuccess: api_data => {
+        setApiSelected(api_data.api_response[0]);
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    if (apiSelected) {
       apiCall({
         url: `/api/${apiSelected}/`,
         onSuccess: api_data => {
           setApiDefinition(api_data.api_response);
         }
       });
-    } else {
-      apiCall({
-        url: '/api/',
-        onSuccess: api_data => {
-          setApiList(api_data.api_response);
-          setApiSelected(api_data.api_response[0]);
-        }
-      });
     }
-    // eslint-disable-next-line
   }, [apiSelected]);
 
   return (
@@ -149,30 +137,17 @@ export default function ApiDoc() {
       <div style={{ textAlign: 'left' }}>
         <PageHeader
           primary={t('title')}
+          secondary={
+            coreVersion && (
+              <>
+                {t('translation:core_version')}: {coreVersion}
+              </>
+            )
+          }
           slotProps={{
             root: { style: { marginBottom: theme.spacing(4) } },
             actions: { spacing: 1 }
           }}
-          actions={
-            apiList && apiSelected ? (
-              <FormControl size="small">
-                <Select
-                  id="api"
-                  value={apiSelected}
-                  onChange={event => setApiSelected(event.target.value)}
-                  variant="outlined"
-                >
-                  {apiList.map((version, index) => (
-                    <MenuItem key={index} value={version}>
-                      {version.replace('v', t('version')) + t('version_end')}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            ) : (
-              <Skeleton variant="rectangular" style={{ display: 'inline-block', height: '2rem', width: '14rem' }} />
-            )
-          }
         />
 
         {apiDefinition ? (

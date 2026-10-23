@@ -62,6 +62,7 @@
   "clipboard": "Copy to clipboard",
   "clipboard.failure": "could not be copied to clipboard",
   "clipboard.success": "was copied to clipboard.",
+  "core_version": "Core version",
   "clue": "Show Clue details",
   "date.cancel": "Cancel",
   "date.clear": "Clear",
