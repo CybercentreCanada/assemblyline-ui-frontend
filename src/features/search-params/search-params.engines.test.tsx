@@ -60,6 +60,30 @@ describe('SearchParamEngine.setDefaultValues', () => {
     expect(result).toBe(engine);
     expect(engine.getDefaultValues().toObject()).toEqual({ page: 1 });
   });
+
+  it('uses nullable object defaults for missing or invalid values and preserves explicit null', () => {
+    const engine = new SearchParamEngine({
+      search: SEARCH_PARAM_BLUEPRINTS_MAP.object({ source: 'search' }).nullable(),
+      state: SEARCH_PARAM_BLUEPRINTS_MAP.object({ source: 'state' }).nullable().source('state'),
+      transient: SEARCH_PARAM_BLUEPRINTS_MAP.object({ source: 'transient' }).nullable().source('transient')
+    });
+    const defaults = { search: { source: 'search' }, state: { source: 'state' }, transient: { source: 'transient' } };
+
+    expect(engine.full(new URLSearchParams()).toObject()).toEqual(defaults);
+    expect(engine.full(new URLSearchParams('search=%7Binvalid')).toObject()).toEqual(defaults);
+    expect(engine.fromLocation(makeLocation()).toObject()).toEqual(defaults);
+    expect(engine.fromLocation(makeLocation({ state: { state: true } })).toObject()).toEqual(defaults);
+    expect(engine.fromRoute('/list').toObject()).toEqual(defaults);
+    expect(engine.fromRoute('/list', { state: null }, { transient: true }).toObject()).toEqual({
+      search: { source: 'search' },
+      state: null,
+      transient: { source: 'transient' }
+    });
+    expect(engine.full(new URLSearchParams('search=null')).toObject()).toEqual({
+      ...defaults,
+      search: null
+    });
+  });
 });
 
 //*****************************************************************************************
@@ -147,6 +171,16 @@ describe('SearchParamEngine.delta', () => {
   it('returns an empty snapshot when values match the defaults', () => {
     const engine = new SearchParamEngine({ page: SEARCH_PARAM_BLUEPRINTS_MAP.number(1) });
     expect(engine.delta({ page: 1 }).toObject()).toEqual({});
+  });
+
+  it('serializes a full object when the nullable default is null', () => {
+    const engine = new SearchParamEngine({ config: SEARCH_PARAM_BLUEPRINTS_MAP.object({}).nullable() });
+    engine.setDefaultValues(new URLSearchParams('config=null'));
+
+    const params = engine.delta({ config: {} }).toParams();
+
+    expect(params.get('config')).toBe('{}');
+    expect(engine.full(params).toObject()).toEqual({ config: {} });
   });
 });
 

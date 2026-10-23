@@ -823,19 +823,6 @@ export class ObjectSearchParamBlueprint<
     return delta;
   }
 
-  protected override parse(value: unknown): O {
-    if (typeof value === 'string') {
-      try {
-        const parsed: unknown = JSON.parse(value);
-        return this.isObjectValue(parsed) ? parsed : super.parse(value);
-      } catch {
-        return super.parse(value);
-      }
-    }
-
-    return this.isObjectValue(value) ? value : super.parse(value);
-  }
-
   protected override valid(value: unknown): value is O {
     return this.isObjectValue(value) || (this.isNullable() && (value === null || value === undefined));
   }
@@ -844,13 +831,23 @@ export class ObjectSearchParamBlueprint<
     search: InferSearchParamValueMapFromBlueprintMap<SearchParamBlueprints> | URLSearchParams
   ): O {
     if (search instanceof URLSearchParams) {
-      const value = this.parse(search.get(this._key));
-      if (this.valid(value)) return this.clone(value);
-    } else if (typeof search === 'object' && this._key in search) {
+      const serialized = search.get(this._key);
+      if (serialized === null) return this.clone(this._defaultValue);
+
+      try {
+        const value: unknown = JSON.parse(serialized);
+        if (value === null) return this.isNullable() ? (null as O) : this.clone(this._defaultValue);
+        if (this.isObjectValue(value)) return this.clone(value);
+      } catch {
+        return this.clone(this._defaultValue);
+      }
+    } else if (typeof search === 'object' && search !== null && this._key in search) {
       const value = search?.[this._key];
-      if (this.valid(value)) return this.clone(value);
+      if (value === null) return this.isNullable() ? (null as O) : this.clone(this._defaultValue);
+      if (this.isObjectValue(value)) return this.clone(value);
     }
-    return null;
+
+    return this.clone(this._defaultValue);
   }
 
   protected override setDefaultValue(values: URLSearchParams) {
@@ -922,7 +919,12 @@ export class ObjectSearchParamBlueprint<
       return prev;
     }
 
-    const delta = this.deltaValue(this._defaultValue || ({} as O), value);
+    if (this._defaultValue === null || this._defaultValue === undefined) {
+      (prev as Record<string, SearchParamValue>)[this._key] = this.clone(value);
+      return prev;
+    }
+
+    const delta = this.deltaValue(this._defaultValue, value);
     if (Object.keys(delta).length === 0) return prev;
 
     (prev as Record<string, SearchParamValue>)[this._key] = delta as unknown as SearchParamValue;
