@@ -837,7 +837,7 @@ export class ObjectSearchParamBlueprint<
   }
 
   protected override valid(value: unknown): value is O {
-    return this.isObjectValue(value) || super.valid(value);
+    return this.isObjectValue(value) || (this.isNullable() && (value === null || value === undefined));
   }
 
   protected override get<SearchParamBlueprints extends SearchParamBlueprintMap>(

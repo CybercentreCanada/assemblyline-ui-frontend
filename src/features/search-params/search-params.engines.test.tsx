@@ -204,6 +204,27 @@ describe('SearchParamEngine.fromRoute', () => {
 
     expect(engine.fromRoute('/list', { config: { a: 3 } }).toObject()).toEqual({ config: { a: 3, b: 2 } });
   });
+
+  it('uses object defaults for unsupported state and transient values', () => {
+    const stateEngine = new SearchParamEngine({
+      config: SEARCH_PARAM_BLUEPRINTS_MAP.object({ enabled: true }).source('state')
+    });
+    const transientEngine = new SearchParamEngine({
+      config: SEARCH_PARAM_BLUEPRINTS_MAP.object({ enabled: true }).source('transient')
+    });
+    const nullableEngine = new SearchParamEngine({
+      config: SEARCH_PARAM_BLUEPRINTS_MAP.object({ enabled: true }).nullable().source('state')
+    });
+
+    expect(stateEngine.fromLocation(makeLocation({ state: { config: true } })).toObject()).toEqual({
+      config: { enabled: true }
+    });
+    expect(stateEngine.fromRoute('/list', { config: true }).toObject()).toEqual({ config: { enabled: true } });
+    expect(transientEngine.fromRoute('/list', null, { config: true }).toObject()).toEqual({
+      config: { enabled: true }
+    });
+    expect(nullableEngine.fromRoute('/list', { config: null }).toObject()).toEqual({ config: null });
+  });
 });
 
 //*****************************************************************************************
