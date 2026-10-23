@@ -758,7 +758,7 @@ export class ObjectSearchParamBlueprint<
       return this.clone(next);
     }
 
-    if (Array.isArray(next)) return this.clone(next);
+    if (Array.isArray(next) || Array.isArray(base)) return this.clone(next);
 
     const merged = this.clone(base) as unknown as Record<string, unknown>;
 
@@ -912,7 +912,7 @@ export class ObjectSearchParamBlueprint<
       return prev;
     }
 
-    if (Array.isArray(value)) {
+    if (Array.isArray(value) || Array.isArray(this._defaultValue)) {
       if (!this.isEqual(this._defaultValue, value)) {
         (prev as Record<string, SearchParamValue>)[this._key] = value;
       }

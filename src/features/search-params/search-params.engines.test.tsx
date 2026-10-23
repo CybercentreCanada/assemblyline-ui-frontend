@@ -182,6 +182,20 @@ describe('SearchParamEngine.delta', () => {
     expect(params.get('config')).toBe('{}');
     expect(engine.full(params).toObject()).toEqual({ config: {} });
   });
+
+  it('round-trips empty and nonempty records over an array default', () => {
+    const engine = new SearchParamEngine({ config: SEARCH_PARAM_BLUEPRINTS_MAP.object([1, 2]) });
+
+    for (const config of [{}, { enabled: true }]) {
+      const values = { config } as never;
+
+      expect(engine.full(values).toObject()).toEqual({ config });
+
+      const params = engine.delta(values).toParams();
+      expect(params.get('config')).toBe(JSON.stringify(config));
+      expect(engine.full(params).toObject()).toEqual({ config });
+    }
+  });
 });
 
 //*****************************************************************************************
