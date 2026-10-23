@@ -6,7 +6,7 @@ import PageFullWidth from 'core/template/components/pages/PageFullWidth';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import CustomChip from 'ui/CustomChip';
-import { PageHeader } from '../../ui/layouts/PageHeader';
+import { PageHeader } from 'ui/layouts/PageHeader';
 
 export default function Configuration() {
   const { apiCall } = useMyAPI();
@@ -49,13 +49,7 @@ export default function Configuration() {
       <div style={{ textAlign: 'left' }}>
         <PageHeader
           primary={t('title')}
-          secondary={
-            coreVersion && (
-              <>
-                {t('help:core_version')}: {coreVersion}
-              </>
-            )
-          }
+          {...(coreVersion && { secondary: `${t('help:core_version')}: ${coreVersion}}` })}
           slotProps={{
             root: { style: { marginBottom: theme.spacing(4) } },
             actions: { spacing: 1 }
