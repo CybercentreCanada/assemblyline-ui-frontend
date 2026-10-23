@@ -303,6 +303,11 @@ describe('createPathParamsCodec', () => {
 
     const rootCodec = createPathParamsCodec('/:id')(b => ({ id: b.string('fallback') }));
     expect(rootCodec.parse(makeLocation('/'))).toEqual({ id: 'fallback' });
+
+    const trailingSlashCodec = createPathParamsCodec('/item/:id/')(b => ({ id: b.string('fallback') }));
+    const pathname = trailingSlashCodec.stringify({ id: 'abc' });
+    expect(pathname).toBe('/item/abc/');
+    expect(trailingSlashCodec.parse(makeLocation(pathname))).toEqual({ id: 'abc' });
   });
 
   it('uses default values when the pathname segment is missing', () => {
@@ -401,10 +406,14 @@ describe('createPathParamsCodec', () => {
 
     expect(codec.parse(makeLocation('/item/abc'))).toEqual({ itemID: 'abc', tab: 'fallback' });
     expect(codec.parse(makeLocation('/item/abc/'))).toEqual({ itemID: 'abc', tab: 'fallback' });
+    expect(codec.parse(makeLocation('/item/abc//'))).toEqual({ itemID: 'abc', tab: 'fallback' });
     expect(() => codec.stringify({ itemID: 'abc', tab: '' })).toThrow(TypeError);
 
     const viewerCodec = createPathParamsCodec('/file/viewer/:view?')(b => ({ view: b.string('fallback') }));
     expect(viewerCodec.parse(makeLocation('/file/viewer/'))).toEqual({ view: 'fallback' });
+
+    const optionalIdCodec = createPathParamsCodec('/item/:id?')(b => ({ id: b.string('fallback') }));
+    expect(optionalIdCodec.parse(makeLocation('/item//'))).toEqual({ id: 'fallback' });
   });
 
   it('decodes URI-encoded path segments', () => {

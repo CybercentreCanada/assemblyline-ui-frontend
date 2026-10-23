@@ -183,14 +183,14 @@ export const isPathConsumed = (pathParts: string[], pathIndex: number): boolean 
 
 /**
  * @name matchPathPattern
- * @description Matches a pathname against a parsed pattern and extracts raw parameter values. Static segments compare decoded and case-insensitively. Missing params are `undefined`; optional params are only allowed at the end. A final slash is ignored before matching, and the root pathname `/` or an empty pathname omit an optional param.
+ * @description Matches a pathname against a parsed pattern and extracts raw parameter values. Static segments compare decoded and case-insensitively. Missing params are `undefined`; optional params are only allowed at the end. A final slash is ignored unless the pattern itself ends with a slash, and the root pathname `/` or an empty pathname omit an optional param.
  * @param pattern - Pattern created by `parsePathPattern`
  * @param pathname - Location pathname to match
  * @returns Raw values keyed by parameter name, or `null` when the pathname does not match. Throws a `TypeError` for supplied values that are empty or `.` / `..`.
  */
 export const matchPathPattern = (pattern: PathPattern, pathname: string): Record<string, string | undefined> | null => {
   const pathParts = splitPathname(pathname);
-  if (pathname.endsWith('/')) pathParts.pop();
+  if (pathname.endsWith('/') && pattern.segments[pattern.segments.length - 1]?.raw !== '') pathParts.pop();
   const isRoot = pathname === '/' || pathname === '';
   const params = Object.create(null) as Record<string, string | undefined>;
   let pathIndex = 0;
