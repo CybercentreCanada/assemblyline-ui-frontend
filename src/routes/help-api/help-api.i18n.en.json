@@ -1,5 +1,6 @@
 {
   "complete": "Fully documented",
+  "core_version": "Core version",
   "description": "Description",
   "function": "Internal Function",
   "methods": "Allowed methods",

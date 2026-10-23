@@ -34,10 +34,9 @@ export default function ApiDoc() {
   const { configuration } = useALContext();
   const [expandMap, setExpandMap] = useState({});
   const theme = useTheme();
-  const { t } = useTranslation(['helpAPI', 'help']);
+  const { t } = useTranslation(['helpAPI']);
   const sp1 = theme.spacing(1);
   const sp2 = theme.spacing(2);
-  const coreVersion = configuration.system.version;
 
   const downSM = useMediaQuery(theme.breakpoints.down('md'));
   const xs = useMediaQuery(theme.breakpoints.only('xs'));
@@ -139,7 +138,6 @@ export default function ApiDoc() {
       <div style={{ textAlign: 'left' }}>
         <PageHeader
           primary={t('title')}
-          {...(coreVersion && { secondary: `${t('help:core_version')}: ${coreVersion}` })}
           slotProps={{
             root: { style: { marginBottom: theme.spacing(4) } },
             actions: { spacing: 1 }

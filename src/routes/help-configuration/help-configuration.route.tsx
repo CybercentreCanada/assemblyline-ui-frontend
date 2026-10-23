@@ -13,7 +13,7 @@ export default function Configuration() {
   const [configuration, setConfiguration] = useState(null);
   const [constants, setConstants] = useState(null);
   const { configuration: systemConfiguration } = useALContext();
-  const { t } = useTranslation(['helpConfiguration', 'help']);
+  const { t } = useTranslation(['helpConfiguration']);
   const theme = useTheme();
   const sp1 = theme.spacing(1);
   const sp2 = theme.spacing(2);
@@ -50,7 +50,7 @@ export default function Configuration() {
       <div style={{ textAlign: 'left' }}>
         <PageHeader
           primary={t('title')}
-          {...(coreVersion && { secondary: `${t('help:core_version')}: ${coreVersion}` })}
+          {...(coreVersion && { secondary: `${t('core_version')}: ${coreVersion}` })}
           slotProps={{
             root: { style: { marginBottom: theme.spacing(4) } },
             actions: { spacing: 1 }
