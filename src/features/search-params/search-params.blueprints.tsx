@@ -292,16 +292,7 @@ export abstract class BaseSearchParamBlueprint<T extends SearchParamValue> {
         value = null;
     }
 
-    if (!this._locked && this.valid(value)) {
-      (prev as Record<string, SearchParamValue>)[this._key] = value;
-      return prev;
-    }
-
-    if (this.valid(this._defaultValue)) {
-      (prev as Record<string, SearchParamValue>)[this._key] = this._defaultValue;
-    }
-
-    return prev;
+    return this.full(prev, { [this._key]: value } as InferSearchParamValueMapFromBlueprintMap<SearchParamBlueprints>);
   }
 
   // -------------------------

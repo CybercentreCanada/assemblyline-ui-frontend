@@ -157,6 +157,20 @@ describe('SearchParamEngine.fromRoute', () => {
     const engine = new SearchParamEngine({ page: SEARCH_PARAM_BLUEPRINTS_MAP.number(1) });
     expect(engine.fromRoute('/list').toObject()).toEqual({ page: 1 });
   });
+
+  it('resolves filter defaults through the full resolver', () => {
+    const engine = new SearchParamEngine({ filters: SEARCH_PARAM_BLUEPRINTS_MAP.filters(['a']) });
+
+    expect(engine.fromRoute('/list').toObject()).toEqual({ filters: ['a'] });
+  });
+
+  it('merges route object values with their defaults through the full resolver', () => {
+    const engine = new SearchParamEngine({
+      config: SEARCH_PARAM_BLUEPRINTS_MAP.object({ a: 1, b: 2 }).source('state')
+    });
+
+    expect(engine.fromRoute('/list', { config: { a: 3 } }).toObject()).toEqual({ config: { a: 3, b: 2 } });
+  });
 });
 
 //*****************************************************************************************
