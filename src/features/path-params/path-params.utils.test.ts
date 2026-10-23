@@ -293,11 +293,16 @@ describe('createPathParamsCodec', () => {
     expect(() => codec.parse(makeLocation('/item//page/3'))).toThrow(TypeError);
   });
 
-  it('rejects an empty trailing parameter', () => {
-    const codec = createPathParamsCodec('/item/:itemID')(b => ({ itemID: b.string() }));
+  it('treats a trailing slash as a missing required parameter', () => {
+    const codec = createPathParamsCodec('/item/:itemID')(b => ({ itemID: b.string('fallback') }));
 
     expect(() => codec.stringify({ itemID: '' })).toThrow(TypeError);
-    expect(() => codec.parse(makeLocation('/item/'))).toThrow(TypeError);
+    expect(codec.parse(makeLocation('/item/'))).toEqual({ itemID: 'fallback' });
+    expect(codec.parse(makeLocation('/item/value/'))).toEqual({ itemID: 'value' });
+    expect(() => codec.parse(makeLocation('/item//'))).toThrow(TypeError);
+
+    const rootCodec = createPathParamsCodec('/:id')(b => ({ id: b.string('fallback') }));
+    expect(rootCodec.parse(makeLocation('/'))).toEqual({ id: 'fallback' });
   });
 
   it('uses default values when the pathname segment is missing', () => {
@@ -388,15 +393,18 @@ describe('createPathParamsCodec', () => {
     expect(() => codec.stringify({ id: '' })).toThrow(TypeError);
   });
 
-  it('rejects empty trailing values for optional params', () => {
+  it('treats a trailing slash as an omitted optional param', () => {
     const codec = createPathParamsCodec('/item/:itemID/:tab?')(b => ({
       itemID: b.string(),
       tab: b.string('fallback')
     }));
 
     expect(codec.parse(makeLocation('/item/abc'))).toEqual({ itemID: 'abc', tab: 'fallback' });
-    expect(() => codec.parse(makeLocation('/item/abc/'))).toThrow(TypeError);
+    expect(codec.parse(makeLocation('/item/abc/'))).toEqual({ itemID: 'abc', tab: 'fallback' });
     expect(() => codec.stringify({ itemID: 'abc', tab: '' })).toThrow(TypeError);
+
+    const viewerCodec = createPathParamsCodec('/file/viewer/:view?')(b => ({ view: b.string('fallback') }));
+    expect(viewerCodec.parse(makeLocation('/file/viewer/'))).toEqual({ view: 'fallback' });
   });
 
   it('decodes URI-encoded path segments', () => {
@@ -442,10 +450,10 @@ describe('createPathParamsCodec', () => {
     expect(codec.stringify({ itemID: '...' })).toBe('/item/...');
   });
 
-  it('rejects empty and dot-segment values when parsing or stringifying', () => {
+  it('rejects empty and dot-segment parameter values when parsing or stringifying', () => {
     const codec = createPathParamsCodec('/item/:itemID')(b => ({ itemID: b.string() }));
 
-    expect(() => codec.parse(makeLocation('/item/'))).toThrow(TypeError);
+    expect(() => codec.parse(makeLocation('/item//'))).toThrow(TypeError);
     expect(() => codec.stringify({ itemID: '.' })).toThrow(TypeError);
     expect(() => codec.stringify({ itemID: '..' })).toThrow(TypeError);
     expect(() => codec.parse(makeLocation('/item/.'))).toThrow(TypeError);
@@ -569,10 +577,15 @@ describe('matchPathPattern', () => {
     expect(() => matchPathPattern(parsePathPattern(':id'), '')).toThrow(TypeError);
   });
 
-  it('allows a trailing slash after the last segment and rejects an empty param value', () => {
+  it('ignores a trailing slash for required and optional params', () => {
     expect(matchPathPattern(parsePathPattern('/item/:id'), '/item/abc/')).toEqual({ id: 'abc' });
-    expect(() => matchPathPattern(parsePathPattern('/item/:id'), '/item/')).toThrow(TypeError);
-    expect(() => matchPathPattern(parsePathPattern('/item/:id/:tab?'), '/item/abc/')).toThrow(TypeError);
+    expect(matchPathPattern(parsePathPattern('/item/:id'), '/item/')).toEqual({ id: undefined });
+    expect(matchPathPattern(parsePathPattern('/:id'), '/')).toEqual({ id: undefined });
+    expect(matchPathPattern(parsePathPattern('/item/:id/:tab?'), '/item/abc/')).toEqual({
+      id: 'abc',
+      tab: undefined
+    });
+    expect(() => matchPathPattern(parsePathPattern('/item/:id'), '/item//')).toThrow(TypeError);
   });
 
   it('rejects dot-segment values', () => {

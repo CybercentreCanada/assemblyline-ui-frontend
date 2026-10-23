@@ -5,7 +5,6 @@ import type { Location } from 'react-router';
 import { DemoContainer } from 'routes/development-library/components/DemoContainer';
 import { DemoSection } from 'routes/development-library/components/DemoSection';
 import { useForm } from 'routes/development-library/contexts/form';
-import { CheckboxInput } from 'ui/inputs/CheckboxInput';
 import { SelectInput } from 'ui/inputs/SelectInput';
 import { TextInput } from 'ui/inputs/TextInput';
 import { PageSection } from 'ui/layouts/PageSection';
@@ -14,6 +13,7 @@ import MonacoEditor from 'ui/MonacoEditor';
 const TAB_VALUES = ['ascii', 'code', 'hex'] as const;
 
 const TAB_OPTIONS = [
+  { primary: 'None', value: null },
   { primary: 'ASCII', value: 'ascii' },
   { primary: 'Code', value: 'code' },
   { primary: 'Hex', value: 'hex' }
@@ -25,8 +25,7 @@ export type PathParamsLibraryState = {
     values: {
       sectionOpen: boolean;
       id: string;
-      tab: (typeof TAB_VALUES)[number];
-      omitTab: boolean;
+      tab: (typeof TAB_VALUES)[number] | null;
       pathname: string;
       itemsPathname: string;
     };
@@ -40,7 +39,6 @@ export const PATH_PARAMS_LIBRARY_STATE: PathParamsLibraryState = {
       sectionOpen: true,
       id: 'abc123',
       tab: 'ascii',
-      omitTab: false,
       pathname: '/file/viewer/abc123/hex',
       itemsPathname: '/items/2/date/true'
     }
@@ -129,34 +127,19 @@ export const PathParamsSection = React.memo(() => {
                   label="tab"
                   value={value}
                   options={TAB_OPTIONS}
+                  displayEmpty
                   onChange={(event, next) => form.setFieldValue('components.path_params.values.tab', next)}
                 />
               )}
             />
 
             <form.Subscribe
-              selector={state => state.values.components.path_params.values.omitTab}
-              children={value => (
-                <CheckboxInput
-                  label="Omit the optional tab param"
-                  value={value}
-                  tiny
-                  onChange={(event, next) => form.setFieldValue('components.path_params.values.omitTab', next)}
-                />
-              )}
-            />
-
-            <form.Subscribe
               selector={state =>
-                [
-                  state.values.components.path_params.values.id,
-                  state.values.components.path_params.values.tab,
-                  state.values.components.path_params.values.omitTab
-                ] as const
+                [state.values.components.path_params.values.id, state.values.components.path_params.values.tab] as const
               }
-              children={([id, tab, omitTab]) => (
+              children={([id, tab]) => (
                 <ResultBlock label="codec.stringify(params)">
-                  {run(() => FILE_VIEWER_CODEC.stringify({ id, tab: omitTab ? null : tab }))}
+                  {run(() => FILE_VIEWER_CODEC.stringify({ id, tab }))}
                 </ResultBlock>
               )}
             />
