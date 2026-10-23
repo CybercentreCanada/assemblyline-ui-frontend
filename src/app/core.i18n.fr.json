@@ -62,7 +62,6 @@
   "clipboard": "Copier dans le presse-papiers",
   "clipboard.failure": "n'a pas pu être copié dans le presse-papiers.",
   "clipboard.success": "a été copié dans le presse-papiers.",
-  "core_version": "Version de l'API central",
   "clue": "Afficher les détails de Clue",
   "date.cancel": "Annuler",
   "date.clear": "Retirer",

@@ -67,6 +67,8 @@ import helpSearchEN from 'routes/help-search/help-search.i18n.en.json';
 import helpSearchFR from 'routes/help-search/help-search.i18n.fr.json';
 import helpServicesEN from 'routes/help-services/help-services.i18n.en.json';
 import helpServicesFR from 'routes/help-services/help-services.i18n.fr.json';
+import helpEN from 'routes/help/help.i18n.en.json';
+import helpFR from 'routes/help/help.i18n.fr.json';
 import manageBadlistAddEN from 'routes/manage-badlist-add/manage-badlist-add.i18n.en.json';
 import manageBadlistAddFR from 'routes/manage-badlist-add/manage-badlist-add.i18n.fr.json';
 import manageBadlistDetailEN from 'routes/manage-badlist-detail/manage-badlist-detail.i18n.en.json';
@@ -150,6 +152,7 @@ const resources = {
     favorites: favoritesEN,
     fileDetail: fileDetailEN,
     fileViewer: fileViewerEN,
+    help: helpEN,
     helpAPI: helpAPIEN,
     helpClassification: helpClassificationEN,
     helpConfiguration: helpConfigurationEN,
@@ -213,6 +216,7 @@ const resources = {
     favorites: favoritesFR,
     fileDetail: fileDetailFR,
     fileViewer: fileViewerFR,
+    help: helpFR,
     helpAPI: helpAPIFR,
     helpClassification: helpClassificationFR,
     helpConfiguration: helpConfigurationFR,

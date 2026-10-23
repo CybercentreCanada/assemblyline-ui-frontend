@@ -13,7 +13,7 @@ export default function Configuration() {
   const [configuration, setConfiguration] = useState(null);
   const [constants, setConstants] = useState(null);
   const { configuration: systemConfiguration } = useALContext();
-  const { t } = useTranslation(['helpConfiguration', 'translation']);
+  const { t } = useTranslation(['helpConfiguration', 'help']);
   const theme = useTheme();
   const sp1 = theme.spacing(1);
   const sp2 = theme.spacing(2);
@@ -52,7 +52,7 @@ export default function Configuration() {
           secondary={
             coreVersion && (
               <>
-                {t('translation:core_version')}: {coreVersion}
+                {t('help:core_version')}: {coreVersion}
               </>
             )
           }

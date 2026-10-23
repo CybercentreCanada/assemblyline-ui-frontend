@@ -34,7 +34,7 @@ export default function ApiDoc() {
   const { configuration } = useALContext();
   const [expandMap, setExpandMap] = useState({});
   const theme = useTheme();
-  const { t } = useTranslation(['helpAPI', 'translation']);
+  const { t } = useTranslation(['helpAPI', 'help']);
   const sp1 = theme.spacing(1);
   const sp2 = theme.spacing(2);
   const coreVersion = configuration.system.version;
@@ -140,7 +140,7 @@ export default function ApiDoc() {
           secondary={
             coreVersion && (
               <>
-                {t('translation:core_version')}: {coreVersion}
+                {t('help:core_version')}: {coreVersion}
               </>
             )
           }
