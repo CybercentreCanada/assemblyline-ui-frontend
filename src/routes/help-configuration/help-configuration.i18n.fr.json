@@ -1,6 +1,7 @@
 {
   "config": "Variables de configuration",
   "config.desc": "Chaque instance d'assemblyline a une configuration unique. Certains paramètres de configuration sont particulièrement utiles pour comprendre le fonctionnement du système:",
+  "core_version": "Version de l'API central",
   "file_types": "Types de fichier",
   "file_types.desc": "Assemblyline attribue un type à tous les fichiers en analysant la structure du fichier et utilise ce type pour acheminer le fichier vers le service approprié.",
   "file_types.non_specific": "D'autres types de fichiers sont identifiés mais ne sont pas acheminés vers des services spécifiques:",
