@@ -139,7 +139,7 @@ export default function ApiDoc() {
       <div style={{ textAlign: 'left' }}>
         <PageHeader
           primary={t('title')}
-          {...(coreVersion && { secondary: `${t('help:core_version')}: ${coreVersion}}` })}
+          {...(coreVersion && { secondary: `${t('help:core_version')}: ${coreVersion}` })}
           slotProps={{
             root: { style: { marginBottom: theme.spacing(4) } },
             actions: { spacing: 1 }
