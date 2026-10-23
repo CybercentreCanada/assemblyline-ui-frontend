@@ -42,6 +42,7 @@ export default function Configuration() {
         setConfiguration(api_data.api_response);
       }
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
