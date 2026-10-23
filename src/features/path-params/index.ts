@@ -6,6 +6,7 @@ export type {
   InferPathParamKeyFromPath,
   InferPathParamStringifyValuesFromBlueprintMap,
   InferPathParamValuesFromBlueprintMap,
+  InferRoutePathFormFromPath,
   PathParamBlueprintKind,
   PathParamValue,
   PathPattern,

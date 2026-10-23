@@ -68,6 +68,38 @@ export type RoutePathWithTrailingOptionalParamsOnly<Path extends RoutePath> = Pa
       : Path
   : never;
 
+type JoinPathSegments<Prefix extends string, Segment extends string> = Prefix extends ''
+  ? Segment
+  : `${Prefix}/${Segment}`;
+
+// `Rest` starts at the first optional segment; every optional after it is also optional.
+type ExpandOptionalPathForms<Prefix extends string, Rest extends string> = Rest extends `:${infer Key}?/${infer Next}`
+  ? Prefix | ExpandOptionalPathForms<JoinPathSegments<Prefix, `:${Key}`>, Next>
+  : Rest extends `:${infer Key}?`
+    ? Prefix | JoinPathSegments<Prefix, `:${Key}`>
+    : never;
+
+type WalkPathForms<Path extends string, Prefix extends string = ''> = Path extends `${infer Segment}/${infer Rest}`
+  ? Segment extends `:${string}?`
+    ? ExpandOptionalPathForms<Prefix, Path>
+    : WalkPathForms<Rest, JoinPathSegments<Prefix, Segment>>
+  : Path extends `:${string}?`
+    ? ExpandOptionalPathForms<Prefix, Path>
+    : JoinPathSegments<Prefix, Path>;
+
+/**
+ * Expands the trailing optional params of a route path literal into every form the path can take.
+ * E.g. `'/path/:option?/:other?'` → `'/path' | '/path/:option' | '/path/:option/:other'`.
+ * Assumes optional params are trailing; see `RoutePathWithTrailingOptionalParamsOnly`.
+ */
+export type InferRoutePathFormFromPath<Path extends RoutePath> = string extends Path
+  ? string
+  : Path extends `/${infer Rest}`
+    ? `/${WalkPathForms<Rest>}`
+    : Path extends string
+      ? WalkPathForms<Path>
+      : never;
+
 /** Extracts the keys of optional `:param?` segments from a route path literal. */
 export type InferOptionalPathParamKeyFromPath<Path extends RoutePath> = string extends Path
   ? never

@@ -144,16 +144,25 @@ export const splitPathname = (pathname: string): string[] =>
 
 /**
  * @name assertSupportedPathPattern
- * @description Throws for patterns the codec cannot handle: optional static segments, and optional params that are followed by a required segment. Optional params are only supported at the end of the path.
+ * @description Throws for patterns the codec cannot handle: wildcard segments, optional static segments, param names that are not alphanumeric (underscores allowed) or are repeated, and optional params followed by a required segment. Optional params are only supported at the end of the path.
  * @param pattern - Pattern created by `parsePathPattern`
  * @returns Nothing; throws a `TypeError` for unsupported patterns
  */
 export const assertSupportedPathPattern = (pattern: PathPattern): void => {
+  const keys = new Set<string>();
   let optionalParamSeen = false;
   for (const segment of pattern.segments) {
-    if (segment.kind === 'static' && segment.raw.endsWith('?')) {
-      throw new TypeError('Optional static path segments are not supported.');
+    if (segment.kind === 'static') {
+      if (segment.raw.includes('*')) throw new TypeError('Wildcard path segments are not supported.');
+      if (segment.raw.endsWith('?')) throw new TypeError('Optional static path segments are not supported.');
+    } else {
+      if (!/^[A-Za-z0-9_]+$/.test(segment.key)) {
+        throw new TypeError('Path parameter names may only contain letters, numbers and underscores.');
+      }
+      if (keys.has(segment.key)) throw new TypeError(`Path parameter names must be unique: "${segment.key}".`);
+      keys.add(segment.key);
     }
+
     if (segment.kind === 'param' && segment.optional) {
       optionalParamSeen = true;
     } else if (optionalParamSeen) {
@@ -174,14 +183,14 @@ export const isPathConsumed = (pathParts: string[], pathIndex: number): boolean 
 
 /**
  * @name matchPathPattern
- * @description Matches a pathname against a parsed pattern and extracts raw parameter values. Static segments compare decoded and case-insensitively. Missing params, which can only be optional ones at the end, are `undefined`; the root pathname `/` omits a leading optional param.
+ * @description Matches a pathname against a parsed pattern and extracts raw parameter values. Static segments compare decoded and case-insensitively. Missing params, which can only be optional ones at the end, are `undefined`; the root pathname, `/` or an empty pathname, omits a leading optional param.
  * @param pattern - Pattern created by `parsePathPattern`
  * @param pathname - Location pathname to match
  * @returns Raw values keyed by parameter name, or `null` when the pathname does not match. Throws a `TypeError` for supplied values that are empty or `.` / `..`.
  */
 export const matchPathPattern = (pattern: PathPattern, pathname: string): Record<string, string | undefined> | null => {
   const pathParts = splitPathname(pathname);
-  const isRoot = pathname === '/';
+  const isRoot = pathname === '/' || pathname === '';
   const params = Object.create(null) as Record<string, string | undefined>;
   let pathIndex = 0;
 

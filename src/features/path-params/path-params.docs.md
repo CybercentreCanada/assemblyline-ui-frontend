@@ -12,6 +12,8 @@ Type-safe URL path parameter extraction and serialization. The module derives pa
 - **Safe path segments** - Rejects empty parameter values and exact `.` or `..` segments while allowing other encoded characters
 - **Default values** - Resolves missing parameters and blueprint-unrecognized values to the configured default
 - **Trailing optional parameters** - Supports `:param?` segments at the end of a pattern; omitted values resolve to the blueprint default, and patterns with an optional before a required segment are rejected
+- **Strict patterns** - Rejects repeated parameter names, parameter names with special characters, and wildcard segments when the codec is created
+- **Path forms** - `InferRoutePathFormFromPath` expands a path literal with trailing optionals into every form the path can take
 - **Route integration** - Provides the codec consumed by `createAppRoute`
 
 ## 3. Concepts
@@ -28,7 +30,11 @@ Type-safe URL path parameter extraction and serialization. The module derives pa
 | `/path/:param?/:other` | No |
 | `/path/:param?/:other/:next?` | No |
 
-Unsupported patterns are rejected by the types when the path is a literal and by a `TypeError` at runtime. Optional parameters still require a blueprint; when the URL omits the segment, the blueprint parses `undefined` and supplies its configured default. Trailing optionals are filled left to right, so `/path/x` parses `x` as the first optional. For a root pattern such as `/:id?`, `/` represents the omitted parameter. Empty parameter values are otherwise invalid, so a trailing slash after an optional parameter, such as `/path/x/`, throws. A parameter is recognized only when its segment starts with `:`; a colon within a static segment does not define a parameter. Optional static segments such as `view?` remain unsupported.
+Unsupported patterns are rejected by the types when the path is a literal and by a `TypeError` at runtime. Optional parameters still require a blueprint; when the URL omits the segment, the blueprint parses `undefined` and supplies its configured default. Trailing optionals are filled left to right, so `/path/x` parses `x` as the first optional. For a root pattern such as `/:id?`, `/` represents the omitted parameter, and for a slashless pattern such as `:id?` an empty pathname does. Empty parameter values are otherwise invalid, so a trailing slash after an optional parameter, such as `/path/x/`, throws. A parameter is recognized only when its segment starts with `:`; a colon within a static segment does not define a parameter. Optional static segments such as `view?` remain unsupported.
+
+Parameter names must be unique within a pattern, whether they are optional or not, so `/item/:id/:id` and `/item/:id/:id?` are rejected. Names may only contain letters, numbers and underscores, so `/files/:id-x` and `/files/:id*` are rejected. Wildcard matching is not supported, so a `*` in any segment, such as `/files/:id/*`, is rejected. These rules are checked with a `TypeError` when the codec is created.
+
+`InferRoutePathFormFromPath<Path>` expands the trailing optionals of a path literal into every form the path can take, for example `'/path/:option?/:other?'` becomes `'/path' | '/path/:option' | '/path/:option/:other'`. It assumes optionals are trailing and is not wired into the codec.
 
 ### Blueprint
 
@@ -133,6 +139,7 @@ const AlertPage = () => {
 | `RoutePath` | Route path pattern type |
 | `RoutePathWithoutOptionalStaticSegments<Path>` | Resolves to `never` for literal paths with optional static segments |
 | `RoutePathWithTrailingOptionalParamsOnly<Path>` | Resolves to `never` for literal paths where an optional segment is followed by a required one |
+| `InferRoutePathFormFromPath<Path>` | Expands trailing optional params into every form of the path |
 | `PathParamValue` | Allowed string, number, and boolean values |
 | `InferPathParamKeyFromPath<Path>` | Extracts parameter keys from a path literal |
 | `InferOptionalPathParamKeyFromPath<Path>` | Extracts keys for optional dynamic segments |
@@ -155,11 +162,11 @@ The input boundary is a route `Location` and its pathname. The codec compares st
 | Step | Helpers | Responsibility |
 | --- | --- | --- |
 | Shared | `assertValidPathParam`, `decodePathSegment`, `getOwnValue` | Validate values, decode segments with malformed escapes kept literal, and read only own properties |
-| Pattern | `parsePathPattern`, `assertSupportedPathPattern` | Split the pattern into static and param segments, and reject optional static segments and optional params that are followed by a required segment |
+| Pattern | `parsePathPattern`, `assertSupportedPathPattern` | Split the pattern into static and param segments, and reject wildcard and optional static segments, invalid or repeated param names, and optional params that are followed by a required segment |
 | Matching | `matchPathPattern`, `splitPathname`, `isPathConsumed` | Walk the pattern and pathname together and extract raw parameter values |
 | Serialization | `stringifyPathPattern`, `serializePathSegments`, `serializePathParam`, `findLastSuppliedParamIndex`, `joinPathParts` | Encode values, drop or fill omitted optionals, and build the pathname |
 
-**Matching.** `matchPathPattern` walks the pattern segments and pathname segments in order in a single pass. A static segment must equal the decoded pathname segment, ignoring case. A param takes the next segment when one is left, and is `undefined` otherwise, which a blueprint turns into its default. Because optionals can only be trailing, they are filled left to right and there is never more than one way to match. The root pathname `/` is read as an omitted optional param. Supplied values must not be empty, `.` or `..`, and a pathname with segments left over does not match.
+**Matching.** `matchPathPattern` walks the pattern segments and pathname segments in order in a single pass. A static segment must equal the decoded pathname segment, ignoring case. A param takes the next segment when one is left, and is `undefined` otherwise, which a blueprint turns into its default. Because optionals can only be trailing, they are filled left to right and there is never more than one way to match. The root pathname `/`, or an empty pathname, is read as an omitted optional param. Supplied values must not be empty, `.` or `..`, and a pathname with segments left over does not match.
 
 **Serialization.** `serializePathSegments` encodes each segment in order. An omitted optional after the last supplied optional (`findLastSuppliedParamIndex`) is dropped. An omitted optional before it is written with its blueprint default so the supplied value stays in its own position.
 

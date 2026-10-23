@@ -1,6 +1,7 @@
 import type {
   InferOptionalPathParamKeyFromPath,
   InferPathParamKeyFromPath,
+  InferRoutePathFormFromPath,
   RoutePath,
   RoutePathWithTrailingOptionalParamsOnly
 } from 'features/path-params';
@@ -206,6 +207,36 @@ describe('createPathParamsCodec', () => {
     }).toThrow('Optional path parameters are only supported at the end of the path.');
   });
 
+  it('rejects repeated parameter names, optional or not', () => {
+    for (const path of ['/item/:id/:id', '/item/:id/:id?', '/item/:id?/:id?', '/:a/x/:a']) {
+      expect(() => createPathParamsCodec(path)).toThrow(/Path parameter names must be unique/);
+    }
+  });
+
+  it('rejects wildcard segments and special characters in parameter names', () => {
+    for (const path of ['/files/:id/*', '/files/*', '/files/:id/*/x', '/files/:id?/*']) {
+      expect(() => createPathParamsCodec(path)).toThrow('Wildcard path segments are not supported.');
+    }
+    for (const path of ['/files/:id*', '/files/:id-x', '/files/:id.x', '/files/:', '/files/:id?x']) {
+      expect(() => createPathParamsCodec(path)).toThrow(
+        'Path parameter names may only contain letters, numbers and underscores.'
+      );
+    }
+    expect(() => createPathParamsCodec('/files/:file_id/:ID2?')).not.toThrow();
+  });
+
+  it('expands trailing optional params into every form of the path', () => {
+    expectTypeOf<InferRoutePathFormFromPath<'/path/:option?/:other?'>>().toEqualTypeOf<
+      '/path' | '/path/:option' | '/path/:option/:other'
+    >();
+    expectTypeOf<InferRoutePathFormFromPath<'/alerts/:id/:tab?'>>().toEqualTypeOf<'/alerts/:id' | '/alerts/:id/:tab'>();
+    expectTypeOf<InferRoutePathFormFromPath<'/alerts/:id'>>().toEqualTypeOf<'/alerts/:id'>();
+    expectTypeOf<InferRoutePathFormFromPath<'/alerts'>>().toEqualTypeOf<'/alerts'>();
+    expectTypeOf<InferRoutePathFormFromPath<'/:id?'>>().toEqualTypeOf<'/' | '/:id'>();
+    expectTypeOf<InferRoutePathFormFromPath<':id?'>>().toEqualTypeOf<'' | ':id'>();
+    expectTypeOf<InferRoutePathFormFromPath<string>>().toEqualTypeOf<string>();
+  });
+
   it('requires extra callback entries to be path-param blueprints', () => {
     const createInvalidCodec = () => {
       // @ts-expect-error Every callback entry must be a path-param blueprint.
@@ -344,6 +375,16 @@ describe('createPathParamsCodec', () => {
 
     expect(codec.parse(makeLocation('/'))).toEqual({ id: 'default-id' });
     expect(codec.stringify({})).toBe('/');
+    expect(() => codec.stringify({ id: '' })).toThrow(TypeError);
+  });
+
+  it('round-trips an omitted slashless root optional param through an empty pathname', () => {
+    const codec = createPathParamsCodec(':id?')(b => ({ id: b.string('default-id') }));
+    const pathname = codec.stringify({});
+
+    expect(pathname).toBe('');
+    expect(codec.parse(makeLocation(pathname))).toEqual({ id: 'default-id' });
+    expect(codec.parse(makeLocation(codec.stringify({ id: 'abc' })))).toEqual({ id: 'abc' });
     expect(() => codec.stringify({ id: '' })).toThrow(TypeError);
   });
 
@@ -520,6 +561,12 @@ describe('matchPathPattern', () => {
 
   it('omits a leading optional param at the root pathname', () => {
     expect(matchPathPattern(parsePathPattern('/:id?'), '/')).toEqual({ id: undefined });
+    expect(matchPathPattern(parsePathPattern('/:id?'), '')).toEqual({ id: undefined });
+    expect(matchPathPattern(parsePathPattern(':id?'), '')).toEqual({ id: undefined });
+  });
+
+  it('does not treat an empty pathname as an omitted required param', () => {
+    expect(() => matchPathPattern(parsePathPattern(':id'), '')).toThrow(TypeError);
   });
 
   it('allows a trailing slash after the last segment and rejects an empty param value', () => {
@@ -673,6 +720,34 @@ describe('assertSupportedPathPattern', () => {
     expect(() => assertSupportedPathPattern(parsePathPattern('/items/:id?/view?'))).toThrow(
       'Optional static path segments are not supported.'
     );
+  });
+
+  it('rejects repeated parameter names', () => {
+    for (const path of ['/item/:id/:id', '/item/:id/:id?', '/item/:id?/:id?']) {
+      expect(() => assertSupportedPathPattern(parsePathPattern(path))).toThrow(
+        'Path parameter names must be unique: "id".'
+      );
+    }
+    expect(() => assertSupportedPathPattern(parsePathPattern('/item/:id/:other'))).not.toThrow();
+  });
+
+  it('rejects wildcard segments', () => {
+    for (const path of ['/files/*', '/files/:id/*', '/files/:id?/*', '/files/pre*fix/:id']) {
+      expect(() => assertSupportedPathPattern(parsePathPattern(path))).toThrow(
+        'Wildcard path segments are not supported.'
+      );
+    }
+  });
+
+  it('only allows letters, numbers and underscores in parameter names', () => {
+    for (const path of ['/files/:id*', '/files/:id-x', '/files/:id.x', '/files/:', '/files/:id?x', '/files/:café']) {
+      expect(() => assertSupportedPathPattern(parsePathPattern(path))).toThrow(
+        'Path parameter names may only contain letters, numbers and underscores.'
+      );
+    }
+    for (const path of ['/files/:id', '/files/:file_id', '/files/:ID2?', '/files/:__proto__']) {
+      expect(() => assertSupportedPathPattern(parsePathPattern(path))).not.toThrow();
+    }
   });
 });
 
