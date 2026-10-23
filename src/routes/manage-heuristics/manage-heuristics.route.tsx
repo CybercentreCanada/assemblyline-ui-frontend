@@ -5,7 +5,7 @@ import useALContext from 'core/config/useALContext';
 import PageContainer from 'core/template/branding/AppPageContainer';
 import { useAppUser } from 'core/template/components/app/hooks';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
-import { createSearchParams, SearchParamsProvider, useSearchParams } from 'features/SearchParams/createSearchParams';
+import { createSearchParams, SearchParamsProvider, useSearchParams } from 'features/search-params';
 import useDrawer from 'layout/drawer/drawer.hooks';
 import type { SearchResult } from 'models/api/search';
 import type { CustomUser, IndexDefinition } from 'models/api/user';
@@ -21,8 +21,8 @@ import { DEFAULT_SUGGESTION } from 'ui/SearchBar/search-textfield';
 
 const HEURISTICS_PARAMS = createSearchParams(p => ({
   query: p.string(''),
-  offset: p.number(0).min(0).origin('snapshot').ephemeral(),
-  rows: p.number(25).locked().origin('snapshot').ephemeral(),
+  offset: p.number(0).min(0).source('transient').ephemeral(),
+  rows: p.number(25).locked().source('transient').ephemeral(),
   sort: p.string('heur_id asc').ephemeral(),
   filters: p.filters([]),
   track_total_hits: p.number(10000).nullable().ephemeral()

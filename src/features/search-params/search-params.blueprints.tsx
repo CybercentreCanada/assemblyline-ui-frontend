@@ -1,13 +1,22 @@
 import type {
-  ParamBlueprints,
-  ParamSource,
-  ParamValues,
-  SearchParamValues
-} from 'features/SearchParams/lib/search_params.model';
-import type { SearchParamSnapshot } from 'features/search-params/search-params.snapshots.tsx';
+  EnumParamValue,
+  InferSearchParamValueMapFromBlueprintMap,
+  ObjectParamShape,
+  ObjectParamValue,
+  SearchParamBlueprintDescriptor,
+  SearchParamBlueprintKind,
+  SearchParamBlueprintMap,
+  SearchParamSnapshot,
+  SearchParamSource,
+  SearchParamValue,
+  SearchParamValueMap
+} from 'features/search-params';
 import type { Location } from 'react-router';
 
-export abstract class BaseBlueprint<T extends ParamValues> {
+//*****************************************************************************************
+// Base Blueprint
+//*****************************************************************************************
+export abstract class BaseSearchParamBlueprint<T extends SearchParamValue> {
   /**
    * Unique identifier for this parameter in `location.search` or `location.state`.
    * Example: `?page=2` → key = "page".
@@ -50,9 +59,9 @@ export abstract class BaseBlueprint<T extends ParamValues> {
    * - "state"  → location.state
    * - "ref"    → a React.ref value
    */
-  protected _origin: ParamSource = 'search';
+  protected _source: SearchParamSource = 'search';
 
-  constructor(key: string = null, param: BaseBlueprint<T> = null) {
+  constructor(key: string = null, param: BaseSearchParamBlueprint<T> = null) {
     this._key = key;
     if (!param) return;
     this._defaultValue = param._defaultValue;
@@ -60,7 +69,7 @@ export abstract class BaseBlueprint<T extends ParamValues> {
     this._ignored = param._ignored;
     this._locked = param._locked;
     this._nullable = param._nullable;
-    this._origin = param._origin;
+    this._source = param._source;
   }
 
   // -------------------------
@@ -92,8 +101,8 @@ export abstract class BaseBlueprint<T extends ParamValues> {
     return this;
   }
 
-  public origin(origin: ParamSource) {
-    this._origin = origin;
+  public source(source: SearchParamSource) {
+    this._source = source;
     return this;
   }
 
@@ -121,8 +130,8 @@ export abstract class BaseBlueprint<T extends ParamValues> {
     return this._nullable;
   }
 
-  protected getOrigin() {
-    return this._origin;
+  protected getSource() {
+    return this._source;
   }
 
   // -------------------------
@@ -141,8 +150,8 @@ export abstract class BaseBlueprint<T extends ParamValues> {
   // Helpers
   // -------------------------
 
-  protected has(origin: T = null, value: unknown = undefined): boolean {
-    return value === undefined ? true : origin === value;
+  protected has(source: T = null, value: unknown = undefined): boolean {
+    return value === undefined ? true : source === value;
   }
 
   protected parse(value: unknown): T {
@@ -153,7 +162,7 @@ export abstract class BaseBlueprint<T extends ParamValues> {
     return this._nullable && (value === null || value === undefined) ? true : !!value;
   }
 
-  protected get<P extends Record<string, ParamValues>>(search: P | URLSearchParams): T {
+  protected get<P extends SearchParamValueMap>(search: P | URLSearchParams): T {
     if (search instanceof URLSearchParams) {
       const value = this.parse(search.get(this._key));
       if (this.valid(value)) return value;
@@ -165,45 +174,80 @@ export abstract class BaseBlueprint<T extends ParamValues> {
   }
 
   // -------------------------
+  // Introspection
+  // -------------------------
+
+  /** Identifies which blueprint variant this instance is, for tooling/introspection. Overridden by each subclass. */
+  public getKind(): SearchParamBlueprintKind {
+    throw new Error('getKind() must be implemented by a concrete blueprint subclass.');
+  }
+
+  /** Plain-object description of this blueprint's configuration, for tooling/introspection. */
+  public describe(): SearchParamBlueprintDescriptor {
+    return {
+      key: this._key,
+      kind: this.getKind(),
+      defaultValue: this._defaultValue,
+      source: this._source,
+      ephemeral: this._ephemeral,
+      ignored: this._ignored,
+      locked: this._locked,
+      nullable: this._nullable
+    };
+  }
+
+  // -------------------------
   // Parsers
   // -------------------------
 
-  protected full<Blueprints extends Record<string, ParamBlueprints>>(
-    prev: SearchParamValues<Blueprints>,
-    params: URLSearchParams | SearchParamValues<Blueprints>
-  ): SearchParamValues<Blueprints> {
+  protected full<SearchParamBlueprints extends SearchParamBlueprintMap>(
+    prev: InferSearchParamValueMapFromBlueprintMap<SearchParamBlueprints>,
+    params: URLSearchParams | InferSearchParamValueMapFromBlueprintMap<SearchParamBlueprints>
+  ): InferSearchParamValueMapFromBlueprintMap<SearchParamBlueprints> {
     const value = this.get(params);
-    if (!this._locked && this.valid(value)) return { ...prev, [this._key]: value };
-    else if (this.valid(this._defaultValue)) return { ...prev, [this._key]: this._defaultValue };
-    else return prev;
+
+    if (!this._locked && this.valid(value)) {
+      (prev as Record<string, SearchParamValue>)[this._key] = value;
+      return prev;
+    }
+
+    if (this.valid(this._defaultValue)) {
+      (prev as Record<string, SearchParamValue>)[this._key] = this._defaultValue;
+    }
+
+    return prev;
   }
 
-  protected delta<Blueprints extends Record<string, ParamBlueprints>>(
-    prev: SearchParamValues<Blueprints>,
-    params: URLSearchParams | SearchParamValues<Blueprints>
-  ): SearchParamValues<Blueprints> {
+  protected delta<SearchParamBlueprints extends SearchParamBlueprintMap>(
+    prev: InferSearchParamValueMapFromBlueprintMap<SearchParamBlueprints>,
+    params: URLSearchParams | InferSearchParamValueMapFromBlueprintMap<SearchParamBlueprints>
+  ): InferSearchParamValueMapFromBlueprintMap<SearchParamBlueprints> {
     const value = this.get(params);
-    if (!this._locked && this.valid(value) && value !== this._defaultValue) return { ...prev, [this._key]: value };
-    else return prev;
+
+    if (!this._locked && this.valid(value) && value !== this._defaultValue) {
+      (prev as Record<string, SearchParamValue>)[this._key] = value;
+    }
+
+    return prev;
   }
 
-  protected fromLocation<Blueprints extends Record<string, ParamBlueprints>>(
-    prev: SearchParamValues<Blueprints>,
+  protected fromLocation<SearchParamBlueprints extends SearchParamBlueprintMap>(
+    prev: InferSearchParamValueMapFromBlueprintMap<SearchParamBlueprints>,
     location: Location,
-    snapshot: SearchParamSnapshot<Blueprints> | null = null
-  ): SearchParamValues<Blueprints> {
+    snapshot: SearchParamSnapshot<SearchParamBlueprints> | null = null
+  ): InferSearchParamValueMapFromBlueprintMap<SearchParamBlueprints> {
     let value: T | undefined;
 
-    switch (this._origin) {
+    switch (this._source) {
       case 'search': {
         value = this.get(new URLSearchParams(location.search));
         break;
       }
       case 'state': {
-        value = this.get((location.state ?? {}) as Record<string, ParamValues>);
+        value = this.get((location.state ?? {}) as SearchParamValueMap);
         break;
       }
-      case 'snapshot': {
+      case 'transient': {
         value = this.get(snapshot?.values);
         break;
       }
@@ -211,29 +255,72 @@ export abstract class BaseBlueprint<T extends ParamValues> {
         value = null;
     }
 
-    if (!this._locked && this.valid(value)) return { ...prev, [this._key]: value };
-    else if (this.valid(this._defaultValue)) return { ...prev, [this._key]: this._defaultValue };
-    else return prev;
+    if (!this._locked && this.valid(value)) {
+      (prev as Record<string, SearchParamValue>)[this._key] = value;
+      return prev;
+    }
+
+    if (this.valid(this._defaultValue)) {
+      (prev as Record<string, SearchParamValue>)[this._key] = this._defaultValue;
+    }
+
+    return prev;
+  }
+
+  protected fromRoute<SearchParamBlueprints extends SearchParamBlueprintMap>(
+    prev: InferSearchParamValueMapFromBlueprintMap<SearchParamBlueprints>,
+    href: string = '',
+    state: unknown = null,
+    transient: unknown = null
+  ): InferSearchParamValueMapFromBlueprintMap<SearchParamBlueprints> {
+    let value: T | undefined;
+
+    switch (this._source) {
+      case 'search': {
+        value = this.get(new URLSearchParams(new URL(href, 'http://localhost').search));
+        break;
+      }
+      case 'state': {
+        value = this.get((state ?? {}) as SearchParamValueMap);
+        break;
+      }
+      case 'transient': {
+        value = this.get((transient ?? {}) as SearchParamValueMap);
+        break;
+      }
+      default:
+        value = null;
+    }
+
+    return this.full(prev, { [this._key]: value } as InferSearchParamValueMapFromBlueprintMap<SearchParamBlueprints>);
   }
 
   // -------------------------
   // Resolvers
   // -------------------------
 
-  protected toParams<Blueprints extends Record<string, ParamBlueprints>>(
+  protected toParams<SearchParamBlueprints extends SearchParamBlueprintMap>(
     prev: string[][],
-    snapshot: SearchParamValues<Blueprints>
+    snapshot: InferSearchParamValueMapFromBlueprintMap<SearchParamBlueprints>
   ): string[][] {
-    return this._key in snapshot && snapshot?.[this._key] !== null && snapshot?.[this._key] !== undefined
-      ? [...prev, [this._key, String(snapshot?.[this._key])]]
-      : prev;
+    if (!(this._key in snapshot)) return prev;
+
+    const value = snapshot?.[this._key];
+    if (value === null || value === undefined || Array.isArray(value) || typeof value === 'object') return prev;
+
+    prev.push([this._key, String(value)]);
+    return prev;
   }
 }
 
-/**
- * Boolean Param
- */
-export class BooleanBlueprint extends BaseBlueprint<boolean> {
+//*****************************************************************************************
+// Boolean Blueprint
+//*****************************************************************************************
+export class BooleanSearchParamBlueprint extends BaseSearchParamBlueprint<boolean> {
+  public override getKind(): SearchParamBlueprintKind {
+    return 'boolean';
+  }
+
   protected override parse(value: unknown): boolean {
     return value === 'true' ? true : value === 'false' ? false : super.parse(value);
   }
@@ -243,15 +330,15 @@ export class BooleanBlueprint extends BaseBlueprint<boolean> {
   }
 }
 
-/**
- * Number Param
- */
-export class NumberBlueprint extends BaseBlueprint<number> {
+//*****************************************************************************************
+// Number Blueprint
+//*****************************************************************************************
+export class NumberSearchParamBlueprint extends BaseSearchParamBlueprint<number> {
   private _min: null | number = null;
 
   private _max: null | number = null;
 
-  constructor(key: string = null, param: NumberBlueprint = null) {
+  constructor(key: string = null, param: NumberSearchParamBlueprint = null) {
     super(key, param);
     if (!param) return;
     this._min = param._min;
@@ -270,6 +357,14 @@ export class NumberBlueprint extends BaseBlueprint<number> {
     return this;
   }
 
+  public override getKind(): SearchParamBlueprintKind {
+    return 'number';
+  }
+
+  public override describe(): SearchParamBlueprintDescriptor {
+    return { ...super.describe(), min: this._min, max: this._max };
+  }
+
   private clamp(value: number): number {
     let num = value;
     if (this._min !== null) num = Math.max(num, this._min);
@@ -277,7 +372,7 @@ export class NumberBlueprint extends BaseBlueprint<number> {
     return num;
   }
 
-  protected override get<P extends Record<string, ParamValues>>(search: P | URLSearchParams): number {
+  protected override get<P extends SearchParamValueMap>(search: P | URLSearchParams): number {
     if (search instanceof URLSearchParams) {
       const value = this.parse(search.get(this._key));
       if (this.valid(value)) return this.clamp(value);
@@ -297,10 +392,14 @@ export class NumberBlueprint extends BaseBlueprint<number> {
   }
 }
 
-/**
- * String Param
- */
-export class StringBlueprint extends BaseBlueprint<string> {
+//*****************************************************************************************
+// String Blueprint
+//*****************************************************************************************
+export class StringSearchParamBlueprint extends BaseSearchParamBlueprint<string> {
+  public override getKind(): SearchParamBlueprintKind {
+    return 'string';
+  }
+
   protected override parse(value: unknown): string {
     return typeof value === 'string' ? String(value) : super.parse(value);
   }
@@ -310,13 +409,15 @@ export class StringBlueprint extends BaseBlueprint<string> {
   }
 }
 
-/**
- * Enum Param
- */
-export class EnumBlueprint<O extends readonly string[]> extends BaseBlueprint<O[number]> {
+//*****************************************************************************************
+// Enum Blueprint
+//*****************************************************************************************
+export class EnumSearchParamBlueprint<
+  O extends readonly [EnumParamValue, ...EnumParamValue[]]
+> extends BaseSearchParamBlueprint<O[number]> {
   private _options: O;
 
-  constructor(key: string = null, param: EnumBlueprint<O> = null) {
+  constructor(key: string = null, param: EnumSearchParamBlueprint<O> = null) {
     super(key, param);
     if (!param) return;
     this._options = param._options;
@@ -328,15 +429,37 @@ export class EnumBlueprint<O extends readonly string[]> extends BaseBlueprint<O[
   }
 
   public options(value: O) {
+    const serializedOptions = new Set<string>();
+    for (const option of value) {
+      const serialized = String(option);
+      if (serializedOptions.has(serialized)) {
+        throw new TypeError('Enum options must have unique string representations.');
+      }
+      serializedOptions.add(serialized);
+    }
+
     this._options = value;
     return this;
   }
 
+  public override getKind(): SearchParamBlueprintKind {
+    return 'enum';
+  }
+
+  public override describe(): SearchParamBlueprintDescriptor {
+    return { ...super.describe(), options: this._options };
+  }
+
   private check(value: unknown): value is O[number] {
-    return Array.isArray(this._options) && this._options.some(v => v === value);
+    return Array.isArray(this._options) && this._options.includes(value as O[number]);
   }
 
   protected override parse(value: unknown): O[number] {
+    if (typeof value === 'string') {
+      const option = this._options?.find(candidate => String(candidate) === value);
+      if (option !== undefined) return option;
+    }
+
     return this.check(value) ? value : super.parse(value);
   }
 
@@ -345,15 +468,15 @@ export class EnumBlueprint<O extends readonly string[]> extends BaseBlueprint<O[
   }
 }
 
-/**
- * Filter Param
- */
-export class FiltersBlueprint extends BaseBlueprint<string[]> {
+//*****************************************************************************************
+// Filter Blueprint
+//*****************************************************************************************
+export class FiltersSearchParamBlueprint extends BaseSearchParamBlueprint<string[]> {
   private _not: string = 'NOT';
 
   private _omit: string = '!';
 
-  constructor(key: string = null, param: FiltersBlueprint = null) {
+  constructor(key: string = null, param: FiltersSearchParamBlueprint = null) {
     super(key, param);
     if (!param) return;
     this._not = param._not;
@@ -374,6 +497,14 @@ export class FiltersBlueprint extends BaseBlueprint<string[]> {
     return this;
   }
 
+  public override getKind(): SearchParamBlueprintKind {
+    return 'filters';
+  }
+
+  public override describe(): SearchParamBlueprintDescriptor {
+    return { ...super.describe(), not: this._not, omit: this._omit };
+  }
+
   // -------------------------
   // Utility
   // -------------------------
@@ -383,40 +514,79 @@ export class FiltersBlueprint extends BaseBlueprint<string[]> {
   }
 
   private toPrefix(value: string, prev: string[] = []): string[] {
+    const next = prev.slice();
+
     if (value.startsWith(`${this._omit}(`) && value.endsWith(')')) {
-      return this.toPrefix(value.substring(this._omit.length + 1, value.length - 1), [...prev, this._omit]);
+      next.push(this._omit);
+      return this.toPrefix(value.substring(this._omit.length + 1, value.length - 1), next);
     } else if (value.startsWith(`${this._not}(`) && value.endsWith(')')) {
-      return this.toPrefix(value.substring(this._not.length + 1, value.length - 1), [...prev, this._not]);
+      next.push(this._not);
+      return this.toPrefix(value.substring(this._not.length + 1, value.length - 1), next);
     } else {
-      return [...prev, value];
+      next.push(value);
+      return next;
     }
   }
 
   private fromPrefix(value: string[]): string {
-    return value.slice(0, -1).reduceRight((prev, current) => `${current}(${prev})`, value.at(-1));
+    if (value.length === 0) return '';
+
+    let output = value[value.length - 1];
+    for (let i = value.length - 2; i >= 0; i--) {
+      output = `${value[i]}(${output})`;
+    }
+
+    return output;
   }
 
   private clean(values: string[]): string[][] {
-    return values
-      .map(v => this.toPrefix(v))
-      .reduceRight((prev, cur) => (prev.some(p => cur.at(-1) === p.at(-1)) ? prev : [...prev, cur]), [] as string[][])
-      .filter(value => !value.some(v => v === this._omit));
+    const prefixed: string[][] = [];
+    for (const value of values) {
+      prefixed.push(this.toPrefix(value));
+    }
+
+    const dedup: string[][] = [];
+    const seen = new Set<string>();
+
+    for (let i = prefixed.length - 1; i >= 0; i--) {
+      const current = prefixed[i];
+      const suffix = current.at(-1);
+      if (!suffix || seen.has(suffix)) continue;
+
+      seen.add(suffix);
+      dedup.push(current);
+    }
+
+    const cleaned: string[][] = [];
+    for (const value of dedup) {
+      if (!value.some(v => v === this._omit)) cleaned.push(value);
+    }
+
+    return cleaned;
   }
 
-  private append<Blueprints extends Record<string, ParamBlueprints>>(
-    prev: SearchParamValues<Blueprints>,
+  private append<SearchParamBlueprints extends SearchParamBlueprintMap>(
+    prev: InferSearchParamValueMapFromBlueprintMap<SearchParamBlueprints>,
     values: string[][]
-  ): SearchParamValues<Blueprints> {
-    const res = values.toSorted((a, b) => a.at(-1).localeCompare(b.at(-1))).map(value => this.fromPrefix(value));
-    return { ...prev, [this._key]: res };
+  ): InferSearchParamValueMapFromBlueprintMap<SearchParamBlueprints> {
+    const sorted = values.slice();
+    sorted.sort((a, b) => a.at(-1).localeCompare(b.at(-1)));
+
+    const res: string[] = [];
+    for (const value of sorted) {
+      res.push(this.fromPrefix(value));
+    }
+
+    (prev as Record<string, SearchParamValue>)[this._key] = res;
+    return prev;
   }
 
   // -------------------------
   // Helpers
   // -------------------------
 
-  protected has(origin: string[] = [], value: string = undefined): boolean {
-    return value === undefined ? true : origin?.includes(value);
+  protected has(source: string[] = [], value: string = undefined): boolean {
+    return value === undefined ? true : source?.includes(value);
   }
 
   protected override parse(value: unknown): string[] {
@@ -427,14 +597,14 @@ export class FiltersBlueprint extends BaseBlueprint<string[]> {
     return this.check(value) || super.valid(value);
   }
 
-  protected override get<Blueprints extends Record<string, ParamBlueprints>>(
-    search: SearchParamValues<Blueprints> | URLSearchParams
+  protected override get<SearchParamBlueprints extends SearchParamBlueprintMap>(
+    search: InferSearchParamValueMapFromBlueprintMap<SearchParamBlueprints> | URLSearchParams
   ): string[] {
     if (search instanceof URLSearchParams) {
       const value = this.parse(search.getAll(this._key));
       if (this.valid(value)) return value;
     } else if (typeof search === 'object' && this._key in search) {
-      const value = search?.[this._key];
+      const value: unknown = search?.[this._key];
       if (this.valid(value)) return value;
     }
     return [];
@@ -444,55 +614,66 @@ export class FiltersBlueprint extends BaseBlueprint<string[]> {
   // Parsers
   // -------------------------
 
-  protected override full<Blueprints extends Record<string, ParamBlueprints>>(
-    prev: SearchParamValues<Blueprints>,
-    params: URLSearchParams | SearchParamValues<Blueprints>
-  ): SearchParamValues<Blueprints> {
+  protected override full<SearchParamBlueprints extends SearchParamBlueprintMap>(
+    prev: InferSearchParamValueMapFromBlueprintMap<SearchParamBlueprints>,
+    params: URLSearchParams | InferSearchParamValueMapFromBlueprintMap<SearchParamBlueprints>
+  ): InferSearchParamValueMapFromBlueprintMap<SearchParamBlueprints> {
     const data = this.get(params);
-    return this.append(prev, this.clean([...this._defaultValue, ...(!this._locked && data)]));
+    const values = this._defaultValue.slice();
+    if (!this._locked) {
+      for (const item of data) values.push(item);
+    }
+
+    return this.append(prev, this.clean(values));
   }
 
-  protected override delta<Blueprints extends Record<string, ParamBlueprints>>(
-    prev: SearchParamValues<Blueprints>,
-    params: URLSearchParams | SearchParamValues<Blueprints>
-  ): SearchParamValues<Blueprints> {
+  protected override delta<SearchParamBlueprints extends SearchParamBlueprintMap>(
+    prev: InferSearchParamValueMapFromBlueprintMap<SearchParamBlueprints>,
+    params: URLSearchParams | InferSearchParamValueMapFromBlueprintMap<SearchParamBlueprints>
+  ): InferSearchParamValueMapFromBlueprintMap<SearchParamBlueprints> {
     const data = this.get(params);
     if (this._locked || !Array.isArray(data)) return prev;
 
     const left = this.clean(data);
     const right = this.clean(this._defaultValue);
-    let values: string[][] = [];
+    const values: string[][] = [];
 
-    values = left.reduceRight(
-      (p, l) => (right.some(r => this.fromPrefix(l) === this.fromPrefix(r)) ? p : [...p, l]),
-      values
-    );
+    for (let i = left.length - 1; i >= 0; i--) {
+      const current = left[i];
+      const exists = right.some(r => this.fromPrefix(current) === this.fromPrefix(r));
+      if (!exists) values.push(current);
+    }
 
-    values = right.reduceRight(
-      (p, r) => (left.some(l => l.at(-1) === r.at(-1)) ? p : [...p, [this._omit, ...r]]),
-      values
-    );
+    for (let i = right.length - 1; i >= 0; i--) {
+      const current = right[i];
+      const exists = left.some(l => l.at(-1) === current.at(-1));
+      if (exists) continue;
+
+      const omitted: string[] = [this._omit];
+      for (const item of current) omitted.push(item);
+      values.push(omitted);
+    }
 
     return this.append(prev, values);
   }
 
-  protected override fromLocation<Blueprints extends Record<string, ParamBlueprints>>(
-    prev: SearchParamValues<Blueprints>,
+  protected override fromLocation<SearchParamBlueprints extends SearchParamBlueprintMap>(
+    prev: InferSearchParamValueMapFromBlueprintMap<SearchParamBlueprints>,
     location: Location,
-    snapshot: SearchParamSnapshot<Blueprints> | null = null
-  ): SearchParamValues<Blueprints> {
+    snapshot: SearchParamSnapshot<SearchParamBlueprints> | null = null
+  ): InferSearchParamValueMapFromBlueprintMap<SearchParamBlueprints> {
     let value: string[] | undefined;
 
-    switch (this._origin) {
+    switch (this._source) {
       case 'search': {
         value = this.get(new URLSearchParams(location.search));
         break;
       }
       case 'state': {
-        value = this.get((location.state ?? {}) as Record<string, ParamValues>);
+        value = this.get((location.state ?? {}) as SearchParamValueMap);
         break;
       }
-      case 'snapshot': {
+      case 'transient': {
         value = this.get(snapshot?.values);
         break;
       }
@@ -500,28 +681,313 @@ export class FiltersBlueprint extends BaseBlueprint<string[]> {
         value = null;
     }
 
-    return this.append(prev, this.clean([...this._defaultValue, ...(!this._locked && value)]));
+    const values = this._defaultValue.slice();
+    if (!this._locked && value) {
+      for (const item of value) values.push(item);
+    }
+
+    return this.append(prev, this.clean(values));
   }
 
   // -------------------------
   // Resolvers
   // -------------------------
 
-  protected override toParams<Blueprints extends Record<string, ParamBlueprints>>(
+  protected override toParams<SearchParamBlueprints extends SearchParamBlueprintMap>(
     prev: string[][],
-    snapshot: SearchParamValues<Blueprints>
+    snapshot: InferSearchParamValueMapFromBlueprintMap<SearchParamBlueprints>
   ): string[][] {
     if (!(this._key in snapshot) || !this.check(snapshot?.[this._key])) return prev;
-    return (snapshot[this._key] as string[]).reduce((p, f) => [...p, [this._key, String(f)]], prev);
+
+    const values = snapshot[this._key] as string[];
+    for (const value of values) {
+      prev.push([this._key, String(value)]);
+    }
+
+    return prev;
   }
 }
 
-export const PARAM_BLUEPRINTS = {
-  boolean: (value: boolean) => new BooleanBlueprint().defaultValue(value),
-  number: (value: number) => new NumberBlueprint().defaultValue(value),
-  string: (value: string) => new StringBlueprint().defaultValue(value),
-  enum: <O extends readonly string[]>(value: O[number], options: O) =>
-    new EnumBlueprint<O>().defaultValue(value).options(options),
+//*****************************************************************************************
+// Object Blueprint
+//*****************************************************************************************
+export class ObjectSearchParamBlueprint<
+  O extends ObjectParamValue = ObjectParamValue
+> extends BaseSearchParamBlueprint<O> {
+  public override getKind(): SearchParamBlueprintKind {
+    return 'object';
+  }
+
+  private isPrimitive(value: unknown): value is string | number | boolean | null {
+    return value === null || ['string', 'number', 'boolean'].includes(typeof value);
+  }
+
+  private isFlatObject(value: unknown): value is Record<string, string | number | boolean | null> {
+    return (
+      typeof value === 'object' &&
+      value !== null &&
+      !Array.isArray(value) &&
+      Object.values(value).every(entry => this.isPrimitive(entry))
+    );
+  }
+
+  private isShape(value: unknown): value is ObjectParamShape {
+    return (
+      this.isPrimitive(value) ||
+      (Array.isArray(value) && value.every(v => this.isShape(v))) ||
+      (typeof value === 'object' &&
+        value !== null &&
+        !Array.isArray(value) &&
+        Object.values(value).every(v => this.isShape(v)))
+    );
+  }
+
+  private isObjectValue(value: unknown): value is O {
+    return (
+      (Array.isArray(value) && value.every(v => this.isShape(v))) ||
+      (typeof value === 'object' && value !== null && Object.values(value).every(v => this.isShape(v)))
+    );
+  }
+
+  private clone(value: O): O {
+    return structuredClone(value);
+  }
+
+  private mergeValue(base: O, next: O): O {
+    if (!this.isObjectValue(next)) {
+      return this.clone(next);
+    }
+
+    if (Array.isArray(next) || Array.isArray(base)) return this.clone(next);
+
+    const merged = this.clone(base) as unknown as Record<string, unknown>;
+
+    for (const [key, nextValue] of Object.entries(next as Record<string, unknown>)) {
+      const baseValue = merged[key];
+
+      if (this.isFlatObject(baseValue) && this.isFlatObject(nextValue)) {
+        const mergedValue: Record<string, unknown> = {};
+
+        for (const [baseKey, baseEntry] of Object.entries(baseValue)) {
+          mergedValue[baseKey] = baseEntry;
+        }
+
+        for (const [nextKey, nextEntry] of Object.entries(nextValue)) {
+          mergedValue[nextKey] = nextEntry;
+        }
+
+        merged[key] = mergedValue;
+      } else {
+        merged[key] = nextValue;
+      }
+    }
+
+    return merged as O;
+  }
+
+  private isEqual(left: unknown, right: unknown): boolean {
+    return JSON.stringify(left) === JSON.stringify(right);
+  }
+
+  private deltaValue(base: O, next: O): Partial<O> {
+    if (!this.isObjectValue(next)) {
+      return {} as Partial<O>;
+    }
+
+    const delta = {} as Partial<O>;
+
+    for (const [key, value] of Object.entries(next)) {
+      const baseValue = (base as Record<string, ObjectParamShape>)[key];
+
+      if (this.isFlatObject(baseValue) && this.isFlatObject(value)) {
+        const nested: Record<string, string | number | boolean | null> = {};
+
+        for (const [nestedKey, nestedValue] of Object.entries(value)) {
+          if (!this.isEqual(baseValue[nestedKey], nestedValue)) {
+            nested[nestedKey] = nestedValue;
+          }
+        }
+
+        if (Object.keys(nested).length > 0) {
+          (delta as Record<string, unknown>)[key] = nested;
+        }
+
+        continue;
+      }
+
+      if (!this.isEqual(baseValue, value)) {
+        (delta as Record<string, unknown>)[key] = value;
+      }
+    }
+
+    return delta;
+  }
+
+  protected override valid(value: unknown): value is O {
+    return this.isObjectValue(value) || (this.isNullable() && (value === null || value === undefined));
+  }
+
+  protected override get<SearchParamBlueprints extends SearchParamBlueprintMap>(
+    search: InferSearchParamValueMapFromBlueprintMap<SearchParamBlueprints> | URLSearchParams
+  ): O {
+    if (search instanceof URLSearchParams) {
+      const serialized = search.get(this._key);
+      if (serialized === null) return this.clone(this._defaultValue);
+
+      try {
+        const value: unknown = JSON.parse(serialized);
+        if (value === null) return this.isNullable() ? (null as O) : this.clone(this._defaultValue);
+        if (this.isObjectValue(value)) return this.clone(value);
+      } catch {
+        return this.clone(this._defaultValue);
+      }
+    } else if (typeof search === 'object' && search !== null && this._key in search) {
+      const value = search?.[this._key];
+      if (value === null) return this.isNullable() ? (null as O) : this.clone(this._defaultValue);
+      if (this.isObjectValue(value)) return this.clone(value);
+    }
+
+    return this.clone(this._defaultValue);
+  }
+
+  protected override setDefaultValue(values: URLSearchParams) {
+    if (!values.has(this._key)) return this;
+
+    const next = this.get(values);
+    if (next !== null || this.isNullable()) {
+      this._defaultValue = this.mergeValue(this._defaultValue || ({} as O), next);
+    }
+
+    return this;
+  }
+
+  protected override full<SearchParamBlueprints extends SearchParamBlueprintMap>(
+    prev: InferSearchParamValueMapFromBlueprintMap<SearchParamBlueprints>,
+    params: URLSearchParams | InferSearchParamValueMapFromBlueprintMap<SearchParamBlueprints>
+  ): InferSearchParamValueMapFromBlueprintMap<SearchParamBlueprints> {
+    const value = this.get(params);
+    if (value === null || value === undefined) {
+      if (!this._locked && this.isNullable()) {
+        (prev as Record<string, SearchParamValue>)[this._key] = null;
+        return prev;
+      }
+
+      if (this.valid(this._defaultValue)) {
+        (prev as Record<string, SearchParamValue>)[this._key] = this.clone(this._defaultValue);
+      }
+
+      return prev;
+    }
+
+    if (!this._locked && this.valid(value)) {
+      (prev as Record<string, SearchParamValue>)[this._key] = this.mergeValue(this._defaultValue || ({} as O), value);
+      return prev;
+    }
+
+    if (this.valid(this._defaultValue)) {
+      (prev as Record<string, SearchParamValue>)[this._key] = this.clone(this._defaultValue);
+    }
+
+    return prev;
+  }
+
+  protected override delta<SearchParamBlueprints extends SearchParamBlueprintMap>(
+    prev: InferSearchParamValueMapFromBlueprintMap<SearchParamBlueprints>,
+    params: URLSearchParams | InferSearchParamValueMapFromBlueprintMap<SearchParamBlueprints>
+  ): InferSearchParamValueMapFromBlueprintMap<SearchParamBlueprints> {
+    const value = this.get(params);
+    if (this._locked || !this.valid(value)) return prev;
+
+    if (value === null || value === undefined) {
+      if (!this.isEqual(this._defaultValue, null)) {
+        (prev as Record<string, SearchParamValue>)[this._key] = null;
+      }
+      return prev;
+    }
+
+    if (!this.isObjectValue(value)) {
+      if (!this.isEqual(this._defaultValue, value)) {
+        (prev as Record<string, SearchParamValue>)[this._key] = value;
+      }
+      return prev;
+    }
+
+    if (Array.isArray(value) || Array.isArray(this._defaultValue)) {
+      if (!this.isEqual(this._defaultValue, value)) {
+        (prev as Record<string, SearchParamValue>)[this._key] = value;
+      }
+      return prev;
+    }
+
+    if (this._defaultValue === null || this._defaultValue === undefined) {
+      (prev as Record<string, SearchParamValue>)[this._key] = this.clone(value);
+      return prev;
+    }
+
+    const delta = this.deltaValue(this._defaultValue, value);
+    if (Object.keys(delta).length === 0) return prev;
+
+    (prev as Record<string, SearchParamValue>)[this._key] = delta as unknown as SearchParamValue;
+    return prev;
+  }
+
+  protected override fromLocation<SearchParamBlueprints extends SearchParamBlueprintMap>(
+    prev: InferSearchParamValueMapFromBlueprintMap<SearchParamBlueprints>,
+    location: Location,
+    snapshot: SearchParamSnapshot<SearchParamBlueprints> | null = null
+  ): InferSearchParamValueMapFromBlueprintMap<SearchParamBlueprints> {
+    let value: O | undefined;
+
+    switch (this._source) {
+      case 'search': {
+        value = this.get(new URLSearchParams(location.search));
+        break;
+      }
+      case 'state': {
+        value = this.get((location.state ?? {}) as SearchParamValueMap);
+        break;
+      }
+      case 'transient': {
+        value = this.get(snapshot?.values);
+        break;
+      }
+      default:
+        value = null;
+    }
+
+    if (!this._locked && this.valid(value)) {
+      (prev as Record<string, SearchParamValue>)[this._key] = this.mergeValue(this._defaultValue || ({} as O), value);
+      return prev;
+    }
+
+    if (this.valid(this._defaultValue)) {
+      (prev as Record<string, SearchParamValue>)[this._key] = this.clone(this._defaultValue);
+    }
+
+    return prev;
+  }
+
+  protected override toParams<SearchParamBlueprints extends SearchParamBlueprintMap>(
+    prev: string[][],
+    snapshot: InferSearchParamValueMapFromBlueprintMap<SearchParamBlueprints>
+  ): string[][] {
+    if (!(this._key in snapshot)) return prev;
+
+    const value = snapshot?.[this._key];
+    if (!this.valid(value)) return prev;
+
+    prev.push([this._key, JSON.stringify(value)]);
+    return prev;
+  }
+}
+
+export const SEARCH_PARAM_BLUEPRINTS_MAP = {
+  boolean: (value: boolean) => new BooleanSearchParamBlueprint().defaultValue(value),
+  number: (value: number) => new NumberSearchParamBlueprint().defaultValue(value),
+  string: (value: string) => new StringSearchParamBlueprint().defaultValue(value),
+  enum: <O extends readonly [EnumParamValue, ...EnumParamValue[]]>(value: O[number], options: O) =>
+    new EnumSearchParamBlueprint<O>().defaultValue(value).options(options),
   filters: (value: string[], not: string = 'NOT', omit: string = '!') =>
-    new FiltersBlueprint().defaultValue(value).not(not).omit(omit)
+    new FiltersSearchParamBlueprint().defaultValue(value).not(not).omit(omit),
+  object: <O extends ObjectParamValue>(value: O) => new ObjectSearchParamBlueprint<O>().defaultValue(value)
 } as const;
