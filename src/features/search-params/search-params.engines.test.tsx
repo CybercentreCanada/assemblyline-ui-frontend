@@ -32,6 +32,28 @@ describe('SearchParamEngine.setDefaultValues', () => {
     expect(engine.getDefaultValues().toObject()).toEqual({ page: 5 });
   });
 
+  it('merges restored object deltas while replacing arrays and preserving nullable values', () => {
+    const engine = new SearchParamEngine({
+      config: SEARCH_PARAM_BLUEPRINTS_MAP.object({ a: 1, b: 2 }),
+      list: SEARCH_PARAM_BLUEPRINTS_MAP.object([1, 2]),
+      nullable: SEARCH_PARAM_BLUEPRINTS_MAP.object({ a: 1 }).nullable(),
+      untouched: SEARCH_PARAM_BLUEPRINTS_MAP.object({ keep: true }).nullable()
+    });
+    const values = new URLSearchParams();
+    values.set('config', JSON.stringify({ a: 3 }));
+    values.set('list', JSON.stringify([3]));
+    values.set('nullable', 'null');
+
+    engine.setDefaultValues(values);
+
+    expect(engine.getDefaultValues().toObject()).toEqual({
+      config: { a: 3, b: 2 },
+      list: [3],
+      nullable: null,
+      untouched: { keep: true }
+    });
+  });
+
   it('returns itself unchanged when no values are provided', () => {
     const engine = new SearchParamEngine({ page: SEARCH_PARAM_BLUEPRINTS_MAP.number(1) });
     const result = engine.setDefaultValues(null);

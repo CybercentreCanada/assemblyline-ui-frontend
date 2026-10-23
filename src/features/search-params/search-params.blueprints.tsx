@@ -839,6 +839,17 @@ export class ObjectSearchParamBlueprint<
     return null;
   }
 
+  protected override setDefaultValue(values: URLSearchParams) {
+    if (!values.has(this._key)) return this;
+
+    const next = this.get(values);
+    if (next !== null || this.isNullable()) {
+      this._defaultValue = this.mergeValue(this._defaultValue || ({} as O), next);
+    }
+
+    return this;
+  }
+
   protected override full<SearchParamBlueprints extends SearchParamBlueprintMap>(
     prev: InferSearchParamValueMapFromBlueprintMap<SearchParamBlueprints>,
     params: URLSearchParams | InferSearchParamValueMapFromBlueprintMap<SearchParamBlueprints>
