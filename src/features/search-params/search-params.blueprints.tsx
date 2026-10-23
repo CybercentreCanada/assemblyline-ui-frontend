@@ -429,6 +429,15 @@ export class EnumSearchParamBlueprint<
   }
 
   public options(value: O) {
+    const serializedOptions = new Set<string>();
+    for (const option of value) {
+      const serialized = String(option);
+      if (serializedOptions.has(serialized)) {
+        throw new TypeError('Enum options must have unique string representations.');
+      }
+      serializedOptions.add(serialized);
+    }
+
     this._options = value;
     return this;
   }
@@ -446,6 +455,11 @@ export class EnumSearchParamBlueprint<
   }
 
   protected override parse(value: unknown): O[number] {
+    if (typeof value === 'string') {
+      const option = this._options?.find(candidate => String(candidate) === value);
+      if (option !== undefined) return option;
+    }
+
     return this.check(value) ? value : super.parse(value);
   }
 

@@ -118,6 +118,17 @@ describe('SearchParamEngine.full', () => {
     const engine = new SearchParamEngine({ page: SEARCH_PARAM_BLUEPRINTS_MAP.number(1) });
     expect(engine.full({ page: 7 }).toObject()).toEqual({ page: 7 });
   });
+
+  it('round-trips numeric and boolean enum values through URL parameters', () => {
+    const engine = new SearchParamEngine({
+      mode: SEARCH_PARAM_BLUEPRINTS_MAP.enum(1, [1, 2] as const),
+      enabled: SEARCH_PARAM_BLUEPRINTS_MAP.enum(false, [false, true] as const)
+    });
+    const params = engine.full({ mode: 2, enabled: true }).toParams();
+
+    expect(params.toString()).toBe('mode=2&enabled=true');
+    expect(engine.full(params).toObject()).toEqual({ mode: 2, enabled: true });
+  });
 });
 
 //*****************************************************************************************

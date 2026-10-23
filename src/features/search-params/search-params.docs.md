@@ -32,13 +32,13 @@ A class extending `BaseBlueprint<T>` that defines:
 
 Available blueprint classes:
 
-| Class              | Value type  | Notes                                    |
-| ------------------ | ----------- | ---------------------------------------- |
-| `BooleanBlueprint` | `boolean`   | Parses `'true'`/`'false'`                |
-| `NumberBlueprint`  | `number`    | Supports `.min()` / `.max()` clamping    |
-| `StringBlueprint`  | `string`    | Direct string passthrough                |
-| `EnumBlueprint<O>` | `O[number]` | Validates against `.options()` list      |
-| `FiltersBlueprint` | `string[]`  | Handles `NOT()`/`!()` prefix expressions |
+| Class              | Value type  | Notes                                                                                              |
+| ------------------ | ----------- | -------------------------------------------------------------------------------------------------- |
+| `BooleanBlueprint` | `boolean`   | Parses `'true'`/`'false'`                                                                          |
+| `NumberBlueprint`  | `number`    | Supports `.min()` / `.max()` clamping                                                              |
+| `StringBlueprint`  | `string`    | Direct string passthrough                                                                          |
+| `EnumBlueprint<O>` | `O[number]` | Parses serialized option values back to their typed options; string representations must be unique |
+| `FiltersBlueprint` | `string[]`  | Handles `NOT()`/`!()` prefix expressions                                                           |
 
 ### Engine
 
