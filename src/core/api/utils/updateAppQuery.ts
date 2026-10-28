@@ -42,5 +42,5 @@ export const updateALQuery = <Request extends ALRequests>(
         }
       }
     },
-    prev => (prev ? { ...prev, api_response: updater(prev.api_response as ALResponses<Request>) } : prev)
+    prev => (prev ? { ...prev, api_response: updater(prev.api_response) } : prev)
   );
