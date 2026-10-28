@@ -15,7 +15,7 @@ export function lzwEncode(s) {
   let currChar;
   let phrase = data[0];
   let code = 256;
-  for (var i = 1; i < data.length; i++) {
+  for (let i = 1; i < data.length; i++) {
     currChar = data[i];
     if (dict[phrase + currChar] != null) {
       phrase += currChar;
