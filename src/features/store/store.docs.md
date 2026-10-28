@@ -10,7 +10,7 @@ Generic Zustand store factory for creating feature-scoped stores with context pr
 
 ## Key Files
 
-- `createAppStore.tsx` — Store factory with devtools integration (Zustand-based)
+- `createAppStore.tsx` — Store factory
 - `createStoreContext.tsx` — Context wrapper for scoped store access (vanilla `useSyncExternalStore`)
 
 ## Usage
