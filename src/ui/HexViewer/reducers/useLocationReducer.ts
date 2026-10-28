@@ -32,7 +32,7 @@ export const useLocationReducer: UseReducer = () => {
       query.current.deleteAll();
       LOCATION_PARAMS.forEach(param => handleLocationShare(store, param));
       handleScrollLocationShare(store);
-      copy(`${window.location.origin}${window.location.pathname}?${query.current.toString()}${window.location.hash}`);
+      void copy(`${window.location.origin}${window.location.pathname}?${query.current.toString()}${window.location.hash}`);
       return store;
     },
     [copy, handleLocationShare, handleScrollLocationShare]

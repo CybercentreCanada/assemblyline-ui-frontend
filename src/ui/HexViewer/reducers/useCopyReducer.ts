@@ -33,7 +33,7 @@ export const useCopyReducer: UseReducer = () => {
       array.forEach(index => {
         value += store.hex.codes.get(index) + ' ';
       });
-      copy(value);
+      void copy(value);
     },
     [copy]
   );
@@ -47,7 +47,7 @@ export const useCopyReducer: UseReducer = () => {
       array.forEach(index => {
         value += getCopyHexCharacter(store, store.hex.codes.get(index));
       });
-      copy(value);
+      void copy(value);
     },
     [copy]
   );

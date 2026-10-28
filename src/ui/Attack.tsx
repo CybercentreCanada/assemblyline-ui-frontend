@@ -75,7 +75,7 @@ const WrappedAttack: React.FC<AttackProps> = ({
   }, []);
 
   const handleMenuCopy = useCallback(() => {
-    copy(text);
+    void copy(text);
     handleClose();
   }, [copy, handleClose, text]);
 

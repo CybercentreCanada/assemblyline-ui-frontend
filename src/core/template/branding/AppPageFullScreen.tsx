@@ -57,7 +57,7 @@ const PageFullscreen = ({
   }, [setIsFullscreen]);
 
   const handleExitFullscreen = () => {
-    document.exitFullscreen();
+    void document.exitFullscreen();
   };
 
   return (
