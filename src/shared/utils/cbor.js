@@ -120,7 +120,7 @@ export function encode(value) {
         return writeFloat64(value);
 
       case 'string':
-        var utf8data = [];
+        const utf8data = [];
         for (i = 0; i < value.length; ++i) {
           let charCode = value.charCodeAt(i);
           if (charCode < 0x80) {
@@ -148,7 +148,7 @@ export function encode(value) {
         return writeUint8Array(utf8data);
 
       default:
-        var length;
+        let length;
         if (Array.isArray(value)) {
           length = value.length;
           writeTypeAndLength(4, length);
@@ -326,13 +326,13 @@ export function decode(data, tagger, simpleValue) {
         }
         return readArrayBuffer(length);
       case 3:
-        var utf16data = [];
+        const utf16data = [];
         if (length < 0) {
           while ((length = readIndefiniteStringLength(majorType)) >= 0) appendUtf16Data(utf16data, length);
         } else appendUtf16Data(utf16data, length);
         return String.fromCharCode.apply(null, utf16data);
       case 4:
-        var retArray;
+        let retArray;
         if (length < 0) {
           retArray = [];
           while (!readBreak()) retArray.push(decodeItem());
@@ -342,7 +342,7 @@ export function decode(data, tagger, simpleValue) {
         }
         return retArray;
       case 5:
-        var retObject = {};
+        const retObject = {};
         for (i = 0; i < length || (length < 0 && !readBreak()); ++i) {
           const key = decodeItem();
           retObject[key] = decodeItem();
