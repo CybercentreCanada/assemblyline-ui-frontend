@@ -22,7 +22,7 @@ const typescriptRules = {
   '@typescript-eslint/consistent-indexed-object-style': ["error", "record"],
   '@typescript-eslint/consistent-type-definitions': 'off',
   '@typescript-eslint/consistent-type-imports': 'error',
-  '@typescript-eslint/default-param-last': 'off',
+  '@typescript-eslint/default-param-last': 'error',
   '@typescript-eslint/explicit-function-return-type': 'off',
   '@typescript-eslint/indent': 'off',
   '@typescript-eslint/no-base-to-string': 'warn',
