@@ -3,6 +3,7 @@
   "app_route.help_configuration.shortname": "Current Configuration",
   "config": "Configuration variables",
   "config.desc": "Every Assemblyline instance has a unique configuration. Some configuration parameters are particularly useful to understand how the system works:",
+  "core_version": "Core version",
   "file_types": "File Types",
   "file_types.desc": "Assemblyline assigns all files a type by analysing the file's structure and uses that type to route the file to the appropriate service.",
   "file_types.non_specific": "Other files types are identified but not routed to specific services:",
