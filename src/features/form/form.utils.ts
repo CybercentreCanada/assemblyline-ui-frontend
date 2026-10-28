@@ -33,9 +33,9 @@ export function getValueFromPath<Data extends object>(data: Data, path: string):
   let paths = path.split('.');
   if (paths[0] === '$') paths = paths.slice(1);
 
-  for (let i = 0; i < paths.length; ++i) {
-    if (current[paths[i]] === undefined) return undefined;
-    current = current[paths[i]];
+  for (const path of paths) {
+    if (current[path] === undefined) return undefined;
+    current = current[path];
   }
   return current;
 }

@@ -30,9 +30,9 @@ const isObject = (data: any, empty: boolean = true): boolean => {
 const getValueFromPath = (obj: any, path: string[]): any => {
   let current = obj;
   if (obj === undefined || obj === null) return null;
-  for (let i = 0; i < path.length; ++i) {
-    if (current[path[i]] === undefined) return undefined;
-    current = current[path[i]];
+  for (const pathSegment of path) {
+    if (current[pathSegment] === undefined) return undefined;
+    current = current[pathSegment];
   }
   return current;
 };
