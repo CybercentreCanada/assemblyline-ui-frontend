@@ -1,14 +1,19 @@
+---
+description: 'Use when creating or editing React components, JSX, component props, files named *.components.tsx, or files under a components/ directory.'
+applyTo: 'src/**/*.components.tsx, src/**/components/**/*.tsx'
+---
+
 # Components
 
 > Applies to: `*.components.tsx` files and files inside `components/` folders.
+>
+> Applies to new and modified code. Legacy code is exempt until it is touched; do not refactor it unless asked.
 
 ## Template
 
 ```typescript
 import { memo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useAppConfig, useAppSetConfig } from 'core/config';
-import type { MyComponentProps } from './my-feature.models';
 
 //*****************************************************************************************
 // My Component
@@ -23,20 +28,18 @@ export type MyComponentProps = {
 
 export const MyComponent = memo(({ open, onClose }: MyComponentProps) => {
   const { t } = useTranslation(['myModule']);
-  const someValue = useAppConfigStore(c => c.layout.someValue);
-  const setConfigStore = useAppSetConfigStore();
 
-  const handleAction = useCallback(() => {
-    setConfig(prev => ({
-      layout: {
-        ...prev.layout,
-        someFeature: { ...prev.layout.someFeature, value: 'new' }
-      }
-    }));
-  }, [setConfig]);
+  const handleClose = useCallback(() => {
+    onClose();
+  }, [onClose]);
 
   return !open ? null : (
-    <div>{t('feature.title')}</div>
+    <div>
+      {t('feature.title')}
+      <button type="button" onClick={handleClose}>
+        {t('feature.close')}
+      </button>
+    </div>
   );
 });
 
@@ -54,13 +57,13 @@ MyComponent.displayName = 'MyComponent';
 - Props as exported `type` directly above component definition, JSDoc per field, alphabetical order
 - NO `React.FC`, NO `React.FunctionComponent`, NO default exports
 - One component = one responsibility — prefer many small files
-- Data from stores, not props — props are for configuration only (variant, size, disabled)
+- Props are for configuration only (variant, size, disabled)
 - Keep < 5 props per component
 
 ## Hook Ordering (strict)
 
 1. Library hooks (`useTranslation`, `useNavigate`, `useTheme`)
-2. App/core hooks (`useAppConfig`, `useAppSetConfig`, `useAPIQuery`, `useSnackbar`)
+2. App/core hooks (`useAPIQuery`, `useSnackbar`)
 3. `useState` (rare — local ephemeral UI only)
 4. `useRef`
 5. `useMemo`
@@ -96,17 +99,6 @@ MyComponent.displayName = 'MyComponent';
 if (isLoading) return <Spinner />;
 ```
 
-## State Access
-
-| Solution                         | When                                  |
-| -------------------------------- | ------------------------------------- |
-| `useAppConfigStore(c => c.path)` | App-wide state (layout, auth, config) |
-| `createAppStore`                 | Feature-scoped shared state           |
-| TanStack Form stores             | Form state with validation            |
-
-- Always use focused selectors — never subscribe to entire store
-- Write via callback: `setConfig(prev => ({ ...prev.layout, ... }))`
-
 ## Decision Table
 
 | Scenario                   | Style                                                    |
@@ -141,9 +133,6 @@ WrappedComponent.displayName = 'WrappedComponent';
 // ❌ Wrapper hook for single-use logic
 const useMyComponentLogic = () => { ... };
 
-// ❌ Prop drilling store data
-<MyComponent user={user} config={config} />
-
 // ❌ Default export
 export default MyComponent;
 
@@ -155,10 +144,4 @@ if (!data) return null;
 
 // ❌ Missing displayName
 export const Foo = memo(() => { ... });
-
-// ❌ Direct setConfig without callback
-setConfig({ layout: { ...config.layout, open: true } });
-
-// ❌ Redux patterns
-dispatch(action); useReducer(...); useSelector(...)
 ```

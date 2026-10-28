@@ -1,4 +1,11 @@
+---
+description: 'Use when creating or modifying React components, hooks, effects, state, or rendering behavior.'
+applyTo: 'src/**/*.tsx'
+---
+
 # React Usage — AI Rules
+
+> Applies to new and modified code. Legacy code is exempt until it is touched; do not refactor it unless asked.
 
 ## Hooks — Use Freely
 

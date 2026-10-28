@@ -1,4 +1,11 @@
+---
+description: 'Use when styling React components or editing application CSS, including MUI, theme tokens, and responsive layout.'
+applyTo: 'src/**/*.tsx, src/**/*.css'
+---
+
 # Styling — AI Rules
+
+> Applies to new and modified code. Legacy code is exempt until it is touched; do not refactor it unless asked.
 
 ## Decision Table
 
