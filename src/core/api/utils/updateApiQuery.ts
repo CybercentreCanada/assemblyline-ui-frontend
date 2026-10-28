@@ -26,5 +26,5 @@ export const updateAPIQuery = <T extends unknown = unknown>(
         }
       }
     },
-    prev => (prev ? { ...prev, api_response: update(prev.api_response as T) } : prev)
+    prev => (prev ? { ...prev, api_response: update(prev.api_response) } : prev)
   );
