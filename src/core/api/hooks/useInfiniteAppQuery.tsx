@@ -8,15 +8,15 @@ export type UseInfiniteALQueryProps<Request extends ALRequests, Error extends st
   getParams: (offset: number) => UseAPICallFnProps<APIResponse<ALResponses<Request>>, Request, APIResponse<Error>>;
   getPreviousOffset?: (
     firstPage: APIResponse<ALResponses<Request>>,
-    allPages: Array<APIResponse<ALResponses<Request>>>,
+    allPages: APIResponse<ALResponses<Request>>[],
     firstPageParam: number,
-    allPageParams: Array<number>
+    allPageParams: number[]
   ) => number | undefined;
   getNextOffset?: (
     lastPage: APIResponse<ALResponses<Request>>,
-    allPages: Array<APIResponse<ALResponses<Request>>>,
+    allPages: APIResponse<ALResponses<Request>>[],
     lastPageParam: number,
-    allPageParams: Array<number>
+    allPageParams: number[]
   ) => number | undefined;
   allowCache?: boolean;
   retryAfter?: number;

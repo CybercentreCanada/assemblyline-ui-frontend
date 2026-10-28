@@ -1,4 +1,4 @@
-import { Store } from '..';
+import type { Store } from '..';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 // eslint-disable-next-line  no-unused-vars
@@ -7,7 +7,7 @@ import { Store } from '..';
 // 1. UTILITY TYPES
 
 // All non-object entities
-type NonObject = null | Array<any> | Date | Map<any, any>;
+type NonObject = null | any[] | Date | Map<any, any>;
 
 // Check if O is an object
 type IsObject<O> = O extends NonObject ? never : O extends object ? (keyof O extends never ? never : O) : never;
@@ -79,7 +79,7 @@ type DropR<O, T> =
 export type KeyType<O extends object, T> = keyof {
   [P in keyof O as O[P] extends T
     ? P
-    : O[P] extends null | Array<any> | Map<any, any>
+    : O[P] extends null | any[] | Map<any, any>
       ? never
       : O[P] extends object
         ? KeyType<O[P], T> extends never
@@ -89,7 +89,7 @@ export type KeyType<O extends object, T> = keyof {
 };
 
 export type PickType<O extends object, T> = {
-  [P in keyof O as O[P] extends null | Array<any> | Map<any, any>
+  [P in keyof O as O[P] extends null | any[] | Map<any, any>
     ? never
     : O[P] extends T
       ? P
@@ -100,7 +100,7 @@ export type PickType<O extends object, T> = {
         : never]: Value<O, P>;
 };
 export type OmitType<O extends object, T> = {
-  [P in keyof O as O[P] extends null | Array<any> | Map<any, any>
+  [P in keyof O as O[P] extends null | any[] | Map<any, any>
     ? never
     : O[P] extends T
       ? never
@@ -123,18 +123,7 @@ export type ItemConfig<T extends string | number | symbol> = {
   description?: { en: string; fr: string };
 };
 
-type ItemArrayConfig<T extends string | number | symbol> = Array<
-  {
-    [P in T]: {
-      value: number;
-      type: T;
-      label: { en: string; fr: string };
-      description?: { en: string; fr: string };
-    };
-  }[keyof {
-    [P in T];
-  }]
->;
+type ItemArrayConfig<T extends string | number | symbol> = ItemConfig<T>[];
 
 export type TypesConfig<O, T extends string | number | symbol> =
   IsObject<O> extends never
@@ -163,7 +152,7 @@ export type ItemsConfig<O, T extends string | number | symbol> =
     ? never
     : {
         [K in keyof PullR<O, T>]: Value<O, K> extends T
-          ? (store: Store) => Array<{ value: number; label: string }>
+          ? (store: Store) => { value: number; label: string }[]
           : IsObject<Value<O, K>> extends never
             ? never
             : ItemsConfig<Value<O, K>, T>;
@@ -247,11 +236,7 @@ export type RemoveStoreKeysConfig<O> = {
 };
 
 export type SetStoreWithPathConfig<O> = {
-  [K in keyof O as K extends string ? `${Capitalize<K>}` : K]: (
-    store: Store,
-    data: any,
-    valuePath?: Array<string>
-  ) => Store;
+  [K in keyof O as K extends string ? `${Capitalize<K>}` : K]: (store: Store, data: any, valuePath?: string[]) => Store;
 } & {
   [K in keyof O as IsObject<O[K]> extends never ? never : K]: SetStoreConfig<O[K]>;
 };
