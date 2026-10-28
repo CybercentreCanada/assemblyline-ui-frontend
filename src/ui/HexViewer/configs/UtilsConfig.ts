@@ -123,17 +123,7 @@ export type ItemConfig<T extends string | number | symbol> = {
   description?: { en: string; fr: string };
 };
 
-type ItemArrayConfig<T extends string | number | symbol> = {
-  [P in T]: {
-    value: number;
-    type: T;
-    label: { en: string; fr: string };
-    description?: { en: string; fr: string };
-  };
-}[keyof {
-  [P in T];
-}];
-[];
+type ItemArrayConfig<T extends string | number | symbol> = ItemConfig<T>[];
 
 export type TypesConfig<O, T extends string | number | symbol> =
   IsObject<O> extends never
