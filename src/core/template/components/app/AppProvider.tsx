@@ -26,7 +26,7 @@ import CarouselProvider from 'layout/carousel/carousel.providers';
 import DrawerProvider from 'layout/drawer/drawer.providers';
 import { ExternalLookupProvider } from 'layout/external-lookup/external-lookup.providers';
 import HighlightProvider from 'layout/highlighter/highlighter.providers';
-import { WhoAmIProps } from 'models/api/user';
+import type { WhoAmIProps } from 'models/api/user';
 import { useCallback, useContext, useMemo, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import JSONEditor from 'ui/JSONEditor';

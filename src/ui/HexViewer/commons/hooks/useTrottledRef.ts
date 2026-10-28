@@ -1,11 +1,12 @@
-import React, { useCallback, useRef } from 'react';
+import type { MutableRefObject } from 'react';
+import { useCallback, useRef } from 'react';
 
 const isFunction = (value: any): value is Function => typeof value === 'function';
 
 export const useTrottledRef = <T>(
   initialState: T,
   delay: number = 1000
-): [React.MutableRefObject<Partial<T>>, (newState: Partial<T> | ((prevState: Partial<T>) => Partial<T>)) => void] => {
+): [MutableRefObject<Partial<T>>, (newState: Partial<T> | ((prevState: Partial<T>) => Partial<T>)) => void] => {
   const ref = useRef<Partial<T>>(initialState);
   const nextRef = useRef<Partial<T>>(initialState);
   const timeout = useRef(null);

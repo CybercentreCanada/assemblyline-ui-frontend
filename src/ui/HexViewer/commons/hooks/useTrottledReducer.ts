@@ -1,11 +1,12 @@
 import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
-import React, { useCallback, useRef, useState } from 'react';
+import type { MutableRefObject } from 'react';
+import { useCallback, useRef, useState } from 'react';
 
 export const useTrottledReducer = <State, Action>(
   reducer: (state: Partial<State>, action: Action) => State,
   initialState: State,
   delay: number = 1000
-): [State, (action: Action) => void, React.MutableRefObject<State>] => {
+): [State, (action: Action) => void, MutableRefObject<State>] => {
   // const [state, dispatch] = React.useReducer<React.Reducer<Partial<State>, { type: string; payload: any }>>(
   //   reducer,
   //   initialState
