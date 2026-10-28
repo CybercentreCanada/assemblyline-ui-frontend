@@ -538,7 +538,7 @@ export const applyClassificationRules = (
     }
   }
 
-  for (const partName in partsToCheck) {
+  for (const partName of partsToCheck) {
     if ({}.hasOwnProperty.call(partsToCheck, partName)) {
       const part = retParts[partsToCheck[partName]];
       for (const value of part) {
