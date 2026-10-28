@@ -6,8 +6,8 @@ import { ACTIONS, isEnterKey, isEscapeKey, isType, isUpDownKey } from '..';
 type KE = React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement> | any;
 
 export type ToolbarAction =
-  | { type: 'searchBarFocus'; payload: void }
-  | { type: 'searchBarBlur'; payload: void }
+  | { type: 'searchBarFocus'; payload: null }
+  | { type: 'searchBarBlur'; payload: null }
   | { type: 'searchBarChange'; payload: { value: string } }
   | { type: 'searchBarValueChange'; payload: { value: string } }
   | { type: 'searchBarInputChange'; payload: { inputValue: string } }
@@ -17,15 +17,15 @@ export type ToolbarAction =
   | { type: 'searchBarArrowKeyDown'; payload: { event: KE }; guard: { store: Store } }
   | { type: 'searchBarWheel'; payload: { event: WheelEvent } }
   | { type: 'selectedSearchIndexChange'; payload: { index: number } }
-  | { type: 'searchClear'; payload: void }
+  | { type: 'searchClear'; payload: null }
   | { type: 'searchTypeChange'; payload: { type: SearchType } }
   | { type: 'cursorIndexChange'; payload: { index: number } }
-  | { type: 'cursorClear'; payload: void }
+  | { type: 'cursorClear'; payload: null }
   | { type: 'historyAddValue'; payload: null }
   | { type: 'historyIndexChange'; payload: null }
-  | { type: 'locationShare'; payload: void }
-  | { type: 'locationLoaded'; payload: void }
-  | { type: 'fullscreenToggle'; payload: void };
+  | { type: 'locationShare'; payload: null }
+  | { type: 'locationLoaded'; payload: null }
+  | { type: 'fullscreenToggle'; payload: null };
 
 export type ToolbarActionTypes = ActionTypesConfig<ToolbarAction>;
 export type ToolbarDispatchers = DispatchersConfig<ToolbarAction>;

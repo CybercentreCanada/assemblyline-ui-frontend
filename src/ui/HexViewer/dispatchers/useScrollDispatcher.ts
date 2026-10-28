@@ -7,7 +7,7 @@ export type ScrollAction =
   | { type: 'scrollSliderChange'; payload: { event: Event; newValue: number | number[] } }
   | { type: 'scrollSliderMouseDown'; payload: null }
   | { type: 'scrollTouchStart'; payload: { event: TouchEvent<HTMLDivElement> } }
-  | { type: 'scrollTouchEnd'; payload: void }
+  | { type: 'scrollTouchEnd'; payload: null }
   | { type: 'scrollTouchMove'; payload: { event: TouchEvent<HTMLDivElement> } };
 
 export type ScrollActionTypes = ActionTypesConfig<ScrollAction>;

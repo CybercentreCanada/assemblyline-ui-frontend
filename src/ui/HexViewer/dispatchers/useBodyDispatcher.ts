@@ -7,9 +7,9 @@ import { ACTIONS, isArrowKey, isCopyKey, isHomeEndKey, isPageKey, isType } from 
 export type BodyAction =
   | { type: 'bodyInit'; payload: { initialized: boolean } }
   | { type: 'bodyRefInit'; payload: { ready: boolean } }
-  | { type: 'bodyScrollInit'; payload: void }
+  | { type: 'bodyScrollInit'; payload: null }
   | { type: 'bodyResize'; payload: { width?: number; height?: number }; tracked: false; repeat: true }
-  | { type: 'bodyMouseLeave'; payload: void; tracked: false; repeat: false }
+  | { type: 'bodyMouseLeave'; payload: null; tracked: false; repeat: false }
   | {
       type: 'bodyMouseUp';
       payload: { onSelectionChange: (value: string) => void };
@@ -18,7 +18,7 @@ export type BodyAction =
   | { type: 'bodyScrollWheel'; payload: { event: React.WheelEvent<HTMLDivElement> } }
   | { type: 'bodyItemsRendered'; payload: { event: ListOnItemsRenderedProps | null } }
   | { type: 'cursorKeyDown'; payload: { event: KeyboardEvent }; guard: { store: Store } }
-  | { type: 'copyKeyDown'; payload: void; guard: { event: KeyboardEvent; store: Store }; tracked: true; repeat: false };
+  | { type: 'copyKeyDown'; payload: null; guard: { event: KeyboardEvent; store: Store }; tracked: true; repeat: false };
 
 export type BodyActionTypes = ActionTypesConfig<BodyAction>;
 export type BodyDispatchers = DispatchersConfig<BodyAction>;
