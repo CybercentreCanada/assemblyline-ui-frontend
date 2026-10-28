@@ -17,12 +17,11 @@ const defaultConfig = {
 };
 
 const typescriptRules = {
-  '@typescript-eslint/array-type': 'error',
-  '@typescript-eslint/array-type': 'warn',
-  '@typescript-eslint/consistent-generic-constructors': 'warn',
-  '@typescript-eslint/consistent-indexed-object-style': 'warn',
+  '@typescript-eslint/array-type': ['error', { default: 'array' }],
+  '@typescript-eslint/consistent-generic-constructors': ['error', 'constructor'],
+  '@typescript-eslint/consistent-indexed-object-style': ["error", "record"],
   '@typescript-eslint/consistent-type-definitions': 'off',
-  '@typescript-eslint/consistent-type-imports': 'warn',
+  '@typescript-eslint/consistent-type-imports': 'error',
   '@typescript-eslint/default-param-last': 'off',
   '@typescript-eslint/explicit-function-return-type': 'off',
   '@typescript-eslint/indent': 'off',
@@ -32,14 +31,13 @@ const typescriptRules = {
   '@typescript-eslint/no-empty-function': 'warn',
   '@typescript-eslint/no-empty-object-type': 'warn',
   '@typescript-eslint/no-explicit-any': 'warn',
-  '@typescript-eslint/no-explicit-any': 'warn',
   '@typescript-eslint/no-floating-promises': 'warn',
   '@typescript-eslint/no-for-in-array': 'warn',
   '@typescript-eslint/no-inferrable-types': 'off',
   '@typescript-eslint/no-invalid-void-type': 'warn',
   '@typescript-eslint/no-misused-promises': 'off',
   '@typescript-eslint/no-redundant-type-constituents': 'warn',
-  '@typescript-eslint/no-unnecessary-type-assertion': 'warn',
+  '@typescript-eslint/no-unnecessary-type-assertion': 'error',
   '@typescript-eslint/no-unnecessary-type-constraint': 'warn',
   '@typescript-eslint/no-unsafe-argument': 'warn',
   '@typescript-eslint/no-unsafe-assignment': 'warn',
@@ -50,10 +48,9 @@ const typescriptRules = {
   '@typescript-eslint/no-unsafe-return': 'warn',
   '@typescript-eslint/no-unused-expressions': 'off',
   '@typescript-eslint/no-unused-vars': 'warn',
-  '@typescript-eslint/no-unused-vars': 'warn',
   '@typescript-eslint/no-use-before-define': 'warn',
-  '@typescript-eslint/no-wrapper-object-types': 'warn',
-  '@typescript-eslint/prefer-as-const': 'warn',
+  '@typescript-eslint/no-wrapper-object-types': 'error',
+  '@typescript-eslint/prefer-as-const': 'error',
   '@typescript-eslint/prefer-for-of': 'warn',
   '@typescript-eslint/space-before-function-paren': 'off',
 
@@ -152,7 +149,7 @@ export default tseslint.config(
     plugins: { 'no-relative-import-paths': noRelativeImportPathsPlugin },
     rules: {
       'no-relative-import-paths/no-relative-import-paths': [
-        'warn',
+        'error',
         { allowSameFolder: false, prefix: '', rootDir: 'src' }
       ]
     }
@@ -258,8 +255,8 @@ export default tseslint.config(
       'no-prototype-builtins': 'warn',
       'no-unsafe-optional-chaining': 'warn',
       'no-unused-vars': 'warn',
-      'no-var': 'warn',
-      'prefer-const': 'warn'
+      'no-var': 'error',
+      'prefer-const': 'error'
     }
   }
 );
