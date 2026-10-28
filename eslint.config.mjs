@@ -51,7 +51,7 @@ const typescriptRules = {
   '@typescript-eslint/no-use-before-define': 'warn',
   '@typescript-eslint/no-wrapper-object-types': 'error',
   '@typescript-eslint/prefer-as-const': 'error',
-  '@typescript-eslint/prefer-for-of': 'warn',
+  '@typescript-eslint/prefer-for-of': 'error',
   '@typescript-eslint/space-before-function-paren': 'off',
 
   '@typescript-eslint/naming-convention': [
@@ -214,7 +214,7 @@ export default tseslint.config(
       ...reactPlugin.configs.recommended.rules,
       'react/display-name': 'off',
       'react/jsx-curly-newline': 'off',
-      'react/jsx-filename-extension': ['warn', { extensions: ['.js', '.jsx', '.ts', '.tsx'] }],
+      'react/jsx-filename-extension': ['error', { extensions: ['.js', '.jsx', '.ts', '.tsx'] }],
       'react/jsx-no-literals': [
         'off',
         {
