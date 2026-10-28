@@ -15,7 +15,7 @@ import { ACTIONS } from '..';
 export type AppAction =
   | { type: 'storeDefault'; payload: any; tracked: boolean; repeat: boolean }
   | { type: 'appLoad'; payload: { data: string }; guard: { store: Store }; tracked: false; repeat: true }
-  | { type: 'appSave'; payload: void }
+  | { type: 'appSave'; payload: null }
   | { type: 'appInit'; payload: null }
   | { type: 'appDataChange'; payload: { data: string } }
   | { type: 'appModeThemeChange'; payload: { theme: ModeTheme } }
@@ -26,9 +26,9 @@ export type AppAction =
   | { type: 'appModeBodyChange'; payload: { body: ModeBody } }
   | { type: 'appHistoryLoad'; payload: null }
   | { type: 'appHistorySave'; payload: null }
-  | { type: 'locationFetch'; payload: void }
-  | { type: 'locationLoad'; payload: void }
-  | { type: 'appClickAway'; payload: void; tracked: true; repeat: true };
+  | { type: 'locationFetch'; payload: null }
+  | { type: 'locationLoad'; payload: null }
+  | { type: 'appClickAway'; payload: null; tracked: true; repeat: true };
 
 export type AppActionTypes = ActionTypesConfig<AppAction>;
 export type AppDispatchers = DispatchersConfig<AppAction>;

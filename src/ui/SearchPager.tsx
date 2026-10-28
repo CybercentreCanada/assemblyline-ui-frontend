@@ -16,7 +16,7 @@ interface Props extends PaginationProps {
   scrollToTop?: boolean;
   size?: 'small' | 'large' | null;
   url?: string;
-  setSearching?: (value: boolean) => void | null;
+  setSearching?: ((value: boolean) => void) | null;
   setResults: (data: SearchResult<unknown>) => void;
 }
 
