@@ -14,53 +14,12 @@ export const WrappedHexField = ({
   id = '',
   slotSX = { root: null, formControl: null, input: null }
 }: HexFieldProps) => {
-  const inputRef = useRef<HTMLInputElement>(null);
-
   const [textValue, setTextValue] = useState<string>('\\n\\t');
-  const [inputValue, setInputValue] = useState<string[]>([]);
-
-  const onMouseDown = useCallback((event: Event | any) => {
-    console.log(event, inputRef.current.selectionStart);
-  }, []);
-
-  const onKeyDown = useCallback((event: Event | any) => {
-    console.log(event, inputRef.current.selectionStart);
-  }, []);
-
-  const onKeyPress = useCallback((event: Event | any) => {
-    console.log(event, inputRef.current.selectionStart);
-  }, []);
-
-  const onPaste = useCallback((event: Event | any) => {
-    const paste = event.clipboardData.getData('text');
-    console.log(event.type, paste, inputRef.current.selectionStart);
-  }, []);
-
-  useEffectOnce(() => {
-    inputRef.current.addEventListener('mousedown', onMouseDown);
-    inputRef.current.addEventListener('keydown', onKeyDown);
-    inputRef.current.addEventListener('keypress', onKeyPress);
-    inputRef.current.addEventListener('paste', onPaste);
-    return () => {
-      inputRef.current.removeEventListener('mousedown', onMouseDown);
-      inputRef.current.removeEventListener('keydown', onKeyDown);
-      inputRef.current.removeEventListener('keypress', onKeyPress);
-      inputRef.current.removeEventListener('paste', onPaste);
-    };
-  });
-
-  useEffectOnce(() => {
-    inputRef.current.addEventListener('mousedown', onMouseDown);
-    inputRef.current.addEventListener('keydown', onKeyDown);
-    inputRef.current.addEventListener('keypress', onKeyPress);
-    inputRef.current.addEventListener('paste', onPaste);
-  });
 
   return (
     <FormControl fullWidth={true} variant="outlined" size="small" sx={{ ...slotSX?.formControl }}>
       <InputLabel htmlFor={id}>label</InputLabel>
       <OutlinedInput
-        inputRef={inputRef}
         placeholder="text"
         fullWidth
         autoFocus

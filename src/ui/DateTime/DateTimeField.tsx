@@ -88,7 +88,7 @@ const WrappedDateTimeField = <DateType extends Date>({
           return null;
       }
     } catch (e) {
-      console.warn('Date: ', children, '\n', e);
+      console.error('Date: ', children, '\n', e);
       return null;
     }
   }, [absolute, children, locale]);

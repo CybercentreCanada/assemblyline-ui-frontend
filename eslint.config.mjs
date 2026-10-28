@@ -13,13 +13,13 @@ import tseslint from 'typescript-eslint';
 
 const defaultConfig = {
   files: ['src/**/*.{js,mjs,cjs,ts,jsx,tsx}'],
-  ignores: ['node_modules/**/*', 'coverage/**/*', 'build/**/*', 'dist/**/*', 'docker/**/*', 'public/**/*']
+  ignores: ['node_modules/**/*', 'coverage/**/*', 'build/**/*', 'dist/**/*', 'docker/**/*', 'public/**/*', '**/*.spec.ts']
 };
 
 const typescriptRules = {
   '@typescript-eslint/array-type': ['error', { default: 'array' }],
   '@typescript-eslint/consistent-generic-constructors': ['error', 'constructor'],
-  '@typescript-eslint/consistent-indexed-object-style': ["error", "record"],
+  '@typescript-eslint/consistent-indexed-object-style': ['error', 'record'],
   '@typescript-eslint/consistent-type-definitions': 'off',
   '@typescript-eslint/consistent-type-imports': 'error',
   '@typescript-eslint/default-param-last': 'error',
@@ -249,7 +249,7 @@ export default tseslint.config(
     rules: {
       'no-async-promise-executor': 'off',
       'no-case-declarations': 'off',
-      'no-console': 'warn',
+      'no-console': ['error', { allow: ['error'] }],
       'no-extra-boolean-cast': 'off',
       'no-param-reassign': 'warn',
       'no-prototype-builtins': 'warn',
