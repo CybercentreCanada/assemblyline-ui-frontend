@@ -27,7 +27,7 @@ export function lzwEncode(s) {
     }
   }
   out.push(phrase.length > 1 ? dict[phrase] : phrase.charCodeAt(0));
-  for (i = 0; i < out.length; i++) {
+  for (let i = 0; i < out.length; i++) {
     out[i] = String.fromCharCode(out[i]);
   }
   return out.join('');
