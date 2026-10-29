@@ -140,7 +140,6 @@
     "@testing-library/user-event": "^14.6.1",
     "@types/autosuggest-highlight": "^3.2.3",
     "@types/d3": "^7.4.3",
-    "dompurify": "^3.4.16",
     "@types/flowjs__flow.js": "^2.13.3",
     "@types/lodash": "^4.14.195",
     "@types/md5": "^2.3.5",
