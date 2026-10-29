@@ -13,15 +13,7 @@ import tseslint from 'typescript-eslint';
 
 const defaultConfig = {
   files: ['src/**/*.{js,mjs,cjs,ts,jsx,tsx}'],
-  ignores: [
-    'node_modules/**/*',
-    'coverage/**/*',
-    'build/**/*',
-    'dist/**/*',
-    'docker/**/*',
-    'public/**/*',
-    '**/*.spec.ts'
-  ]
+  ignores: ['node_modules/**/*', 'coverage/**/*', 'build/**/*', 'dist/**/*', 'docker/**/*', 'public/**/*']
 };
 
 const typescriptRules = {

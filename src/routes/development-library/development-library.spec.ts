@@ -56,7 +56,7 @@ test.describe('Development Library Inputs page', () => {
       await inputs.textInput.expectHelperTextToBe('Helper Text');
       await inputs.helperTextButton.inputValue(false);
     } catch (err) {
-      console.warn(`Flaky test ignored`, err);
+      console.error(`Flaky test ignored`, err);
     }
   });
 
@@ -101,7 +101,7 @@ test.describe('Development Library Inputs page', () => {
       await inputs.numberInput.expectHelperTextToBe('Helper Text');
       await inputs.helperTextButton.inputValue(false);
     } catch (err) {
-      console.warn(`Flaky test ignored`, err);
+      console.error(`Flaky test ignored`, err);
     }
   });
 
@@ -146,7 +146,7 @@ test.describe('Development Library Inputs page', () => {
       await inputs.checkboxInput.expectHelperTextToBe('Helper Text');
       await inputs.helperTextButton.inputValue(false);
     } catch (err) {
-      console.warn(`Flaky test ignored`, err);
+      console.error(`Flaky test ignored`, err);
     }
   });
 
