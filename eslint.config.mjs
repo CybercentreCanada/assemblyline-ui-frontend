@@ -13,7 +13,15 @@ import tseslint from 'typescript-eslint';
 
 const defaultConfig = {
   files: ['src/**/*.{js,mjs,cjs,ts,jsx,tsx}'],
-  ignores: ['node_modules/**/*', 'coverage/**/*', 'build/**/*', 'dist/**/*', 'docker/**/*', 'public/**/*', '**/*.spec.ts']
+  ignores: [
+    'node_modules/**/*',
+    'coverage/**/*',
+    'build/**/*',
+    'dist/**/*',
+    'docker/**/*',
+    'public/**/*',
+    '**/*.spec.ts'
+  ]
 };
 
 const typescriptRules = {
@@ -253,7 +261,7 @@ export default tseslint.config(
       'no-extra-boolean-cast': 'off',
       'no-param-reassign': 'warn',
       'no-prototype-builtins': 'warn',
-      'no-unsafe-optional-chaining': 'warn',
+      'no-unsafe-optional-chaining': 'error',
       'no-unused-vars': 'warn',
       'no-var': 'error',
       'prefer-const': 'error'
