@@ -68,7 +68,7 @@ export const useBodyDispatcher = (dispatch: Dispatch): BodyDispatchers => {
     (_, { event, store }) => {
       if (!(isType.layout.isFocusing(store, 'body') && isCopyKey(event))) return;
       event.preventDefault();
-      dispatch({ type: ACTIONS.copyKeyDown, payload: null, tracked: true, repeat: false });
+      dispatch({ type: ACTIONS.copyKeyDown, payload: undefined, tracked: true, repeat: false });
     },
     [dispatch]
   );
@@ -87,7 +87,8 @@ export const useBodyDispatcher = (dispatch: Dispatch): BodyDispatchers => {
     onBodyRefInit: payload => dispatch({ type: ACTIONS.bodyRefInit, payload }),
     onBodyScrollInit: payload => dispatch({ type: ACTIONS.bodyScrollInit, payload }),
     onBodyResize,
-    onBodyMouseLeave: () => dispatch({ type: ACTIONS.bodyMouseLeave, payload: null, tracked: false, repeat: false }),
+    onBodyMouseLeave: () =>
+      dispatch({ type: ACTIONS.bodyMouseLeave, payload: undefined, tracked: false, repeat: false }),
     onBodyScrollWheel: payload => dispatch({ type: ACTIONS.bodyScrollWheel, payload }),
     onBodyItemsRendered: payload => dispatch({ type: ACTIONS.bodyItemsRendered, payload }),
     onCursorKeyDown,
