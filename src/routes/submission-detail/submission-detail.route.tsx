@@ -235,11 +235,11 @@ function WrappedSubmissionDetail() {
 
                   let attExists = false;
                   const attackItem: Attack = [attack.attack_id, attack.pattern, hType as Verdict];
-                  for (const attackItem of tempSummary.attack_matrix[cat]) {
+                  for (const existingAttack of tempSummary.attack_matrix[cat]) {
                     if (
-                      attackItem[0] === attackItem[0] &&
-                      attackItem[1] === attackItem[1] &&
-                      attackItem[2] === attackItem[2]
+                      existingAttack[0] === attackItem[0] &&
+                      existingAttack[1] === attackItem[1] &&
+                      existingAttack[2] === attackItem[2]
                     ) {
                       attExists = true;
                       break;
@@ -359,8 +359,10 @@ function WrappedSubmissionDetail() {
             toUpdate.push(tempTree.TBD.children[key]);
           }
         }
-        const toDelTDB = [];
+        const toDelTDB: string[] = [];
         for (const item of toUpdate) {
+          if (!item) continue;
+
           if (result.result.score !== undefined) {
             item.score += result.result.score;
           }
