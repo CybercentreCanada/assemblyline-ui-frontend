@@ -2,26 +2,12 @@ import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import CheckOutlinedIcon from '@mui/icons-material/CheckOutlined';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import {
-  Box,
-  Card,
-  Collapse,
-  FormControl,
-  Grid,
-  MenuItem,
-  Select,
-  Skeleton,
-  styled,
-  Typography,
-  useMediaQuery,
-  useTheme
-} from '@mui/material';
-import type { SelectChangeEvent } from '@mui/material/Select';
+import { Box, Card, Collapse, Grid, Skeleton, styled, Typography, useMediaQuery, useTheme } from '@mui/material';
 import { useApiQuery } from 'core/api';
 import { useAppConfigStore } from 'core/config';
 import { createAppRoute } from 'core/router';
 import { AppPageFullWidth } from 'core/template';
-import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CustomChip } from 'ui/CustomChip';
 import { PageHeader } from 'ui/layouts/PageHeader';
@@ -105,11 +91,11 @@ const Expand = memo(
 // HelpAPI Page
 //*****************************************************************************************
 
-export const HelpAPIPage = React.memo(() => {
+export const HelpAPIPage = memo(() => {
   const { t } = useTranslation(['helpAPI']);
   const theme = useTheme();
 
-  const [apiSelected, setApiSelected] = useState<string>('');
+  const [apiSelected, setApiSelected] = useState<string | null>(null);
   const [expandMap, setExpandMap] = useState<Record<string, boolean>>({});
 
   const configuration = useAppConfigStore(s => s?.configuration);
@@ -121,15 +107,13 @@ export const HelpAPIPage = React.memo(() => {
   const xs = useMediaQuery(theme.breakpoints.only('xs'));
   const isDark = useMemo(() => theme.palette.mode === 'dark', [theme.palette.mode]);
 
-  const { data: apiListData, isLoading: isLoadingApiList } = useApiQuery<string[]>({
+  const { data: apiList, isLoading: isLoadingApiList } = useApiQuery<string[]>({
     method: 'GET',
     url: '/api/'
   });
 
-  const apiList = useMemo(() => apiListData ?? [], [apiListData]);
-
   useEffect(() => {
-    if (!apiSelected && apiList.length > 0) {
+    if (!apiSelected && (apiList ?? []).length > 0) {
       setApiSelected(apiList[0]);
     }
   }, [apiList, apiSelected]);
@@ -163,11 +147,6 @@ export const HelpAPIPage = React.memo(() => {
     [apiDefinition, apiSelected, compareAPIs]
   );
 
-  const onSelectApiVersion = useCallback((event: SelectChangeEvent<string>) => {
-    setApiSelected(event.target.value);
-    setExpandMap({});
-  }, []);
-
   const getMethodColor = useCallback((method: string) => METHOD_COLORS[method as MethodType] ?? 'info', []);
 
   const getUserColor = useCallback((role: string) => USER_COLORS[role] ?? 'default', []);
@@ -188,26 +167,6 @@ export const HelpAPIPage = React.memo(() => {
             root: { style: { marginBottom: theme.spacing(4) } },
             actions: { spacing: 1 }
           }}
-          actions={
-            apiList && apiSelected ? (
-              <FormControl size="small">
-                <Select
-                  id="api"
-                  value={apiSelected}
-                  onChange={event => setApiSelected(event.target.value)}
-                  variant="outlined"
-                >
-                  {apiList.map((version, index) => (
-                    <MenuItem key={index} value={version}>
-                      {version.replace('v', t('version')) + t('version_end')}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            ) : (
-              <Skeleton variant="rectangular" style={{ display: 'inline-block', height: '2rem', width: '14rem' }} />
-            )
-          }
         />
 
         {!isLoading && apiDefinition ? (

@@ -9,7 +9,7 @@ Look for performance defects without changing behavior or redesigning APIs. Cons
 
 ## Guidance
 
-Consult [project performance conventions](../../instructions/conventions/performance.instructions.md) where relevant.
+Consult [project performance conventions](../../../.github/instructions/conventions/performance.instructions.md) where relevant.
 
 ## Review
 

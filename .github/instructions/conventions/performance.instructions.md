@@ -1,11 +1,15 @@
+---
+description: 'Use when changing React render paths, memoization, list rendering, or performance-sensitive TypeScript.'
+applyTo: 'src/**/*.ts, src/**/*.tsx'
+---
+
 # Performance — AI Rules
+
+> Applies to new and modified code. Legacy code is exempt until it is touched; do not refactor it unless asked.
 
 ## Must
 
 - Every exported component wrapped in `memo()`
-- Focused store selectors — never subscribe to entire store
-- Store selectors must access the most nested (leaf) values — never select a parent object and read its fields later
-- Mutate store objects in place — never spread/replace parent objects (preserves reference identity for unchanged siblings)
 - Functions passed as props must use `useCallback`
 - Computed arrays/objects (filter, sort, map, spread) passed as props must use `useMemo`
 - Empty array/object defaults must be module-level constants
@@ -108,9 +112,6 @@ useEffect(() => { setFiltered(items.filter(...)); }, [items]);
 - NO `useEffect` for derived state — use `useMemo`
 - NO inline arrow functions as JSX props — use `useCallback`
 - NO computed arrays/objects inline as props — use `useMemo`
-- NO subscribing to entire store
-- NO selecting a parent object from a store and reading its fields in JSX — select each leaf field separately
-- NO spreading/replacing parent objects in store mutations — mutate fields in place
 - NO `lazy()` or code splitting — everything bundled upfront
 - NO unvirtualized lists of 100+ items
 - NO MUI layout components (`Box`, `Stack`, `Grid`) — raw HTML

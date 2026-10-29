@@ -23,7 +23,8 @@ const TestSchema = z.object({
     .catch({ lang: 'en', mode: 'system' })
 });
 const STORAGE_KEY = 'test.preference';
-const createTestPreference = () => TestSchema.parse({});
+type TestPreference = z.infer<typeof TestSchema>;
+const createTestPreference = (): TestPreference => TestSchema.parse({});
 
 afterEach(() => {
   vi.restoreAllMocks();
@@ -73,7 +74,10 @@ describe('savePreferenceToLocalStorage', () => {
       delete storage[k];
     });
 
-    const preference = { api: { gcTime: 2_000, staleTime: 500 }, layout: { lang: 'en', mode: 'system' } };
+    const preference: TestPreference = {
+      api: { gcTime: 2_000, staleTime: 500 },
+      layout: { lang: 'en', mode: 'system' }
+    };
     savePreferenceToLocalStorage(TestSchema, preference, STORAGE_KEY);
 
     const stored: unknown = JSON.parse(storage[STORAGE_KEY]);
@@ -84,7 +88,7 @@ describe('savePreferenceToLocalStorage', () => {
     const removeSpy = vi.spyOn(Storage.prototype, 'removeItem').mockImplementation(vi.fn());
     vi.spyOn(Storage.prototype, 'setItem').mockImplementation(vi.fn());
 
-    const defaults = TestSchema.parse({});
+    const defaults = createTestPreference();
     savePreferenceToLocalStorage(TestSchema, defaults, STORAGE_KEY);
 
     expect(removeSpy).toHaveBeenCalledWith(STORAGE_KEY);
@@ -97,7 +101,7 @@ describe('savePreferenceToLocalStorage', () => {
     });
     vi.spyOn(Storage.prototype, 'removeItem').mockImplementation(vi.fn());
 
-    const preference = { api: { gcTime: 5_000, staleTime: 999 }, layout: { lang: 'fr', mode: 'dark' } };
+    const preference: TestPreference = { api: { gcTime: 5_000, staleTime: 999 }, layout: { lang: 'fr', mode: 'dark' } };
     savePreferenceToLocalStorage(TestSchema, preference, STORAGE_KEY);
 
     const stored: unknown = JSON.parse(storage[STORAGE_KEY]);
@@ -119,14 +123,11 @@ describe('loadPreferenceFromLocalStorage', () => {
   it('merges stored overrides with the current store values', () => {
     vi.spyOn(Storage.prototype, 'getItem').mockReturnValue(JSON.stringify({ api: { gcTime: 3_000 } }));
 
-    const result = loadPreferenceFromLocalStorage(
-      TestSchema,
-      {
-        api: { gcTime: 1_000, staleTime: 9_999 },
-        layout: { lang: 'fr', mode: 'light' }
-      } as unknown as AppPreferenceStore,
-      STORAGE_KEY
-    );
+    const current: TestPreference = {
+      api: { gcTime: 1_000, staleTime: 9_999 },
+      layout: { lang: 'fr', mode: 'light' }
+    };
+    const result = loadPreferenceFromLocalStorage(TestSchema, current, STORAGE_KEY);
     expect(result).toEqual({
       api: { gcTime: 3_000, staleTime: 9_999 },
       layout: { lang: 'fr', mode: 'light' }
@@ -136,8 +137,8 @@ describe('loadPreferenceFromLocalStorage', () => {
   it('returns current store values when stored data is invalid JSON', () => {
     vi.spyOn(Storage.prototype, 'getItem').mockReturnValue('not-json{{{');
 
-    const current = { api: { gcTime: 2_500, staleTime: 500 }, layout: { lang: 'en', mode: 'dark' } };
-    const result = loadPreferenceFromLocalStorage(TestSchema, current as unknown as AppPreferenceStore, STORAGE_KEY);
+    const current: TestPreference = { api: { gcTime: 2_500, staleTime: 500 }, layout: { lang: 'en', mode: 'dark' } };
+    const result = loadPreferenceFromLocalStorage(TestSchema, current, STORAGE_KEY);
     expect(result).toEqual(current);
   });
 

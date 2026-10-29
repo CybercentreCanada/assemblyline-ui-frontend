@@ -1,4 +1,11 @@
+---
+description: 'Use when writing or updating unit tests for TypeScript utility functions.'
+applyTo: 'src/**/*.utils.test.ts, src/**/utils/**/*.test.ts'
+---
+
 # Utility Unit Tests — AI Rules
+
+> Applies to new and modified utilities. Existing utility files without tests are exempt until they are touched.
 
 ## Must
 
@@ -14,7 +21,7 @@
 ## Never
 
 - NO shared mutable state between tests (`beforeEach` for data setup)
-- NO mocking (utilities are pure — mock only for side-effect testing)
+- NO mocking (utilities have no external dependencies — mock only if one is introduced)
 - NO testing implementation details (`it('calls splice')`)
 - NO skipping edge cases (empty arrays, index 0, undefined fields)
 - NO utility function without corresponding tests

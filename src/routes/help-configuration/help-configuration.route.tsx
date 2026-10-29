@@ -1,11 +1,13 @@
 import SettingsApplicationsOutlinedIcon from '@mui/icons-material/SettingsApplicationsOutlined';
 import { Grid, Skeleton, Typography, useTheme } from '@mui/material';
+import { useAppConfigStore } from 'core/config';
 import { createAppRoute } from 'core/router';
 import { AppPageFullWidth } from 'core/template';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CustomChip } from 'ui/CustomChip';
+import { PageHeader } from 'ui/layouts/PageHeader';
 
 export const HelpConfigurationPage = memo(() => {
   const { apiCall } = useMyAPI();
@@ -15,6 +17,8 @@ export const HelpConfigurationPage = memo(() => {
   const theme = useTheme();
   const sp1 = theme.spacing(1);
   const sp2 = theme.spacing(2);
+
+  const coreVersion = useAppConfigStore(s => s?.configuration.system.version);
 
   function isArrayOfArray(val) {
     if (Array.isArray(val)) {
@@ -45,9 +49,15 @@ export const HelpConfigurationPage = memo(() => {
   return (
     <AppPageFullWidth>
       <div style={{ textAlign: 'left' }}>
-        <div style={{ marginBottom: theme.spacing(4) }}>
-          <Typography variant="h4">{t('title')}</Typography>
-        </div>
+        <PageHeader
+          primary={t('title')}
+          {...(coreVersion && { secondary: `${t('core_version')}: ${coreVersion}` })}
+          slotProps={{
+            root: { style: { marginBottom: theme.spacing(4) } },
+            actions: { spacing: 1 }
+          }}
+        />
+
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           <Typography variant="h6" gutterBottom>
             {t('tags')}

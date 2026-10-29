@@ -1,3 +1,8 @@
+---
+description: 'Use when building or modifying React UI, forms, dialogs, interactive controls, keyboard behavior, or accessible names.'
+applyTo: 'src/**/*.tsx'
+---
+
 # Accessibility — AI Rules
 
 ## Must
@@ -22,15 +27,14 @@
 
 ## Semantic HTML
 
-| Need | Use | Not |
-| ---- | --- | --- |
-
-| Action | `<button>` | `<div onClick>` |
-| Navigation | `<nav>` | `<div role="navigation">` |
-| Main content | `<main>` | `<div role="main">` |
-| Heading | `<h1>`–`<h6>` | `<div aria-level>` |
-| List | `<ul>`/`<ol>` + `<li>` | nested `<div>` |
-| Table | `<table>` | grid of `<div>` |
+| Need         | Use                    | Not                       |
+| ------------ | ---------------------- | ------------------------- |
+| Action       | `<button>`             | `<div onClick>`           |
+| Navigation   | `<nav>`                | `<div role="navigation">` |
+| Main content | `<main>`               | `<div role="main">`       |
+| Heading      | `<h1>`–`<h6>`          | `<div aria-level>`        |
+| List         | `<ul>`/`<ol>` + `<li>` | nested `<div>`            |
+| Table        | `<table>`              | grid of `<div>`           |
 
 ## ARIA Patterns
 
@@ -65,14 +69,7 @@
 ## Keyboard Template
 
 ```typescript
-<div
-  role="button"
-  tabIndex={0}
-  onClick={handleClick}
-  onKeyDown={(e) => {
-    if (e.key === 'Enter' || e.key === ' ') handleClick();
-  }}
->
+<button type="button" onClick={handleClick}>
 ```
 
 ## E2E Locator Priority
