@@ -524,7 +524,7 @@ export const applyClassificationRules = (
   };
 
   for (const item in c12nDef.params_map) {
-    if ({}.hasOwnProperty.call(c12nDef.params_map, item)) {
+    if (Object.hasOwnProperty.call(c12nDef.params_map, item)) {
       const data = c12nDef.params_map[item];
       if ('require_lvl' in data) {
         requireLvl[item] = data.require_lvl;
@@ -538,8 +538,10 @@ export const applyClassificationRules = (
     }
   }
 
-  for (const partName of partsToCheck) {
-    if ({}.hasOwnProperty.call(partsToCheck, partName)) {
+  // Iterate over the 'partsToCheck' fields; must use 'in' (not 'of')
+  // eslint-disable-next-line @typescript-eslint/no-for-in-array
+  for (const partName in partsToCheck) {
+    if (Object.hasOwnProperty.call(partsToCheck, partName)) {
       const part = retParts[partsToCheck[partName]];
       for (const value of part) {
         let triggerAutoSelect = false;
