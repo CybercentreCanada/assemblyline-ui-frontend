@@ -52,7 +52,9 @@ export type IsActionConfig<AS extends ActionStruct> = IsActionsConfig<AS>[keyof 
 export type DispatchersConfig<Actions extends ActionStruct> = {
   [A in Actions as `on${Capitalize<A['type']>}`]: A extends { guard: any }
     ? (payload: A['payload'], guard: A['guard']) => void
-    : (payload: A['payload']) => void;
+    : [A['payload']] extends [undefined]
+      ? (payload?: A['payload']) => void // allows optional 'payload' for actions without a payload
+      : (payload: A['payload']) => void;
 };
 
 export type DispatchPropsConfig<Actions extends ActionStruct> = {

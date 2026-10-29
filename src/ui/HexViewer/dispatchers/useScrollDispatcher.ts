@@ -5,9 +5,9 @@ import { ACTIONS } from '..';
 export type ScrollAction =
   | { type: 'scrollButtonClick'; payload: { value: number } }
   | { type: 'scrollSliderChange'; payload: { event: Event; newValue: number | number[] } }
-  | { type: 'scrollSliderMouseDown'; payload: null }
+  | { type: 'scrollSliderMouseDown'; payload: undefined }
   | { type: 'scrollTouchStart'; payload: { event: TouchEvent<HTMLDivElement> } }
-  | { type: 'scrollTouchEnd'; payload: null }
+  | { type: 'scrollTouchEnd'; payload: undefined }
   | { type: 'scrollTouchMove'; payload: { event: TouchEvent<HTMLDivElement> } };
 
 export type ScrollActionTypes = ActionTypesConfig<ScrollAction>;
