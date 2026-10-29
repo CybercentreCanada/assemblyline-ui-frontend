@@ -3,24 +3,24 @@ import type { ActionTypesConfig, Dispatch, DispatchersConfig } from '..';
 import { ACTIONS } from '..';
 
 export type SettingAction =
-  | { type: 'settingFetch'; payload: null }
-  | { type: 'settingLoad'; payload: null }
-  | { type: 'settingSave'; payload: null }
-  | { type: 'settingOpen'; payload: null }
-  | { type: 'settingClose'; payload: null }
-  | { type: 'settingReset'; payload: null }
+  | { type: 'settingFetch'; payload: undefined }
+  | { type: 'settingLoad'; payload: undefined }
+  | { type: 'settingSave'; payload: undefined }
+  | { type: 'settingOpen'; payload: undefined }
+  | { type: 'settingClose'; payload: undefined }
+  | { type: 'settingReset'; payload: undefined }
   | { type: 'settingHexEncodingChange'; payload: { event: ChangeEvent<{ name?: string; value: unknown }> } }
   | { type: 'settingBodyTypeChange'; payload: { event: ChangeEvent<{ name?: string; value: unknown }> } }
   | { type: 'settingSearchTextTypeChange'; payload: { event: ChangeEvent<{ name?: string; value: unknown }> } }
   | { type: 'settingCopyNonPrintableTypeChange'; payload: { event: ChangeEvent<{ name?: string; value: unknown }> } }
   | { type: 'settingCopyNonPrintablePrefixChange'; payload: { event: ChangeEvent<{ name?: string; value: unknown }> } }
   | { type: 'settingOffsetBaseChange'; payload: { event: ChangeEvent<{ name?: string; value: unknown }> } }
-  | { type: 'settingAutoColumnChange'; payload: null }
+  | { type: 'settingAutoColumnChange'; payload: undefined }
   | { type: 'settingColumnChange'; payload: { value: number } }
   | { type: 'settingHexSetChange'; payload: { key: string; value: number } }
   | { type: 'settingHexCharChange'; payload: { key: string; value: string } }
   | { type: 'settingHexByteSizeChange'; payload: { event: ChangeEvent<{ name?: string; value: unknown }> } }
-  | { type: 'settingRowFoldingChange'; payload: null };
+  | { type: 'settingRowFoldingChange'; payload: undefined };
 
 export type SettingActionTypes = ActionTypesConfig<SettingAction>;
 export type SettingDispatchers = DispatchersConfig<SettingAction>;
