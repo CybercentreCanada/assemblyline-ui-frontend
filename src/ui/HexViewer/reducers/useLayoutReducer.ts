@@ -77,8 +77,12 @@ export const useLayoutReducer: UseReducer = () => {
     else return setStore.store.layout.row.Size(store, event.visibleStopIndex - event.visibleStartIndex);
   }, []);
 
+  const getHexViewerBoundingRect = (): { height: number; width: number } => {
+    return document.getElementById('hex-viewer')?.getBoundingClientRect() ?? { height: 1, width: 1 };
+  };
+
   const settingAutoColumnChange: Reducers['settingAutoColumnChange'] = useCallback(store => {
-    const { width = 1 } = document.getElementById('hex-viewer')?.getBoundingClientRect();
+    const { width } = getHexViewerBoundingRect();
     const newColumnSize = handleLayoutColumnResize2(store, width);
     return setStore.store.setting.layout.Column(store, store.setting.layout.column, data => ({
       auto: !data.auto,
@@ -95,7 +99,7 @@ export const useLayoutReducer: UseReducer = () => {
             : data?.column?.max;
         return { column: { auto: data?.column?.auto, max: maxColumn }, folding: { active: data?.folding?.active } };
       });
-      const { height = 1, width = 1 } = document.getElementById('hex-viewer')?.getBoundingClientRect();
+      const { height, width } = getHexViewerBoundingRect();
       return handleResize(newStore, { height, width });
     },
     [handleResize]
@@ -112,14 +116,14 @@ export const useLayoutReducer: UseReducer = () => {
   const settingSave: Reducers['settingSave'] = useCallback(
     store => {
       const newStore = setStore.store.Layout(store, store.setting.layout);
-      const { height = 1, width = 1 } = document.getElementById('hex-viewer')?.getBoundingClientRect();
+      const { height, width } = getHexViewerBoundingRect();
       return handleResize(newStore, { height, width });
     },
     [handleResize]
   );
 
   const settingReset: Reducers['settingReset'] = useCallback(store => {
-    const { width = 1 } = document.getElementById('hex-viewer')?.getBoundingClientRect();
+    const { width } = getHexViewerBoundingRect();
     const newColumnSize = handleLayoutColumnResize2(store, width);
     return setStore.store.setting.Layout(store, LAYOUT_STATE.layout, data => ({
       column: { auto: data?.column?.auto, max: newColumnSize },
