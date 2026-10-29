@@ -1,7 +1,7 @@
 import type { PaletteMode, PaletteOptions, ThemeOptions } from '@mui/material';
-import { deepmerge } from '@mui/utils';
 import type { AppTheme } from '@tui/core';
 import type { AppLegacyTheme } from 'core/template';
+import _ from 'lodash';
 
 const APP_PALETTE = {
   dark: {
@@ -109,6 +109,9 @@ const BASE_THEME_CONFIG: Partial<ThemeOptions> & { cssVariables?: boolean } = {
   cssVariables: true
 };
 
+const replaceArrays = (_current: unknown, source: unknown): unknown[] | undefined =>
+  Array.isArray(source) ? (source as unknown[]) : undefined;
+
 /**
  * @name parseAppThemeFromLegacy
  * @description Converts a legacy `AppLegacyTheme` (mode-split palette/appbar, mode-agnostic
@@ -128,7 +131,7 @@ export const parseAppThemeFromLegacy = ({ id, i18nKey, default: isDefault, confi
       ...(palette?.[mode] ? { palette: palette[mode] } : {})
     };
 
-    return deepmerge(DEFAULT_THEME.configs[mode] || {}, legacy);
+    return _.mergeWith({}, DEFAULT_THEME.configs[mode] || {}, legacy, replaceArrays);
   };
 
   const legacyGlobal: Partial<ThemeOptions> = {
@@ -139,7 +142,7 @@ export const parseAppThemeFromLegacy = ({ id, i18nKey, default: isDefault, confi
   return {
     configs: {
       dark: buildModeConfig('dark'),
-      global: deepmerge(deepmerge(DEFAULT_THEME.configs.global || {}, BASE_THEME_CONFIG), legacyGlobal),
+      global: _.mergeWith({}, DEFAULT_THEME.configs.global || {}, BASE_THEME_CONFIG, legacyGlobal, replaceArrays),
       light: buildModeConfig('light')
     },
     default: isDefault,
