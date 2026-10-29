@@ -177,7 +177,7 @@ export default tseslint.config(
             {
               from: { element: { type: 'shared' } },
               allow: { to: { element: { type: 'models' } } }
-            }
+            },
             // models and ui are leaf layers: no dependencies on other source folders.
 
             // Legacy dependencies: remove these allowances as imports are migrated.
