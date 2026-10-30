@@ -2,7 +2,7 @@
 
 ## 1. Purpose
 
-Provides a scroll-aware table-of-content context for registering document anchors, tracking the active section, and navigating to registered sections within a scrollable root.
+Provides a scroll-aware table-of-content layout and context for registering document anchors, tracking the active section, and navigating within a scrollable content root.
 
 ## 2. Features
 
@@ -16,7 +16,7 @@ Provides a scroll-aware table-of-content context for registering document anchor
 
 ### TableOfContentProvider
 
-`TableOfContentProvider` creates the form-backed store and provides the table-of-content context to descendants. It accepts an optional scroll behavior and child content.
+`TableOfContentFormProvider` owns the form-backed store. `TableOfContentProvider` must be rendered beneath it; it consumes the store and exposes the table-of-content context. `TableOfContentLayout` composes both providers in the required order and forwards the optional scroll behavior. Use the layout for standalone usage.
 
 ### Anchor
 
@@ -24,7 +24,7 @@ Provides a scroll-aware table-of-content context for registering document anchor
 
 ### TableOfContentContext
 
-The context exposes:
+`useTableOfContent` returns the context exposed by `TableOfContentProvider`:
 
 - `rootRef` - Scrollable content root reference
 - `headerRef` - Header reference used to offset navigation and active-section detection
@@ -35,7 +35,9 @@ The context exposes:
 
 ## 4. Configuration
 
-### TableOfContentProps
+### TableOfContentProviderProps
+
+This type is shared by `TableOfContentProvider` and `TableOfContentLayout`.
 
 | Prop | Required | Default | Behavior |
 | --- | --- | --- | --- |
@@ -49,14 +51,16 @@ The context exposes:
 | Prop | Required | Default | Behavior |
 | --- | --- | --- | --- |
 | `anchor` | No | Generated ID | Explicit anchor identifier |
-| `label` | No | `''` | Label registered in the table of contents |
+| `label` | No | `''` | Label registered in the table of contents; non-string and non-number values register as an empty label |
 | `subheader` | No | `false` | Marks the anchor as a subsection |
 | `disabled` | No | `false` | Renders children without registering an anchor |
+
+Even when `disabled` is true, `Anchor` must be rendered beneath a table-of-content provider because it reads the context before checking this prop.
 
 ## 5. Usage
 
 ```tsx
-import { Anchor, TableOfContentProvider, useTableOfContent } from 'features/table-of-content';
+import { Anchor, TableOfContentLayout, useTableOfContent } from 'features/table-of-content';
 
 const Navigation = () => {
   const { ActiveAnchor, Anchors, scrollTo } = useTableOfContent();
@@ -68,7 +72,11 @@ const Navigation = () => {
           anchors.map(anchor => (
             <ActiveAnchor key={anchor.id} activeID={anchor.id}>
               {active => (
-                <a href={`#${anchor.id}`} aria-current={active ? 'location' : undefined} onClick={event => scrollTo(event, anchor.id)}>
+                <a
+                  href={`#${anchor.id}`}
+                  aria-current={active ? 'location' : undefined}
+                  onClick={event => scrollTo(event, anchor.id)}
+                >
                   {anchor.label}
                 </a>
               )}
@@ -80,22 +88,34 @@ const Navigation = () => {
   );
 };
 
+const DocumentContent = () => {
+  const { rootRef, headerRef } = useTableOfContent();
+
+  return (
+    <div ref={rootRef} style={{ height: '100vh', overflowY: 'auto' }}>
+      <header ref={headerRef} style={{ position: 'sticky', top: 0 }}>
+        <Navigation />
+      </header>
+      <main>
+        <Anchor anchor="overview" label="Overview">
+          <section>Overview</section>
+        </Anchor>
+        <Anchor anchor="details" label="Details" subheader>
+          <section>Details</section>
+        </Anchor>
+      </main>
+    </div>
+  );
+};
+
 const Document = () => (
-  <TableOfContentProvider>
-    <Navigation />
-    <main>
-      <Anchor anchor="overview" label="Overview">
-        <section>Overview</section>
-      </Anchor>
-      <Anchor anchor="details" label="Details" subheader>
-        <section>Details</section>
-      </Anchor>
-    </main>
-  </TableOfContentProvider>
+  <TableOfContentLayout>
+    <DocumentContent />
+  </TableOfContentLayout>
 );
 ```
 
-`useTableOfContent` must be called below `TableOfContentProvider`. The `rootRef` and `headerRef` from the context must be attached by the consumer to the scrollable root and its header for active tracking and offset scrolling to work.
+Call `useTableOfContent` from a descendant of `TableOfContentLayout` or a correctly composed provider pair. Attach `rootRef` to the scrollable element containing the anchors and `headerRef` to its fixed or sticky header. Anchor registration, active-section tracking, and scrolling depend on these refs being attached.
 
 ## 6. Codebase (Internals)
 
@@ -103,18 +123,17 @@ const Document = () => (
 
 | File | Role |
 | --- | --- |
-| `table-of-content.models.ts` | Shared anchor, store, context, and props types |
-| `table-of-content.providers.tsx` | Context, form-backed state provider, and context hook |
-| `components/Anchor.tsx` | Anchor registration component |
-| `components/TableOfContent.tsx` | Table-of-content root and provider components |
+| `table-of-content.models.ts` | Anchor and store types |
+| `table-of-content.providers.tsx` | Form-backed store provider, context, provider props, context hook, and layout |
+| `table-of-content.components.tsx` | Anchor registration component and `AnchorProps` |
 | `index.ts` | Explicit public exports |
 
 ### Data Flow And Boundaries
 
-`TableOfContentProvider` creates the state store and context. `Anchor` components discover the nearest context and register themselves after mounting. The root component scans registered DOM anchors when an anchor changes and stores their order. Scroll events calculate the active anchor from the root and header geometry, while `scrollTo` navigates to a selected anchor.
+`TableOfContentFormProvider` creates the form store, and `TableOfContentProvider` exposes it through the table-of-content context. `TableOfContentLayout` composes the providers for standalone use. Consumers attach the context refs to the scroll root and header. Each enabled `Anchor` registers after mounting; registration scans the root for `[data-anchor]` elements and updates the store. Scroll events use root and header geometry to update the active anchor, while `scrollTo` navigates within the root and accounts for the header height.
 
 ## 7. Related Modules
 
 - `features/form/` - Provides the form-backed state context used by the table-of-content provider
 - `ui/layouts/PageSection.tsx` - Uses `Anchor` to mark page sections
-- `core/routes/` - Hosts route pages that consume table-of-content navigation
+- `routes/` - Contains application route pages, some of which use table-of-content navigation
