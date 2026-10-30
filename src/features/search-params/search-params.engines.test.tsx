@@ -153,6 +153,33 @@ describe('SearchParamEngine.full', () => {
     expect(params.toString()).toBe('mode=2&enabled=true');
     expect(engine.full(params).toObject()).toEqual({ mode: 2, enabled: true });
   });
+
+  it('rejects object values that do not match the default shape', () => {
+    const engine = new SearchParamEngine({
+      config: SEARCH_PARAM_BLUEPRINTS_MAP.object({ ids: ['default'], limit: 5, nested: { on: true } })
+    });
+    const defaults = { config: { ids: ['default'], limit: 5, nested: { on: true } } };
+
+    for (const config of [{ ids: false }, { ids: [1] }, { limit: '5' }, { nested: { on: 'yes' } }, { nested: [] }]) {
+      expect(engine.full(new URLSearchParams({ config: JSON.stringify(config) })).toObject()).toEqual(defaults);
+    }
+
+    expect(engine.full(new URLSearchParams({ config: '{"ids":["a","b"],"limit":9}' })).toObject()).toEqual({
+      config: { ids: ['a', 'b'], limit: 9, nested: { on: true } }
+    });
+  });
+
+  it('keeps a __proto__ object key as an own property without changing the prototype', () => {
+    const engine = new SearchParamEngine({ config: SEARCH_PARAM_BLUEPRINTS_MAP.object({ a: 1 }) });
+    const params = new URLSearchParams({ config: '{"__proto__":{"polluted":true}}' });
+
+    const { config } = engine.full(params).toObject();
+
+    expect(Object.getPrototypeOf(config)).toBe(Object.prototype);
+    expect(Object.hasOwn(config, '__proto__')).toBe(true);
+    expect(({} as Record<string, unknown>).polluted).toBeUndefined();
+    expect((config as Record<string, unknown>).polluted).toBeUndefined();
+  });
 });
 
 //*****************************************************************************************

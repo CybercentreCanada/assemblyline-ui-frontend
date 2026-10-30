@@ -5,11 +5,13 @@ import type { ReactNode } from 'react';
 import { memo, useCallback, useMemo } from 'react';
 import { FormProvider, useForm } from 'routes/development-library/contexts/form';
 import { DateTimeSection } from 'routes/development-library/sections/DateTime';
+import { HashParamsSection } from 'routes/development-library/sections/HashParams';
 import { InputsSection } from 'routes/development-library/sections/Inputs';
 import { LayoutSection } from 'routes/development-library/sections/Layout';
 import { ListSection } from 'routes/development-library/sections/List';
 import { ListInputsSection } from 'routes/development-library/sections/ListInputs';
 import { PathParamsSection } from 'routes/development-library/sections/PathParams';
+import { SearchParamsSection } from 'routes/development-library/sections/search-params/SearchParams';
 import { PageHeader } from 'ui/layouts/PageHeader';
 import { PageLayout } from 'ui/layouts/PageLayout';
 import type { PageNavigationItemProp } from 'ui/layouts/PageNavigation';
@@ -20,11 +22,13 @@ import { PageNavigation } from 'ui/layouts/PageNavigation';
 // Component types only, so switching tabs doesn't build every section's JSX up front.
 const LIBRARY_SECTIONS = {
   datetime: DateTimeSection,
+  hash_params: HashParamsSection,
   inputs: InputsSection,
   layout: LayoutSection,
   list_inputs: ListInputsSection,
   list: ListSection,
-  path_params: PathParamsSection
+  path_params: PathParamsSection,
+  search_params: SearchParamsSection
 } as const;
 
 export const DevelopmentLibraryContent = memo(() => {

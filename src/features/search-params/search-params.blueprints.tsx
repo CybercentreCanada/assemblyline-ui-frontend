@@ -742,11 +742,40 @@ export class ObjectSearchParamBlueprint<
     );
   }
 
-  private isObjectValue(value: unknown): value is O {
-    return (
-      (Array.isArray(value) && value.every(v => this.isShape(v))) ||
-      (typeof value === 'object' && value !== null && Object.values(value).every(v => this.isShape(v)))
+  private getOwn(record: Record<string, unknown>, key: string): unknown {
+    return Object.hasOwn(record, key) ? record[key] : undefined;
+  }
+
+  private setOwn(record: Record<string, unknown>, key: string, value: unknown): void {
+    Object.defineProperty(record, key, { value, enumerable: true, writable: true, configurable: true });
+  }
+
+  private matchesTemplate(value: unknown, template: unknown): boolean {
+    if (template === null || template === undefined) return this.isShape(value);
+    if (this.isPrimitive(template)) return typeof value === typeof template;
+
+    if (Array.isArray(template)) {
+      if (!Array.isArray(value)) return false;
+      if (template.length === 0) return this.isShape(value);
+      return value.every(item => template.some(entry => this.matchesTemplate(item, entry)));
+    }
+
+    if (typeof value !== 'object' || value === null || Array.isArray(value)) return false;
+
+    const record = template as Record<string, unknown>;
+    if (Object.keys(record).length === 0) return this.isShape(value);
+
+    return Object.entries(value).every(([key, entry]) =>
+      Object.hasOwn(record, key) ? this.matchesTemplate(entry, record[key]) : this.isShape(entry)
     );
+  }
+
+  private isObjectValue(value: unknown): value is O {
+    if (typeof value !== 'object' || value === null) return false;
+
+    if (Array.isArray(this._defaultValue) && !Array.isArray(value)) return this.isShape(value);
+
+    return this.matchesTemplate(value, this._defaultValue);
   }
 
   private clone(value: O): O {
@@ -763,23 +792,13 @@ export class ObjectSearchParamBlueprint<
     const merged = this.clone(base) as unknown as Record<string, unknown>;
 
     for (const [key, nextValue] of Object.entries(next as Record<string, unknown>)) {
-      const baseValue = merged[key];
+      const baseValue = this.getOwn(merged, key);
 
-      if (this.isFlatObject(baseValue) && this.isFlatObject(nextValue)) {
-        const mergedValue: Record<string, unknown> = {};
-
-        for (const [baseKey, baseEntry] of Object.entries(baseValue)) {
-          mergedValue[baseKey] = baseEntry;
-        }
-
-        for (const [nextKey, nextEntry] of Object.entries(nextValue)) {
-          mergedValue[nextKey] = nextEntry;
-        }
-
-        merged[key] = mergedValue;
-      } else {
-        merged[key] = nextValue;
-      }
+      this.setOwn(
+        merged,
+        key,
+        this.isFlatObject(baseValue) && this.isFlatObject(nextValue) ? { ...baseValue, ...nextValue } : nextValue
+      );
     }
 
     return merged as O;
@@ -797,26 +816,26 @@ export class ObjectSearchParamBlueprint<
     const delta = {} as Partial<O>;
 
     for (const [key, value] of Object.entries(next)) {
-      const baseValue = (base as Record<string, ObjectParamShape>)[key];
+      const baseValue = this.getOwn(base as Record<string, unknown>, key);
 
       if (this.isFlatObject(baseValue) && this.isFlatObject(value)) {
-        const nested: Record<string, string | number | boolean | null> = {};
+        const nested: Record<string, unknown> = {};
 
         for (const [nestedKey, nestedValue] of Object.entries(value)) {
-          if (!this.isEqual(baseValue[nestedKey], nestedValue)) {
-            nested[nestedKey] = nestedValue;
+          if (!this.isEqual(this.getOwn(baseValue, nestedKey), nestedValue)) {
+            this.setOwn(nested, nestedKey, nestedValue);
           }
         }
 
         if (Object.keys(nested).length > 0) {
-          (delta as Record<string, unknown>)[key] = nested;
+          this.setOwn(delta as Record<string, unknown>, key, nested);
         }
 
         continue;
       }
 
       if (!this.isEqual(baseValue, value)) {
-        (delta as Record<string, unknown>)[key] = value;
+        this.setOwn(delta as Record<string, unknown>, key, value);
       }
     }
 

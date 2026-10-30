@@ -122,6 +122,18 @@ describe('SearchParamSnapshot.toLocationTransient', () => {
   it('returns an empty object when no transient-sourced params exist', () => {
     expect(makeSnapshot().toLocationTransient()).toEqual({});
   });
+
+  it('omits default-valued params and keeps only changed object keys', () => {
+    const engine = new SearchParamEngine({
+      count: SEARCH_PARAM_BLUEPRINTS_MAP.number(1).source('transient'),
+      config: SEARCH_PARAM_BLUEPRINTS_MAP.object({ a: { x: 1, y: 2 }, b: 2 }).source('transient')
+    });
+
+    const delta = engine.full({ count: 1, config: { a: { x: 1, y: 3 }, b: 2 } }).toLocationTransient();
+
+    expect(delta.count).toBeUndefined();
+    expect(delta).toEqual({ config: { a: { y: 3 } } });
+  });
 });
 
 describe('SearchParamSnapshot.toObject', () => {
