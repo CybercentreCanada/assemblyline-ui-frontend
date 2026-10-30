@@ -666,7 +666,7 @@ export function applyClassificationRules(
   const requireLvl = {};
   const limitedToGroup = {};
   const requireGroup = {};
-  const partsToCheck = ['req', 'groups', 'subgroups'];
+  const partsToCheck = ['req', 'groups', 'subgroups'] as const satisfies readonly (keyof ClassificationParts)[];
   const retParts = { ...parts };
   const disabledList = {
     levels: [],
@@ -688,65 +688,61 @@ export function applyClassificationRules(
     }
   }
 
-  // Iterate over the 'partsToCheck' fields; must use 'in' (not 'of')
-  // eslint-disable-next-line @typescript-eslint/no-for-in-array
-  for (const partName in partsToCheck) {
-    if (Object.hasOwnProperty.call(partsToCheck, partName)) {
-      const part = retParts[partsToCheck[partName]];
-      for (const value of part) {
-        let triggerAutoSelect = false;
-        if (value) {
-          if (value in requireLvl) {
-            if (retParts.lvlIdx < requireLvl[value]) {
-              retParts.lvlIdx = requireLvl[value];
-              retParts.lvl = getLevelText(requireLvl[value], c12nDef, format, isMobile);
-            }
-            const levels = levelList(c12nDef);
-            for (const l of levels) {
-              if (c12nDef.levels_map[l] < requireLvl[value]) {
-                disabledList.levels.push(l);
-              }
-            }
+  for (const partName of partsToCheck) {
+    const part = retParts[partName];
+    for (const value of part) {
+      let triggerAutoSelect = false;
+      if (value) {
+        if (value in requireLvl) {
+          if (retParts.lvlIdx < requireLvl[value]) {
+            retParts.lvlIdx = requireLvl[value];
+            retParts.lvl = getLevelText(requireLvl[value], c12nDef, format, isMobile);
           }
-          if (value in requireGroup) {
-            const valueLong = c12nDef.groups_map_stl[requireGroup[value]] || requireGroup[value];
-            const valueShort = c12nDef.groups_map_lts[requireGroup[value]] || requireGroup[value];
-            if (!retParts.groups.includes(valueLong) && !retParts.groups.includes(valueShort)) {
-              retParts.groups.push(valueShort);
-              for (const group of c12nDef.groups_auto_select) {
-                const gLong = c12nDef.groups_map_stl[group] || group;
-                const gShort = c12nDef.groups_map_lts[group] || group;
-                if (!retParts.groups.includes(gShort) && !retParts.groups.includes(gLong)) {
-                  retParts.groups.push(group);
-                }
-              }
+          const levels = levelList(c12nDef);
+          for (const l of levels) {
+            if (c12nDef.levels_map[l] < requireLvl[value]) {
+              disabledList.levels.push(l);
             }
-          }
-          if (value in limitedToGroup) {
-            for (const gShort in c12nDef.groups_map_stl) {
-              const lgShort = c12nDef.groups_map_lts[limitedToGroup[value]] || limitedToGroup[value];
-              if (gShort !== lgShort) {
-                const gLong = c12nDef.groups_map_stl[gShort];
-                disabledList.groups.push(gShort);
-                if (retParts.groups.includes(gShort)) {
-                  retParts.groups.splice(retParts.groups.indexOf(gShort), 1);
-                } else if (retParts.groups.includes(gLong)) {
-                  retParts.groups.splice(retParts.groups.indexOf(gLong), 1);
-                }
-              }
-            }
-          }
-          if (!userClassification && partsToCheck[partName] === 'groups') {
-            triggerAutoSelect = true;
           }
         }
-        if (triggerAutoSelect) {
-          for (const group of c12nDef.groups_auto_select) {
-            const gLong = c12nDef.groups_map_stl[group] || group;
-            const gShort = c12nDef.groups_map_lts[group] || group;
-            if (!retParts.groups.includes(gLong) && !retParts.groups.includes(gShort)) {
-              retParts.groups.push(group);
+        if (value in requireGroup) {
+          const valueLong = c12nDef.groups_map_stl[requireGroup[value]] || requireGroup[value];
+          const valueShort = c12nDef.groups_map_lts[requireGroup[value]] || requireGroup[value];
+          if (!retParts.groups.includes(valueLong) && !retParts.groups.includes(valueShort)) {
+            retParts.groups.push(valueShort);
+            for (const group of c12nDef.groups_auto_select) {
+              const gLong = c12nDef.groups_map_stl[group] || group;
+              const gShort = c12nDef.groups_map_lts[group] || group;
+              if (!retParts.groups.includes(gShort) && !retParts.groups.includes(gLong)) {
+                retParts.groups.push(group);
+              }
             }
+          }
+        }
+        if (value in limitedToGroup) {
+          for (const gShort in c12nDef.groups_map_stl) {
+            const lgShort = c12nDef.groups_map_lts[limitedToGroup[value]] || limitedToGroup[value];
+            if (gShort !== lgShort) {
+              const gLong = c12nDef.groups_map_stl[gShort];
+              disabledList.groups.push(gShort);
+              if (retParts.groups.includes(gShort)) {
+                retParts.groups.splice(retParts.groups.indexOf(gShort), 1);
+              } else if (retParts.groups.includes(gLong)) {
+                retParts.groups.splice(retParts.groups.indexOf(gLong), 1);
+              }
+            }
+          }
+        }
+        if (!userClassification && partName === 'groups') {
+          triggerAutoSelect = true;
+        }
+      }
+      if (triggerAutoSelect) {
+        for (const group of c12nDef.groups_auto_select) {
+          const gLong = c12nDef.groups_map_stl[group] || group;
+          const gShort = c12nDef.groups_map_lts[group] || group;
+          if (!retParts.groups.includes(gLong) && !retParts.groups.includes(gShort)) {
+            retParts.groups.push(group);
           }
         }
       }

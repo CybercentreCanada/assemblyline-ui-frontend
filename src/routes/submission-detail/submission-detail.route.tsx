@@ -226,8 +226,9 @@ function WrappedSubmissionDetail() {
             }
 
             // #3: Parse Att&cks
-            if (section.heuristic.attack) {
+            if (section.heuristic?.attack) {
               for (const attack of section.heuristic.attack) {
+                if (!attack.categories) continue;
                 for (const cat of attack.categories) {
                   if (!Object.hasOwnProperty.call(tempSummary.attack_matrix, cat)) {
                     tempSummary.attack_matrix[cat] = [];
@@ -262,43 +263,45 @@ function WrappedSubmissionDetail() {
 
           // #3: Parse Tags
 
-          for (const tagging of section.tags) {
-            let summaryType: keyof TagTypes = null;
-            if (configuration['submission.tag_types.attribution'].indexOf(tagging.type) !== -1) {
-              summaryType = 'attribution';
-            } else if (configuration['submission.tag_types.behavior'].indexOf(tagging.type) !== -1) {
-              summaryType = 'behavior';
-            } else if (configuration['submission.tag_types.ioc'].indexOf(tagging.type) !== -1) {
-              summaryType = 'ioc';
-            }
-
-            if (summaryType !== null) {
-              if (!Object.hasOwnProperty.call(tempSummary.tags, summaryType)) {
-                tempSummary.tags[summaryType] = {};
+          if (section.tags) {
+            for (const tagging of section.tags) {
+              let summaryType: keyof TagTypes = null;
+              if (configuration['submission.tag_types.attribution'].indexOf(tagging.type) !== -1) {
+                summaryType = 'attribution';
+              } else if (configuration['submission.tag_types.behavior'].indexOf(tagging.type) !== -1) {
+                summaryType = 'behavior';
+              } else if (configuration['submission.tag_types.ioc'].indexOf(tagging.type) !== -1) {
+                summaryType = 'ioc';
               }
 
-              if (!Object.hasOwnProperty.call(tempSummary.tags[summaryType], tagging.type)) {
-                tempSummary.tags[summaryType][tagging.type] = [];
-              }
-
-              let exists = false;
-              const tagVal: Tag = [tagging.value, hType as Verdict];
-              for (const tag of tempSummary.tags[summaryType][tagging.type]) {
-                if (tag[0] === tagVal[0] && tag[1] === tagVal[1]) {
-                  exists = true;
-                  break;
+              if (summaryType !== null) {
+                if (!Object.hasOwnProperty.call(tempSummary.tags, summaryType)) {
+                  tempSummary.tags[summaryType] = {};
                 }
-              }
 
-              if (!exists) {
-                tempSummary.tags[summaryType][tagging.type].push(tagVal);
-
-                const tagKey = `${tagging.type}__${tagging.value}`;
-                tempTagMap[key].push(tagKey);
-                if (!Object.hasOwnProperty.call(tempTagMap, tagKey)) {
-                  tempTagMap[tagKey] = [];
+                if (!Object.hasOwnProperty.call(tempSummary.tags[summaryType], tagging.type)) {
+                  tempSummary.tags[summaryType][tagging.type] = [];
                 }
-                tempTagMap[tagKey].push(key);
+
+                let exists = false;
+                const tagVal: Tag = [tagging.value, hType as Verdict];
+                for (const tag of tempSummary.tags[summaryType][tagging.type]) {
+                  if (tag[0] === tagVal[0] && tag[1] === tagVal[1]) {
+                    exists = true;
+                    break;
+                  }
+                }
+
+                if (!exists) {
+                  tempSummary.tags[summaryType][tagging.type].push(tagVal);
+
+                  const tagKey = `${tagging.type}__${tagging.value}`;
+                  tempTagMap[key].push(tagKey);
+                  if (!Object.hasOwnProperty.call(tempTagMap, tagKey)) {
+                    tempTagMap[tagKey] = [];
+                  }
+                  tempTagMap[tagKey].push(key);
+                }
               }
             }
           }
@@ -367,22 +370,24 @@ function WrappedSubmissionDetail() {
             item.score += result.result.score;
           }
 
-          for (const extracted of result.response.extracted) {
-            const { sha256, name } = extracted;
+          if (result.response.extracted) {
+            for (const extracted of result.response.extracted) {
+              const { sha256, name } = extracted;
 
-            if (!Object.hasOwnProperty.call(item.children, sha256)) {
-              if (
-                Object.hasOwnProperty.call(tempTree, 'TBD') &&
-                Object.hasOwnProperty.call(tempTree.TBD.children, sha256)
-              ) {
-                item.children[sha256] = tempTree.TBD.children[sha256];
-                item.children[sha256].name = [name];
-                if (toDelTDB.indexOf(sha256) === -1) toDelTDB.push(sha256);
+              if (!Object.hasOwnProperty.call(item.children, sha256)) {
+                if (
+                  Object.hasOwnProperty.call(tempTree, 'TBD') &&
+                  Object.hasOwnProperty.call(tempTree.TBD.children, sha256)
+                ) {
+                  item.children[sha256] = tempTree.TBD.children[sha256];
+                  item.children[sha256].name = [name];
+                  if (toDelTDB.indexOf(sha256) === -1) toDelTDB.push(sha256);
+                } else {
+                  item.children[sha256] = { children: {}, name: [name], score: 0, sha256, type: 'N/A' };
+                }
               } else {
-                item.children[sha256] = { children: {}, name: [name], score: 0, sha256, type: 'N/A' };
+                item.children[sha256].name.push(name);
               }
-            } else {
-              item.children[sha256].name.push(name);
             }
           }
         }

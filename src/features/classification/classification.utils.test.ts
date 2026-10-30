@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import type { ClassificationDefinition, ClassificationParts } from 'features/classification/classification.utils';
 import {
   applyClassificationRules,
@@ -771,7 +770,130 @@ describe('`getMaxClassification` correctly identifies the maximum', () => {
   });
 });
 
+//*****************************************************************************************
+// applyClassificationRules
+//*****************************************************************************************
 describe('`applyClassificationRules` should correctly identify incorrect combinations', () => {
+  it('leaves empty component lists empty without auto-selecting groups', () => {
+    const definition = structuredClone(c12nDef);
+    const parts: ClassificationParts = { lvlIdx: 1, lvl: 'L0', req: [], groups: [], subgroups: [] };
+
+    expect(applyClassificationRules(parts, definition, 'short', false)).toEqual({
+      disabled: { levels: [], groups: [] },
+      parts: { lvlIdx: 1, lvl: 'L0', req: [], groups: [], subgroups: [] }
+    });
+  });
+
+  it.each(['req', 'groups', 'subgroups'] as const)('enforces minimum levels from the %s field', field => {
+    const definition = structuredClone(c12nDef);
+    definition.params_map.LE.require_lvl = 5;
+    const parts: ClassificationParts = { lvlIdx: 1, lvl: 'L0', req: [], groups: [], subgroups: [] };
+    parts[field].push('LE');
+
+    const result = applyClassificationRules(parts, definition, 'short', false, true);
+
+    expect(result.parts.lvlIdx).toBe(5);
+    expect(result.parts.lvl).toBe('L1');
+    expect(result.disabled.levels).toEqual(['L0']);
+  });
+
+  it('does not raise the level when it already equals the required minimum', () => {
+    const definition = structuredClone(c12nDef);
+    definition.params_map.LE.require_lvl = 5;
+    const parts: ClassificationParts = { lvlIdx: 5, lvl: 'L1', req: ['LE'], groups: [], subgroups: [] };
+
+    const result = applyClassificationRules(parts, definition, 'short', false);
+
+    expect(result.parts.lvlIdx).toBe(5);
+    expect(result.disabled.levels).toEqual(['L0']);
+  });
+
+  it.each([
+    { userClassification: false, expected: ['A', 'B'] },
+    { userClassification: true, expected: ['B'] }
+  ])(
+    'auto-selects groups only for non-user classifications: $userClassification',
+    ({ userClassification, expected }) => {
+      const definition = structuredClone(c12nDef);
+      const parts: ClassificationParts = { lvlIdx: 1, lvl: 'L0', req: [], groups: ['B'], subgroups: [] };
+
+      const result = applyClassificationRules(parts, definition, 'short', false, userClassification);
+
+      expect(result.parts.groups).toEqual(expect.arrayContaining(expected));
+      expect(result.parts.groups).toHaveLength(expected.length);
+    }
+  );
+
+  it.each(['req', 'subgroups'] as const)('does not trigger group auto-selection from the %s field', field => {
+    const definition = structuredClone(c12nDef);
+    const parts: ClassificationParts = { lvlIdx: 1, lvl: 'L0', req: [], groups: [], subgroups: [] };
+    parts[field].push(field === 'req' ? 'LE' : 'R1');
+
+    expect(applyClassificationRules(parts, definition, 'short', false).parts.groups).toEqual([]);
+  });
+
+  it('ignores empty group values when deciding whether to auto-select', () => {
+    const definition = structuredClone(c12nDef);
+    const parts: ClassificationParts = { lvlIdx: 1, lvl: 'L0', req: [], groups: [''], subgroups: [] };
+
+    expect(applyClassificationRules(parts, definition, 'short', false).parts.groups).toEqual(['']);
+  });
+
+  it('does not duplicate an auto-selected group already present in long format', () => {
+    const definition = structuredClone(c12nDef);
+    const parts: ClassificationParts = {
+      lvlIdx: 1,
+      lvl: 'LEVEL 0',
+      req: [],
+      groups: ['GROUP A', 'GROUP B'],
+      subgroups: []
+    };
+
+    expect(applyClassificationRules(parts, definition, 'short', false).parts.groups).toEqual(['A', 'B']);
+  });
+
+  it('adds a subgroup-required group without relying on the parser to add it first', () => {
+    const definition = structuredClone(c12nDef);
+    const parts: ClassificationParts = { lvlIdx: 1, lvl: 'L0', req: [], groups: [], subgroups: ['R2'] };
+
+    const result = applyClassificationRules(parts, definition, 'short', false);
+
+    expect(result.parts.groups).toEqual(['A', 'X']);
+    expect(result.parts.subgroups).toEqual(['R2']);
+  });
+
+  it.each([
+    ['A', 'B', 'X'],
+    ['GROUP A', 'GROUP B', 'GROUP X']
+  ])('removes groups forbidden by a subgroup from input %j', (...groups) => {
+    const definition = structuredClone(c12nDef);
+    const parts: ClassificationParts = { lvlIdx: 1, lvl: 'L0', req: [], groups, subgroups: ['R3'] };
+
+    const result = applyClassificationRules(parts, definition, 'short', false, true);
+
+    expect(result.parts.groups).toEqual(['X']);
+    expect(result.disabled.groups).toEqual(['A', 'B']);
+  });
+
+  it('uses short names on mobile even when long format is requested', () => {
+    const definition = structuredClone(c12nDef);
+    const parts: ClassificationParts = {
+      lvlIdx: 1,
+      lvl: 'LEVEL 0',
+      req: ['LEGAL DEPARTMENT'],
+      groups: ['GROUP A'],
+      subgroups: ['RESERVE ONE']
+    };
+
+    expect(applyClassificationRules(parts, definition, 'long', true).parts).toEqual({
+      lvlIdx: 1,
+      lvl: 'L0',
+      req: ['LE'],
+      groups: ['A'],
+      subgroups: ['R1']
+    });
+  });
+
   it('Should find disabled groups', () => {
     let parts = getParts('L2//XX/R1', c12nDef, 'short', false);
     let result = applyClassificationRules(parts, c12nDef, 'short', false);
