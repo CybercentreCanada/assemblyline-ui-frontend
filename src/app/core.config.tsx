@@ -1,5 +1,5 @@
 import type { AppUser } from 'core/template/components/app/AppUserService';
-import type { ClassificationDefinition } from 'features/classification/classification.utils';
+import type { ClassificationDefinition } from 'features/classification';
 import type { ClassificationAliases } from 'layout/auth/auth.hooks';
 import type { Indexes, SystemMessage } from 'models/api/user';
 import { CONFIGURATION, type Configuration } from 'models/base/config';
