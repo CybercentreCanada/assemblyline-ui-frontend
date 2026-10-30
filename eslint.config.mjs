@@ -1,5 +1,6 @@
 import eslint from '@eslint/js';
 import eslintConfigPrettier from 'eslint-config-prettier/flat';
+import boundariesPlugin from 'eslint-plugin-boundaries';
 import importPlugin from 'eslint-plugin-import';
 import jsoncPlugin from 'eslint-plugin-jsonc';
 import jsxA11yPlugin from 'eslint-plugin-jsx-a11y';
@@ -122,6 +123,89 @@ export default tseslint.config(
       'import/no-extraneous-dependencies': ['error', { devDependencies: true, packageDir: './' }],
       'import/no-named-as-default': 'off',
       'import/prefer-default-export': 'off'
+    }
+  },
+
+  // Import boundaries: app is the composition root.
+  {
+    ...defaultConfig,
+    plugins: { boundaries: boundariesPlugin },
+    settings: {
+      'boundaries/root-path': import.meta.dirname,
+      'boundaries/elements': [
+        { type: 'app', pattern: 'src/app', partialMatch: false },
+        { type: 'pages', pattern: 'src/routes', partialMatch: false },
+        { type: 'layout', pattern: 'src/layout', partialMatch: false },
+        { type: 'features', pattern: 'src/features', partialMatch: false },
+        { type: 'core', pattern: 'src/core', partialMatch: false },
+        { type: 'models', pattern: 'src/models', partialMatch: false },
+        { type: 'shared', pattern: 'src/shared', partialMatch: false },
+        { type: 'ui', pattern: 'src/ui', partialMatch: false }
+      ],
+      // Legacy code and test infrastructure do not follow production layering yet.
+      'boundaries/ignore': ['src/deprecated/**', 'src/**/*.{spec,test,pom}.{ts,tsx}', 'src/core/{e2e,test}/**']
+    },
+    rules: {
+      // Enforce intended layering plus explicit legacy allowances during adoption.
+      // Same-folder imports and external packages remain allowed.
+      // Root-level bootstrap files are intentionally outside these folder boundaries.
+      'boundaries/dependencies': [
+        'error',
+        {
+          default: 'disallow',
+          policies: [
+            {
+              from: { element: { type: 'app' } },
+              allow: { to: { element: { type: '*' } } }
+            },
+            {
+              from: { element: { type: 'pages' } },
+              allow: { to: { element: { type: ['app', 'layout', 'features', 'core', 'models', 'shared', 'ui'] } } }
+            },
+            {
+              from: { element: { type: 'layout' } },
+              allow: { to: { element: { type: ['features', 'core', 'models', 'shared', 'ui'] } } }
+            },
+            {
+              from: { element: { type: 'features' } },
+              allow: { to: { element: { type: ['core', 'models', 'shared'] } } }
+            },
+            {
+              from: { element: { type: 'core' } },
+              allow: { to: { element: { type: ['models', 'shared', 'ui'] } } }
+            },
+            {
+              from: { element: { type: 'shared' } },
+              allow: { to: { element: { type: 'models' } } }
+            },
+            // models and ui are leaf layers: no dependencies on other source folders.
+
+            // Legacy dependencies: remove these allowances as imports are migrated.
+            // The policies above describe the intended architecture; models and ui
+            // should eventually be leaf layers with no cross-layer dependencies.
+            {
+              from: { element: { type: 'layout' } },
+              allow: { to: { element: { type: 'pages' } } }
+            },
+            {
+              from: { element: { type: 'features' } },
+              allow: { to: { element: { type: 'layout' } } }
+            },
+            {
+              from: { element: { type: 'core' } },
+              allow: { to: { element: { type: ['app', 'layout', 'features'] } } }
+            },
+            {
+              from: { element: { type: 'models' } },
+              allow: { to: { element: { type: ['features', 'core', 'shared'] } } }
+            },
+            {
+              from: { element: { type: 'ui' } },
+              allow: { to: { element: { type: ['pages', 'layout', 'features', 'core', 'models', 'shared'] } } }
+            }
+          ]
+        }
+      ]
     }
   },
 
