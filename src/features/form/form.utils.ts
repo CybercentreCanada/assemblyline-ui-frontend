@@ -1,7 +1,7 @@
 import type { NestedTypeUsingTuplesAgain2, ValidPathTuples } from 'features/form';
 
 /** Represents a recursively addressable form value with a path resolver. */
-export type FieldPath<Data> = Data extends unknown[]
+export type FieldPath<Data> = Data extends readonly unknown[]
   ? { [K in keyof Data]: FieldPath<Data[K]> }
   : Data extends object
     ? { [K in keyof Data]: FieldPath<Data[K]> } & { toPath: () => string }
@@ -14,10 +14,7 @@ export type FieldPath<Data> = Data extends unknown[]
  * @param empty - Whether empty objects should be treated as objects.
  * @returns True when the value is a matching object.
  */
-export const isObject = function <Data extends Record<string, unknown>>(
-  data: unknown,
-  empty: boolean = true
-): data is Data {
+export const isObject = function (data: unknown, empty: boolean = true): data is Record<string, unknown> {
   if (typeof data !== 'object' || data === null || Array.isArray(data)) return false;
   return empty || Object.keys(data).length > 0;
 };

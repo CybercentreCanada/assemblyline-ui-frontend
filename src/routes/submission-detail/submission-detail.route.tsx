@@ -1112,7 +1112,7 @@ const SubmissionDetail = memo(() => {
         <Popper
           anchorEl={anchorRef.current}
           placement="bottom-end"
-          open={outstandingOpen}
+          open={true}
           disablePortal
           style={{ zIndex: 100 }}
           modifiers={[

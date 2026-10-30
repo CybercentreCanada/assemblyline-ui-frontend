@@ -108,7 +108,7 @@ export type ClassificationGroup = {
 export type ClassificationSubGroup = {
   /** Alternate names for the subgroup. */
   aliases: string[];
-  /** When true, the subgroup auto-selects its corresponding group. */
+  /** When true, this subgroup is auto-selected whenever any subgroup is selected, unless auto-selection is skipped. */
   auto_select?: boolean;
   /** Description of the subgroup. */
   description: string;

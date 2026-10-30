@@ -136,7 +136,7 @@ const WrappedURIIdentificationSection: React.FC<URIIdentificationSectionProps> =
           <span style={{ fontWeight: 500, marginRight: theme.spacing(0.5), display: 'flex' }}>{t('hostname')}</span>
         </Grid>
         <Grid size={{ xs: 8, sm: 9, lg: 10 }} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
-          {fileinfo.uri_info.hostname}
+          {fileinfo?.uri_info ? fileinfo.uri_info.hostname : <Skeleton />}
         </Grid>
 
         {fileinfo?.uri_info?.port && (

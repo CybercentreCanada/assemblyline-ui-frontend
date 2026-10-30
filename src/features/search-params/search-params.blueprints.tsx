@@ -292,16 +292,7 @@ export abstract class BaseSearchParamBlueprint<T extends SearchParamValue> {
         value = null;
     }
 
-    if (!this._locked && this.valid(value)) {
-      (prev as Record<string, SearchParamValue>)[this._key] = value;
-      return prev;
-    }
-
-    if (this.valid(this._defaultValue)) {
-      (prev as Record<string, SearchParamValue>)[this._key] = this._defaultValue;
-    }
-
-    return prev;
+    return this.full(prev, { [this._key]: value } as InferSearchParamValueMapFromBlueprintMap<SearchParamBlueprints>);
   }
 
   // -------------------------
@@ -438,6 +429,15 @@ export class EnumSearchParamBlueprint<
   }
 
   public options(value: O) {
+    const serializedOptions = new Set<string>();
+    for (const option of value) {
+      const serialized = String(option);
+      if (serializedOptions.has(serialized)) {
+        throw new TypeError('Enum options must have unique string representations.');
+      }
+      serializedOptions.add(serialized);
+    }
+
     this._options = value;
     return this;
   }
@@ -455,6 +455,11 @@ export class EnumSearchParamBlueprint<
   }
 
   protected override parse(value: unknown): O[number] {
+    if (typeof value === 'string') {
+      const option = this._options?.find(candidate => String(candidate) === value);
+      if (option !== undefined) return option;
+    }
+
     return this.check(value) ? value : super.parse(value);
   }
 
@@ -753,7 +758,7 @@ export class ObjectSearchParamBlueprint<
       return this.clone(next);
     }
 
-    if (Array.isArray(next)) return this.clone(next);
+    if (Array.isArray(next) || Array.isArray(base)) return this.clone(next);
 
     const merged = this.clone(base) as unknown as Record<string, unknown>;
 
@@ -818,34 +823,42 @@ export class ObjectSearchParamBlueprint<
     return delta;
   }
 
-  protected override parse(value: unknown): O {
-    if (typeof value === 'string') {
-      try {
-        const parsed: unknown = JSON.parse(value);
-        return this.isObjectValue(parsed) ? parsed : super.parse(value);
-      } catch {
-        return super.parse(value);
-      }
-    }
-
-    return this.isObjectValue(value) ? value : super.parse(value);
-  }
-
   protected override valid(value: unknown): value is O {
-    return this.isObjectValue(value) || super.valid(value);
+    return this.isObjectValue(value) || (this.isNullable() && (value === null || value === undefined));
   }
 
   protected override get<SearchParamBlueprints extends SearchParamBlueprintMap>(
     search: InferSearchParamValueMapFromBlueprintMap<SearchParamBlueprints> | URLSearchParams
   ): O {
     if (search instanceof URLSearchParams) {
-      const value = this.parse(search.get(this._key));
-      if (this.valid(value)) return this.clone(value);
-    } else if (typeof search === 'object' && this._key in search) {
+      const serialized = search.get(this._key);
+      if (serialized === null) return this.clone(this._defaultValue);
+
+      try {
+        const value: unknown = JSON.parse(serialized);
+        if (value === null) return this.isNullable() ? (null as O) : this.clone(this._defaultValue);
+        if (this.isObjectValue(value)) return this.clone(value);
+      } catch {
+        return this.clone(this._defaultValue);
+      }
+    } else if (typeof search === 'object' && search !== null && this._key in search) {
       const value = search?.[this._key];
-      if (this.valid(value)) return this.clone(value);
+      if (value === null) return this.isNullable() ? (null as O) : this.clone(this._defaultValue);
+      if (this.isObjectValue(value)) return this.clone(value);
     }
-    return null;
+
+    return this.clone(this._defaultValue);
+  }
+
+  protected override setDefaultValue(values: URLSearchParams) {
+    if (!values.has(this._key)) return this;
+
+    const next = this.get(values);
+    if (next !== null || this.isNullable()) {
+      this._defaultValue = this.mergeValue(this._defaultValue || ({} as O), next);
+    }
+
+    return this;
   }
 
   protected override full<SearchParamBlueprints extends SearchParamBlueprintMap>(
@@ -899,14 +912,19 @@ export class ObjectSearchParamBlueprint<
       return prev;
     }
 
-    if (Array.isArray(value)) {
+    if (Array.isArray(value) || Array.isArray(this._defaultValue)) {
       if (!this.isEqual(this._defaultValue, value)) {
         (prev as Record<string, SearchParamValue>)[this._key] = value;
       }
       return prev;
     }
 
-    const delta = this.deltaValue(this._defaultValue || ({} as O), value);
+    if (this._defaultValue === null || this._defaultValue === undefined) {
+      (prev as Record<string, SearchParamValue>)[this._key] = this.clone(value);
+      return prev;
+    }
+
+    const delta = this.deltaValue(this._defaultValue, value);
     if (Object.keys(delta).length === 0) return prev;
 
     (prev as Record<string, SearchParamValue>)[this._key] = delta as unknown as SearchParamValue;

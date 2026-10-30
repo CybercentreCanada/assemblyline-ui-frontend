@@ -1,4 +1,8 @@
-import type { HashParamValue, InferHashParamBlueprintFromValue } from 'features/hash-params';
+import type {
+  HashParamValue,
+  InferHashParamBlueprintFromValue,
+  InferHashParamCodecFromBlueprint
+} from 'features/hash-params';
 import type { Location } from 'react-router';
 
 //*****************************************************************************************
@@ -31,22 +35,38 @@ export const HASH_PARAM_BLUEPRINTS = {
   enum: <const Values extends readonly [HashParamValue, ...HashParamValue[]]>(
     values: Values,
     defaultValue?: Values[number]
-  ): InferHashParamBlueprintFromValue<Values[number]> => ({
-    type: values[0],
-    kind: 'enum',
-    options: values,
-    parse: value => {
-      if (value == null || value === '') return defaultValue;
-      for (const candidate of values) {
-        if (String(candidate) === value) return candidate;
+  ): InferHashParamBlueprintFromValue<Values[number]> => {
+    const optionByString = new Map<string, Values[number]>();
+
+    for (const option of values) {
+      if (option === '' && option !== defaultValue) {
+        throw new TypeError('Empty enum options must be the configured default.');
       }
-      return defaultValue;
-    },
-    stringify: value => {
-      if (value == null || value === defaultValue) return '';
-      return String(value);
+
+      const serialized = String(option);
+      if (optionByString.has(serialized) && !Object.is(optionByString.get(serialized), option)) {
+        throw new TypeError('Enum options must have unique string representations.');
+      }
+      optionByString.set(serialized, option);
     }
-  })
+
+    return {
+      type: values[0],
+      kind: 'enum',
+      options: values,
+      parse: value => {
+        if (value == null || value === '') return defaultValue;
+        for (const candidate of values) {
+          if (String(candidate) === value) return candidate;
+        }
+        return defaultValue;
+      },
+      stringify: value => {
+        if (value == null || value === defaultValue) return '';
+        return String(value);
+      }
+    };
+  }
 };
 
 /**
@@ -76,12 +96,12 @@ export const getDefaultHashParamBlueprint = function <
 export function createHashParamCodec<const Value extends HashParamValue>() {
   return function <const Blueprint extends InferHashParamBlueprintFromValue<Value>>(
     input: (blueprints: typeof HASH_PARAM_BLUEPRINTS) => Blueprint
-  ) {
-    const blueprint = input(HASH_PARAM_BLUEPRINTS) ?? (getDefaultHashParamBlueprint() as Blueprint);
+  ): InferHashParamCodecFromBlueprint<Blueprint> {
+    const blueprint = input(HASH_PARAM_BLUEPRINTS) ?? (getDefaultHashParamBlueprint<Value>() as Blueprint);
 
-    const type: Value = blueprint.type as never;
+    const type = blueprint.type;
 
-    const parse = (location: Location): Value => {
+    const parse = (location: Location): ReturnType<Blueprint['parse']> => {
       const hash = typeof location?.hash === 'string' ? location.hash : '';
       // Remove leading '#'
       const rawValue = hash.startsWith('#') ? hash.slice(1) : hash;
@@ -94,18 +114,14 @@ export function createHashParamCodec<const Value extends HashParamValue>() {
         decodedValue = rawValue;
       }
 
-      return blueprint.parse(decodedValue || undefined);
+      return blueprint.parse(decodedValue || undefined) as ReturnType<Blueprint['parse']>;
     };
 
-    const stringify = (value: Value): string => {
-      const stringified = blueprint.stringify(value as never);
+    const stringify = (value: Parameters<Blueprint['stringify']>[0]): string => {
+      const stringified = blueprint.stringify(value);
       if (!stringified) return '';
 
-      try {
-        return `#${encodeURIComponent(stringified)}`;
-      } catch {
-        return `#${stringified}`;
-      }
+      return `#${encodeURIComponent(stringified)}`;
     };
 
     return { blueprint, type, parse, stringify };

@@ -32,11 +32,57 @@ describe('SearchParamEngine.setDefaultValues', () => {
     expect(engine.getDefaultValues().toObject()).toEqual({ page: 5 });
   });
 
+  it('merges restored object deltas while replacing arrays and preserving nullable values', () => {
+    const engine = new SearchParamEngine({
+      config: SEARCH_PARAM_BLUEPRINTS_MAP.object({ a: 1, b: 2 }),
+      list: SEARCH_PARAM_BLUEPRINTS_MAP.object([1, 2]),
+      nullable: SEARCH_PARAM_BLUEPRINTS_MAP.object({ a: 1 }).nullable(),
+      untouched: SEARCH_PARAM_BLUEPRINTS_MAP.object({ keep: true }).nullable()
+    });
+    const values = new URLSearchParams();
+    values.set('config', JSON.stringify({ a: 3 }));
+    values.set('list', JSON.stringify([3]));
+    values.set('nullable', 'null');
+
+    engine.setDefaultValues(values);
+
+    expect(engine.getDefaultValues().toObject()).toEqual({
+      config: { a: 3, b: 2 },
+      list: [3],
+      nullable: null,
+      untouched: { keep: true }
+    });
+  });
+
   it('returns itself unchanged when no values are provided', () => {
     const engine = new SearchParamEngine({ page: SEARCH_PARAM_BLUEPRINTS_MAP.number(1) });
     const result = engine.setDefaultValues(null);
     expect(result).toBe(engine);
     expect(engine.getDefaultValues().toObject()).toEqual({ page: 1 });
+  });
+
+  it('uses nullable object defaults for missing or invalid values and preserves explicit null', () => {
+    const engine = new SearchParamEngine({
+      search: SEARCH_PARAM_BLUEPRINTS_MAP.object({ source: 'search' }).nullable(),
+      state: SEARCH_PARAM_BLUEPRINTS_MAP.object({ source: 'state' }).nullable().source('state'),
+      transient: SEARCH_PARAM_BLUEPRINTS_MAP.object({ source: 'transient' }).nullable().source('transient')
+    });
+    const defaults = { search: { source: 'search' }, state: { source: 'state' }, transient: { source: 'transient' } };
+
+    expect(engine.full(new URLSearchParams()).toObject()).toEqual(defaults);
+    expect(engine.full(new URLSearchParams('search=%7Binvalid')).toObject()).toEqual(defaults);
+    expect(engine.fromLocation(makeLocation()).toObject()).toEqual(defaults);
+    expect(engine.fromLocation(makeLocation({ state: { state: true } })).toObject()).toEqual(defaults);
+    expect(engine.fromRoute('/list').toObject()).toEqual(defaults);
+    expect(engine.fromRoute('/list', { state: null }, { transient: true }).toObject()).toEqual({
+      search: { source: 'search' },
+      state: null,
+      transient: { source: 'transient' }
+    });
+    expect(engine.full(new URLSearchParams('search=null')).toObject()).toEqual({
+      ...defaults,
+      search: null
+    });
   });
 });
 
@@ -96,6 +142,17 @@ describe('SearchParamEngine.full', () => {
     const engine = new SearchParamEngine({ page: SEARCH_PARAM_BLUEPRINTS_MAP.number(1) });
     expect(engine.full({ page: 7 }).toObject()).toEqual({ page: 7 });
   });
+
+  it('round-trips numeric and boolean enum values through URL parameters', () => {
+    const engine = new SearchParamEngine({
+      mode: SEARCH_PARAM_BLUEPRINTS_MAP.enum(1, [1, 2] as const),
+      enabled: SEARCH_PARAM_BLUEPRINTS_MAP.enum(false, [false, true] as const)
+    });
+    const params = engine.full({ mode: 2, enabled: true }).toParams();
+
+    expect(params.toString()).toBe('mode=2&enabled=true');
+    expect(engine.full(params).toObject()).toEqual({ mode: 2, enabled: true });
+  });
 });
 
 //*****************************************************************************************
@@ -114,6 +171,30 @@ describe('SearchParamEngine.delta', () => {
   it('returns an empty snapshot when values match the defaults', () => {
     const engine = new SearchParamEngine({ page: SEARCH_PARAM_BLUEPRINTS_MAP.number(1) });
     expect(engine.delta({ page: 1 }).toObject()).toEqual({});
+  });
+
+  it('serializes a full object when the nullable default is null', () => {
+    const engine = new SearchParamEngine({ config: SEARCH_PARAM_BLUEPRINTS_MAP.object({}).nullable() });
+    engine.setDefaultValues(new URLSearchParams('config=null'));
+
+    const params = engine.delta({ config: {} }).toParams();
+
+    expect(params.get('config')).toBe('{}');
+    expect(engine.full(params).toObject()).toEqual({ config: {} });
+  });
+
+  it('round-trips empty and nonempty records over an array default', () => {
+    const engine = new SearchParamEngine({ config: SEARCH_PARAM_BLUEPRINTS_MAP.object([1, 2]) });
+
+    for (const config of [{}, { enabled: true }]) {
+      const values = { config } as never;
+
+      expect(engine.full(values).toObject()).toEqual({ config });
+
+      const params = engine.delta(values).toParams();
+      expect(params.get('config')).toBe(JSON.stringify(config));
+      expect(engine.full(params).toObject()).toEqual({ config });
+    }
   });
 });
 
@@ -156,6 +237,41 @@ describe('SearchParamEngine.fromRoute', () => {
   it('falls back to defaults when the href has no matching query param', () => {
     const engine = new SearchParamEngine({ page: SEARCH_PARAM_BLUEPRINTS_MAP.number(1) });
     expect(engine.fromRoute('/list').toObject()).toEqual({ page: 1 });
+  });
+
+  it('resolves filter defaults through the full resolver', () => {
+    const engine = new SearchParamEngine({ filters: SEARCH_PARAM_BLUEPRINTS_MAP.filters(['a']) });
+
+    expect(engine.fromRoute('/list').toObject()).toEqual({ filters: ['a'] });
+  });
+
+  it('merges route object values with their defaults through the full resolver', () => {
+    const engine = new SearchParamEngine({
+      config: SEARCH_PARAM_BLUEPRINTS_MAP.object({ a: 1, b: 2 }).source('state')
+    });
+
+    expect(engine.fromRoute('/list', { config: { a: 3 } }).toObject()).toEqual({ config: { a: 3, b: 2 } });
+  });
+
+  it('uses object defaults for unsupported state and transient values', () => {
+    const stateEngine = new SearchParamEngine({
+      config: SEARCH_PARAM_BLUEPRINTS_MAP.object({ enabled: true }).source('state')
+    });
+    const transientEngine = new SearchParamEngine({
+      config: SEARCH_PARAM_BLUEPRINTS_MAP.object({ enabled: true }).source('transient')
+    });
+    const nullableEngine = new SearchParamEngine({
+      config: SEARCH_PARAM_BLUEPRINTS_MAP.object({ enabled: true }).nullable().source('state')
+    });
+
+    expect(stateEngine.fromLocation(makeLocation({ state: { config: true } })).toObject()).toEqual({
+      config: { enabled: true }
+    });
+    expect(stateEngine.fromRoute('/list', { config: true }).toObject()).toEqual({ config: { enabled: true } });
+    expect(transientEngine.fromRoute('/list', null, { config: true }).toObject()).toEqual({
+      config: { enabled: true }
+    });
+    expect(nullableEngine.fromRoute('/list', { config: null }).toObject()).toEqual({ config: null });
   });
 });
 

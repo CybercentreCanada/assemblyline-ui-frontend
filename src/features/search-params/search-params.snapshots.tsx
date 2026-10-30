@@ -82,9 +82,9 @@ export class SearchParamSnapshot<Blueprints extends SearchParamBlueprintMap> {
     key: K
   ): InferSearchParamValueMapFromBlueprintMap<Blueprints>[K] | null {
     if (!this.has(key)) return null;
-    const value = this.valuesEntries(this.values).find(([k]) => k === key)?.[1];
+    const value = this.values?.[key];
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    return (value ?? null) as InferSearchParamValueMapFromBlueprintMap<Blueprints>[K] | null;
+    return value ?? null;
   }
 
   public pick<K extends keyof InferSearchParamValueMapFromBlueprintMap<Blueprints>>(keys: K[]) {

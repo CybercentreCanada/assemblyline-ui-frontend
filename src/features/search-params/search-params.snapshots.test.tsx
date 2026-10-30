@@ -69,6 +69,13 @@ describe('SearchParamSnapshot.get', () => {
   it('returns null for an unknown key', () => {
     expect(makeSnapshot().get('missing' as never)).toBeNull();
   });
+
+  it('returns values for numeric blueprint keys', () => {
+    const snapshot = new SearchParamEngine({ 1: SEARCH_PARAM_BLUEPRINTS_MAP.number(5) }).full({ 1: 8 });
+
+    expect(snapshot.has(1)).toBe(true);
+    expect(snapshot.get(1)).toBe(8);
+  });
 });
 
 describe('SearchParamSnapshot.pick', () => {
