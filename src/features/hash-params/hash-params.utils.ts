@@ -74,9 +74,9 @@ export const HASH_PARAM_BLUEPRINTS = {
  * @description Returns a safe no-op hash blueprint used as a fallback when no blueprint is provided.
  * @returns A blueprint with empty type, undefined parse result, and empty stringify output.
  */
-export const getDefaultHashParamBlueprint = function <
+export const getDefaultHashParamBlueprint = <
   const Value extends HashParamValue = HashParamValue
->(): InferHashParamBlueprintFromValue<Value> {
+>(): InferHashParamBlueprintFromValue<Value> => {
   return {
     type: '' as unknown as Value,
     kind: 'string',
@@ -93,10 +93,10 @@ export const getDefaultHashParamBlueprint = function <
  * Creates a codec for parsing and stringifying hash parameters.
  * Returns an object with methods to parse location hash and stringify parameter values.
  */
-export function createHashParamCodec<const Value extends HashParamValue>() {
-  return function <const Blueprint extends InferHashParamBlueprintFromValue<Value>>(
+export const createHashParamCodec = <const Value extends HashParamValue>() => {
+  return <const Blueprint extends InferHashParamBlueprintFromValue<Value>>(
     input: (blueprints: typeof HASH_PARAM_BLUEPRINTS) => Blueprint
-  ): InferHashParamCodecFromBlueprint<Blueprint> {
+  ): InferHashParamCodecFromBlueprint<Blueprint> => {
     const blueprint = input(HASH_PARAM_BLUEPRINTS) ?? (getDefaultHashParamBlueprint<Value>() as Blueprint);
 
     const type = blueprint.type;
@@ -126,4 +126,4 @@ export function createHashParamCodec<const Value extends HashParamValue>() {
 
     return { blueprint, type, parse, stringify };
   };
-}
+};
