@@ -6,8 +6,7 @@ import type {
   PathPattern,
   PathPatternSegment,
   RoutePath,
-  RoutePathWithoutOptionalStaticSegments,
-  RoutePathWithTrailingOptionalParamsOnly
+  ValidRoutePath
 } from 'features/path-params';
 import type { Location } from 'react-router';
 
@@ -299,17 +298,13 @@ export const stringifyPathPattern = (
 //*****************************************************************************************
 // Create Path Param Codec
 //*****************************************************************************************
-export const createPathParamsCodec = <const Path extends RoutePath>(
-  basePath: Path & RoutePathWithoutOptionalStaticSegments<Path> & RoutePathWithTrailingOptionalParamsOnly<Path>
-) => {
+export function createPathParamsCodec<const Path extends RoutePath>(basePath: ValidRoutePath<Path>) {
   const pattern = parsePathPattern(typeof basePath === 'string' ? basePath : '');
   assertSupportedPathPattern(pattern);
 
-  return <
+  return function <
     const Blueprints extends InferPathParamBlueprintMapFromPath<Path> & Record<string, InferPathParamBlueprintFromValue>
-  >(
-    input: (blueprints: typeof PATH_PARAM_BLUEPRINTS_MAP) => Blueprints
-  ) => {
+  >(input: (blueprints: typeof PATH_PARAM_BLUEPRINTS_MAP) => Blueprints) {
     const blueprints = input(PATH_PARAM_BLUEPRINTS_MAP);
     const blueprintMap = blueprints as Record<string, InferPathParamBlueprintFromValue>;
     const blueprintKeys = Object.keys(blueprints || {});
@@ -334,4 +329,4 @@ export const createPathParamsCodec = <const Path extends RoutePath>(
 
     return { blueprints, type, parse, stringify };
   };
-};
+}

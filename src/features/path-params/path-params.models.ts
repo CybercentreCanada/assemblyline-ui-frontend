@@ -68,6 +68,11 @@ export type RoutePathWithTrailingOptionalParamsOnly<Path extends RoutePath> = Pa
       : Path
   : never;
 
+/** Resolves to `never` for literal route paths that fail either path validation; otherwise the path itself. */
+export type ValidRoutePath<Path extends RoutePath> = Path &
+  RoutePathWithoutOptionalStaticSegments<Path> &
+  RoutePathWithTrailingOptionalParamsOnly<Path>;
+
 type JoinPathSegments<Prefix extends string, Segment extends string> = Prefix extends ''
   ? Segment
   : `${Prefix}/${Segment}`;

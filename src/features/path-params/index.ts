@@ -13,6 +13,7 @@ export type {
   PathPatternSegment,
   RoutePath,
   RoutePathWithoutOptionalStaticSegments,
-  RoutePathWithTrailingOptionalParamsOnly
+  RoutePathWithTrailingOptionalParamsOnly,
+  ValidRoutePath
 } from './path-params.models';
 export { createPathParamsCodec, PATH_PARAM_BLUEPRINTS_MAP } from './path-params.utils';

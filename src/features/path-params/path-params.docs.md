@@ -131,6 +131,7 @@ const AlertPage = () => {
 | `RoutePath`                                                       | Route path pattern type                                                                       |
 | `RoutePathWithoutOptionalStaticSegments<Path>`                    | Resolves to `never` for literal paths with optional static segments                           |
 | `RoutePathWithTrailingOptionalParamsOnly<Path>`                   | Resolves to `never` for literal paths where an optional segment is followed by a required one |
+| `ValidRoutePath<Path>`                                            | `Path` constrained by both path validations; use it to type route path arguments              |
 | `InferRoutePathFormFromPath<Path>`                                | Expands trailing optional params into every form of the path                                  |
 | `PathParamValue`                                                  | Allowed string, number, and boolean values                                                    |
 | `InferPathParamKeyFromPath<Path>`                                 | Extracts parameter keys from a path literal                                                   |
