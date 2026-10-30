@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { LONG_TIMEOUT } from 'app/spec.constant';
 import { test } from 'core/e2e/e2e.fixtures';
 

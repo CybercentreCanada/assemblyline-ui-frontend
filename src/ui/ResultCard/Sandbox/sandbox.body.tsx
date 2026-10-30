@@ -87,7 +87,7 @@ export const SandboxBody = React.memo(({ body, printable = false }: SandboxBodyP
   );
 
   const filteredNetflows = useMemo(
-    () => filterNetflowsBySafelistedProcesses(body?.network_connections, safelistedProcessIds, showSafeResults),
+    () => filterNetflowsBySafelistedProcesses(safelistedProcessIds, body?.network_connections, showSafeResults),
     [body?.network_connections, safelistedProcessIds, showSafeResults]
   );
 

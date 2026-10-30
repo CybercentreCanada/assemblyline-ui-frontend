@@ -183,8 +183,7 @@ function WrappedSubmissionDetail() {
           tempTagMap[key] = [];
         }
 
-        for (const sectionID in result.result.sections) {
-          const section = result.result.sections[sectionID];
+        for (const section of result.result.sections) {
           let hType = 'info';
           if (section.heuristic !== null && section.heuristic !== undefined) {
             // #1: Get heuristic score
@@ -227,23 +226,21 @@ function WrappedSubmissionDetail() {
             }
 
             // #3: Parse Att&cks
-            if (section.heuristic.attack) {
-              for (const i in section.heuristic.attack) {
-                const attack = section.heuristic.attack[i];
-
-                for (const j in attack.categories) {
-                  const cat = attack.categories[j];
+            if (section.heuristic?.attack) {
+              for (const attack of section.heuristic.attack) {
+                if (!attack.categories) continue;
+                for (const cat of attack.categories) {
                   if (!Object.hasOwnProperty.call(tempSummary.attack_matrix, cat)) {
                     tempSummary.attack_matrix[cat] = [];
                   }
 
                   let attExists = false;
                   const attackItem: Attack = [attack.attack_id, attack.pattern, hType as Verdict];
-                  for (const k in tempSummary.attack_matrix[cat]) {
+                  for (const existingAttack of tempSummary.attack_matrix[cat]) {
                     if (
-                      tempSummary.attack_matrix[cat][k][0] === attackItem[0] &&
-                      tempSummary.attack_matrix[cat][k][1] === attackItem[1] &&
-                      tempSummary.attack_matrix[cat][k][2] === attackItem[2]
+                      existingAttack[0] === attackItem[0] &&
+                      existingAttack[1] === attackItem[1] &&
+                      existingAttack[2] === attackItem[2]
                     ) {
                       attExists = true;
                       break;
@@ -266,47 +263,45 @@ function WrappedSubmissionDetail() {
 
           // #3: Parse Tags
 
-          for (const tagID in section.tags) {
-            const tag = section.tags[tagID];
-            let summaryType: keyof TagTypes = null;
-            if (configuration['submission.tag_types.attribution'].indexOf(tag.type) !== -1) {
-              summaryType = 'attribution';
-            } else if (configuration['submission.tag_types.behavior'].indexOf(tag.type) !== -1) {
-              summaryType = 'behavior';
-            } else if (configuration['submission.tag_types.ioc'].indexOf(tag.type) !== -1) {
-              summaryType = 'ioc';
-            }
-
-            if (summaryType !== null) {
-              if (!Object.hasOwnProperty.call(tempSummary.tags, summaryType)) {
-                tempSummary.tags[summaryType] = {};
+          if (section.tags) {
+            for (const tagging of section.tags) {
+              let summaryType: keyof TagTypes = null;
+              if (configuration['submission.tag_types.attribution'].indexOf(tagging.type) !== -1) {
+                summaryType = 'attribution';
+              } else if (configuration['submission.tag_types.behavior'].indexOf(tagging.type) !== -1) {
+                summaryType = 'behavior';
+              } else if (configuration['submission.tag_types.ioc'].indexOf(tagging.type) !== -1) {
+                summaryType = 'ioc';
               }
 
-              if (!Object.hasOwnProperty.call(tempSummary.tags[summaryType], tag.type)) {
-                tempSummary.tags[summaryType][tag.type] = [];
-              }
-
-              let exists = false;
-              const tagVal: Tag = [tag.value, hType as Verdict];
-              for (const i in tempSummary.tags[summaryType][tag.type]) {
-                if (
-                  tempSummary.tags[summaryType][tag.type][i][0] === tagVal[0] &&
-                  tempSummary.tags[summaryType][tag.type][i][1] === tagVal[1]
-                ) {
-                  exists = true;
-                  break;
+              if (summaryType !== null) {
+                if (!Object.hasOwnProperty.call(tempSummary.tags, summaryType)) {
+                  tempSummary.tags[summaryType] = {};
                 }
-              }
 
-              if (!exists) {
-                tempSummary.tags[summaryType][tag.type].push(tagVal);
-
-                const tagKey = `${tag.type}__${tag.value}`;
-                tempTagMap[key].push(tagKey);
-                if (!Object.hasOwnProperty.call(tempTagMap, tagKey)) {
-                  tempTagMap[tagKey] = [];
+                if (!Object.hasOwnProperty.call(tempSummary.tags[summaryType], tagging.type)) {
+                  tempSummary.tags[summaryType][tagging.type] = [];
                 }
-                tempTagMap[tagKey].push(key);
+
+                let exists = false;
+                const tagVal: Tag = [tagging.value, hType as Verdict];
+                for (const tag of tempSummary.tags[summaryType][tagging.type]) {
+                  if (tag[0] === tagVal[0] && tag[1] === tagVal[1]) {
+                    exists = true;
+                    break;
+                  }
+                }
+
+                if (!exists) {
+                  tempSummary.tags[summaryType][tagging.type].push(tagVal);
+
+                  const tagKey = `${tagging.type}__${tagging.value}`;
+                  tempTagMap[key].push(tagKey);
+                  if (!Object.hasOwnProperty.call(tempTagMap, tagKey)) {
+                    tempTagMap[tagKey] = [];
+                  }
+                  tempTagMap[tagKey].push(key);
+                }
               }
             }
           }
@@ -338,9 +333,9 @@ function WrappedSubmissionDetail() {
 
       const getFilenameFromSHA256 = (sha256: string) => {
         if (submission !== null) {
-          for (const i in submission.files) {
-            if (submission.files[i].sha256 === sha256) {
-              return submission.files[i].name;
+          for (const file of submission.files) {
+            if (file.sha256 === sha256) {
+              return file.name;
             }
           }
         }
@@ -367,41 +362,38 @@ function WrappedSubmissionDetail() {
             toUpdate.push(tempTree.TBD.children[key]);
           }
         }
-        const toDelTDB = [];
-        for (const idx in toUpdate) {
-          if (Object.hasOwnProperty.call(toUpdate, idx)) {
-            const item = toUpdate[idx];
-            if (result.result.score !== undefined) {
-              item.score += result.result.score;
-            }
+        const toDelTDB: string[] = [];
+        for (const item of toUpdate) {
+          if (!item) continue;
 
-            for (const i in result.response.extracted) {
-              if (Object.hasOwnProperty.call(result.response.extracted, i)) {
-                const { sha256, name } = result.response.extracted[i];
+          if (result.result.score !== undefined) {
+            item.score += result.result.score;
+          }
 
-                if (!Object.hasOwnProperty.call(item.children, sha256)) {
-                  if (
-                    Object.hasOwnProperty.call(tempTree, 'TBD') &&
-                    Object.hasOwnProperty.call(tempTree.TBD.children, sha256)
-                  ) {
-                    item.children[sha256] = tempTree.TBD.children[sha256];
-                    item.children[sha256].name = [name];
-                    if (toDelTDB.indexOf(sha256) === -1) toDelTDB.push(sha256);
-                  } else {
-                    item.children[sha256] = { children: {}, name: [name], score: 0, sha256, type: 'N/A' };
-                  }
+          if (result.response.extracted) {
+            for (const extracted of result.response.extracted) {
+              const { sha256, name } = extracted;
+
+              if (!Object.hasOwnProperty.call(item.children, sha256)) {
+                if (
+                  Object.hasOwnProperty.call(tempTree, 'TBD') &&
+                  Object.hasOwnProperty.call(tempTree.TBD.children, sha256)
+                ) {
+                  item.children[sha256] = tempTree.TBD.children[sha256];
+                  item.children[sha256].name = [name];
+                  if (toDelTDB.indexOf(sha256) === -1) toDelTDB.push(sha256);
                 } else {
-                  item.children[sha256].name.push(name);
+                  item.children[sha256] = { children: {}, name: [name], score: 0, sha256, type: 'N/A' };
                 }
+              } else {
+                item.children[sha256].name.push(name);
               }
             }
           }
         }
 
-        for (const idxDel in toDelTDB) {
-          if (Object.hasOwnProperty.call(toDelTDB, idxDel)) {
-            delete tempTree.TBD.children[toDelTDB[idxDel]];
-          }
+        for (const del of toDelTDB) {
+          delete tempTree.TBD.children[del];
         }
       });
 

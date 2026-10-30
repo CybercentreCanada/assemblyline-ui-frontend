@@ -7,9 +7,9 @@ import { ACTIONS, isArrowKey, isCopyKey, isHomeEndKey, isPageKey, isType } from 
 export type BodyAction =
   | { type: 'bodyInit'; payload: { initialized: boolean } }
   | { type: 'bodyRefInit'; payload: { ready: boolean } }
-  | { type: 'bodyScrollInit'; payload: void }
+  | { type: 'bodyScrollInit'; payload: undefined }
   | { type: 'bodyResize'; payload: { width?: number; height?: number }; tracked: false; repeat: true }
-  | { type: 'bodyMouseLeave'; payload: void; tracked: false; repeat: false }
+  | { type: 'bodyMouseLeave'; payload: undefined; tracked: false; repeat: false }
   | {
       type: 'bodyMouseUp';
       payload: { onSelectionChange: (value: string) => void };
@@ -18,7 +18,13 @@ export type BodyAction =
   | { type: 'bodyScrollWheel'; payload: { event: React.WheelEvent<HTMLDivElement> } }
   | { type: 'bodyItemsRendered'; payload: { event: ListOnItemsRenderedProps | null } }
   | { type: 'cursorKeyDown'; payload: { event: KeyboardEvent }; guard: { store: Store } }
-  | { type: 'copyKeyDown'; payload: void; guard: { event: KeyboardEvent; store: Store }; tracked: true; repeat: false };
+  | {
+      type: 'copyKeyDown';
+      payload: undefined;
+      guard: { event: KeyboardEvent; store: Store };
+      tracked: true;
+      repeat: false;
+    };
 
 export type BodyActionTypes = ActionTypesConfig<BodyAction>;
 export type BodyDispatchers = DispatchersConfig<BodyAction>;
@@ -62,7 +68,7 @@ export const useBodyDispatcher = (dispatch: Dispatch): BodyDispatchers => {
     (_, { event, store }) => {
       if (!(isType.layout.isFocusing(store, 'body') && isCopyKey(event))) return;
       event.preventDefault();
-      dispatch({ type: ACTIONS.copyKeyDown, payload: null, tracked: true, repeat: false });
+      dispatch({ type: ACTIONS.copyKeyDown, payload: undefined, tracked: true, repeat: false });
     },
     [dispatch]
   );
@@ -81,7 +87,8 @@ export const useBodyDispatcher = (dispatch: Dispatch): BodyDispatchers => {
     onBodyRefInit: payload => dispatch({ type: ACTIONS.bodyRefInit, payload }),
     onBodyScrollInit: payload => dispatch({ type: ACTIONS.bodyScrollInit, payload }),
     onBodyResize,
-    onBodyMouseLeave: () => dispatch({ type: ACTIONS.bodyMouseLeave, payload: null, tracked: false, repeat: false }),
+    onBodyMouseLeave: () =>
+      dispatch({ type: ACTIONS.bodyMouseLeave, payload: undefined, tracked: false, repeat: false }),
     onBodyScrollWheel: payload => dispatch({ type: ACTIONS.bodyScrollWheel, payload }),
     onBodyItemsRendered: payload => dispatch({ type: ACTIONS.bodyItemsRendered, payload }),
     onCursorKeyDown,

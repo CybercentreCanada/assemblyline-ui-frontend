@@ -2,7 +2,7 @@ import type { Store } from '..';
 
 // Action
 
-export type ActionStruct = { type: string; payload: any; guard?: any; tracked?: boolean; repeat?: boolean };
+export type ActionStruct = { type: string; payload: unknown; guard?: unknown; tracked?: boolean; repeat?: boolean };
 
 export type ActionsConfig<AS extends ActionStruct> = {
   [A in AS as A['type']]: {
@@ -50,17 +50,19 @@ export type IsActionConfig<AS extends ActionStruct> = IsActionsConfig<AS>[keyof 
 // Dispatch
 
 export type DispatchersConfig<Actions extends ActionStruct> = {
-  [A in Actions as `on${Capitalize<A['type']>}`]: A extends { guard: any }
+  [A in Actions as `on${Capitalize<A['type']>}`]: A extends { guard: unknown }
     ? (payload: A['payload'], guard: A['guard']) => void
-    : (payload: A['payload']) => void;
+    : [A['payload']] extends [undefined]
+      ? (payload?: A['payload']) => void
+      : (payload: A['payload']) => void;
 };
 
 export type DispatchPropsConfig<Actions extends ActionStruct> = {
   [A in Actions as A['type']]: {
     type: `${Capitalize<A['type']>}_Action`;
     payload: A['payload'];
-  } & (A extends { tracked: true } ? { tracked: true } : A extends { tracked: false } ? { tracked: false } : {}) &
-    (A extends { repeat: true } ? { repeat: true } : A extends { repeat: false } ? { repeat: false } : {});
+  } & (A extends { tracked: true } ? { tracked: true } : A extends { tracked: false } ? { tracked: false } : object) &
+    (A extends { repeat: true } ? { repeat: true } : A extends { repeat: false } ? { repeat: false } : object);
 }[keyof {
   [A in Actions as A['type']];
 }];
@@ -71,7 +73,9 @@ export type DispatchPropConfig<AS extends ActionStruct> = DispatchPropsConfig<AS
 // Reducer
 
 export type ReducersConfig<Actions extends ActionStruct> = {
-  [A in Actions as A['type']]: (store: Store, payload: A['payload'], prevStore?: Store) => Store;
+  [A in Actions as A['type']]: [A['payload']] extends [undefined]
+    ? (store: Store, payload?: A['payload'], prevStore?: Store) => Store
+    : (store: Store, payload: A['payload'], prevStore?: Store) => Store;
 };
 
 export type ReducerActionsConfig<Actions extends ActionStruct> = {

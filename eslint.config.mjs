@@ -19,10 +19,10 @@ const defaultConfig = {
 const typescriptRules = {
   '@typescript-eslint/array-type': ['error', { default: 'array' }],
   '@typescript-eslint/consistent-generic-constructors': ['error', 'constructor'],
-  '@typescript-eslint/consistent-indexed-object-style': ["error", "record"],
+  '@typescript-eslint/consistent-indexed-object-style': ['error', 'record'],
   '@typescript-eslint/consistent-type-definitions': 'off',
   '@typescript-eslint/consistent-type-imports': 'error',
-  '@typescript-eslint/default-param-last': 'off',
+  '@typescript-eslint/default-param-last': 'error',
   '@typescript-eslint/explicit-function-return-type': 'off',
   '@typescript-eslint/indent': 'off',
   '@typescript-eslint/no-base-to-string': 'warn',
@@ -31,10 +31,10 @@ const typescriptRules = {
   '@typescript-eslint/no-empty-function': 'warn',
   '@typescript-eslint/no-empty-object-type': 'warn',
   '@typescript-eslint/no-explicit-any': 'warn',
-  '@typescript-eslint/no-floating-promises': 'warn',
-  '@typescript-eslint/no-for-in-array': 'warn',
+  '@typescript-eslint/no-floating-promises': 'error',
+  '@typescript-eslint/no-for-in-array': 'error',
   '@typescript-eslint/no-inferrable-types': 'off',
-  '@typescript-eslint/no-invalid-void-type': 'warn',
+  '@typescript-eslint/no-invalid-void-type': 'error',
   '@typescript-eslint/no-misused-promises': 'off',
   '@typescript-eslint/no-redundant-type-constituents': 'warn',
   '@typescript-eslint/no-unnecessary-type-assertion': 'error',
@@ -51,7 +51,7 @@ const typescriptRules = {
   '@typescript-eslint/no-use-before-define': 'warn',
   '@typescript-eslint/no-wrapper-object-types': 'error',
   '@typescript-eslint/prefer-as-const': 'error',
-  '@typescript-eslint/prefer-for-of': 'warn',
+  '@typescript-eslint/prefer-for-of': 'error',
   '@typescript-eslint/space-before-function-paren': 'off',
 
   '@typescript-eslint/naming-convention': [
@@ -214,7 +214,7 @@ export default tseslint.config(
       ...reactPlugin.configs.recommended.rules,
       'react/display-name': 'off',
       'react/jsx-curly-newline': 'off',
-      'react/jsx-filename-extension': ['warn', { extensions: ['.js', '.jsx', '.ts', '.tsx'] }],
+      'react/jsx-filename-extension': ['error', { extensions: ['.js', '.jsx', '.ts', '.tsx'] }],
       'react/jsx-no-literals': [
         'off',
         {
@@ -249,11 +249,11 @@ export default tseslint.config(
     rules: {
       'no-async-promise-executor': 'off',
       'no-case-declarations': 'off',
-      'no-console': 'warn',
+      'no-console': ['error', { allow: ['error'] }],
       'no-extra-boolean-cast': 'off',
       'no-param-reassign': 'warn',
       'no-prototype-builtins': 'warn',
-      'no-unsafe-optional-chaining': 'warn',
+      'no-unsafe-optional-chaining': 'error',
       'no-unused-vars': 'warn',
       'no-var': 'error',
       'prefer-const': 'error'

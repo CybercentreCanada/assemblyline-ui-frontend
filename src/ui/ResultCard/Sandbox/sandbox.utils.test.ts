@@ -1,6 +1,7 @@
 import type { Theme } from '@mui/material';
 import type {
   SandboxBody,
+  SandboxNetflowItem,
   SandboxNetworkDNS,
   SandboxNetworkHTTP,
   SandboxNetworkSMTP,
@@ -10,11 +11,16 @@ import type {
 import {
   buildProcessTree,
   compareIPs,
+  filterNetflowsBySafelistedProcesses,
+  filterSafelistedProcesses,
   getBackgroundColor,
   getBorderColor,
   getDescendantPids,
   getHighestProcessScore,
+  getProcessMapByPid,
   getProcessScore,
+  getSafelistedProcessIds,
+  getVisibleProcessesByPids,
   hasObjectData
 } from 'ui/ResultCard/Sandbox/sandbox.utils.ts';
 import { describe, expect, it } from 'vitest';
@@ -38,6 +44,148 @@ const mockThemeDark: Theme = {
     grey: { 800: '#808080' }
   }
 } as unknown as Theme;
+
+//*****************************************************************************************
+// getProcessMapByPid
+//*****************************************************************************************
+describe('getProcessMapByPid', () => {
+  it('indexes processes by PID including zero', () => {
+    const process: SandboxProcessItem = { pid: 0, image: 'root', start_time: '' };
+
+    expect(getProcessMapByPid([process]).get(0)).toBe(process);
+  });
+
+  it('returns an empty map for missing or empty processes', () => {
+    expect(getProcessMapByPid()).toEqual(new Map());
+    expect(getProcessMapByPid([])).toEqual(new Map());
+  });
+
+  it('uses the last process when a PID appears twice', () => {
+    const first: SandboxProcessItem = { pid: 1, image: 'first', start_time: '' };
+    const last: SandboxProcessItem = { pid: 1, image: 'last', start_time: '' };
+
+    expect(getProcessMapByPid([first, last])).toEqual(new Map([[1, last]]));
+  });
+});
+
+//*****************************************************************************************
+// filterSafelistedProcesses
+//*****************************************************************************************
+describe('filterSafelistedProcesses', () => {
+  it('keeps all processes by default without returning the input array', () => {
+    const processes: SandboxProcessItem[] = [{ pid: 1, image: '', start_time: '', safelisted: true }];
+    const result = filterSafelistedProcesses(processes);
+
+    expect(result).toEqual(processes);
+    expect(result).not.toBe(processes);
+  });
+
+  it('removes only explicitly safelisted processes when safe results are hidden', () => {
+    const safe: SandboxProcessItem = { pid: 1, image: '', start_time: '', safelisted: true };
+    const unsafe: SandboxProcessItem = { pid: 2, image: '', start_time: '', safelisted: false };
+    const unspecified: SandboxProcessItem = { pid: 3, image: '', start_time: '' };
+    const processes = [safe, unsafe, unspecified];
+
+    expect(filterSafelistedProcesses(processes, false)).toEqual([unsafe, unspecified]);
+    expect(processes).toEqual([safe, unsafe, unspecified]);
+  });
+
+  it('returns an empty array for missing input or when every process is hidden', () => {
+    expect(filterSafelistedProcesses()).toEqual([]);
+    expect(filterSafelistedProcesses([], false)).toEqual([]);
+    expect(filterSafelistedProcesses([{ pid: 0, image: '', start_time: '', safelisted: true }], false)).toEqual([]);
+  });
+});
+
+//*****************************************************************************************
+// getSafelistedProcessIds
+//*****************************************************************************************
+describe('getSafelistedProcessIds', () => {
+  it('includes only safelisted PIDs and deduplicates PID zero', () => {
+    const processes: SandboxProcessItem[] = [
+      { pid: 0, image: '', start_time: '', safelisted: true },
+      { pid: 0, image: '', start_time: '', safelisted: true },
+      { pid: 1, image: '', start_time: '', safelisted: false },
+      { pid: 2, image: '', start_time: '' }
+    ];
+
+    expect(getSafelistedProcessIds(processes)).toEqual(new Set([0]));
+  });
+
+  it('returns an empty set for missing or empty processes', () => {
+    expect(getSafelistedProcessIds()).toEqual(new Set());
+    expect(getSafelistedProcessIds([])).toEqual(new Set());
+  });
+
+  it('returns an empty set when no processes are safelisted', () => {
+    expect(getSafelistedProcessIds([{ pid: 1, image: '', start_time: '' }])).toEqual(new Set());
+  });
+});
+
+//*****************************************************************************************
+// filterNetflowsBySafelistedProcesses
+//*****************************************************************************************
+describe('filterNetflowsBySafelistedProcesses', () => {
+  it('accepts safelisted PIDs as its first argument and defaults to empty flows', () => {
+    expect(filterNetflowsBySafelistedProcesses(new Set([1]))).toEqual([]);
+    expect(filterNetflowsBySafelistedProcesses(new Set([1]), undefined, false)).toEqual([]);
+  });
+
+  it('keeps all flows by default even when their processes are safelisted', () => {
+    const flows: SandboxNetflowItem[] = [{ process: 1 }, { process: 2 }];
+    const result = filterNetflowsBySafelistedProcesses(new Set([1]), flows);
+
+    expect(result).toEqual(flows);
+    expect(result).not.toBe(flows);
+  });
+
+  it('removes safelisted flows including PID zero but keeps unassociated and unknown flows', () => {
+    const safe: SandboxNetflowItem = { process: 0 };
+    const unknown: SandboxNetflowItem = { process: 2 };
+    const missing: SandboxNetflowItem = { destination_ip: '192.0.2.1' };
+    const nullProcess: SandboxNetflowItem = { process: null };
+    const flows = [safe, unknown, missing, nullProcess];
+
+    expect(filterNetflowsBySafelistedProcesses(new Set([0]), flows, false)).toEqual([unknown, missing, nullProcess]);
+    expect(flows).toEqual([safe, unknown, missing, nullProcess]);
+  });
+
+  it('keeps flows when the safelist is empty', () => {
+    const flows: SandboxNetflowItem[] = [{ process: 1 }];
+
+    expect(filterNetflowsBySafelistedProcesses(new Set(), flows, false)).toEqual(flows);
+  });
+});
+
+//*****************************************************************************************
+// getVisibleProcessesByPids
+//*****************************************************************************************
+describe('getVisibleProcessesByPids', () => {
+  it('keeps requested order, ignores missing PIDs, and hides safelisted processes', () => {
+    const safe: SandboxProcessItem = { pid: 1, image: '', start_time: '', safelisted: true };
+    const first: SandboxProcessItem = { pid: 2, image: '', start_time: '' };
+    const second: SandboxProcessItem = { pid: 3, image: '', start_time: '' };
+    const processes = new Map([
+      [1, safe],
+      [2, first],
+      [3, second]
+    ]);
+
+    expect(getVisibleProcessesByPids([99, 3, 1, 2], processes, false)).toEqual([second, first]);
+  });
+
+  it('includes safelisted processes when safe results are visible', () => {
+    const safe: SandboxProcessItem = { pid: 0, image: '', start_time: '', safelisted: true };
+
+    expect(getVisibleProcessesByPids([0], new Map([[0, safe]]), true)).toEqual([safe]);
+  });
+
+  it('returns an empty array for missing PIDs, empty PIDs, or an empty process map', () => {
+    expect(getVisibleProcessesByPids(undefined, new Map(), false)).toEqual([]);
+    expect(getVisibleProcessesByPids([], new Map(), true)).toEqual([]);
+    expect(getVisibleProcessesByPids([1], new Map(), true)).toEqual([]);
+  });
+});
 
 /* ----------------------------------------------------------------------------
  * Tests for hasObjectData utility
