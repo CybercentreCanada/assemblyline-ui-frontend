@@ -1,5 +1,6 @@
 import { createFormContext } from 'features/form';
 import { DATETIME_LIBRARY_STATE, type DateTimeLibraryState } from 'routes/development-library/sections/DateTime';
+import { HASH_PARAMS_LIBRARY_STATE, type HashParamsLibraryState } from 'routes/development-library/sections/HashParams';
 import { INPUTS_LIBRARY_STATE, type InputsLibraryState } from 'routes/development-library/sections/Inputs';
 import { LAYOUT_LIBRARY_STATE, type LayoutLibraryState } from 'routes/development-library/sections/Layout';
 import { LIST_LIBRARY_STATE, type ListLibraryState } from 'routes/development-library/sections/List';
@@ -11,6 +12,7 @@ import {
 } from 'routes/development-library/sections/search-params/SearchParams';
 
 type LibraryComponents = DateTimeLibraryState &
+  HashParamsLibraryState &
   InputsLibraryState &
   LayoutLibraryState &
   ListInputsLibraryState &
@@ -31,6 +33,7 @@ const LIBRARY_FORM_STORE: LibraryFormStore = Object.freeze({
   },
   components: {
     ...DATETIME_LIBRARY_STATE,
+    ...HASH_PARAMS_LIBRARY_STATE,
     ...INPUTS_LIBRARY_STATE,
     ...LAYOUT_LIBRARY_STATE,
     ...LIST_INPUTS_LIBRARY_STATE,
