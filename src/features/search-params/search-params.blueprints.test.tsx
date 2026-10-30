@@ -72,6 +72,12 @@ describe('SEARCH_PARAM_BLUEPRINTS_MAP.enum', () => {
     ] as const as never);
     expect(blueprint).toBeInstanceOf(EnumSearchParamBlueprint);
   });
+
+  it('rejects options with colliding serialized values', () => {
+    expect(() => SEARCH_PARAM_BLUEPRINTS_MAP.enum(1, [1, '1'] as const)).toThrow(
+      'Enum options must have unique string representations.'
+    );
+  });
 });
 
 describe('SEARCH_PARAM_BLUEPRINTS_MAP.filters', () => {
