@@ -1,4 +1,4 @@
-import type { createHashParamCodec } from 'features/hash-params';
+import type { Location } from 'react-router';
 
 //*****************************************************************************************
 // Hash Params Primitives
@@ -47,4 +47,9 @@ export type InferHashParamFromBlueprint<
 /** Resolved codec type produced by `createHashParamCodec`. */
 export type InferHashParamCodecFromBlueprint<
   Blueprint extends InferHashParamBlueprintFromValue = InferHashParamBlueprintFromValue
-> = ReturnType<ReturnType<typeof createHashParamCodec>>;
+> = {
+  blueprint: Blueprint;
+  type: Blueprint['type'];
+  parse: (location: Location) => ReturnType<Blueprint['parse']>;
+  stringify: (value: Parameters<Blueprint['stringify']>[0]) => string;
+};
