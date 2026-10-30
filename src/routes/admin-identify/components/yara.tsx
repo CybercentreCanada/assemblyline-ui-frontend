@@ -105,7 +105,7 @@ export const Yara = memo(({ reload, yaraFile, originalYaraFile, setYaraFile }: Y
       </Dialog>
 
       <PageHeader
-        primary={t('title.patterns')}
+        primary={t('title.yara')}
         slotProps={{
           root: { style: { marginBottom: theme.spacing(1) } },
           primary: { variant: 'h5' },
