@@ -1,20 +1,23 @@
 import { Grid, Typography, useTheme } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
 import useMyAPI from 'core/api/hooks/useMyAPI';
+import useALContext from 'core/config/useALContext';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
-import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import CustomChip from 'ui/CustomChip';
+import { PageHeader } from 'ui/layouts/PageHeader';
 
 export default function Configuration() {
   const { apiCall } = useMyAPI();
   const [configuration, setConfiguration] = useState(null);
   const [constants, setConstants] = useState(null);
+  const { configuration: systemConfiguration } = useALContext();
   const { t } = useTranslation(['helpConfiguration']);
   const theme = useTheme();
   const sp1 = theme.spacing(1);
   const sp2 = theme.spacing(2);
+  const coreVersion = systemConfiguration.system.version;
 
   function isArrayOfArray(val) {
     if (Array.isArray(val)) {
@@ -25,7 +28,7 @@ export default function Configuration() {
     return false;
   }
 
-  useEffectOnce(() => {
+  useEffect(() => {
     // Load all services on start
     apiCall({
       url: '/api/v4/help/constants/',
@@ -39,14 +42,21 @@ export default function Configuration() {
         setConfiguration(api_data.api_response);
       }
     });
-  });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <PageFullWidth margin={4}>
       <div style={{ textAlign: 'left' }}>
-        <div style={{ marginBottom: theme.spacing(4) }}>
-          <Typography variant="h4">{t('title')}</Typography>
-        </div>
+        <PageHeader
+          primary={t('title')}
+          {...(coreVersion && { secondary: `${t('core_version')}: ${coreVersion}` })}
+          slotProps={{
+            root: { style: { marginBottom: theme.spacing(4) } },
+            actions: { spacing: 1 }
+          }}
+        />
+
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           <Typography variant="h6" gutterBottom>
             {t('tags')}
