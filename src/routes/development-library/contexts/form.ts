@@ -1,20 +1,17 @@
 import { createFormContext } from 'features/form';
-import type { DateTimeLibraryState } from 'routes/development-library/sections/DateTime';
-import { DATETIME_LIBRARY_STATE } from 'routes/development-library/sections/DateTime';
-import type { InputsLibraryState } from 'routes/development-library/sections/Inputs';
-import { INPUTS_LIBRARY_STATE } from 'routes/development-library/sections/Inputs';
-import type { LayoutLibraryState } from 'routes/development-library/sections/Layout';
-import { LAYOUT_LIBRARY_STATE } from 'routes/development-library/sections/Layout';
-import type { ListLibraryState } from 'routes/development-library/sections/List';
-import { LIST_LIBRARY_STATE } from 'routes/development-library/sections/List';
-import type { ListInputsLibraryState } from 'routes/development-library/sections/ListInputs';
-import { LIST_INPUTS_LIBRARY_STATE } from 'routes/development-library/sections/ListInputs';
+import { DATETIME_LIBRARY_STATE, type DateTimeLibraryState } from 'routes/development-library/sections/DateTime';
+import { INPUTS_LIBRARY_STATE, type InputsLibraryState } from 'routes/development-library/sections/Inputs';
+import { LAYOUT_LIBRARY_STATE, type LayoutLibraryState } from 'routes/development-library/sections/Layout';
+import { LIST_LIBRARY_STATE, type ListLibraryState } from 'routes/development-library/sections/List';
+import { LIST_INPUTS_LIBRARY_STATE, type ListInputsLibraryState } from 'routes/development-library/sections/ListInputs';
+import { PATH_PARAMS_LIBRARY_STATE, type PathParamsLibraryState } from 'routes/development-library/sections/PathParams';
 
 type LibraryComponents = DateTimeLibraryState &
   InputsLibraryState &
   LayoutLibraryState &
   ListInputsLibraryState &
-  ListLibraryState;
+  ListLibraryState &
+  PathParamsLibraryState;
 
 export type LibraryFormStore = {
   state: {
@@ -32,7 +29,8 @@ const LIBRARY_FORM_STORE: LibraryFormStore = Object.freeze({
     ...INPUTS_LIBRARY_STATE,
     ...LAYOUT_LIBRARY_STATE,
     ...LIST_INPUTS_LIBRARY_STATE,
-    ...LIST_LIBRARY_STATE
+    ...LIST_LIBRARY_STATE,
+    ...PATH_PARAMS_LIBRARY_STATE
   }
 });
 

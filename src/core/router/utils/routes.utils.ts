@@ -24,7 +24,7 @@ const DEFAULT_APP_ROUTE = {
   element: null,
 
   path: null,
-  params: createPathParamsCodec(null)(() => null),
+  params: createPathParamsCodec(null)(() => null as never),
   search: new SearchParamEngine<SearchParamBlueprintMap>(null),
   hash: createHashParamCodec()(() => null),
 
