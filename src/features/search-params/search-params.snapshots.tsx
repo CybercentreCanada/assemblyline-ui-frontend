@@ -1,4 +1,5 @@
 import type {
+  InferSearchParamDeltaValueMapFromBlueprintMap,
   InferSearchParamRuntimeMapFromBlueprintMap,
   InferSearchParamValueMapFromBlueprintMap,
   SearchParamBlueprintMap,
@@ -126,24 +127,30 @@ export class SearchParamSnapshot<Blueprints extends SearchParamBlueprintMap> {
     return new SearchParamSnapshot(this.runtimes, values).toString();
   }
 
-  public toLocationState(): InferSearchParamValueMapFromBlueprintMap<Blueprints> {
+  public toLocationState(): InferSearchParamDeltaValueMapFromBlueprintMap<Blueprints> {
     const values = {} as InferSearchParamValueMapFromBlueprintMap<Blueprints>;
     for (const [, runtime] of this.runtimeEntries()) {
       if (runtime.getSource() !== 'state') continue;
       runtime.delta(values, this.values);
     }
 
-    return new SearchParamSnapshot(this.runtimes, values).toObject();
+    return new SearchParamSnapshot(
+      this.runtimes,
+      values
+    ).toObject() as InferSearchParamDeltaValueMapFromBlueprintMap<Blueprints>;
   }
 
-  public toLocationTransient(): InferSearchParamValueMapFromBlueprintMap<Blueprints> {
+  public toLocationTransient(): InferSearchParamDeltaValueMapFromBlueprintMap<Blueprints> {
     const values = {} as InferSearchParamValueMapFromBlueprintMap<Blueprints>;
     for (const [, runtime] of this.runtimeEntries()) {
       if (runtime.getSource() !== 'transient') continue;
       runtime.delta(values, this.values);
     }
 
-    return new SearchParamSnapshot(this.runtimes, values).toObject();
+    return new SearchParamSnapshot(
+      this.runtimes,
+      values
+    ).toObject() as InferSearchParamDeltaValueMapFromBlueprintMap<Blueprints>;
   }
 
   public toObject(): InferSearchParamValueMapFromBlueprintMap<Blueprints> {
