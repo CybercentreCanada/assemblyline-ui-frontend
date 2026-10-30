@@ -101,6 +101,23 @@ export type InferSearchParamValueMapFromBlueprintMap<BlueprintMap extends Search
   [K in keyof BlueprintMap]: InferSearchParamValueFromBlueprint<BlueprintMap[K]>;
 };
 
+// Arrays are replaced whole by a delta; only nested records can be partial.
+type SearchParamDeltaObject<T> = T extends readonly unknown[]
+  ? T
+  : T extends object
+    ? { [K in keyof T]?: SearchParamDeltaObject<T[K]> }
+    : T;
+
+// prettier-ignore
+/** Value of one param inside a delta; object params may hold only the keys that differ from the default. */
+export type InferSearchParamDeltaValueFromBlueprint<B extends SearchParamBlueprint> =
+  B extends ObjectSearchParamBlueprint<infer O> ? SearchParamDeltaObject<O> : InferSearchParamValueFromBlueprint<B>;
+
+/** Sparse value map: params equal to their default are omitted. */
+export type InferSearchParamDeltaValueMapFromBlueprintMap<BlueprintMap extends SearchParamBlueprintMap> = {
+  [K in keyof BlueprintMap]?: InferSearchParamDeltaValueFromBlueprint<BlueprintMap[K]>;
+};
+
 //*****************************************************************************************
 // Search Param Runtimes
 //*****************************************************************************************

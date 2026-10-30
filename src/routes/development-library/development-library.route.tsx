@@ -10,6 +10,7 @@ import { LayoutSection } from 'routes/development-library/sections/Layout';
 import { ListSection } from 'routes/development-library/sections/List';
 import { ListInputsSection } from 'routes/development-library/sections/ListInputs';
 import { PathParamsSection } from 'routes/development-library/sections/PathParams';
+import { SearchParamsSection } from 'routes/development-library/sections/search-params/SearchParams';
 import { PageHeader } from 'ui/layouts/PageHeader';
 import { PageLayout } from 'ui/layouts/PageLayout';
 import type { PageNavigationItemProp } from 'ui/layouts/PageNavigation';
@@ -24,7 +25,8 @@ const LIBRARY_SECTIONS = {
   layout: LayoutSection,
   list_inputs: ListInputsSection,
   list: ListSection,
-  path_params: PathParamsSection
+  path_params: PathParamsSection,
+  search_params: SearchParamsSection
 } as const;
 
 export const DevelopmentLibraryContent = memo(() => {
