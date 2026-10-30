@@ -1,6 +1,6 @@
 import type { FormAsyncValidateOrFn, FormOptions, FormValidateOrFn, ReactFormExtendedApi } from '@tanstack/react-form';
 import { useForm as useTanStackForm } from '@tanstack/react-form';
-import type { ReactElement, ReactNode } from 'react';
+import type { PropsWithChildren, ReactElement, ReactNode } from 'react';
 import { createContext, useContext } from 'react';
 
 export const createFormContext = <
@@ -63,7 +63,7 @@ export const createFormContext = <
 
   const FormContext = createContext<FormContextProps>(null);
 
-  type FormProviderProps = { children: ReactNode };
+  type FormProviderProps = PropsWithChildren;
 
   const FormProvider = ({ children }: FormProviderProps) => {
     const form = useTanStackForm(options);
