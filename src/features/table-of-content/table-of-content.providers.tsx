@@ -1,4 +1,4 @@
-import { createFormContext } from 'features/form/form.factories';
+import { createFormContext } from 'features/form';
 import React, { useCallback, useContext, useEffect, useMemo, useRef } from 'react';
 
 export type TableOfContentAnchor = {
