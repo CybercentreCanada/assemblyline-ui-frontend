@@ -120,7 +120,16 @@ export const DevelopmentLibraryRoute = createAppRoute({
 
   path: '/development/library',
   search: s => ({
-    tab: s.enum(null, ['datetime', 'inputs', 'layout', 'list', 'list_inputs'])
+    tab: s.enum(null, [
+      'datetime',
+      'hash_params',
+      'inputs',
+      'layout',
+      'list',
+      'list_inputs',
+      'path_params',
+      'search_params'
+    ])
   }),
 
   ancestor: '/development',
