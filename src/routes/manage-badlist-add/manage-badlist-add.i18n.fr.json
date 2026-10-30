@@ -1,5 +1,7 @@
 {
   "add.success": "L'élément de la liste mauvaise a été ajouté avec succès au système.",
+  "app_route.manage_badlist_add.fullname": "Gestion à l'Ajout à la Liste mauvaise",
+  "app_route.manage_badlist_add.shortname": "Ajouter",
   "attribution": "Attributions (facultatif)",
   "attribution.actor.title": "Acteurs",
   "attribution.campaign.title": "Campagnes",

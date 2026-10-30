@@ -1,4 +1,5 @@
 import { Fetcher, useClueFetcherSelector } from '@cccsaurora/clue-ui';
+import BallotOutlinedIcon from '@mui/icons-material/BallotOutlined';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import {
@@ -14,21 +15,19 @@ import {
   useTheme
 } from '@mui/material';
 import Alert from '@mui/material/Alert';
-import useMyAPI from 'core/api/hooks/useMyAPI';
-import useALContext from 'core/config/useALContext';
-import { useAppUser } from 'core/template/components/app/hooks';
-import PageFullWidth from 'core/template/components/pages/PageFullWidth';
+import { createAppRoute, useAppLocation, useAppPathParams, useAppSearchSnapshot } from 'core/router';
+import { AppPageFullWidth } from 'core/template';
 import ListCarousel from 'deprecated/components/lists/carousel/ListCarousel';
 import ListNavigator from 'deprecated/components/lists/navigator/ListNavigator';
-import useAssistant from 'layout/assistant/assistant.hooks';
-import useClipboard from 'layout/clipboard/clipboard.hooks';
-import type { CustomUser } from 'models/api/user';
+import useALContext from 'deprecated/hooks/useALContext';
+import useClipboard from 'deprecated/hooks/useClipboard';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
+import { useAssistant } from 'layout/assistant';
 import type { AlertItem } from 'models/base/alert';
-import React, { memo, useCallback, useEffect, useState } from 'react';
+import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BsClipboard } from 'react-icons/bs';
-import { useParams } from 'react-router';
-import { ALERT_DEFAULT_PARAMS, ALERT_SIMPLELIST_ID } from 'routes/alerts/alerts.route';
+import { ALERT_SIMPLELIST_ID } from 'routes/alerts/alerts.route';
 import AlertActions, {
   AlertBadlist,
   AlertGroup,
@@ -45,17 +44,16 @@ import {
   AutoHideChipList,
   SkeletonInline
 } from 'routes/alerts/components/Components';
-import { SearchParamsProvider } from 'routes/alerts/contexts/SearchParamsContext';
-import ForbiddenPage from 'routes/forbidden/forbidden.route';
+import { ForbiddenPage } from 'routes/forbidden/forbidden';
 import { verdictToColor } from 'shared/utils/utils';
 import { ActionableChipList } from 'ui/ActionableChipList';
 import ActionableText from 'ui/ActionableText';
 import { ChipSkeleton, ChipSkeletonInline } from 'ui/ChipList';
 import Classification from 'ui/Classification';
 import CustomChip from 'ui/CustomChip';
+import { ImageInline } from 'ui/image_inline';
 import Verdict from 'ui/Verdict';
 import VerdictBar from 'ui/VerdictBar';
-import { ImageInline } from 'ui/image_inline';
 
 const Section = memo(
   styled('div')(({ theme }) => ({
@@ -89,47 +87,37 @@ const ClipboardIcon = memo(
   }))
 );
 
-type Params = {
-  id?: string;
-};
-
-type Props = {
-  id?: string;
-  alert?: AlertItem;
-  inDrawer?: boolean;
-  defaults?: string;
-  search?: string;
-};
-
-const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null, inDrawer = false }: Props) => {
+export const AlertDetailPage = memo(() => {
   const { t } = useTranslation(['alerts']);
   const theme = useTheme();
   const { apiCall } = useMyAPI();
   const { copy } = useClipboard();
   const { addInsight, removeInsight } = useAssistant();
-  const { c12nDef, configuration } = useALContext();
-  const { id: paramId } = useParams<Params>();
-  const { user: currentUser } = useAppUser<CustomUser>();
+  const { c12nDef, configuration, user: currentUser } = useALContext();
+  const paramId = useAppPathParams<'/alert/:id'>()?.id;
+  const search = useAppSearchSnapshot<'/alert/:id'>();
+  const inDrawer = useAppLocation('from')(s => s.route === '/alerts');
   const fetchers = useClueFetcherSelector(s => s.fetchers);
 
-  const [alert, setAlert] = useState<AlertItem>(null);
+  const [fetchedAlert, setFetchedAlert] = useState<AlertItem>(null);
   const [metaOpen, setMetaOpen] = useState<boolean>(false);
 
   const upSM = useMediaQuery(theme.breakpoints.up('sm'));
 
+  const alert = useMemo<AlertItem>(
+    () => fetchedAlert || search.get('alert') || null,
+    [fetchedAlert, search?.toString()]
+  );
+
   useEffect(() => {
-    if (!currentUser.roles.includes('alert_view')) {
-      return;
-    } else if (propAlert) {
-      setAlert(propAlert);
-    } else {
-      apiCall({
-        url: `/api/v4/alert/${inDrawer ? propId.split('?')[0] : paramId}/`,
-        onSuccess: ({ api_response }) => setAlert(api_response)
-      });
-    }
+    if (!currentUser.roles.includes('alert_view') || search.get('alert')) return;
+
+    apiCall({
+      url: `/api/v4/alert/${paramId}/`,
+      onSuccess: ({ api_response }) => setFetchedAlert(api_response)
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentUser.roles, inDrawer, paramId, propAlert, propId]);
+  }, [currentUser.roles, paramId]);
 
   useEffect(() => {
     if (alert) {
@@ -154,7 +142,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
 
   useEffect(() => {
     const update = ({ detail }: CustomEvent<Partial<AlertItem>[]>) => {
-      setAlert(a => {
+      setFetchedAlert(a => {
         const item = detail.find(i => a.alert_id === i.alert_id);
         return item ? { ...a, ...item } : a;
       });
@@ -178,11 +166,11 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
               display: 'flex',
               float: 'right',
               height: theme.spacing(8),
-              marginTop: theme.spacing(-8),
-              marginRight: theme.spacing(-1),
+              marginTop: theme.spacing(-12),
+              marginRight: theme.spacing(1),
               position: 'sticky',
               top: theme.spacing(1),
-              zIndex: 10
+              zIndex: theme.zIndex.appBar + 1
             }}
           >
             <AlertActions alert={alertProp} inDrawer={drawer} />
@@ -198,7 +186,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
 
   return currentUser.roles.includes('alert_view') ? (
     <Wrapper alert={alert} drawer={inDrawer}>
-      <PageFullWidth margin={inDrawer ? 1 : 4}>
+      <AppPageFullWidth>
         {c12nDef.enforce && (
           <div style={{ display: 'flex', alignItems: 'center', marginBottom: theme.spacing(2) }}>
             <div style={{ flex: 1 }}>
@@ -605,7 +593,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                                 classification: alert.classification,
                                 color: verdictToColor(item.verdict),
                                 data_type: item.subtype in dataTypes ? dataTypes[item.subtype] : null,
-                                index: '/result',
+                                index: 'result',
                                 label: item.subtype ? `${item.value} - ${item.subtype}` : item.value,
                                 value: item.value,
                                 variant: 'outlined'
@@ -869,7 +857,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                           <AutoHideChipList
                             category={null}
                             defaultClassification={alert.classification}
-                            index="/result"
+                            index="result"
                             items={alert.al.detailed.heuristic}
                             type="result.sections.heuristic.name"
                           />
@@ -966,7 +954,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                               <AutoHideChipList
                                 category={null}
                                 defaultClassification={alert.classification}
-                                index="/result"
+                                index="result"
                                 items={alert.al.detailed.attack_category}
                                 type="result.sections.heuristic.attack.categories"
                               />
@@ -992,7 +980,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                               <AutoHideChipList
                                 category={null}
                                 defaultClassification={alert.classification}
-                                index="/result"
+                                index="result"
                                 items={alert.al.detailed.attack_pattern}
                                 type="result.sections.heuristic.attack.pattern"
                               />
@@ -1019,24 +1007,41 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
             </>
           )}
         </div>
-      </PageFullWidth>
+      </AppPageFullWidth>
     </Wrapper>
   ) : (
     <ForbiddenPage />
   );
-};
+});
 
-const AlertDetailContent = React.memo(WrappedAlertDetailContent);
+AlertDetailPage.displayName = 'AlertDetailPage';
 
-const WrappedAlertDetail = (props: Props) => (
-  <SearchParamsProvider
-    defaultValue={ALERT_DEFAULT_PARAMS}
-    hidden={['rows', 'offset', 'tc_start', 'track_total_hits']}
-    enforced={['rows']}
-  >
-    <AlertDetailContent {...props} />
-  </SearchParamsProvider>
-);
+export const AlertDetailRoute = createAppRoute({
+  component: memo(() => <AlertDetailPage />),
 
-export const AlertDetail = React.memo(WrappedAlertDetail);
-export default AlertDetail;
+  path: '/alert/:id',
+  params: s => ({
+    id: s.string()
+  }),
+  search: s => ({
+    alert: s
+      .object(null as AlertItem)
+      .nullable()
+      .source('state'),
+
+    q: s.string('').source('state'),
+    fq: s.filters([]).source('state'),
+    group_by: s.string('file.sha256').source('state'),
+    tc_start: s.string('').source('state').ephemeral(),
+    tc: s.string('4d').source('state')
+  }),
+
+  ancestor: '/alerts',
+  shortname: location => ['app_route.alert_detail.shortname', { ns: 'alerts', id: location.path.id }],
+  fullname: location => ['app_route.alert_detail.fullname', { ns: 'alerts', id: location.path.id }],
+  shorticon: () => <BallotOutlinedIcon />,
+  fullicon: () => <BallotOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
+});

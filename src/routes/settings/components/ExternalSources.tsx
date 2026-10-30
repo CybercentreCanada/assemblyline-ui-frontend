@@ -1,16 +1,16 @@
 import { List, useTheme } from '@mui/material';
-import useALContext from 'core/config/useALContext';
-import React, { useMemo } from 'react';
+import { useAppConfigStore } from 'core/config';
+import { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useForm } from 'routes/settings/settings.form.ts';
 import { PageSection } from 'ui/layouts/PageSection';
 import { BooleanListInput } from 'ui/list-inputs/BooleanListInput';
+import { useForm } from '../settings.form';
 
-export const ExternalSourcesSection = React.memo(() => {
+export const ExternalSourcesSection = memo(() => {
   const { t } = useTranslation(['settings']);
   const theme = useTheme();
   const form = useForm();
-  const { configuration } = useALContext();
+  const configuration = useAppConfigStore(s => s.configuration);
 
   const fileSources = useMemo<string[]>(() => {
     if (!configuration?.submission?.file_sources) return [];
@@ -25,9 +25,7 @@ export const ExternalSourcesSection = React.memo(() => {
     return Array.from(sourcesSet).sort((a, b) => a.localeCompare(b));
   }, [configuration]);
 
-  if (fileSources.length === 0) return null;
-
-  return (
+  return fileSources.length === 0 ? null : (
     <form.Subscribe selector={state => [state.values.state.disabled, state.values.state.loading] as const}>
       {([disabled, loading]) => (
         <div style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(1) }}>

@@ -1,5 +1,7 @@
 {
   "add_badlist": "Add an item to the badlist",
+  "app_route.manage_badlists.fullname": "Manage Badlist",
+  "app_route.manage_badlists.shortname": "Badlist",
   "filter": "Filter badlisted hashes...",
   "filter.disabled.add": "Add filter query to show disabled hashes",
   "filter.disabled.remove": "Remove filter query to show disabled hashes",

@@ -1,4 +1,6 @@
 {
+  "app_route.help_classification.fullname": "Aide à la Classification",
+  "app_route.help_classification.shortname": "Aide à la Classification",
   "assumptions": "Supposons ce qui suit:",
   "desc_1": "Lorsque vous soumettez un fichier à Assemblyline, vous devez fournir sa classification. Cette classification concerne la soumission elle-même et sera appliquée à tous les fichiers enfants de la soumission ainsi qu'aux résultats associés à la soumission.",
   "desc_2": "Si vous réalisez que vous avez soumis un fichier avec la mauvaise classification, vous pouvez toujours utiliser le bouton Supprimer dans la page de détails de la soumission pour vous en débarrasser.",

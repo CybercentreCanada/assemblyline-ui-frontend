@@ -13,51 +13,49 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-import type { APIResponseProps } from 'core/api/hooks/useMyAPI';
-import useMyAPI from 'core/api/hooks/useMyAPI';
-import useALContext from 'core/config/useALContext';
-import useMySnackbar from 'core/snackbar/snackbar.hooks';
+import type { ApiResponse } from 'core/api/api.models';
+import { useAppConfigStore } from 'core/config';
+import { useAppSetInterfaceStore } from 'core/interface';
+import { AppLink, useAppNavigate } from 'core/router';
+import { useAppSnackbar } from 'core/snackbar';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
+import type { ApiResponseProps } from 'layout/auth/auth.models';
 import type { SearchResult } from 'models/api/search';
-import type { File } from 'models/base/file';
-import type { Submission } from 'models/base/submission';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type { File as FileModel } from 'models/base/file';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
-import { Link } from 'react-router-dom';
-import { getProfileNames } from 'routes/settings/settings.utils.ts';
-import FileDropper from 'routes/submit/components/FileDropper';
-import type { SubmitStore } from 'routes/submit/submit.form.ts';
-import { FLOW, useForm } from 'routes/submit/submit.form.ts';
+import { getProfileNames } from 'routes/settings/settings.utils';
+import { FileDropper } from 'routes/submit/components/FileDropper';
+import type { SubmitStore } from 'routes/submit/submit.form';
+import { FLOW, useForm } from 'routes/submit/submit.form';
+import { useAutoURLServicesSelection, useSubmitCancel } from 'routes/submit/submit.hooks';
 import {
   calculateFileHash,
+  generateSubmitUUID,
   getHashQuery,
   isUsingExternalServices,
   parseSubmitProfile,
-  switchProfile,
-  useAutoURLServicesSelection
-} from 'routes/submit/submit.utils.ts';
+  switchProfile
+} from 'routes/submit/submit.utils';
 import { getSubmitType } from 'shared/utils/utils';
-import generateUUID from 'shared/utils/uuid';
 import type { ButtonProps } from 'ui/buttons/Button';
 import { Button } from 'ui/buttons/Button';
 import { IconButton } from 'ui/buttons/IconButton';
-import Classification from 'ui/Classification';
+import { Classification } from 'ui/Classification';
 import { CheckboxInput } from 'ui/inputs/CheckboxInput';
-import type { SelectInputOption } from 'ui/inputs/models/inputs.model.ts';
+import type { SelectInputOption } from 'ui/inputs/models/inputs.model';
 import { SelectInput } from 'ui/inputs/SelectInput';
 import { SwitchInput } from 'ui/inputs/SwitchInput';
 import { TextAreaInput } from 'ui/inputs/TextAreaInput';
 import { TextInput } from 'ui/inputs/TextInput';
 
-export const ClassificationInput = React.memo(() => {
+export const ClassificationInput = memo(() => {
   const { t } = useTranslation(['submit']);
   const theme = useTheme();
-  const { c12nDef } = useALContext();
+  const c12nDef = useAppConfigStore(s => s.c12nDef);
   const form = useForm();
 
-  if (!c12nDef?.enforce) return null;
-
-  return (
+  return !c12nDef?.enforce ? null : (
     <form.Subscribe
       selector={state =>
         [
@@ -85,8 +83,9 @@ export const ClassificationInput = React.memo(() => {
     </form.Subscribe>
   );
 });
+ClassificationInput.displayName = 'ClassificationInput';
 
-export const FileInput = React.memo(() => {
+export const FileInput = memo(() => {
   const form = useForm();
 
   const handleFileChange = useCallback(
@@ -122,11 +121,12 @@ export const FileInput = React.memo(() => {
     </form.Subscribe>
   );
 });
+FileInput.displayName = 'FileInput';
 
-export const HashInput = React.memo(() => {
+export const HashInput = memo(() => {
   const { t } = useTranslation(['submit']);
-  const { configuration } = useALContext();
-  const { closeSnackbar } = useMySnackbar();
+  const configuration = useAppConfigStore(s => s.configuration);
+  const { closeSnackbar } = useAppSnackbar();
   const form = useForm();
 
   const applyAutoURLServicesSelection = useAutoURLServicesSelection();
@@ -173,10 +173,13 @@ export const HashInput = React.memo(() => {
     </form.Subscribe>
   );
 });
+HashInput.displayName = 'HashInput';
 
-export const SubmissionProfileInput = React.memo(() => {
+export const SubmissionProfileInput = memo(() => {
   const { t } = useTranslation(['submit']);
-  const { user, configuration, settings } = useALContext();
+  const user = useAppConfigStore(s => s.user);
+  const configuration = useAppConfigStore(s => s.configuration);
+  const settings = useAppConfigStore(s => s.settings);
   const form = useForm();
 
   const applyAutoURLServicesSelection = useAutoURLServicesSelection();
@@ -236,8 +239,9 @@ export const SubmissionProfileInput = React.memo(() => {
     </form.Subscribe>
   );
 });
+SubmissionProfileInput.displayName = 'SubmissionProfileInput';
 
-export const RawInput = React.memo(() => {
+export const RawInput = memo(() => {
   const { t } = useTranslation(['submit']);
   const form = useForm();
 
@@ -298,8 +302,9 @@ export const RawInput = React.memo(() => {
     </form.Subscribe>
   );
 });
+RawInput.displayName = 'RawInput';
 
-export const MaliciousInput = React.memo(() => {
+export const MaliciousInput = memo(() => {
   const { t } = useTranslation(['submit']);
   const form = useForm();
 
@@ -330,10 +335,11 @@ export const MaliciousInput = React.memo(() => {
     </form.Subscribe>
   );
 });
+MaliciousInput.displayName = 'MaliciousInput';
 
-export const ExternalSources = React.memo(() => {
+export const ExternalSources = memo(() => {
   const { t } = useTranslation(['submit']);
-  const { configuration } = useALContext();
+  const configuration = useAppConfigStore(s => s.configuration);
   const form = useForm();
 
   return (
@@ -384,8 +390,9 @@ export const ExternalSources = React.memo(() => {
     />
   );
 });
+ExternalSources.displayName = 'ExternalSources';
 
-export const ExternalServices = React.memo(() => {
+export const ExternalServices = memo(() => {
   const { t } = useTranslation(['submit']);
   const form = useForm();
 
@@ -440,8 +447,9 @@ export const ExternalServices = React.memo(() => {
     </form.Subscribe>
   );
 });
+ExternalServices.displayName = 'ExternalServices';
 
-export const CustomizabilityAlert = React.memo(() => {
+export const CustomizabilityAlert = memo(() => {
   const { t } = useTranslation(['submit']);
   const theme = useTheme();
   const form = useForm();
@@ -467,10 +475,13 @@ export const CustomizabilityAlert = React.memo(() => {
     </form.Subscribe>
   );
 });
+CustomizabilityAlert.displayName = 'CustomizabilityAlert';
 
-export const CancelButton = React.memo(() => {
+export const CancelButton = memo(() => {
   const { t } = useTranslation(['submit']);
   const form = useForm();
+
+  const cancelSubmit = useSubmitCancel();
 
   return (
     <form.Subscribe
@@ -493,20 +504,7 @@ export const CancelButton = React.memo(() => {
           loading={loading}
           disabled={disabled || (tab === 'file' ? file : tab === 'hash' ? hash : tab === 'raw' ? raw : false)}
           variant="outlined"
-          onClick={() => {
-            form.setFieldValue('file', null);
-            form.setFieldValue('hash.type', null);
-            form.setFieldValue('hash.value', '');
-            form.setFieldValue('raw.hash', null);
-            form.setFieldValue('raw.value', null);
-            form.setFieldValue('state.phase', 'editing');
-            form.setFieldValue('state.progress', null);
-            form.setFieldValue('state.uuid', generateUUID());
-            FLOW.cancel();
-            FLOW.off('complete');
-            FLOW.off('fileError');
-            FLOW.off('progress');
-          }}
+          onClick={cancelSubmit}
         >
           {t('cancel.button.label')}
         </Button>
@@ -514,14 +512,15 @@ export const CancelButton = React.memo(() => {
     </form.Subscribe>
   );
 });
+CancelButton.displayName = 'CancelButton';
 
-export const FindButton = React.memo(() => {
+export const FindButton = memo(() => {
   const { t } = useTranslation(['submit']);
   const theme = useTheme();
   const form = useForm();
   const { apiCall } = useMyAPI();
 
-  const [results, setResults] = useState<SearchResult<File> | null>(null);
+  const [results, setResults] = useState<SearchResult<FileModel> | null>(null);
   const [open, setOpen] = useState<boolean>(false);
   const [fetching, setFetching] = useState<boolean>(true);
   const [query, setQuery] = useState<string | null>(null);
@@ -532,11 +531,11 @@ export const FindButton = React.memo(() => {
     if (query === prevQuery) return;
     setPrevQuery(query);
 
-    apiCall<SearchResult<File>>({
+    apiCall({
       method: 'POST',
       url: '/api/v4/search/file/',
       body: { query, offset: 0, rows: 1 },
-      onSuccess: api_data => {
+      onSuccess: (api_data: ApiResponse<SearchResult<FileModel>>) => {
         setResults(api_data.api_response);
       },
       onFailure: () => setResults(null),
@@ -598,9 +597,12 @@ export const FindButton = React.memo(() => {
               <DialogActions>
                 <Button onClick={() => setOpen(false)}>{t('find.close.title')}</Button>
                 <MuiButton
-                  component={Link}
+                  component={AppLink}
                   autoFocus
-                  to={`/file/detail/${results?.items?.[0]?.sha256 ?? ''}`}
+                  nav={nav =>
+                    nav.to().create({ route: '/file/detail/:id', path: { id: results?.items?.[0]?.sha256 ?? '' } })
+                  }
+                  navDeps={[results?.items]}
                   disabled={fetching || !results?.items?.[0]?.sha256}
                   onClick={() => setOpen(false)}
                 >
@@ -644,8 +646,9 @@ export const FindButton = React.memo(() => {
     </>
   );
 });
+FindButton.displayName = 'FindButton';
 
-export const AdjustButton = React.memo(() => {
+export const AdjustButton = memo(() => {
   const { t } = useTranslation(['submit']);
   const form = useForm();
 
@@ -664,8 +667,9 @@ export const AdjustButton = React.memo(() => {
     </form.Subscribe>
   );
 });
+AdjustButton.displayName = 'AdjustButton';
 
-const AnalyzeButton = React.memo(({ children, ...props }: ButtonProps) => {
+const AnalyzeButton = memo(({ children, ...props }: ButtonProps) => {
   const { t } = useTranslation(['submit']);
   const form = useForm();
 
@@ -710,14 +714,18 @@ const AnalyzeButton = React.memo(({ children, ...props }: ButtonProps) => {
     </form.Subscribe>
   );
 });
+AnalyzeButton.displayName = 'AnalyzeButton';
 
-export const FileSubmit = React.memo(({ onClick = () => null, ...props }: ButtonProps) => {
+export const FileSubmit = memo(({ onClick = () => null, ...props }: ButtonProps) => {
   const { t } = useTranslation(['submit']);
   const form = useForm();
-  const navigate = useNavigate();
+  const navigate = useAppNavigate();
   const { apiCall } = useMyAPI();
-  const { closeSnackbar, showErrorMessage, showSuccessMessage } = useMySnackbar();
-  const { settings } = useALContext();
+  const { closeSnackbar, showErrorMessage, showSuccessMessage } = useAppSnackbar();
+  const settings = useAppConfigStore(s => s.settings);
+  const setInterfaceStore = useAppSetInterfaceStore();
+
+  const cancelSubmit = useSubmitCancel();
 
   const warnOnUnload = useCallback((warn: boolean) => {
     window.onbeforeunload = warn ? () => true : null;
@@ -726,7 +734,7 @@ export const FileSubmit = React.memo(({ onClick = () => null, ...props }: Button
   const handleCancel = useCallback(() => {
     form.setFieldValue('state.phase', 'editing');
     form.setFieldValue('state.progress', null);
-    form.setFieldValue('state.uuid', generateUUID());
+    form.setFieldValue('state.uuid', generateSubmitUUID());
 
     FLOW.cancel();
     FLOW.off('complete');
@@ -761,16 +769,23 @@ export const FileSubmit = React.memo(({ onClick = () => null, ...props }: Button
 
       FLOW.on('fileError', (_, api_data) => {
         try {
-          const data = JSON.parse(api_data) as APIResponseProps<unknown>;
+          const data = JSON.parse(api_data) as ApiResponseProps<unknown>;
           if ('api_status_code' in data) {
-            if (
-              data.api_status_code === 401 ||
-              (data.api_status_code === 503 &&
-                data.api_error_message.includes('quota') &&
-                data.api_error_message.includes('daily') &&
-                data.api_error_message.includes('API'))
+            if (data.api_status_code === 401) {
+              setInterfaceStore(s => {
+                s.auth.mode = 'logout';
+                return s;
+              });
+            } else if (
+              data.api_status_code === 503 &&
+              data.api_error_message.includes('quota') &&
+              data.api_error_message.includes('daily') &&
+              data.api_error_message.includes('API')
             ) {
-              window.location.reload();
+              setInterfaceStore(s => {
+                s.auth.mode = 'quota';
+                return s;
+              });
             } else handleCancel();
             showErrorMessage(t('upload.snackbar.file.upload_fail'));
           }
@@ -787,7 +802,7 @@ export const FileSubmit = React.memo(({ onClick = () => null, ...props }: Button
       FLOW.on('complete', () => {
         warnOnUnload(false);
         if (!FLOW.files.length || FLOW.files.some(f => f.error)) return;
-        apiCall<{ started: boolean; sid: string }>({
+        apiCall({
           url: `/api/v4/ui/start/${uuid}/`,
           method: 'POST',
           body: {
@@ -796,10 +811,13 @@ export const FileSubmit = React.memo(({ onClick = () => null, ...props }: Button
             filename: file.path,
             metadata: metadata.data
           },
-          onSuccess: ({ api_response }) => {
+          onSuccess: ({ api_response }: ApiResponse<{ started: boolean; sid: string }>) => {
             showSuccessMessage(`${t('upload.snackbar.success')} ${api_response.sid}`);
             form.setFieldValue('state.phase', 'redirecting');
-            setTimeout(() => navigate(`/submission/detail/${api_response.sid}`), 1000);
+            setTimeout(() => {
+              navigate.here().create({ route: '/submission/detail/:id', path: { id: api_response.sid } });
+              cancelSubmit();
+            }, 1000);
           },
           onFailure: ({ api_status_code, api_error_message }) => {
             if ([400, 403, 404, 503].includes(api_status_code)) showErrorMessage(api_error_message);
@@ -813,7 +831,7 @@ export const FileSubmit = React.memo(({ onClick = () => null, ...props }: Button
       FLOW.upload();
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [form, handleCancel, navigate, settings, showErrorMessage, showSuccessMessage, t]
+    [cancelSubmit, form, handleCancel, navigate, settings, showErrorMessage, showSuccessMessage, t]
   );
 
   return (
@@ -826,13 +844,16 @@ export const FileSubmit = React.memo(({ onClick = () => null, ...props }: Button
     />
   );
 });
+FileSubmit.displayName = 'FileSubmit';
 
-const RawSubmit = React.memo(({ onClick = () => null, ...props }: ButtonProps) => {
+const RawSubmit = memo(({ onClick = () => null, ...props }: ButtonProps) => {
   const { t } = useTranslation(['submit']);
   const form = useForm();
-  const navigate = useNavigate();
+  const navigate = useAppNavigate();
   const { apiCall } = useMyAPI();
-  const { closeSnackbar, showErrorMessage, showSuccessMessage } = useMySnackbar();
+  const { closeSnackbar, showErrorMessage, showSuccessMessage } = useAppSnackbar();
+
+  const cancelSubmit = useSubmitCancel();
 
   const handleSubmit = useCallback(
     () => {
@@ -843,7 +864,7 @@ const RawSubmit = React.memo(({ onClick = () => null, ...props }: ButtonProps) =
       const metadata = form.getFieldValue('metadata');
       const profile = form.getFieldValue('state.profile');
 
-      apiCall<Submission>({
+      apiCall({
         url: '/api/v4/submit/',
         method: 'POST',
         body: {
@@ -857,10 +878,13 @@ const RawSubmit = React.memo(({ onClick = () => null, ...props }: ButtonProps) =
           form.setFieldValue('state.phase', 'uploading');
           form.setFieldValue('autoURLServiceSelection.open', false);
         },
-        onSuccess: ({ api_response }) => {
+        onSuccess: ({ api_response }: ApiResponse<{ started: boolean; sid: string }>) => {
           showSuccessMessage(`${t('upload.snackbar.success')} ${api_response.sid}`);
           form.setFieldValue('state.phase', 'redirecting');
-          setTimeout(() => navigate(`/submission/detail/${api_response.sid}`), 1000);
+          setTimeout(() => {
+            navigate.here().create({ route: '/submission/detail/:id', path: { id: api_response.sid } });
+            cancelSubmit();
+          }, 1000);
         },
         onFailure: ({ api_error_message }) => {
           showErrorMessage(api_error_message);
@@ -869,7 +893,7 @@ const RawSubmit = React.memo(({ onClick = () => null, ...props }: ButtonProps) =
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [form, navigate, showErrorMessage, showSuccessMessage, t]
+    [cancelSubmit, form, navigate, showErrorMessage, showSuccessMessage, t]
   );
 
   return (
@@ -882,13 +906,16 @@ const RawSubmit = React.memo(({ onClick = () => null, ...props }: ButtonProps) =
     />
   );
 });
+RawSubmit.displayName = 'RawSubmit';
 
-const HashSubmit = React.memo(({ onClick = () => null, ...props }: ButtonProps) => {
+const HashSubmit = memo(({ onClick = () => null, ...props }: ButtonProps) => {
   const { t } = useTranslation(['submit']);
   const form = useForm();
-  const navigate = useNavigate();
+  const navigate = useAppNavigate();
   const { apiCall } = useMyAPI();
-  const { closeSnackbar, showErrorMessage, showSuccessMessage } = useMySnackbar();
+  const { closeSnackbar, showErrorMessage, showSuccessMessage } = useAppSnackbar();
+
+  const cancelSubmit = useSubmitCancel();
 
   const handleSubmit = useCallback(
     () => {
@@ -899,7 +926,7 @@ const HashSubmit = React.memo(({ onClick = () => null, ...props }: ButtonProps) 
       const metadata = form.getFieldValue('metadata');
       const profile = form.getFieldValue('state.profile');
 
-      apiCall<Submission>({
+      apiCall({
         url: '/api/v4/submit/',
         method: 'POST',
         body: {
@@ -912,10 +939,13 @@ const HashSubmit = React.memo(({ onClick = () => null, ...props }: ButtonProps) 
           form.setFieldValue('state.phase', 'uploading');
           form.setFieldValue('autoURLServiceSelection.open', false);
         },
-        onSuccess: ({ api_response }) => {
+        onSuccess: ({ api_response }: ApiResponse<{ started: boolean; sid: string }>) => {
           showSuccessMessage(`${t('upload.snackbar.success')} ${api_response.sid}`);
           form.setFieldValue('state.phase', 'redirecting');
-          setTimeout(() => navigate(`/submission/detail/${api_response.sid}`), 1000);
+          setTimeout(() => {
+            navigate.here().create({ route: '/submission/detail/:id', path: { id: api_response.sid } });
+            cancelSubmit();
+          }, 1000);
         },
         onFailure: ({ api_error_message }) => {
           showErrorMessage(api_error_message);
@@ -924,7 +954,7 @@ const HashSubmit = React.memo(({ onClick = () => null, ...props }: ButtonProps) 
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [form, navigate, showErrorMessage, showSuccessMessage, t]
+    [cancelSubmit, form, navigate, showErrorMessage, showSuccessMessage, t]
   );
 
   return (
@@ -937,10 +967,11 @@ const HashSubmit = React.memo(({ onClick = () => null, ...props }: ButtonProps) 
     />
   );
 });
+HashSubmit.displayName = 'HashSubmit';
 
-const ExternalServicesDialog = React.memo(() => {
+const ExternalServicesDialog = memo(() => {
   const { t } = useTranslation(['submit']);
-  const { configuration } = useALContext();
+  const configuration = useAppConfigStore(s => s.configuration);
   const form = useForm();
 
   const handleDeselectExternalServices = useCallback(() => {
@@ -1013,9 +1044,10 @@ const ExternalServicesDialog = React.memo(() => {
     </>
   );
 });
+ExternalServicesDialog.displayName = 'ExternalServicesDialog';
 
-export const AnalyzeSubmission = React.memo(() => {
-  const { configuration } = useALContext();
+export const AnalyzeSubmission = memo(() => {
+  const configuration = useAppConfigStore(s => s.configuration);
   const form = useForm();
 
   return (
@@ -1045,25 +1077,28 @@ export const AnalyzeSubmission = React.memo(() => {
     </form.Subscribe>
   );
 });
+AnalyzeSubmission.displayName = 'AnalyzeSubmission';
 
-export const ToS = React.memo(() => {
+export const ToS = memo(() => {
   const { t } = useTranslation(['submit']);
   const theme = useTheme();
-  const { configuration } = useALContext();
+  const configuration = useAppConfigStore(s => s.configuration);
 
-  if (!configuration.ui.tos) return null;
-
-  return (
+  return !configuration.ui.tos ? null : (
     <div style={{ textAlign: 'center' }}>
       <Typography variant="body2">
         {t('tos.terms1')}
         <i>{t('submit.button.editing.label')}</i>
         {t('tos.terms2')}
-        <Link style={{ textDecoration: 'none', color: theme.palette.primary.main }} to="/tos">
+        <AppLink
+          style={{ textDecoration: 'none', color: theme.palette.primary.main }}
+          nav={nav => nav.to().create({ route: '/tos' })}
+        >
           {t('tos.terms3')}
-        </Link>
+        </AppLink>
         .
       </Typography>
     </div>
   );
 });
+ToS.displayName = 'ToS';

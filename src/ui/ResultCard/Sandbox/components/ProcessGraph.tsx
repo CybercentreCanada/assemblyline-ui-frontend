@@ -15,14 +15,14 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
-import useALContext from 'core/config/useALContext';
-import useSafeResults from 'layout/safe-results/safe-results.hooks';
+import useALContext from 'deprecated/hooks/useALContext';
+import { useAppSafeResults } from 'layout/safe-results';
 import type { SandboxBody as SandboxData, SandboxProcessItem } from 'models/base/result_body';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { humanReadableNumber } from 'shared/utils/utils';
 import { CustomChip } from 'ui/CustomChip';
-import type { ProcessItem, SandboxFilter } from 'ui/ResultCard/Sandbox/sandbox.utils.ts';
+import type { ProcessItem, SandboxFilter } from 'ui/ResultCard/Sandbox/sandbox.utils';
 import {
   buildProcessTree,
   filterSafelistedProcesses,
@@ -30,7 +30,7 @@ import {
   getBorderColor,
   getDescendantPids,
   getProcessScore
-} from 'ui/ResultCard/Sandbox/sandbox.utils.ts';
+} from 'ui/ResultCard/Sandbox/sandbox.utils';
 
 /* ----------------------------------------------------------------------------
  * ProcessStats
@@ -143,7 +143,7 @@ const ProcessTreeItem = React.memo(
   }: ProcessTreeItemProps) => {
     const theme = useTheme();
     const { configuration, scoreToVerdict } = useALContext();
-    const { showSafeResults } = useSafeResults();
+    const { showSafeResults } = useAppSafeResults();
 
     const filteredChildren = useMemo(
       () => filterSafelistedProcesses(item.children, showSafeResults),

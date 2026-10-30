@@ -1,11 +1,11 @@
 import type { Page } from '@playwright/test';
-import type { APIResponse } from 'core/api/api.models.ts';
 import { test } from 'core/e2e/e2e.fixtures';
+import type { APIResponseProps } from 'deprecated/hooks/useMyAPI';
 
 type Response<T> = {
   url: string;
   status: number;
-  body: APIResponse<T>;
+  body: APIResponseProps<T>;
   error: unknown;
 };
 
@@ -20,16 +20,16 @@ export class APIFixture {
       const response = await this.page.waitForResponse(`**/api/v4${route}`, { timeout });
       const status = response.status();
 
-      let body: APIResponse<T>;
+      let body: APIResponseProps<T>;
       try {
-        body = (await response.json()) as APIResponse<T>;
+        body = (await response.json()) as APIResponseProps<T>;
       } catch (error) {
         return {
           api_error_message: error as string,
           api_response: null,
           api_server_version: null,
           api_status_code: status
-        } as APIResponse<T>;
+        } as APIResponseProps<T>;
       }
 
       await this.testInfo.attach(`api-response: ${response.url()}`, {

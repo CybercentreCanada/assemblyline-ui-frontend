@@ -1,24 +1,21 @@
 import { ClearOutlined } from '@mui/icons-material';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
 import ToggleOffOutlinedIcon from '@mui/icons-material/ToggleOffOutlined';
 import ToggleOnIcon from '@mui/icons-material/ToggleOn';
 import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
 import { Divider, Grid, MenuItem, Skeleton, TextField, Tooltip, Typography, useTheme } from '@mui/material';
-import { useALMutation } from 'core/api/hooks/useAppMutation';
-import { useALQuery } from 'core/api/hooks/useAppQuery';
-import { invalidateALQuery } from 'core/api/utils/invalidateAppQuery';
-import { updateALQuery } from 'core/api/utils/updateAppQuery';
-import useALContext from 'core/config/useALContext';
-import useMySnackbar from 'core/snackbar/snackbar.hooks';
-import PageCenter from 'core/template/components/pages/PageCenter';
+import { invalidateAppQuery, updateAppQuery, useAppMutation, useAppQuery } from 'core/api';
+import { createAppRoute, useAppNavigate, useAppPathParams } from 'core/router';
+import { AppPageCenter } from 'core/template';
+import useALContext from 'deprecated/hooks/useALContext';
+import useMySnackbar from 'deprecated/hooks/useMySnackbar';
 import type { Badlist } from 'models/base/badlist';
 import { ATTRIBUTION_TYPES, DEFAULT_TEMP_ATTRIBUTION } from 'models/base/badlist';
-import { useState } from 'react';
+import { memo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router';
-import ForbiddenPage from 'routes/forbidden/forbidden.route';
-import { bytesToSize, safeFieldValue, safeFieldValueURI } from 'shared/utils/utils';
+import { bytesToSize, safeFieldValue } from 'shared/utils/utils';
 import { IconButton } from 'ui/buttons/IconButton';
 import Classification from 'ui/Classification';
 import ConfirmationDialog from 'ui/ConfirmationDialog';
@@ -29,20 +26,11 @@ import InputDialog from 'ui/InputDialog';
 import { PageHeader } from 'ui/layouts/PageHeader';
 import Moment from 'ui/Moment';
 
-type ParamProps = {
-  id: string;
-};
-
-type BadlistDetailProps = {
-  badlist_id?: string;
-  close?: () => void;
-};
-
-const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailProps) => {
+export const ManageBadlistDetailPage = memo(() => {
   const { t } = useTranslation(['manageBadlistDetail']);
   const theme = useTheme();
-  const navigate = useNavigate();
-  const { id } = useParams<ParamProps>();
+  const navigate = useAppNavigate<'/manage/badlist/detail/:id'>();
+  const badlistID = useAppPathParams<'/manage/badlist/detail/:id'>()?.id;
   const { showSuccessMessage } = useMySnackbar();
   const { user: currentUser, c12nDef } = useALContext();
 
@@ -56,13 +44,13 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
     ...DEFAULT_TEMP_ATTRIBUTION
   });
 
-  const { data: badlist } = useALQuery({
-    url: `/api/v4/badlist/${badlist_id || id}/`,
-    disabled: !(badlist_id || id) || !currentUser.roles.includes('badlist_view'),
+  const { data: badlist } = useAppQuery({
+    url: `/api/v4/badlist/${badlistID}/`,
+    disabled: !badlistID || !currentUser.roles.includes('badlist_view'),
     body: null
   });
 
-  const { data: histogram } = useALQuery({
+  const { data: histogram } = useAppQuery({
     url: '/api/v4/search/histogram/result/created/',
     method: 'POST',
     disabled: !badlist || !currentUser.roles.includes('badlist_view'),
@@ -71,7 +59,7 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
       : {
           query:
             badlist.type === 'file'
-              ? `result.sections.heuristic.signature.name:"BADLIST_${badlist_id || id}"`
+              ? `result.sections.heuristic.signature.name:"BADLIST_${badlistID}"`
               : `result.sections.tags.${badlist.tag.type}:${safeFieldValue(badlist.tag.value)}`,
           mincount: 0,
           start: 'now-30d/d',
@@ -80,90 +68,90 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
         }
   });
 
-  const handleRemoveBadlist = useALMutation(() => ({
-    url: `/api/v4/badlist/${badlist_id || id}/`,
+  const handleRemoveBadlist = useAppMutation(() => ({
+    url: `/api/v4/badlist/${badlistID}/`,
     method: 'DELETE',
     onSuccess: () => {
       setDeleteDialog(false);
       showSuccessMessage(t('delete.success'));
-      invalidateALQuery({ url: '/api/v4/search/badlist/' }, 1000);
-      if (id) setTimeout(() => navigate('/manage/badlist'), 1000);
+      invalidateAppQuery({ url: '/api/v4/search/badlist/' }, 1000);
+      navigate.here().closePanel({ route: '/manage/badlists' });
       close();
     }
   }));
 
-  const handleEnableHash = useALMutation((enabled: boolean) => ({
-    url: `/api/v4/badlist/enable/${badlist_id || id}/`,
+  const handleEnableHash = useAppMutation((enabled: boolean) => ({
+    url: `/api/v4/badlist/enable/${badlistID}/`,
     method: 'PUT',
     body: enabled,
     onSuccess: () => {
       setEnableDialog(false);
       setDisableDialog(false);
       showSuccessMessage(enabled ? t('enable.success') : t('disable.success'));
-      invalidateALQuery({ url: '/api/v4/search/badlist/' }, 1000);
-      updateALQuery({ url: `/api/v4/badlist/${badlist_id || id}/` }, prev => ({ ...prev, enabled }));
+      invalidateAppQuery({ url: '/api/v4/search/badlist/' }, 1000);
+      updateAppQuery({ url: `/api/v4/badlist/${badlistID}/` }, prev => ({ ...prev, enabled }));
     }
   }));
 
-  const handleExpiryDateChange = useALMutation((expiry_ts: string) => ({
-    url: `/api/v4/badlist/expiry/${badlist_id || id}/`,
+  const handleExpiryDateChange = useAppMutation((expiry_ts: string) => ({
+    url: `/api/v4/badlist/expiry/${badlistID}/`,
     method: 'DELETE',
     ...(expiry_ts && { method: 'PUT', body: expiry_ts }),
     onSuccess: () => {
       setDisableDialog(false);
       showSuccessMessage(t(expiry_ts ? 'expiry.update.success' : 'expiry.clear.success'));
-      invalidateALQuery({ url: '/api/v4/search/badlist/' }, 1000);
-      updateALQuery({ url: `/api/v4/badlist/${badlist_id || id}/` }, prev => ({ ...prev, expiry_ts }));
+      invalidateAppQuery({ url: '/api/v4/search/badlist/' }, 1000);
+      updateAppQuery({ url: `/api/v4/badlist/${badlistID}/` }, prev => ({ ...prev, expiry_ts }));
     }
   }));
 
-  const handleClassificationChange = useALMutation((classification: string, source: string, type: string) => ({
-    url: `/api/v4/badlist/classification/${badlist_id || id}/${source}/${type}/`,
+  const handleClassificationChange = useAppMutation((classification: string, source: string, type: string) => ({
+    url: `/api/v4/badlist/classification/${badlistID}/${source}/${type}/`,
     method: 'PUT',
     body: classification,
     onSuccess: () => {
       showSuccessMessage(t('classification.update.success'));
-      invalidateALQuery({ url: '/api/v4/search/badlist/' }, 1000);
-      invalidateALQuery({ url: `/api/v4/badlist/${badlist_id || id}/` }, 1000);
+      invalidateAppQuery({ url: '/api/v4/search/badlist/' }, 1000);
+      invalidateAppQuery({ url: `/api/v4/badlist/${badlistID}/` }, 1000);
     }
   }));
 
-  const handleDeleteSource = useALMutation((name: string, type: string) => ({
-    url: `/api/v4/badlist/source/${badlist_id || id}/${name}/${type}/`,
+  const handleDeleteSource = useAppMutation((name: string, type: string) => ({
+    url: `/api/v4/badlist/source/${badlistID}/${name}/${type}/`,
     method: 'DELETE',
     onSuccess: () => {
       showSuccessMessage(t('remove.source.success'));
-      invalidateALQuery({ url: '/api/v4/search/badlist/' }, 1000);
-      invalidateALQuery({ url: `/api/v4/badlist/${badlist_id || id}/` }, 1000);
+      invalidateAppQuery({ url: '/api/v4/search/badlist/' }, 1000);
+      invalidateAppQuery({ url: `/api/v4/badlist/${badlistID}/` }, 1000);
       setRemoveSourceData(null);
     }
   }));
 
-  const handleDeleteAttribution = useALMutation((type: string, value: string) => ({
-    url: `/api/v4/badlist/attribution/${badlist_id || id}/${type}/${value}/`,
+  const handleDeleteAttribution = useAppMutation((type: string, value: string) => ({
+    url: `/api/v4/badlist/attribution/${badlistID}/${type}/${value}/`,
     method: 'DELETE',
     onSuccess: () => {
       showSuccessMessage(t('remove.attribution.success'));
-      invalidateALQuery({ url: '/api/v4/search/badlist/' }, 1000);
-      invalidateALQuery({ url: `/api/v4/badlist/${badlist_id || id}/` }, 1000);
+      invalidateAppQuery({ url: '/api/v4/search/badlist/' }, 1000);
+      invalidateAppQuery({ url: `/api/v4/badlist/${badlistID}/` }, 1000);
       setRemoveAttributionDialog(null);
     }
   }));
 
-  const handleAddAttribution = useALMutation((type: string, value: string) => ({
-    url: `/api/v4/badlist/attribution/${badlist_id || id}/${type}/${value}/`,
+  const handleAddAttribution = useAppMutation((type: string, value: string) => ({
+    url: `/api/v4/badlist/attribution/${badlistID}/${type}/${value}/`,
     method: 'PUT',
     onSuccess: () => {
       setAddAttributionDialog(false);
       showSuccessMessage(t('add.attribution.success'));
-      invalidateALQuery({ url: '/api/v4/search/badlist/' }, 1000);
-      invalidateALQuery({ url: `/api/v4/badlist/${badlist_id || id}/` }, 1000);
+      invalidateAppQuery({ url: '/api/v4/search/badlist/' }, 1000);
+      invalidateAppQuery({ url: `/api/v4/badlist/${badlistID}/` }, 1000);
       setTimeout(() => setAddAttributionData({ ...DEFAULT_TEMP_ATTRIBUTION }), 1000);
     }
   }));
 
-  return currentUser.roles.includes('badlist_view') ? (
-    <PageCenter margin={!id ? 2 : 4} width="100%">
+  return (
+    <AppPageCenter>
       <ConfirmationDialog
         open={deleteDialog}
         handleClose={() => setDeleteDialog(false)}
@@ -256,7 +244,7 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
       <div style={{ textAlign: 'left' }}>
         <PageHeader
           primary={badlist ? t(`title.${badlist.type}`) : t('title')}
-          secondary={badlist_id || id}
+          secondary={badlistID}
           secondaryLoading={!badlist}
           slotProps={{
             root: { style: { marginBottom: theme.spacing(4) } }
@@ -266,13 +254,26 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
               <IconButton
                 tooltip={t('usage')}
                 loading={!badlist}
-                preventRender={!(badlist_id || id) || !currentUser.roles.includes('submission_view')}
+                preventRender={!badlistID || !currentUser.roles.includes('submission_view')}
                 size="large"
                 sx={{ color: theme.palette.action.active }}
-                to={() =>
-                  badlist.type === 'file'
-                    ? `/search/?query=sha256:${badlist.hashes.sha256 || badlist_id || id} OR results:${badlist.hashes.sha256 || badlist_id || id}* OR errors:${badlist.hashes.sha256 || badlist_id || id}* OR file.sha256:${badlist.hashes.sha256 || badlist_id || id}`
-                    : `/search/result/?query=result.sections.tags.${badlist.tag.type}:${safeFieldValueURI(badlist.tag.value)}`
+                nav={nav =>
+                  nav.to().create(
+                    badlist.type === 'file'
+                      ? {
+                          route: '/search',
+                          search: {
+                            query: `sha256:${badlist.hashes.sha256 || badlistID} OR results:${badlist.hashes.sha256 || badlistID}* OR errors:${badlist.hashes.sha256 || badlistID}* OR file.sha256:${badlist.hashes.sha256 || badlistID}`
+                          }
+                        }
+                      : {
+                          route: '/search/:index',
+                          path: { index: 'result' },
+                          search: {
+                            query: `result.sections.tags.${badlist.tag.type}:${safeFieldValue(badlist.tag.value)}`
+                          }
+                        }
+                  )
                 }
               >
                 <YoutubeSearchedForIcon />
@@ -281,7 +282,7 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
                 tooltip={!badlist ? null : badlist.enabled ? t('enabled') : t('disabled')}
                 loading={!badlist}
                 size="large"
-                preventRender={!(badlist_id || id) || !currentUser.roles.includes('badlist_manage')}
+                preventRender={!badlistID || !currentUser.roles.includes('badlist_manage')}
                 onClick={!badlist ? null : badlist.enabled ? () => setDisableDialog(true) : () => setEnableDialog(true)}
               >
                 {!badlist ? null : badlist.enabled ? <ToggleOnIcon /> : <ToggleOffOutlinedIcon />}
@@ -290,7 +291,7 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
                 tooltip={t('remove')}
                 loading={!badlist}
                 size="large"
-                preventRender={!(badlist_id || id) || !currentUser.roles.includes('badlist_manage')}
+                preventRender={!badlistID || !currentUser.roles.includes('badlist_manage')}
                 sx={{ color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark }}
                 onClick={() => setDeleteDialog(true)}
               >
@@ -615,17 +616,37 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
                 height="300px"
                 isDate
                 title={t('chart.title')}
-                datatype={badlist_id || id}
+                datatype={badlistID}
                 verticalLine
               />
             </Grid>
           )}
         </Grid>
       </div>
-    </PageCenter>
-  ) : (
-    <ForbiddenPage />
+    </AppPageCenter>
   );
-};
+});
 
-export default BadlistDetail;
+export const ManageBadlistDetailRoute = createAppRoute({
+  component: ManageBadlistDetailPage,
+
+  path: '/manage/badlist/detail/:id',
+  params: s => ({
+    id: s.string()
+  }),
+
+  ancestor: '/manage/badlists',
+  shortname: location => [
+    'app_route.manage_badlist_detail.shortname',
+    { ns: 'manageBadlistDetail', id: location.path.id }
+  ],
+  fullname: location => [
+    'app_route.manage_badlist_detail.fullname',
+    { ns: 'manageBadlistDetail', id: location.path.id }
+  ],
+  shorticon: () => <BugReportOutlinedIcon />,
+  fullicon: () => <BugReportOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.roles.includes('badlist_view')
+});

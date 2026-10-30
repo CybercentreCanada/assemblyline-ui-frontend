@@ -17,12 +17,13 @@ import {
   Tooltip,
   useTheme
 } from '@mui/material';
-import useALContext from 'core/config/useALContext';
-import useClipboard from 'layout/clipboard/clipboard.hooks';
-import useHighlighter from 'layout/highlighter/highlighter.hooks';
-import useSafeResults from 'layout/safe-results/safe-results.hooks';
+import useALContext from 'deprecated/hooks/useALContext';
+import useClipboard from 'deprecated/hooks/useClipboard';
+import useHighlighter from 'deprecated/hooks/useHighlighter';
+import useSafeResults from 'deprecated/hooks/useSafeResults';
+import { useAppHasHighlightedKeys } from 'layout/highlighter';
 import type { Section, SectionItem } from 'models/base/result';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Attack from 'ui/Attack';
 import Classification from 'ui/Classification';
@@ -36,7 +37,7 @@ import { MemDumpBody } from 'ui/ResultCard/memdump_body';
 import { MultiBody } from 'ui/ResultCard/multi_body';
 import { OrderedKVBody } from 'ui/ResultCard/ordered_kv_body';
 import { ProcessTreeBody } from 'ui/ResultCard/process_tree_body';
-import { SandboxBody } from 'ui/ResultCard/Sandbox/sandbox.body.tsx';
+import { SandboxBody } from 'ui/ResultCard/Sandbox/sandbox.body';
 import { TblBody } from 'ui/ResultCard/table_body';
 import { TextBody } from 'ui/ResultCard/text_body';
 import { TimelineBody } from 'ui/ResultCard/timeline_body';
@@ -90,7 +91,7 @@ const WrappedResultSection: React.FC<Props> = ({
   const theme = useTheme();
   const { c12nDef } = useALContext();
   const { copy } = useClipboard();
-  const { getKey, hasHighlightedKeys } = useHighlighter();
+  const { getKey } = useHighlighter();
   const { showSafeResults } = useSafeResults();
 
   const [state, setState] = useState<{ mouseX: number; mouseY: number }>(null);
@@ -101,8 +102,8 @@ const WrappedResultSection: React.FC<Props> = ({
   const [showAttack, setShowAttack] = useState<boolean>(false);
   const [showTable, setShowTable] = useState<boolean>(false);
 
-  const allTags = useMemo(() => {
-    const tagList = [];
+  const highlighted = useAppHasHighlightedKeys(() => {
+    const tagList: string[] = [];
     if (!printable) {
       if (Array.isArray(section.tags)) {
         for (const tag of section.tags) {
@@ -127,10 +128,7 @@ const WrappedResultSection: React.FC<Props> = ({
       }
     }
     return tagList;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [section]);
-
-  const highlighted = hasHighlightedKeys(allTags);
 
   const handleMenuClick = useCallback(
     event => {

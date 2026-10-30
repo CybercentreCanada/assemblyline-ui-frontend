@@ -1,4 +1,6 @@
 {
+  "app_route.statistics_signatures.fullname": "Signature Statistics",
+  "app_route.statistics_signatures.shortname": "Signature Statistics",
   "avg": "Avg Score",
   "classification": "Classification",
   "count": "Count",

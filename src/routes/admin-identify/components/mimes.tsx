@@ -1,18 +1,23 @@
 import Editor, { DiffEditor, loader } from '@monaco-editor/react';
-import { Dialog, DialogActions, DialogContent, DialogTitle, Skeleton, useTheme } from '@mui/material';
-import useMyAPI from 'core/api/hooks/useMyAPI';
-import useMySnackbar from 'core/snackbar/snackbar.hooks';
-import { useAppTheme } from 'core/template/components/app/hooks';
-import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
-import React, { useRef, useState } from 'react';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Skeleton, useTheme } from '@mui/material';
+import { useAppTemplateThemeMode } from 'core/template';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useMySnackbar from 'deprecated/hooks/useMySnackbar';
+import { memo, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ReactResizeDetector from 'react-resize-detector';
-import { Button } from 'ui/buttons/Button';
 import { PageHeader } from 'ui/layouts/PageHeader';
 
 loader.config({ paths: { vs: '/cdn/monaco_0.35.0/vs' } });
 
-function WrappedMimes({ reload, mimesFile, originalMimesFile, setMimesFile }) {
+export type MimesProps = {
+  reload: (defValue?: boolean, autoOpen?: (open: boolean) => void) => void;
+  mimesFile: string | null;
+  originalMimesFile: string | null;
+  setMimesFile: (value: string | null | undefined) => void;
+};
+
+export const Mimes = memo(({ reload, mimesFile, originalMimesFile, setMimesFile }: MimesProps) => {
   const { t, i18n } = useTranslation(['adminIdentify']);
   const theme = useTheme();
   const containerEL = useRef<HTMLDivElement>(null);
@@ -20,9 +25,9 @@ function WrappedMimes({ reload, mimesFile, originalMimesFile, setMimesFile }) {
   const [open, setOpen] = useState(false);
   const { showSuccessMessage } = useMySnackbar();
   const { apiCall } = useMyAPI();
-  const { isDark: isDarkTheme } = useAppTheme();
+  const themeMode = useAppTemplateThemeMode();
 
-  useEffectOnce(() => {
+  useEffect(() => {
     if (!mimesFile) reload();
     // I cannot find a way to hot switch monaco editor's locale but at least I can load
     // the right language on first load...
@@ -31,7 +36,7 @@ function WrappedMimes({ reload, mimesFile, originalMimesFile, setMimesFile }) {
     } else {
       loader.config({ 'vs/nls': { availableLanguages: { '*': '' } } });
     }
-  });
+  }, []);
 
   const saveChanges = tagData => {
     setOpen(false);
@@ -61,7 +66,7 @@ function WrappedMimes({ reload, mimesFile, originalMimesFile, setMimesFile }) {
                 <div ref={containerDialogEL}>
                   <DiffEditor
                     language="mimes"
-                    theme={isDarkTheme ? 'vs-dark' : 'vs'}
+                    theme={themeMode === 'dark' ? 'vs-dark' : 'vs'}
                     original={originalMimesFile}
                     width={width}
                     height="50vh"
@@ -145,7 +150,7 @@ function WrappedMimes({ reload, mimesFile, originalMimesFile, setMimesFile }) {
                       language="yaml"
                       width={width}
                       height={height}
-                      theme={isDarkTheme ? 'vs-dark' : 'vs'}
+                      theme={themeMode === 'dark' ? 'vs-dark' : 'vs'}
                       loading={t('loading.mimes')}
                       value={mimesFile}
                       onChange={setMimesFile}
@@ -163,7 +168,4 @@ function WrappedMimes({ reload, mimesFile, originalMimesFile, setMimesFile }) {
       </div>
     </>
   );
-}
-
-const Mimes = React.memo(WrappedMimes);
-export default Mimes;
+});

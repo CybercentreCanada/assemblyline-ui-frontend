@@ -1,19 +1,19 @@
 import { ClearOutlined } from '@mui/icons-material';
+import ListOutlinedIcon from '@mui/icons-material/ListOutlined';
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
 import ToggleOffOutlinedIcon from '@mui/icons-material/ToggleOffOutlined';
 import ToggleOnIcon from '@mui/icons-material/ToggleOn';
 import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
 import { Divider, Grid, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
-import useMyAPI from 'core/api/hooks/useMyAPI';
-import useALContext from 'core/config/useALContext';
-import useMySnackbar from 'core/snackbar/snackbar.hooks';
-import PageCenter from 'core/template/components/pages/PageCenter';
+import { createAppRoute, useAppNavigate, useAppPathParams } from 'core/router';
+import { AppPageCenter } from 'core/template';
+import useALContext from 'deprecated/hooks/useALContext';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useMySnackbar from 'deprecated/hooks/useMySnackbar';
 import type { Safelist } from 'models/base/safelist';
-import { useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router';
-import ForbiddenPage from 'routes/forbidden/forbidden.route';
-import { bytesToSize, safeFieldValue, safeFieldValueURI } from 'shared/utils/utils';
+import { bytesToSize, safeFieldValue } from 'shared/utils/utils';
 import { IconButton } from 'ui/buttons/IconButton';
 import Classification from 'ui/Classification';
 import ConfirmationDialog from 'ui/ConfirmationDialog';
@@ -22,18 +22,10 @@ import Histogram from 'ui/Histogram';
 import { PageHeader } from 'ui/layouts/PageHeader';
 import Moment from 'ui/Moment';
 
-type ParamProps = {
-  id: string;
-};
-
-type SafelistDetailProps = {
-  safelist_id?: string;
-  close?: () => void;
-};
-
-const SafelistDetail = ({ safelist_id = null, close = () => null }: SafelistDetailProps) => {
-  const { t, i18n } = useTranslation(['manageSafelistDetail']);
-  const { id } = useParams<ParamProps>();
+export const ManageSafelistDetailPage = memo(() => {
+  const { t } = useTranslation(['manageSafelistDetail']);
+  const navigate = useAppNavigate<'/manage/safelist/detail/:id'>();
+  const safelistID = useAppPathParams<'/manage/safelist/detail/:id'>()?.id;
   const theme = useTheme();
   const [safelist, setSafelist] = useState<Safelist>(null);
   const [histogram, setHistogram] = useState<any>(null);
@@ -45,18 +37,17 @@ const SafelistDetail = ({ safelist_id = null, close = () => null }: SafelistDeta
   const { user: currentUser, c12nDef } = useALContext();
   const { showSuccessMessage } = useMySnackbar();
   const { apiCall } = useMyAPI();
-  const navigate = useNavigate();
 
   useEffect(() => {
-    if ((safelist_id || id) && currentUser.roles.includes('safelist_view')) {
+    if (safelistID && currentUser.roles.includes('safelist_view')) {
       reload();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [safelist_id, id]);
+  }, [safelistID]);
 
   const reload = () => {
     apiCall({
-      url: `/api/v4/safelist/${safelist_id || id}/`,
+      url: `/api/v4/safelist/${safelistID}/`,
       onSuccess: api_data => {
         setSafelist(api_data.api_response);
       }
@@ -71,7 +62,7 @@ const SafelistDetail = ({ safelist_id = null, close = () => null }: SafelistDeta
         body: {
           query:
             safelist.type === 'file'
-              ? `result.sections.heuristic.signature.name:"SAFELIST_${safelist_id || id}"`
+              ? `result.sections.heuristic.signature.name:"SAFELIST_${safelistID}"`
               : safelist.type === 'signature'
                 ? `result.sections.heuristic.signature.name:${safeFieldValue(safelist.signature.name)}`
                 : `result.sections.safelisted_tags.${safelist.tag.type}:${safeFieldValue(safelist.tag.value)}`,
@@ -90,14 +81,12 @@ const SafelistDetail = ({ safelist_id = null, close = () => null }: SafelistDeta
 
   const removeSafelist = () => {
     apiCall({
-      url: `/api/v4/safelist/${safelist_id || id}/`,
+      url: `/api/v4/safelist/${safelistID}/`,
       method: 'DELETE',
       onSuccess: () => {
         setDeleteDialog(false);
         showSuccessMessage(t('delete.success'));
-        if (id) {
-          setTimeout(() => navigate('/manage/safelist'), 1000);
-        }
+        setTimeout(() => navigate.here().closePanel({ route: '/manage/safelists' }), 1000);
         setTimeout(() => window.dispatchEvent(new CustomEvent('reloadSafelist')), 1000);
         close();
       },
@@ -109,7 +98,7 @@ const SafelistDetail = ({ safelist_id = null, close = () => null }: SafelistDeta
   const enableHash = () => {
     apiCall({
       body: true,
-      url: `/api/v4/safelist/enable/${safelist_id || id}/`,
+      url: `/api/v4/safelist/enable/${safelistID}/`,
       method: 'PUT',
       onSuccess: () => {
         setEnableDialog(false);
@@ -125,7 +114,7 @@ const SafelistDetail = ({ safelist_id = null, close = () => null }: SafelistDeta
   const disableHash = () => {
     apiCall({
       body: false,
-      url: `/api/v4/safelist/enable/${safelist_id || id}/`,
+      url: `/api/v4/safelist/enable/${safelistID}/`,
       method: 'PUT',
       onSuccess: () => {
         setDisableDialog(false);
@@ -141,7 +130,7 @@ const SafelistDetail = ({ safelist_id = null, close = () => null }: SafelistDeta
   const handleExpiryDateChange = date => {
     apiCall({
       body: date,
-      url: `/api/v4/safelist/expiry/${safelist_id || id}/`,
+      url: `/api/v4/safelist/expiry/${safelistID}/`,
       method: date ? 'PUT' : 'DELETE',
       onSuccess: () => {
         setDisableDialog(false);
@@ -157,7 +146,7 @@ const SafelistDetail = ({ safelist_id = null, close = () => null }: SafelistDeta
   const handleClassificationChange = (classification, source, type) => {
     apiCall({
       body: classification,
-      url: `/api/v4/safelist/classification/${safelist_id || id}/${source}/${type}/`,
+      url: `/api/v4/safelist/classification/${safelistID}/${source}/${type}/`,
       method: 'PUT',
       onSuccess: () => {
         showSuccessMessage(t('classification.update.success'));
@@ -173,7 +162,7 @@ const SafelistDetail = ({ safelist_id = null, close = () => null }: SafelistDeta
 
   const deleteSource = () => {
     apiCall({
-      url: `/api/v4/safelist/source/${safelist_id || id}/${removeSourceData.name}/${removeSourceData.type}/`,
+      url: `/api/v4/safelist/source/${safelistID}/${removeSourceData.name}/${removeSourceData.type}/`,
       method: 'DELETE',
       onSuccess: () => {
         showSuccessMessage(t('remove.source.success'));
@@ -190,8 +179,8 @@ const SafelistDetail = ({ safelist_id = null, close = () => null }: SafelistDeta
     });
   };
 
-  return currentUser.roles.includes('safelist_view') ? (
-    <PageCenter margin={!id ? 2 : 4} width="100%">
+  return (
+    <AppPageCenter>
       <ConfirmationDialog
         open={deleteDialog}
         handleClose={() => setDeleteDialog(false)}
@@ -241,7 +230,7 @@ const SafelistDetail = ({ safelist_id = null, close = () => null }: SafelistDeta
       <div style={{ textAlign: 'left' }}>
         <PageHeader
           primary={safelist ? t(`title.${safelist.type}`) : t('title')}
-          secondary={safelist_id || id}
+          secondary={safelistID}
           secondaryLoading={!safelist}
           slotProps={{
             root: { style: { marginBottom: theme.spacing(4) } }
@@ -251,14 +240,21 @@ const SafelistDetail = ({ safelist_id = null, close = () => null }: SafelistDeta
               <IconButton
                 tooltip={t('usage')}
                 loading={!safelist}
-                preventRender={!(safelist_id || id) || !currentUser.roles.includes('submission_view')}
+                preventRender={!safelistID || !currentUser.roles.includes('submission_view')}
                 sx={{ color: theme.palette.action.active }}
-                to={() =>
-                  safelist.type === 'file'
-                    ? `/search/result/?query=result.sections.heuristic.signature.name:"SAFELIST_${safelist_id || id}"`
-                    : safelist.type === 'signature'
-                      ? `/search/result/?query=result.sections.heuristic.signature.name:${safeFieldValueURI(safelist.signature.name)}`
-                      : `/search/result/?query=result.sections.safelisted_tags.${safelist.tag.type}:${safeFieldValueURI(safelist.tag.value)}`
+                nav={nav =>
+                  nav.to().create({
+                    route: '/search/:index',
+                    path: { index: 'result' },
+                    search: {
+                      query:
+                        safelist.type === 'file'
+                          ? `result.sections.heuristic.signature.name:"SAFELIST_${safelistID}"`
+                          : safelist.type === 'signature'
+                            ? `result.sections.heuristic.signature.name:${safeFieldValue(safelist.signature.name)}`
+                            : `result.sections.safelisted_tags.${safelist.tag.type}:${safeFieldValue(safelist.tag.value)}`
+                    }
+                  })
                 }
                 size="large"
               >
@@ -268,7 +264,7 @@ const SafelistDetail = ({ safelist_id = null, close = () => null }: SafelistDeta
                 tooltip={!safelist ? null : safelist.enabled ? t('enabled') : t('disabled')}
                 loading={!safelist}
                 size="large"
-                preventRender={!(safelist_id || id) || !currentUser.roles.includes('safelist_manage')}
+                preventRender={!safelistID || !currentUser.roles.includes('safelist_manage')}
                 onClick={
                   !safelist ? null : safelist.enabled ? () => setDisableDialog(true) : () => setEnableDialog(true)
                 }
@@ -279,7 +275,7 @@ const SafelistDetail = ({ safelist_id = null, close = () => null }: SafelistDeta
                 tooltip={t('remove')}
                 loading={!safelist}
                 size="large"
-                preventRender={!(safelist_id || id) || !currentUser.roles.includes('safelist_manage')}
+                preventRender={!safelistID || !currentUser.roles.includes('safelist_manage')}
                 sx={{ color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark }}
                 onClick={() => setDeleteDialog(true)}
               >
@@ -526,17 +522,37 @@ const SafelistDetail = ({ safelist_id = null, close = () => null }: SafelistDeta
                 height="300px"
                 isDate
                 title={t('chart.title')}
-                datatype={safelist_id || id}
+                datatype={safelistID}
                 verticalLine
               />
             </Grid>
           )}
         </Grid>
       </div>
-    </PageCenter>
-  ) : (
-    <ForbiddenPage />
+    </AppPageCenter>
   );
-};
+});
 
-export default SafelistDetail;
+export const ManageSafelistDetailRoute = createAppRoute({
+  component: ManageSafelistDetailPage,
+
+  path: '/manage/safelist/detail/:id',
+  params: s => ({
+    id: s.string()
+  }),
+
+  ancestor: '/manage/safelists',
+  shortname: location => [
+    'app_route.manage_safelist_detail.shortname',
+    { ns: 'manageSafelistDetail', id: location.path.id }
+  ],
+  fullname: location => [
+    'app_route.manage_safelist_detail.fullname',
+    { ns: 'manageSafelistDetail', id: location.path.id }
+  ],
+  shorticon: () => <ListOutlinedIcon />,
+  fullicon: () => <ListOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.roles.includes('safelist_view')
+});

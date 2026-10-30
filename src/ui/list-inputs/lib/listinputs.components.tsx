@@ -13,15 +13,15 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
-import { usePropStore } from 'features/prop-provider/prop-provider.providers';
+import { usePropStore } from 'features/prop-provider';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { IconButton } from 'ui/buttons/IconButton';
-import { InputListItemText, SelectInputOptionMenuItem } from 'ui/inputs/components/inputs.component.form.tsx';
-import { useInputTextFieldSlots } from 'ui/inputs/components/inputs.component.textfield.tsx';
-import { useInputId } from 'ui/inputs/hooks/inputs.hook.renderer.tsx';
-import type { SelectInputOption } from 'ui/inputs/models/inputs.model.ts';
-import type { ListInputControllerProps } from 'ui/list-inputs/lib/listinputs.model.ts';
+import { InputListItemText, SelectInputOptionMenuItem } from 'ui/inputs/components/inputs.component.form';
+import { useInputTextFieldSlots } from 'ui/inputs/components/inputs.component.textfield';
+import { useInputId } from 'ui/inputs/hooks/inputs.hook.renderer';
+import type { SelectInputOption } from 'ui/inputs/models/inputs.model';
+import type { ListInputControllerProps } from 'ui/list-inputs/lib/listinputs.model';
 
 /**********************************************************************************************************************
  * Skeletons
@@ -355,7 +355,7 @@ export const SelectListInputOptionMenuItem = React.memo(
             <IconButton
               color="secondary"
               tabIndex={-1}
-              to={helpLink}
+              nav={nav => nav.to().create(helpLink)}
               tooltip={
                 <>
                   <span style={{ color: theme.palette.text.secondary }}>{t('adornment.help.tooltip')}</span>

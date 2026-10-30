@@ -1,20 +1,20 @@
+import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import { AlertTitle, useMediaQuery, useTheme } from '@mui/material';
-import useMyAPI from 'core/api/hooks/useMyAPI';
-import useALContext from 'core/config/useALContext';
-import useMySnackbar from 'core/snackbar/snackbar.hooks';
-import PageFullSize from 'core/template/branding/AppPageCenter';
-import PageCenter from 'core/template/components/pages/PageCenter';
-import useAssistant from 'layout/assistant/assistant.hooks';
+import { createAppRoute, useAppNavigate, useAppPathParams } from 'core/router';
+import { AppPageFullSize } from 'core/template';
+import useALContext from 'deprecated/hooks/useALContext';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useMySnackbar from 'deprecated/hooks/useMySnackbar';
+import { useAssistant } from 'layout/assistant';
 import type { File } from 'models/api/file';
 import type { Section } from 'models/base/result';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate, useLocation, useNavigate, useParams } from 'react-router';
-import { ArchiveBanner } from 'routes/archive-detail/components/banner';
-import { CommentSection } from 'routes/archive-detail/components/comments';
-import { LabelSection } from 'routes/archive-detail/components/labels';
-import { SimilarSection } from 'routes/archive-detail/components/similar';
-import { ArchivedTagSection } from 'routes/archive-detail/components/tags';
+import ArchiveBanner from 'routes/archive-detail/components/banner';
+import CommentSection from 'routes/archive-detail/components/comments';
+import LabelSection from 'routes/archive-detail/components/labels';
+import SimilarSection from 'routes/archive-detail/components/similar';
+import ArchivedTagSection from 'routes/archive-detail/components/tags';
 import AttackSection from 'routes/file-detail/components/attacks';
 import ChildrenSection from 'routes/file-detail/components/childrens';
 import Detection from 'routes/file-detail/components/detection';
@@ -26,48 +26,51 @@ import MetadataSection from 'routes/file-detail/components/metadata';
 import ParentSection from 'routes/file-detail/components/parents';
 import ResultSection from 'routes/file-detail/components/results';
 import URIIdentificationSection from 'routes/file-detail/components/uriIdent';
-import { ASCIISection } from 'routes/file-viewer/components/ascii';
+import ASCIISection from 'routes/file-viewer/components/ascii';
 import CodeSection from 'routes/file-viewer/components/code_summary';
-import { HexSection } from 'routes/file-viewer/components/hex';
-import { ImageSection } from 'routes/file-viewer/components/image';
-import { StringsSection } from 'routes/file-viewer/components/strings';
-import ForbiddenPage from 'routes/forbidden/forbidden.route';
-import NotFoundPage from 'routes/not-found/not-found.route';
+import HexSection from 'routes/file-viewer/components/hex';
+import ImageSection from 'routes/file-viewer/components/image';
+import StringsSection from 'routes/file-viewer/components/strings';
 import AISummarySection from 'routes/submission-detail/components/ai_summary';
 import Classification from 'ui/Classification';
 import InformativeAlert from 'ui/InformativeAlert';
 import { emptyResult } from 'ui/ResultCard';
 import { TabContainer } from 'ui/TabContainer';
 
-type Params = {
-  id?: string;
-  tab?: 'details' | 'detection' | 'tags' | 'relations' | 'ascii' | 'code' | 'hex' | 'image' | 'community';
-};
+export const TAB_OPTIONS = [
+  'details',
+  'detection',
+  'tags',
+  'relations',
+  'ascii',
+  'code',
+  'strings',
+  'hex',
+  'image',
+  'community'
+] as const;
 
-type Props = {
-  sha256?: string;
-  sid?: string;
-  force?: boolean;
-};
+export type Tab = (typeof TAB_OPTIONS)[number];
 
-const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = false }) => {
+export const DEFAULT_TAB: Tab = 'details';
+
+export const ArchiveDetailPage = memo(() => {
   const { t } = useTranslation(['archive']);
   const theme = useTheme();
-  const location = useLocation();
-  const navigate = useNavigate();
-  const { id: paramSha256, tab: paramTab } = useParams<Params>();
+  const navigate = useAppNavigate<'/archive/:id/:tab'>();
+  const { id: sha256, tab: paramTab } = useAppPathParams<'/archive/:id/:tab'>();
 
   const { apiCall } = useMyAPI();
   const { showErrorMessage } = useMySnackbar();
-  const { user: currentUser, c12nDef, configuration, settings } = useALContext();
+  const { c12nDef, configuration, settings } = useALContext();
 
   const [file, setFile] = useState<File>(null);
   const [promotedSections, setPromotedSections] = useState<Section[]>([]);
   const [codeAllowed, setCodeAllowed] = useState<boolean>(false);
 
-  const inDrawer = useMemo<boolean>(() => (propSha256 ? true : paramSha256 ? false : null), [paramSha256, propSha256]);
-  const sha256 = useMemo<string>(() => paramSha256 || propSha256, [paramSha256, propSha256]);
   const { addInsight, removeInsight } = useAssistant();
+
+  const force = false;
 
   const patchFileDetails = useCallback((data: File) => {
     const newData = { ...data };
@@ -105,20 +108,6 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
     };
   }, [sha256]);
 
-  const Layout: React.FC<{ children: React.ReactNode }> = useCallback(
-    ({ children }) =>
-      inDrawer ? (
-        <PageFullSize mt={0} styles={{ paper: { textAlign: 'left', minHeight: null } }}>
-          {children}
-        </PageFullSize>
-      ) : (
-        <PageCenter width="100%" height="100%" textAlign="left">
-          <PageFullSize>{children}</PageFullSize>
-        </PageCenter>
-      ),
-    [inDrawer]
-  );
-
   useEffect(() => {
     if (file === null) {
       setPromotedSections(null);
@@ -151,165 +140,199 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [codeAllowed]);
 
-  if (!configuration?.datastore?.archive?.enabled)
-    return inDrawer ? <NotFoundPage /> : <Navigate to="/notfound" replace />;
-  else if (!currentUser.roles.includes('archive_view'))
-    return inDrawer ? <ForbiddenPage /> : <Navigate to="/forbidden" replace />;
-  else
-    return (
-      <Layout>
-        {c12nDef.enforce && (
-          <div style={{ paddingBottom: theme.spacing(2), paddingTop: theme.spacing(0) }}>
-            <Classification size="tiny" c12n={file ? file.file_info.classification : null} />
-          </div>
-        )}
+  return (
+    <AppPageFullSize>
+      {c12nDef.enforce && (
+        <div style={{ paddingBottom: theme.spacing(2), paddingTop: theme.spacing(0) }}>
+          <Classification size="tiny" c12n={file ? file.file_info.classification : null} />
+        </div>
+      )}
 
-        <ArchiveBanner sha256={sha256} file={file} sid={null} force={force} />
+      <ArchiveBanner sha256={sha256} file={file} sid={null} force={force} />
 
-        <TabContainer
-          value={inDrawer ? null : paramTab}
-          paper={!inDrawer}
-          defaultTab="details"
-          selectionFollowsFocus
-          stickyTop={63}
-          onChange={
-            inDrawer
-              ? null
-              : (_event, value) =>
-                  navigate(`/archive/${sha256}/${value}${location.search}${location.hash}`, { replace: true })
-          }
-          tabs={{
-            details: {
-              label: t('details'),
-              inner: (
-                <>
-                  {file?.file_info?.type.startsWith('uri/') ? (
-                    <URIIdentificationSection
-                      fileinfo={file ? file.file_info : null}
-                      promotedSections={promotedSections}
-                      nocollapse
-                    />
-                  ) : (
-                    <IdentificationSection
-                      fileinfo={file ? file.file_info : null}
-                      promotedSections={promotedSections}
-                      nocollapse
-                    />
-                  )}
-                  <FrequencySection seen={file ? file.file_info?.seen : null} nocollapse />
-                  <MetadataSection metadata={file ? file.metadata : null} nocollapse />
-                </>
-              )
-            },
-            detection: {
-              label: t('detection'),
-              inner:
-                file &&
-                file.results.length === 0 &&
-                Object.keys(file.heuristics).length === 0 &&
-                Object.keys(file.attack_matrix).length === 0 &&
-                file.emptys.length === 0 &&
-                file.errors.length === 0 ? (
-                  <div style={{ width: '100%' }}>
-                    <InformativeAlert>
-                      <AlertTitle>{t('no_detection_title', { ns: 'archive' })}</AlertTitle>
-                      {t('no_detection_desc', { ns: 'archive' })}
-                    </InformativeAlert>
-                  </div>
+      <TabContainer
+        value={paramTab}
+        paper
+        defaultTab={DEFAULT_TAB}
+        selectionFollowsFocus
+        stickyTop={63}
+        onChange={(_event, value: Tab) =>
+          navigate.here({ replace: true }).update({ route: '/archive/:id/:tab', path: { id: sha256, tab: value } })
+        }
+        tabs={{
+          details: {
+            label: t('details'),
+            inner: (
+              <>
+                {file?.file_info?.type.startsWith('uri/') ? (
+                  <URIIdentificationSection
+                    fileinfo={file ? file.file_info : null}
+                    promotedSections={promotedSections}
+                    nocollapse
+                  />
                 ) : (
-                  <div style={{ paddingBottom: theme.spacing(2) }}>
-                    {configuration.ui.ai.enabled && settings.executive_summary && (
-                      <AISummarySection type="file" id={file ? file.file_info.sha256 : null} noCollapse archiveOnly />
-                    )}
-                    <Detection
-                      results={file ? file.results : null}
-                      heuristics={file ? file.heuristics : null}
-                      force={force}
-                      nocollapse
-                    />
-                    <AttackSection attacks={file ? file.attack_matrix : null} force={force} nocollapse />
-                    <ResultSection
-                      results={file ? file.results : null}
-                      sid={null}
-                      alternates={file ? file.alternates : null}
-                      force={force}
-                      nocollapse
-                    />
-                    <EmptySection emptys={file ? file.emptys : null} sid={null} nocollapse />
-                    <ErrorSection errors={file ? file.errors : null} nocollapse />
-                  </div>
-                )
-            },
-            tags: {
-              label: t('tags'),
-              inner: (
-                <ArchivedTagSection
-                  sha256={sha256}
-                  signatures={file ? file.signatures : null}
-                  tags={file ? file.tags : null}
-                  force={force}
-                  drawer={inDrawer}
+                  <IdentificationSection
+                    fileinfo={file ? file.file_info : null}
+                    promotedSections={promotedSections}
+                    nocollapse
+                  />
+                )}
+                <FrequencySection seen={file ? file.file_info?.seen : null} nocollapse />
+                <MetadataSection metadata={file ? file.metadata : null} nocollapse />
+              </>
+            )
+          },
+          detection: {
+            label: t('detection'),
+            inner:
+              file &&
+              file.results.length === 0 &&
+              Object.keys(file.heuristics).length === 0 &&
+              Object.keys(file.attack_matrix).length === 0 &&
+              file.emptys.length === 0 &&
+              file.errors.length === 0 ? (
+                <div style={{ width: '100%' }}>
+                  <InformativeAlert>
+                    <AlertTitle>{t('no_detection_title', { ns: 'archive' })}</AlertTitle>
+                    {t('no_detection_desc', { ns: 'archive' })}
+                  </InformativeAlert>
+                </div>
+              ) : (
+                <div style={{ paddingBottom: theme.spacing(2) }}>
+                  {configuration.ui.ai.enabled && settings.executive_summary && (
+                    <AISummarySection type="file" id={file ? file.file_info.sha256 : null} noCollapse archiveOnly />
+                  )}
+                  <Detection
+                    results={file ? file.results : null}
+                    heuristics={file ? file.heuristics : null}
+                    force={force}
+                    nocollapse
+                  />
+                  <AttackSection attacks={file ? file.attack_matrix : null} force={force} nocollapse />
+                  <ResultSection
+                    results={file ? file.results : null}
+                    sid={null}
+                    alternates={file ? file.alternates : null}
+                    force={force}
+                    nocollapse
+                  />
+                  <EmptySection emptys={file ? file.emptys : null} sid={null} nocollapse />
+                  <ErrorSection errors={file ? file.errors : null} nocollapse />
+                </div>
+              )
+          },
+          tags: {
+            label: t('tags'),
+            inner: (
+              <ArchivedTagSection
+                sha256={sha256}
+                signatures={file ? file.signatures : null}
+                tags={file ? file.tags : null}
+                force={force}
+                drawer={false}
+                nocollapse
+              />
+            )
+          },
+          relations: {
+            label: t('relations'),
+            inner: (
+              <>
+                <ChildrenSection
+                  childrens={file ? file.childrens : null}
+                  title={t('childrens', { ns: 'archive' })}
+                  show
                   nocollapse
                 />
-              )
-            },
-            relations: {
-              label: t('relations'),
-              inner: (
-                <>
-                  <ChildrenSection
-                    childrens={file ? file.childrens : null}
-                    title={t('childrens', { ns: 'archive' })}
-                    show
-                    nocollapse
-                  />
-                  <ParentSection
-                    parents={file ? file.parents : null}
-                    title={t('parents', { ns: 'archive' })}
-                    show
-                    nocollapse
-                  />
-                  <SimilarSection file={file ? file : null} drawer={inDrawer} show nocollapse />
-                </>
-              )
-            },
-            ascii: {
-              label: t('ascii'),
-              inner: <ASCIISection sha256={sha256} type={file?.file_info?.type} codeAllowed={codeAllowed} archiveOnly />
-            },
+                <ParentSection
+                  parents={file ? file.parents : null}
+                  title={t('parents', { ns: 'archive' })}
+                  show
+                  nocollapse
+                />
+                <SimilarSection file={file ? file : null} drawer={false} show nocollapse />
+              </>
+            )
+          },
+          ascii: {
+            label: t('ascii'),
+            inner: <ASCIISection sha256={sha256} type={file?.file_info?.type} codeAllowed={codeAllowed} archiveOnly />
+          },
 
-            code: {
-              label: t('code'),
-              inner: <CodeSection sha256={sha256} archiveOnly />,
-              preventRender: isMdUp || !codeAllowed
-            },
-            strings: { label: t('strings'), inner: <StringsSection sha256={sha256} type={file?.file_info?.type} /> },
-            hex: { label: t('hex'), inner: <HexSection sha256={sha256} /> },
-            image: {
-              label: t('image'),
-              disabled: !file?.file_info?.is_section_image,
-              inner: <ImageSection sha256={sha256} name={sha256} />
-            },
-            community: {
-              label: t('community'),
-              inner: (
-                <>
-                  <LabelSection sha256={sha256} labels={file?.file_info?.label_categories} nocollapse />
-                  <CommentSection
-                    sha256={file?.file_info?.sha256}
-                    comments={file ? file?.file_info?.comments : null}
-                    drawer={inDrawer}
-                    nocollapse
-                  />
-                </>
-              )
-            }
-          }}
-        />
-      </Layout>
-    );
-};
+          code: {
+            label: t('code'),
+            inner: <CodeSection sha256={sha256} archiveOnly />,
+            preventRender: isMdUp || !codeAllowed
+          },
+          strings: { label: t('strings'), inner: <StringsSection sha256={sha256} type={file?.file_info?.type} /> },
+          hex: { label: t('hex'), inner: <HexSection sha256={sha256} /> },
+          image: {
+            label: t('image'),
+            disabled: !file?.file_info?.is_section_image,
+            inner: <ImageSection sha256={sha256} name={sha256} />
+          },
+          community: {
+            label: t('community'),
+            inner: (
+              <>
+                <LabelSection sha256={sha256} labels={file?.file_info?.label_categories} nocollapse />
+                <CommentSection
+                  sha256={file?.file_info?.sha256}
+                  comments={file ? file?.file_info?.comments : null}
+                  drawer={false}
+                  nocollapse
+                />
+              </>
+            )
+          }
+        }}
+      />
+    </AppPageFullSize>
+  );
+});
 
-export const ArchiveDetail = React.memo(WrappedArchiveDetail);
+export const ArchiveDetailRoute = createAppRoute({
+  component: ArchiveDetailPage,
 
-export default ArchiveDetail;
+  path: '/archive/:id/:tab',
+  params: s => ({
+    id: s.string(),
+    tab: s.enum(TAB_OPTIONS, DEFAULT_TAB)
+  }),
+  search: s => ({
+    name: s.string(null).nullable()
+  }),
+
+  ancestor: '/archives',
+  shortname: location => ['app_route.archive_detail_id_tab.shortname', { ns: 'archive', id: location.path.id }],
+  fullname: location => [
+    'app_route.archive_detail_id_tab.fullname',
+    { ns: 'archive', id: location.path.id, tab: location.path.tab }
+  ],
+  shorticon: () => <DescriptionOutlinedIcon />,
+  fullicon: () => <DescriptionOutlinedIcon />,
+
+  disabled: (_location, config) => !config.configuration?.datastore?.archive?.enabled,
+  forbidden: (_location, config) => !config.user.roles.includes('archive_view')
+});
+
+export const ArchiveDetailRootRoute = createAppRoute({
+  component: ArchiveDetailPage,
+
+  path: '/archive/:id',
+  params: s => ({
+    id: s.string()
+  }),
+  search: s => ({
+    name: s.string(null).nullable()
+  }),
+
+  ancestor: '/archives',
+  shortname: location => ['app_route.archive_detail_id.shortname', { ns: 'archive', id: location.path.id }],
+  fullname: location => ['app_route.archive_detail_id.fullname', { ns: 'archive', id: location.path.id }],
+  shorticon: () => <DescriptionOutlinedIcon />,
+  fullicon: () => <DescriptionOutlinedIcon />,
+
+  disabled: (_location, config) => !config.configuration?.datastore?.archive?.enabled,
+  forbidden: (_location, config) => !config.user.roles.includes('archive_view')
+});

@@ -1,22 +1,26 @@
 import type { FilterField } from 'deprecated/components/lists/filters/FilterSelector';
 import { GLOBAL_FILTER } from 'deprecated/components/lists/filters/FilterSelector';
-import lodash from 'lodash';
+import lodashGet from 'lodash/get';
+import lodashIsArray from 'lodash/isArray';
+import lodashIsNaN from 'lodash/isNaN';
+import lodashIsNull from 'lodash/isNull';
+import lodashIsString from 'lodash/isString';
 
 export function isNumber(value: any): boolean {
-  return !lodash.isNull(value) && !lodash.isNaN(value);
+  return !lodashIsNull(value) && !lodashIsNaN(value);
 }
 
 export function extractValue(object: any, path: string): any {
-  const _value = lodash.get(object, path, '');
+  const _value = lodashGet(object, path, '');
   return _value || '';
 }
 
 export function isString(value: any): boolean {
-  return lodash.isString(value);
+  return lodashIsString(value);
 }
 
 export function isArray(value: any): boolean {
-  return lodash.isArray(value);
+  return lodashIsArray(value);
 }
 
 export function normalizeString(input: string): string {

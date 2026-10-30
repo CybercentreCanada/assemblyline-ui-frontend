@@ -1,5 +1,5 @@
 import { Link as MaterialLink, Skeleton, useTheme } from '@mui/material';
-import useExternalLookup from 'layout/external-lookup/external-lookup.hooks';
+import useExternalLookup from 'deprecated/hooks/useExternalLookup';
 import React, { useCallback, useState } from 'react';
 import ActionMenu from 'ui/ActionMenu';
 import ExternalLinks from 'ui/ExternalSearch';

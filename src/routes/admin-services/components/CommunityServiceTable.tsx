@@ -20,8 +20,8 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
-import useClipboard from 'layout/clipboard/clipboard.hooks';
-import type { JSONFeedItem } from 'layout/notifications/notifications.hooks';
+import useClipboard from 'deprecated/hooks/useClipboard';
+import type { JSONFeedItem } from 'layout/notifications';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BsClipboard } from 'react-icons/bs';

@@ -1,3 +1,4 @@
+import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import ChevronRightOutlinedIcon from '@mui/icons-material/ChevronRightOutlined';
 import CloseIcon from '@mui/icons-material/Close';
 import {
@@ -23,17 +24,16 @@ import {
   useTheme
 } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
-import Skeleton from '@mui/material/Skeleton';
 import { red } from '@mui/material/colors';
-import useMyAPI from 'core/api/hooks/useMyAPI';
-import useALContext from 'core/config/useALContext';
-import useMySnackbar from 'core/snackbar/snackbar.hooks';
-import PageCenter from 'core/template/components/pages/PageCenter';
-import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
+import Skeleton from '@mui/material/Skeleton';
+import { createAppRoute, useAppBlocker, useAppNavigate, useAppPathParams } from 'core/router';
+import { AppPageCenter } from 'core/template';
+import useALContext from 'deprecated/hooks/useALContext';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useMySnackbar from 'deprecated/hooks/useMySnackbar';
 import type { User } from 'models/base/user';
-import React, { memo, useMemo, useRef, useState } from 'react';
+import React, { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate, useLocation, useNavigate, useParams } from 'react-router';
 import APIKeys from 'routes/user/components/api_keys';
 import Apps from 'routes/user/components/apps';
 import DisableOTP from 'routes/user/components/disable_otp';
@@ -42,7 +42,6 @@ import SecurityToken from 'routes/user/components/token';
 import Classification from 'ui/Classification';
 import ConfirmationDialog from 'ui/ConfirmationDialog';
 import CustomChip from 'ui/CustomChip';
-import { RouterPrompt } from 'ui/RouterPrompt';
 
 type ParsedUser = Omit<
   User,
@@ -57,14 +56,6 @@ type ParsedUser = Omit<
   submission_async_quota?: User['submission_async_quota'] | string;
   submission_daily_quota?: User['submission_daily_quota'] | string;
   submission_quota?: User['submission_quota'] | string;
-};
-
-type UserProps = {
-  username?: string | null;
-};
-
-type ParamProps = {
-  id: string;
 };
 
 const DeleteButton = memo(
@@ -91,13 +82,16 @@ const ClickRow = ({ children, enabled, onClick, chevron = false, ...other }) => 
   </TableRow>
 );
 
-function User({ username = null }: UserProps) {
+type UserPageProps = {
+  username?: string | null;
+};
+
+export const UserPage = memo(({ username = null }: UserPageProps) => {
   const { t } = useTranslation(['user']);
   const theme = useTheme();
-  const { id } = useParams<ParamProps>();
-  const location = useLocation();
+  const id = useAppPathParams<'/admin/users/:id'>()?.id;
   const inputRef = useRef(null);
-  const navigate = useNavigate();
+  const navigate = useAppNavigate();
   const { apiCall } = useMyAPI();
   const { user: currentUser, configuration, classificationAliases } = useALContext();
   const { showErrorMessage, showSuccessMessage, showWarningMessage } = useMySnackbar();
@@ -119,6 +113,8 @@ function User({ username = null }: UserProps) {
 
   const classificationAliasesValues = useMemo(() => Object.entries(classificationAliases), [classificationAliases]);
 
+  useAppBlocker(() => (modified ? 'unsaved_changes' : null), [modified]);
+
   const doDeleteUser = () => {
     apiCall({
       url: `/api/v4/user/${username || id}/`,
@@ -126,7 +122,7 @@ function User({ username = null }: UserProps) {
       onSuccess: () => {
         showSuccessMessage(t('delete.success'));
         setTimeout(() => {
-          navigate('/admin/users');
+          navigate.to().create({ route: '/admin/users' });
         }, 500);
       },
       onEnter: () => setButtonLoading(true),
@@ -297,7 +293,7 @@ function User({ username = null }: UserProps) {
     }
   };
 
-  useEffectOnce(() => {
+  useEffect(() => {
     // Make interface editable
     setEditable(currentUser.is_admin || currentUser.roles.includes('self_manage'));
 
@@ -305,12 +301,11 @@ function User({ username = null }: UserProps) {
     reloadUser();
 
     getQuotas();
-  });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  return !currentUser.is_admin && location.pathname.includes('/admin/') ? (
-    <Navigate to="/forbidden" replace />
-  ) : (
-    <PageCenter margin={4} width="100%">
+  return (
+    <AppPageCenter>
       <React.Fragment key="right">
         <Drawer anchor="right" open={drawerOpen} onClose={() => setDrawerOpen(false)}>
           <div style={{ alignSelf: 'flex-end' }}>
@@ -1046,8 +1041,6 @@ function User({ username = null }: UserProps) {
             </TableContainer>
           )}
 
-          <RouterPrompt when={modified} />
-
           {user && modified ? (
             <div
               style={{
@@ -1070,8 +1063,54 @@ function User({ username = null }: UserProps) {
           ) : null}
         </Grid>
       </Grid>
-    </PageCenter>
+    </AppPageCenter>
   );
-}
+});
 
-export default memo(User);
+//*****************************************************************************************
+// Admin User Detail Route
+//*****************************************************************************************
+
+export const AdminUserDetailRoute = createAppRoute({
+  component: UserPage,
+
+  path: '/admin/users/:id',
+  params: s => ({
+    id: s.string()
+  }),
+
+  ancestor: '/admin/users',
+  shortname: location => ['app_route.user_id.shortname', { ns: 'user', id: location.path.id }],
+  fullname: location => ['app_route.user_id.fullname', { ns: 'user', id: location.path.id }],
+  shorticon: () => <AccountCircleOutlinedIcon />,
+  fullicon: () => <AccountCircleOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.is_admin
+});
+
+//*****************************************************************************************
+// Admin User Detail Route
+//*****************************************************************************************
+
+export const AccountPage = memo(() => {
+  const { user: currentUser } = useALContext();
+  return <UserPage username={currentUser.username} />;
+});
+
+AccountPage.displayName = 'AccountPage';
+
+export const AccountRoute = createAppRoute({
+  component: AccountPage,
+
+  path: '/account',
+
+  ancestor: null,
+  shortname: () => ['app_route.account.shortname', { ns: 'user' }],
+  fullname: () => ['app_route.account.fullname', { ns: 'user' }],
+  shorticon: () => <AccountCircleOutlinedIcon />,
+  fullicon: () => <AccountCircleOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.roles.includes('self_manage')
+});

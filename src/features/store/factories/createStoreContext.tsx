@@ -1,37 +1,58 @@
 import React, { createContext, useCallback, useContext, useEffect, useRef, useSyncExternalStore } from 'react';
 
 export const createStoreContext = <Store extends object>(initialState: Store) => {
-  const useStoreData = (
-    data: Store
-  ): {
+  type StorePatch = Partial<Store> | ((value: Store) => Partial<Store>);
+  type EqualityFn<T> = (a: T, b: T) => boolean;
+
+  const shallowEqual = <T extends object>(a: T, b: T): boolean => {
+    if (Object.is(a, b)) return true;
+    const aKeys = Object.keys(a) as Array<keyof T>;
+    const bKeys = Object.keys(b) as Array<keyof T>;
+    if (aKeys.length !== bKeys.length) return false;
+    return aKeys.every(key => Object.is(a[key], b[key]));
+  };
+
+  type UseStoreDataReturn = {
     get: () => Store;
-    set: (dispatch: Partial<Store> | ((value: Partial<Store>) => Partial<Store>)) => void;
+    set: (dispatch: StorePatch) => void;
     subscribe: (callback: () => void) => () => void;
-  } => {
-    const store = useRef<Store>(data);
+  };
+
+  const useStoreData = (patch: StorePatch): UseStoreDataReturn => {
+    const resolvePatch = useCallback(
+      (dispatch: StorePatch, current: Store): Partial<Store> =>
+        typeof dispatch === 'function' ? dispatch(current) : dispatch,
+      []
+    );
+
+    const store = useRef<Store>({ ...initialState, ...resolvePatch(patch, initialState) });
+    const apiRef = useRef<UseStoreDataReturn>(null);
 
     const get = useCallback(() => store.current, []);
 
     const subscribers = useRef<Set<() => void>>(new Set<() => void>());
 
-    const reset = useCallback((data: Store) => {
-      Object.keys(store.current).forEach(key => {
-        if (!(key in data) && key in initialState) {
-          delete store.current[key];
-        }
-      });
+    const reset = useCallback(
+      (dispatch: StorePatch) => {
+        const nextPatch = resolvePatch(dispatch, store.current);
+        const nextState = { ...initialState, ...nextPatch };
+        if (Object.is(store.current, nextState)) return;
+        store.current = nextState;
+        subscribers.current.forEach(callback => callback());
+      },
+      [initialState, resolvePatch]
+    );
 
-      store.current = { ...store.current, ...data };
-      subscribers.current.forEach(callback => callback());
-    }, []);
-
-    const set = useCallback((dispatch: Partial<Store> | ((value: Partial<Store>) => Partial<Store>)) => {
-      store.current =
-        typeof dispatch === 'function'
-          ? { ...store.current, ...dispatch(store.current) }
-          : { ...store.current, ...dispatch };
-      subscribers.current.forEach(callback => callback());
-    }, []);
+    const set = useCallback(
+      (dispatch: StorePatch) => {
+        const nextPatch = resolvePatch(dispatch, store.current);
+        const nextState = { ...store.current, ...nextPatch };
+        if (shallowEqual(store.current, nextState)) return;
+        store.current = nextState;
+        subscribers.current.forEach(callback => callback());
+      },
+      [resolvePatch]
+    );
 
     const subscribe = useCallback((callback: () => void) => {
       subscribers.current.add(callback);
@@ -39,40 +60,55 @@ export const createStoreContext = <Store extends object>(initialState: Store) =>
     }, []);
 
     useEffect(() => {
-      reset(data);
-    }, [data, reset]);
+      reset(patch);
+    }, [patch, reset]);
 
-    return { get, set, subscribe };
+    if (!apiRef.current) apiRef.current = { get, set, subscribe };
+    return apiRef.current;
   };
 
   type UseStoreDataReturnType = ReturnType<typeof useStoreData>;
 
   const StoreContext = createContext<UseStoreDataReturnType | null>(null);
 
+  StoreContext.displayName = 'StoreContext';
+
   type ProviderProps = {
     children: React.ReactNode;
-    data: Store;
+    data: StorePatch;
   };
 
   const StoreProvider = ({ children, data }: ProviderProps) => (
     <StoreContext.Provider value={useStoreData(data)}>{children}</StoreContext.Provider>
   );
 
+  StoreProvider.displayName = 'StoreProvider';
+
   const useStore = <SelectorOutput,>(
-    selector: (store: Store) => SelectorOutput
-  ): [SelectorOutput, (dispatch: Partial<Store> | ((value: Partial<Store>) => Partial<Store>)) => void] => {
+    selector: (store: Store) => SelectorOutput,
+    isEqual: EqualityFn<SelectorOutput> = Object.is
+  ): [SelectorOutput, (dispatch: StorePatch) => void] => {
     const store = useContext(StoreContext);
-    if (!store) {
-      throw new Error('Store not found');
-    }
+    const fallbackStoreRef = useRef<UseStoreDataReturn>({
+      get: () => initialState,
+      set: () => undefined,
+      subscribe: () => () => undefined
+    });
+    const storeApi = store ?? fallbackStoreRef.current;
 
-    const state = useSyncExternalStore(
-      store.subscribe,
-      () => selector(store.get()) ?? selector(initialState),
-      () => selector(initialState)
-    );
+    const lastSelectionRef = useRef<SelectorOutput>(selector(storeApi.get()) ?? selector(initialState));
 
-    return [state, store.set];
+    const getSnapshot = useCallback(() => {
+      const nextSelection = selector(storeApi.get()) ?? selector(initialState);
+      if (!isEqual(lastSelectionRef.current, nextSelection)) {
+        lastSelectionRef.current = nextSelection;
+      }
+      return lastSelectionRef.current;
+    }, [initialState, isEqual, selector, storeApi]);
+
+    const state = useSyncExternalStore(storeApi.subscribe, getSnapshot, () => selector(initialState));
+
+    return [state, storeApi.set];
   };
 
   return {

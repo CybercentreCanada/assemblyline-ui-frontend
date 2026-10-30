@@ -1,4 +1,5 @@
 import Editor, { loader } from '@monaco-editor/react';
+import ListOutlinedIcon from '@mui/icons-material/ListOutlined';
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
 import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
 import {
@@ -17,21 +18,18 @@ import {
   useTheme
 } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
-import useMyAPI from 'core/api/hooks/useMyAPI';
-import useALContext from 'core/config/useALContext';
-import useMySnackbar from 'core/snackbar/snackbar.hooks';
-import { useAppTheme } from 'core/template/components/app/hooks';
-import PageCenter from 'core/template/components/pages/PageCenter';
-import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
+import { createAppRoute, useAppBlocker, useAppNavigate, useAppPathParams } from 'core/router';
+import { AppPageCenter, useAppTemplateThemeMode } from 'core/template';
+import useALContext from 'deprecated/hooks/useALContext';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useMySnackbar from 'deprecated/hooks/useMySnackbar';
 import type { Signature } from 'models/base/signature';
 import type { Statistic } from 'models/base/statistic';
 import { DEFAULT_STATS } from 'models/base/statistic';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TbUserX } from 'react-icons/tb';
-import { useNavigate, useParams } from 'react-router';
-import ForbiddenPage from 'routes/forbidden/forbidden.route';
-import ResultsTable from 'routes/search/components/results';
+import { ResultsTable } from 'routes/search/components/results';
 import { suricataConfig, suricataDef } from 'shared/utils/suricata';
 import { safeFieldValue, safeFieldValueURI } from 'shared/utils/utils';
 import { yaraConfig, yaraDef } from 'shared/utils/yara';
@@ -41,10 +39,11 @@ import ConfirmationDialog from 'ui/ConfirmationDialog';
 import Histogram from 'ui/Histogram';
 import { PageHeader } from 'ui/layouts/PageHeader';
 import Moment from 'ui/Moment';
-import { RouterPrompt } from 'ui/RouterPrompt';
 import SignatureStatus from 'ui/SignatureStatus';
 
-loader.config({ paths: { vs: '/cdn/monaco_0.35.0/vs' } });
+loader.config({
+  paths: { vs: '/cdn/monaco_0.35.0/vs' }
+});
 
 const LANG_SELECTOR = {
   yara: 'yara',
@@ -63,7 +62,9 @@ type SaveSignatureProps = {
 const SaveSignature: React.FC<SaveSignatureProps> = React.memo(
   ({ signature = null, modified = false, handleSuccess = () => null }) => {
     const { t } = useTranslation(['manageSignatureDetail']);
-    const { id, type, source, name } = useParams<ParamProps>();
+    const { id, type, source, name } = useAppPathParams<
+      '/manage/signature/detail/:id' & '/manage/signature/detail/:type/:source/:name'
+    >();
     const theme = useTheme();
     const { apiCall } = useMyAPI();
     const { user: currentUser } = useALContext();
@@ -202,19 +203,11 @@ type ParamProps = {
   name?: string;
 };
 
-type SignatureDetailProps = {
-  signature_id?: string;
-  onUpdated?: () => void;
-  onDeleted?: () => void;
-};
-
-const SignatureDetail = ({
-  signature_id = null,
-  onUpdated = () => null,
-  onDeleted = () => null
-}: SignatureDetailProps) => {
+export const ManageSignatureDetailPage = memo(() => {
   const { t, i18n } = useTranslation(['manageSignatureDetail']);
-  const { id, type, source, name } = useParams<ParamProps>();
+  const { id, type, source, name } = useAppPathParams<
+    '/manage/signature/detail/:id' & '/manage/signature/detail/:type/:source/:name'
+  >();
   const theme = useTheme();
   const [signature, setSignature] = useState<Signature>(null);
   const [stats, setStats] = useState<Statistic>(DEFAULT_STATS);
@@ -224,14 +217,17 @@ const SignatureDetail = ({
   const [deleteDialog, setDeleteDialog] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
   const [modified, setModified] = useState(false);
-  const navigate = useNavigate();
+  const navigate = useAppNavigate();
+  const signatureID = useAppPathParams<'/manage/signature/detail/:id'>()?.id;
   const { showSuccessMessage, showErrorMessage } = useMySnackbar();
   const { apiCall } = useMyAPI();
   const { user: currentUser, c12nDef } = useALContext();
-  const { isDark: isDarkTheme } = useAppTheme();
+  const themeMode = useAppTemplateThemeMode();
   // const editorRef = useRef(null);
 
-  useEffectOnce(() => {
+  useAppBlocker(() => (modified ? 'unsaved_changes' : null), [modified]);
+
+  useEffect(() => {
     // I cannot find a way to hot switch monaco editor's locale but at least I can load
     // the right language on first load...
     if (i18n.language === 'fr') {
@@ -239,7 +235,7 @@ const SignatureDetail = ({
     } else {
       loader.config({ 'vs/nls': { availableLanguages: { '*': '' } } });
     }
-  });
+  }, []);
 
   const beforeMount = monaco => {
     // Register Yara language
@@ -258,16 +254,16 @@ const SignatureDetail = ({
   // };
 
   useEffect(() => {
-    if ((signature_id || id) && currentUser.roles.includes('signature_view')) {
+    if (signatureID && currentUser.roles.includes('signature_view')) {
       apiCall({
-        url: `/api/v4/signature/${signature_id || id}/`,
+        url: `/api/v4/signature/${signatureID}/`,
         onSuccess: api_data => {
-          setSignature({ id: signature_id || id, ...api_data.api_response });
+          setSignature({ id: signatureID, ...api_data.api_response });
         }
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [signature_id, id]);
+  }, [signatureID]);
 
   useEffect(() => {
     if (type && source && name && currentUser.roles.includes('signature_view')) {
@@ -360,7 +356,8 @@ const SignatureDetail = ({
       onSuccess: () => {
         showSuccessMessage(t('change.success'));
         setModified(false);
-        onUpdated();
+        navigate.here().closePanel({ route: '/manage/signatures' });
+        setTimeout(() => window.dispatchEvent(new CustomEvent('reloadSignatures')), 1000);
         setSignature(s => ({
           ...s,
           state_change_user: currentUser.username,
@@ -379,8 +376,9 @@ const SignatureDetail = ({
       method: 'DELETE',
       onSuccess: () => {
         showSuccessMessage(t('delete.success'));
-        if (id) setTimeout(() => navigate('/manage/signatures'), 1000);
-        onDeleted();
+        if (id) setTimeout(() => navigate.here().closePanel({ route: '/manage/signatures' }), 1000);
+        navigate.here().closePanel({ route: '/manage/signatures' });
+        setTimeout(() => window.dispatchEvent(new CustomEvent('reloadSignatures')), 1000);
       },
       onEnter: () => setButtonLoading(true),
       onExit: () => setButtonLoading(false)
@@ -391,8 +389,8 @@ const SignatureDetail = ({
     setDeleteDialog(true);
   };
 
-  return currentUser.roles.includes('signature_view') ? (
-    <PageCenter margin={!id && !type && !name && !source ? 2 : 4} width="100%">
+  return (
+    <AppPageCenter>
       <ConfirmationDialog
         open={deleteDialog}
         handleClose={() => setDeleteDialog(false)}
@@ -477,8 +475,14 @@ const SignatureDetail = ({
                 preventRender={!currentUser.roles.includes('submission_view')}
                 size="large"
                 sx={{ color: theme.palette.action.active }}
-                to={() =>
-                  `/search/result/?query=result.sections.tags.file.rule.${signature.type}:${safeFieldValueURI(`${signature.source}.${signature.name}`)}`
+                nav={nav =>
+                  nav.to().create({
+                    route: '/search/:index',
+                    path: { index: 'result' },
+                    search: {
+                      query: `result.sections.tags.file.rule.${signature.type}:${safeFieldValue(`${signature.source}.${signature.name}`)}`
+                    }
+                  })
                 }
                 tooltip={t('usage')}
               >
@@ -526,7 +530,7 @@ const SignatureDetail = ({
                   language={LANG_SELECTOR[signature.type] || 'plaintext'}
                   width="100%"
                   height="450px"
-                  theme={isDarkTheme ? 'vs-dark' : 'vs'}
+                  theme={themeMode === 'dark' ? 'vs-dark' : 'vs'}
                   loading={t('loading.yara')}
                   value={signature.data}
                   beforeMount={beforeMount}
@@ -615,7 +619,7 @@ const SignatureDetail = ({
                   height="250px"
                   isDate
                   title={t('chart.title')}
-                  datatype={signature_id || id}
+                  datatype={signatureID}
                   verticalLine
                 />
               </Grid>
@@ -623,20 +627,19 @@ const SignatureDetail = ({
                 <Typography variant="h6">{t('last10')}</Typography>
               </Grid>
               <Grid size={{ xs: 12 }}>
-                <ResultsTable resultResults={results} allowSort={false} allowHash />
+                <ResultsTable resultResults={results} allowSort={false} />
               </Grid>
             </>
           )}
         </Grid>
-
-        <RouterPrompt when={modified} />
 
         <SaveSignature
           signature={signature}
           modified={modified}
           handleSuccess={() => {
             setModified(false);
-            onUpdated();
+            navigate.here().closePanel({ route: '/manage/signatures' });
+            setTimeout(() => window.dispatchEvent(new CustomEvent('reloadSignatures')), 1000);
             setSignature({
               ...signature,
               state_change_user: currentUser.username,
@@ -645,10 +648,56 @@ const SignatureDetail = ({
           }}
         />
       </div>
-    </PageCenter>
-  ) : (
-    <ForbiddenPage />
+    </AppPageCenter>
   );
-};
+});
 
-export default SignatureDetail;
+export const ManageSignatureDetailRoute = createAppRoute({
+  component: ManageSignatureDetailPage,
+
+  path: '/manage/signature/detail/:id',
+  params: s => ({
+    id: s.string()
+  }),
+
+  ancestor: '/manage/signatures',
+  shortname: location => [
+    'app_route.manage_signature_detail_id.shortname',
+    { ns: 'manageSignatureDetail', id: location.path.id }
+  ],
+  fullname: location => [
+    'app_route.manage_signature_detail_id.fullname',
+    { ns: 'manageSignatureDetail', id: location.path.id }
+  ],
+  shorticon: () => <ListOutlinedIcon />,
+  fullicon: () => <ListOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.roles.includes('signature_view')
+});
+
+export const ManageSignatureDetailRoute2 = createAppRoute({
+  component: ManageSignatureDetailPage,
+
+  path: '/manage/signature/detail/:type/:source/:name',
+  params: s => ({
+    type: s.string(),
+    source: s.string(),
+    name: s.string()
+  }),
+
+  ancestor: '/manage/signatures',
+  shortname: location => [
+    'app_route.manage_signature_detail_type_source_name.shortname',
+    { ns: 'manageSignatureDetail', name: location.path.name }
+  ],
+  fullname: location => [
+    'app_route.manage_signature_detail_type_source_name.fullname',
+    { ns: 'manageSignatureDetail', type: location.path.type, source: location.path.source, name: location.path.name }
+  ],
+  shorticon: () => <ListOutlinedIcon />,
+  fullicon: () => <ListOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.roles.includes('signature_view')
+});

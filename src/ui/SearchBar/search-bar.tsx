@@ -12,9 +12,9 @@ import {
   useTheme
 } from '@mui/material';
 import type { IndexDefinition } from 'models/api/user';
-import SearchTextField from 'ui/SearchBar/search-textfield';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import SearchTextField from 'ui/SearchBar/search-textfield';
 
 const Root = styled('div')(({ theme }) => ({
   '& button': {

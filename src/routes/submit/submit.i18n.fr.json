@@ -1,6 +1,8 @@
 {
   "adjust.button.close.tooltip": "Fermer le panneau qui affiche les paramètres de soumission",
   "adjust.button.open.tooltip": "Ouvrir le panneau pour ajuster les paramètres d'envoi",
+  "app_route.submit.fullname": "Soumettre",
+  "app_route.submit.shortname": "Soumettre",
   "cancel.button.label": "Annuler",
   "cancel.button.tooltip": "Annuler la soumission et réinitialiser toutes les valeurs",
   "classification.input.label": "La classification suivante sera appliquée à votre soumission :",

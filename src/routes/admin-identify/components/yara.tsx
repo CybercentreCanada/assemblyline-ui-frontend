@@ -1,10 +1,9 @@
 import Editor, { DiffEditor, loader } from '@monaco-editor/react';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Skeleton, useTheme } from '@mui/material';
-import useMyAPI from 'core/api/hooks/useMyAPI';
-import useMySnackbar from 'core/snackbar/snackbar.hooks';
-import { useAppTheme } from 'core/template/components/app/hooks';
-import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
-import React, { useRef, useState } from 'react';
+import { useAppTemplateThemeMode } from 'core/template';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useMySnackbar from 'deprecated/hooks/useMySnackbar';
+import { memo, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ReactResizeDetector from 'react-resize-detector';
 import { registerYaraCompletionItemProvider, yaraConfig, yaraDef } from 'shared/utils/yara';
@@ -12,7 +11,14 @@ import { PageHeader } from 'ui/layouts/PageHeader';
 
 loader.config({ paths: { vs: '/cdn/monaco_0.35.0/vs' } });
 
-function WrappedYara({ reload, yaraFile, originalYaraFile, setYaraFile }) {
+export type YaraProps = {
+  reload: (defValue?: boolean, autoOpen?: (open: boolean) => void) => void;
+  yaraFile: string | null;
+  originalYaraFile: string | null;
+  setYaraFile: (value: string | null | undefined) => void;
+};
+
+export const Yara = memo(({ reload, yaraFile, originalYaraFile, setYaraFile }: YaraProps) => {
   const { t, i18n } = useTranslation(['adminIdentify']);
   const theme = useTheme();
   const containerEL = useRef<HTMLDivElement>(null);
@@ -20,9 +26,9 @@ function WrappedYara({ reload, yaraFile, originalYaraFile, setYaraFile }) {
   const [open, setOpen] = useState(false);
   const { showSuccessMessage } = useMySnackbar();
   const { apiCall } = useMyAPI();
-  const { isDark: isDarkTheme } = useAppTheme();
+  const themeMode = useAppTemplateThemeMode();
 
-  useEffectOnce(() => {
+  useEffect(() => {
     if (!yaraFile) reload();
     // I cannot find a way to hot switch monaco editor's locale but at least I can load
     // the right language on first load...
@@ -31,7 +37,7 @@ function WrappedYara({ reload, yaraFile, originalYaraFile, setYaraFile }) {
     } else {
       loader.config({ 'vs/nls': { availableLanguages: { '*': '' } } });
     }
-  });
+  }, []);
 
   const saveChanges = tagData => {
     setOpen(false);
@@ -74,7 +80,7 @@ function WrappedYara({ reload, yaraFile, originalYaraFile, setYaraFile }) {
                 <div ref={containerDialogEL}>
                   <DiffEditor
                     language="yara"
-                    theme={isDarkTheme ? 'vs-dark' : 'vs'}
+                    theme={themeMode === 'dark' ? 'vs-dark' : 'vs'}
                     original={originalYaraFile}
                     width={width}
                     height="50vh"
@@ -99,7 +105,7 @@ function WrappedYara({ reload, yaraFile, originalYaraFile, setYaraFile }) {
       </Dialog>
 
       <PageHeader
-        primary={t('title.patterns')}
+        primary={t('title.yara')}
         slotProps={{
           root: { style: { marginBottom: theme.spacing(1) } },
           primary: { variant: 'h5' },
@@ -159,7 +165,7 @@ function WrappedYara({ reload, yaraFile, originalYaraFile, setYaraFile }) {
                       language="yara"
                       width={width}
                       height={height}
-                      theme={isDarkTheme ? 'vs-dark' : 'vs'}
+                      theme={themeMode === 'dark' ? 'vs-dark' : 'vs'}
                       loading={t('loading.yara')}
                       value={yaraFile}
                       onChange={setYaraFile}
@@ -178,7 +184,4 @@ function WrappedYara({ reload, yaraFile, originalYaraFile, setYaraFile }) {
       </div>
     </>
   );
-}
-
-const Yara = React.memo(WrappedYara);
-export default Yara;
+});

@@ -1,7 +1,7 @@
-import { shallowEqual } from 'features/prop-provider/prop-provider.utils.ts';
-import { SearchParamEngine } from 'features/search-params/search-params.engines.tsx';
-import { SearchParamSnapshot } from 'features/search-params/search-params.snapshots.tsx';
-import type { SearchParamBlueprints, SearchParamValues } from 'features/SearchParams/lib/search_params.model';
+import { shallowEqual } from 'features/prop-provider/prop-provider.utils';
+import type { InferSearchParamValueMapFromBlueprintMap, SearchParamBlueprintMap } from 'features/search-params';
+import { SEARCH_PARAM_BLUEPRINTS_MAP, SearchParamEngine, SearchParamSnapshot } from 'features/search-params';
+import type { SetStateAction } from 'react';
 import React, {
   createContext,
   useCallback,
@@ -19,7 +19,7 @@ export const createSearchParamsStore = () => {
   // -------------------------
   // Store
   // -------------------------
-  const useSearchParamsStore = <Blueprints extends SearchParamBlueprints>(
+  const useSearchParamsStore = <Blueprints extends SearchParamBlueprintMap>(
     params: Blueprints,
     storageKey: string = null
   ) => {
@@ -72,7 +72,7 @@ export const createSearchParamsStore = () => {
       ) => {
         const values = typeof input === 'function' ? input(snapshotRef.current.toParams()) : input;
         set(engine.full(values));
-        navigate(
+        void navigate(
           {
             pathname: window.location.pathname,
             search: snapshotRef.current.toLocationSearch(),
@@ -86,14 +86,12 @@ export const createSearchParamsStore = () => {
 
     const setSearchObject = useCallback(
       (
-        input:
-          | SearchParamValues<Blueprints>
-          | ((params: SearchParamValues<Blueprints>) => SearchParamValues<Blueprints>),
+        input: SetStateAction<InferSearchParamValueMapFromBlueprintMap<Blueprints>>,
         replace: NavigateOptions['replace'] = false
       ) => {
         const values = typeof input === 'function' ? input(snapshotRef.current.toObject()) : input;
         set(engine.full(values));
-        navigate(
+        void navigate(
           {
             pathname: window.location.pathname,
             search: snapshotRef.current.toLocationSearch(),
@@ -106,7 +104,7 @@ export const createSearchParamsStore = () => {
     );
 
     const setDefaultParams = useCallback(
-      (value: SearchParamValues<Blueprints>) => {
+      (value: InferSearchParamValueMapFromBlueprintMap<Blueprints>) => {
         if (!storageKey) return;
         const search = engine.delta(value).omit(engine.getEphemeralKeys()).toParams();
         localStorage.setItem(storageKey, search.toString());
@@ -148,7 +146,7 @@ export const createSearchParamsStore = () => {
   // -------------------------
   // Context
   // -------------------------
-  type SearchParamsContextProps<Blueprints extends SearchParamBlueprints = SearchParamBlueprints> = ReturnType<
+  type SearchParamsContextProps<Blueprints extends SearchParamBlueprintMap = SearchParamBlueprintMap> = ReturnType<
     typeof useSearchParamsStore<Blueprints>
   > | null;
 
@@ -157,14 +155,14 @@ export const createSearchParamsStore = () => {
   // -------------------------
   // Provider
   // -------------------------
-  type SearchParamsProviderProps<Blueprints extends SearchParamBlueprints> = {
+  type SearchParamsProviderProps<Blueprints extends SearchParamBlueprintMap> = {
     children: React.ReactNode;
     params: Blueprints;
     storageKey?: string;
   };
 
   const SearchParamsProvider = React.memo(
-    <Blueprints extends SearchParamBlueprints>({
+    <Blueprints extends SearchParamBlueprintMap>({
       children,
       params,
       storageKey
@@ -178,7 +176,7 @@ export const createSearchParamsStore = () => {
   // -------------------------
   // Hook
   // -------------------------
-  type UseSearchParams<Blueprints extends SearchParamBlueprints> = {
+  type UseSearchParams<Blueprints extends SearchParamBlueprintMap> = {
     search: SearchParamSnapshot<Blueprints>;
     setSearchParams: ReturnType<typeof useSearchParamsStore<Blueprints>>['setSearchParams'];
     setSearchObject: ReturnType<typeof useSearchParamsStore<Blueprints>>['setSearchObject'];
@@ -186,7 +184,7 @@ export const createSearchParamsStore = () => {
     clearDefaultParams: ReturnType<typeof useSearchParamsStore<Blueprints>>['clearDefaultParams'];
   };
 
-  const useSearchParams = <Blueprints extends SearchParamBlueprints>() => {
+  const useSearchParams = <Blueprints extends SearchParamBlueprintMap>() => {
     const ctx = useContext(SearchParamsContext);
 
     const emptySnapshot = useMemo(() => new SearchParamSnapshot<Blueprints>(), []);
@@ -217,3 +215,12 @@ export const createSearchParamsStore = () => {
 
   return { SearchParamsProvider, useSearchParams };
 };
+
+export type SearchParams<Blueprints extends SearchParamBlueprintMap> =
+  InferSearchParamValueMapFromBlueprintMap<Blueprints>;
+
+export const createSearchParams = <Blueprints extends SearchParamBlueprintMap>(
+  input: (blueprints: typeof SEARCH_PARAM_BLUEPRINTS_MAP) => Blueprints
+): Blueprints => input(SEARCH_PARAM_BLUEPRINTS_MAP);
+
+export const { SearchParamsProvider, useSearchParams } = createSearchParamsStore();

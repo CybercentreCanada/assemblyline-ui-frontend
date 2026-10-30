@@ -1,4 +1,6 @@
 {
+  "app_route.statistics_heuristics.fullname": "Statistiques des heuristiques",
+  "app_route.statistics_heuristics.shortname": "Statistiques des heuristiques",
   "avg": "Score Moy",
   "classification": "Classification",
   "count": "Nombre",

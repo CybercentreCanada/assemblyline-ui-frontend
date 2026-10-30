@@ -1,4 +1,6 @@
 {
+  "app_route.manage_heuristics.fullname": "Manage Heuristics",
+  "app_route.manage_heuristics.shortname": "Heuristics",
   "filter": "Filter heuristics...",
   "filtered": "heuristic matching filter",
   "filtereds": "heuristics matching filter",

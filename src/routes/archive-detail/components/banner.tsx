@@ -12,7 +12,6 @@ import type { SvgIconProps, Theme } from '@mui/material';
 import {
   Box,
   Collapse,
-  IconButton,
   List,
   ListItemButton,
   ListItemIcon,
@@ -24,18 +23,18 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
-import useMyAPI from 'core/api/hooks/useMyAPI';
-import useALContext from 'core/config/useALContext';
-import useMySnackbar from 'core/snackbar/snackbar.hooks';
+import { AppLink, useAppNavigate, useAppSearchSnapshot } from 'core/router';
+import useALContext from 'deprecated/hooks/useALContext';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useMySnackbar from 'deprecated/hooks/useMySnackbar';
 import type { File } from 'models/api/file';
 import type { LabelCategories } from 'models/base/file';
 import type { CSSProperties } from 'react';
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router';
-import { Link } from 'react-router-dom';
 import { bytesToSize } from 'shared/utils/utils';
 import { FileDownloader } from 'ui/buttons/FileDownloader';
+import { IconButton } from 'ui/buttons/IconButton';
 import Classification from 'ui/Classification';
 import CustomChip from 'ui/CustomChip';
 import InputDialog from 'ui/InputDialog';
@@ -152,8 +151,8 @@ type Props = {
 const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid = null, force = false }) => {
   const { t } = useTranslation(['fileDetail', 'archive']);
   const theme = useTheme();
-  const location = useLocation();
-  const navigate = useNavigate();
+  const search = useAppSearchSnapshot<'/archive/:id'>();
+  const navigate = useAppNavigate();
   const { apiCall } = useMyAPI();
   const { showSuccessMessage } = useMySnackbar();
   const { user: currentUser, scoreToVerdict } = useALContext();
@@ -167,8 +166,7 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
   const [showMoreLabels, setShowMoreLabels] = useState<boolean>(false);
   const [collapseLabels, setCollapseLabels] = useState<boolean>(false);
 
-  const params = new URLSearchParams(location.search);
-  const fileName = file ? params.get('name') || sha256 : null;
+  const fileName = file ? search.get('name') || sha256 : null;
   const popoverOpen = Boolean(resubmitAnchor);
 
   const ref = useRef<HTMLDivElement>(null);
@@ -213,7 +211,7 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
       onSuccess: api_data => {
         showSuccessMessage(t('resubmit.success'));
         setTimeout(() => {
-          navigate(`/submission/detail/${api_data.api_response.sid}`);
+          navigate.here().update({ route: '/submission/detail/:id', path: { id: api_data.api_response.sid } });
         }, 500);
       }
     });
@@ -484,8 +482,16 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
               <>
                 <Tooltip title={t('related')}>
                   <IconButton
-                    component={Link}
-                    to={`/search/submission?query=files.sha256:${file.file_info.sha256} OR results:${file.file_info.sha256}* OR errors:${file.file_info.sha256}*&use_archive`}
+                    nav={nav =>
+                      nav.to().create({
+                        route: '/search/:index',
+                        path: { index: 'submission' },
+                        search: {
+                          query: `files.sha256:${file.file_info.sha256} OR results:${file.file_info.sha256}* OR errors:${file.file_info.sha256}*`,
+                          use_archive: true
+                        }
+                      })
+                    }
                     size="large"
                   >
                     <ViewCarouselOutlinedIcon />
@@ -527,11 +533,17 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
                     >
                       <List disablePadding>
                         <ListItemButton
-                          component={Link}
-                          to={`/submit?hash=${file.file_info.sha256}`}
-                          state={{
-                            c12n: file.file_info.classification
-                          }}
+                          component={AppLink}
+                          nav={nav =>
+                            nav.to().create({
+                              route: '/submit',
+                              search: {
+                                hash: file.file_info.sha256,
+                                classification: file.file_info.classification
+                              }
+                            })
+                          }
+                          navDeps={[file?.file_info?.sha256, file?.file_info?.classification]}
                           dense
                           onClick={() => setResubmitAnchor(null)}
                         >
@@ -593,14 +605,14 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
               wordBreak: 'break-word',
               whiteSpace: 'wrap !important'
             },
-            '&>div:nth-child(1)': {
+            '&>div:nth-of-type(1)': {
               gridRow: 'span 2',
               fontWeight: 500
             },
-            '&>div:nth-child(2n + 2)': {
+            '&>div:nth-of-type(2n + 2)': {
               fontWeight: 500
             },
-            '&>div:nth-child(2n + 3)': {
+            '&>div:nth-of-type(2n + 3)': {
               fontWeight: 400
               // overflowX: 'hidden',
               // whiteSpace: 'nowrap',
@@ -611,7 +623,7 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
               columnGap: theme.spacing(2),
               gridTemplateColumns: 'auto 1fr',
               gridTemplateRows: 'repeat(4, auto)',
-              '&>div:nth-child(1)': {
+              '&>div:nth-of-type(1)': {
                 gridRow: 'span 1',
                 gridColumn: 'span 2'
               }

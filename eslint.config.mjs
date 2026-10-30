@@ -254,7 +254,7 @@ export default tseslint.config(
       'no-case-declarations': 'off',
       'no-console': 'warn',
       'no-extra-boolean-cast': 'off',
-      'no-param-reassign': 'warn',
+      'no-param-reassign': 'off',
       'no-prototype-builtins': 'warn',
       'no-unsafe-optional-chaining': 'warn',
       'no-unused-vars': 'warn',

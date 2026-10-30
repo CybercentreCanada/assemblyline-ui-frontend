@@ -1,287 +1,503 @@
-import { Search } from '@mui/icons-material';
+import ClearIcon from '@mui/icons-material/Clear';
+import InfoIcon from '@mui/icons-material/Info';
+import SearchIcon from '@mui/icons-material/Search';
+import type { InputBaseProps } from '@mui/material';
 import {
-  Box,
+  Button,
+  CircularProgress,
   ClickAwayListener,
   Dialog,
   DialogContent,
   DialogTitle,
   emphasize,
-  IconButton,
+  InputAdornment,
+  InputBase,
+  MenuItem,
+  MenuList,
   Popper,
   Slide,
-  Stack,
   styled,
   Tooltip,
+  Typography,
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import { useAppSearchService } from 'core/template/components/app/hooks/useAppSearchService';
-import AppSearchInput from 'core/template/components/search/AppSearchInput';
-import AppSearchResult from 'core/template/components/search/AppSearchResult';
-import { parseEvent } from 'deprecated/utils/keyboard';
-import { type ChangeEvent, forwardRef, type KeyboardEvent, useCallback, useEffect, useRef, useState } from 'react';
+import { useAppInterfaceStore, useAppSetInterfaceStore } from 'core/interface';
+import { useAppPreferenceStore } from 'core/preference';
+import { AppLink, useAppNavigate } from 'core/router';
+import type { QuickSearchItem } from 'layout/quick-search';
+import { fetchQuickSearchItems, parseQuickSearchKeyEvent, RESULT_LIST_ID } from 'layout/quick-search';
+import type { ChangeEvent, ComponentProps, CSSProperties, KeyboardEvent } from 'react';
+import { forwardRef, memo, useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { IconButton } from 'ui/buttons/IconButton';
 
-const MENU_LIST_SX = { maxHeight: 500, overflow: 'auto' };
+const RESULT_LIST_STYLE: CSSProperties = { maxHeight: 500, overflow: 'auto' };
 
-const AppSearchRoot = styled(Box, { shouldForwardProp: prop => prop !== 'menuOpen' })<{ menuOpen: boolean }>(({
-  theme,
-  menuOpen
-}) => {
+//*****************************************************************************************
+// Quick Search Root
+//*****************************************************************************************
+
+export const QuickSearchRoot = styled('div', { shouldForwardProp: prop => prop !== 'menuOpen' })<{
+  menuOpen: boolean;
+}>(({ theme, menuOpen }) => {
   const backgroundColor = emphasize(theme.palette.background.default, theme.palette.mode === 'dark' ? 0.1 : 0.033);
+
   return {
     position: 'relative',
+    display: 'flex',
+    flexGrow: 1,
+    justifyContent: 'flex-end',
     borderRadius: theme.shape.borderRadius,
-    borderBottomLeftRadius: menuOpen && 0,
-    borderBottomRightRadius: menuOpen && 0,
+    borderBottomLeftRadius: menuOpen ? 0 : theme.shape.borderRadius,
+    borderBottomRightRadius: menuOpen ? 0 : theme.shape.borderRadius,
 
-    '.app-search-input': {
+    '.quicksearch-input': {
       backgroundColor:
         theme.palette.mode === 'dark' ? backgroundColor : menuOpen ? theme.palette.background.default : backgroundColor,
-      boxShadow: menuOpen && theme.shadows[4]
+      boxShadow: menuOpen ? theme.shadows[4] : 'none'
     },
-    '.app-search-result': {
+    '.quicksearch-result': {
       backgroundColor: theme.palette.mode === 'dark' ? backgroundColor : theme.palette.background.default,
       borderBottomLeftRadius: theme.shape.borderRadius,
       borderBottomRightRadius: theme.shape.borderRadius,
-      boxShadow: menuOpen && theme.shadows[4],
+      boxShadow: menuOpen ? theme.shadows[4] : 'none',
       color: theme.palette.text.primary
     }
   };
 });
 
-const ModalTransition = forwardRef(function Transition(props: any, ref: any) {
-  const { children, ..._props } = props;
+QuickSearchRoot.displayName = 'QuickSearchRoot';
+
+type QuickSearchModalTransitionProps = ComponentProps<typeof Slide>;
+
+const QuickSearchModalTransition = forwardRef<HTMLDivElement, QuickSearchModalTransitionProps>(
+  function QuickSearchModalTransition({ children, ...transitionProps }, ref) {
+    return (
+      <Slide direction="down" ref={ref} {...transitionProps}>
+        {children}
+      </Slide>
+    );
+  }
+);
+
+//*****************************************************************************************
+// Quick Search Empty
+//*****************************************************************************************
+
+const QuickSearchEmpty = memo(() => {
+  const { t } = useTranslation(['quicksearch']);
+  const theme = useTheme();
+  const bgColor = emphasize(theme.palette.background.default, 0.1);
+  const color = emphasize(bgColor, 0.4);
+
   return (
-    <Slide direction="down" ref={ref} {..._props}>
-      {children}
-    </Slide>
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: theme.spacing(2),
+        margin: theme.spacing(1),
+        borderRadius: theme.spacing(1),
+        backgroundColor: bgColor,
+        color
+      }}
+    >
+      <InfoIcon fontSize="large" />
+      <div style={{ margin: theme.spacing(1) }} />
+      <Typography variant="h5">{t('noresults')}</Typography>
+    </div>
   );
 });
 
-export default function AppSearch() {
+QuickSearchEmpty.displayName = 'QuickSearchEmpty';
+
+//*****************************************************************************************
+// Quick Search Input
+//*****************************************************************************************
+
+export type QuickSearchInputProps = {
+  searching?: boolean;
+  provided?: boolean;
+  focused?: boolean;
+  showToggle?: boolean;
+  showClear?: boolean;
+  open?: boolean;
+  minWidth?: CSSProperties['minWidth'];
+  maxWidth?: CSSProperties['maxWidth'];
+  onClear: () => void;
+  onToggleFullscreen: () => void;
+} & InputBaseProps;
+
+export const QuickSearchInput = memo(
+  ({
+    searching = false,
+    provided = false,
+    focused = false,
+    autoFocus = false,
+    showToggle = false,
+    showClear = false,
+    value,
+    open = false,
+    maxWidth = '100%',
+    minWidth = '100%',
+    onBlur,
+    onClear,
+    onToggleFullscreen,
+    onFocus,
+    onChange,
+    onKeyDown,
+    ...inputProps
+  }: QuickSearchInputProps) => {
+    const { t } = useTranslation(['quicksearch']);
+    const rootRef = useRef<HTMLDivElement>(null);
+
+    const handleToggleClick = useCallback(() => {
+      if (open && provided) {
+        onToggleFullscreen();
+      } else {
+        rootRef.current?.querySelector('input')?.focus();
+      }
+    }, [open, provided, onToggleFullscreen]);
+
+    return (
+      <div ref={rootRef} style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', flexGrow: 2 }}>
+        <InputBase
+          {...inputProps}
+          fullWidth
+          autoComplete="off"
+          autoFocus={autoFocus}
+          value={value}
+          onBlur={onBlur}
+          onFocus={onFocus}
+          onChange={onChange}
+          onKeyDown={onKeyDown}
+          placeholder={t('placeholder')}
+          inputProps={{ 'aria-label': t('aria') }}
+          startAdornment={
+            <InputAdornment position="start" sx={theme => ({ color: theme.palette.text.disabled })}>
+              {searching ? <CircularProgress size={24} color="inherit" /> : <SearchIcon color="inherit" />}
+            </InputAdornment>
+          }
+          endAdornment={
+            <InputAdornment position="end" sx={theme => ({ color: theme.palette.text.disabled })}>
+              {showToggle && !focused && (
+                <Tooltip title={t(open && provided ? 'fullscreen' : 'shortcut')}>
+                  <Button
+                    size="small"
+                    color="inherit"
+                    onClick={handleToggleClick}
+                    sx={{ fontSize: 'small', marginRight: '8px', padding: 0, minWidth: 'auto' }}
+                  >
+                    CTRL+K
+                  </Button>
+                </Tooltip>
+              )}
+              {showClear && (
+                <IconButton color="inherit" onClick={onClear} disabled={!value}>
+                  <ClearIcon />
+                </IconButton>
+              )}
+            </InputAdornment>
+          }
+          sx={theme => ({
+            color: theme.palette.text.secondary,
+            paddingTop: 0.5,
+            paddingBottom: 0.5,
+            paddingLeft: 1.5,
+            paddingRight: 1,
+            maxWidth,
+            minWidth,
+            borderRadius: theme.spacing(0.5)
+          })}
+        />
+      </div>
+    );
+  }
+);
+
+QuickSearchInput.displayName = 'QuickSearchInput';
+
+//*****************************************************************************************
+// Quick Search Result
+//*****************************************************************************************
+
+type QuickSearchResultProps = {
+  items: QuickSearchItem[] | null;
+  onSelect: (item: QuickSearchItem) => void;
+  onEscape: () => void;
+};
+
+export const QuickSearchResult = memo(({ items, onSelect, onEscape }: QuickSearchResultProps) => {
+  const { t } = useTranslation(['quicksearch']);
+
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent<HTMLElement>, item: QuickSearchItem) => {
+      const { isEnter, isEscape } = parseQuickSearchKeyEvent(event);
+      if (isEnter) {
+        onSelect(item);
+      } else if (isEscape) {
+        onEscape();
+      }
+    },
+    [onSelect, onEscape]
+  );
+
+  return !items?.length ? null : (
+    <MenuList data-quicksearch-id={RESULT_LIST_ID} className="quicksearch-result" sx={RESULT_LIST_STYLE}>
+      {items && items.length > 0 ? (
+        items.map(item => (
+          <MenuItem key={item.id} onKeyDown={event => handleKeyDown(event, item)}>
+            <AppLink nav={item.nav} style={{ display: 'block', width: '100%' }}>
+              {item.label}
+            </AppLink>
+          </MenuItem>
+        ))
+      ) : items ? (
+        <QuickSearchEmpty />
+      ) : (
+        <MenuItem disabled>
+          <Typography variant="body2" style={{ marginTop: 8, marginBottom: 8 }}>
+            <em>{t('starttyping')}</em>
+          </Typography>
+        </MenuItem>
+      )}
+    </MenuList>
+  );
+});
+
+QuickSearchResult.displayName = 'QuickSearchResult';
+
+//*****************************************************************************************
+// Quick Search
+//*****************************************************************************************
+
+export const QuickSearch = memo(() => {
+  const { t } = useTranslation(['quicksearch']);
   const theme = useTheme();
-  const menuRef = useRef<HTMLDivElement>(null);
+  const navigate = useAppNavigate();
+
+  const showQuickSearch = useAppPreferenceStore(store => store.template.showQuickSearch);
+  const value = useAppInterfaceStore(store => store.quicksearch.value);
+  const searching = useAppInterfaceStore(store => store.quicksearch.searching);
+  const menu = useAppInterfaceStore(store => store.quicksearch.menu);
+  const mode = useAppInterfaceStore(store => store.quicksearch.mode);
+  const focused = useAppInterfaceStore(store => store.quicksearch.focused);
+  const autoReset = useAppInterfaceStore(store => store.quicksearch.autoReset);
+  const items = useAppInterfaceStore(store => store.quicksearch.items);
+  const setInterfaceStore = useAppSetInterfaceStore();
+
+  const rootRef = useRef<HTMLDivElement>(null);
+  const requestId = useRef<number>(0);
+
   const isPhoneMode = useMediaQuery(theme.breakpoints.only('xs'));
   const isTabletMode = useMediaQuery(theme.breakpoints.only('sm'));
-  const { t } = useTranslation();
-  const { provided, state, service } = useAppSearchService();
-  const [value, setValue] = useState<string>('');
+
+  const patch = useCallback(
+    (next: Partial<AppInterfaceStore['quicksearch']>) => {
+      setInterfaceStore(store => ({ quicksearch: { ...store.quicksearch, ...next } }));
+    },
+    [setInterfaceStore]
+  );
+
+  const selectItem = useCallback((item: QuickSearchItem) => item.nav?.(navigate), [navigate]);
 
   useEffect(() => {
-    if (service.onMounted) {
-      service.onMounted(setValue, state);
-    }
+    patch({ value: '', items: null });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // keyboard[window] handler.
-  // this is to trigger the CTLR+K shortcut to appsearch.
+  // CTRL+K global shortcut to open/focus quicksearch.
   useEffect(() => {
-    const keyHandler = event => {
-      const { key, isCtrl } = parseEvent(event);
-      if (isCtrl && key === 'k') {
+    if (!showQuickSearch) return undefined;
+
+    const handleWindowKeyDown = (event: globalThis.KeyboardEvent) => {
+      const { isCtrl } = parseQuickSearchKeyEvent(event);
+      if (isCtrl && event.key === 'k') {
         event.preventDefault();
-        const inputRef = menuRef.current.querySelector('input');
-        if (!inputRef || isPhoneMode) {
-          state.set({ ...state, menu: state.menu || isPhoneMode, mode: 'fullscreen' });
+        const input = rootRef.current?.querySelector('input');
+        if (!input || isPhoneMode) {
+          patch({ menu: menu || isPhoneMode, mode: 'fullscreen' });
         } else {
-          inputRef.focus();
+          input.focus();
         }
       }
     };
-    window.addEventListener('keydown', keyHandler);
-    return () => {
-      window.removeEventListener('keydown', keyHandler);
-    };
-  }, [provided, isPhoneMode, state]);
 
-  // Search input focus handler.
-  const onFocus = useCallback(() => {
-    state.set({ ...state, menu: true, focused: true });
-  }, [state]);
+    window.addEventListener('keydown', handleWindowKeyDown);
+    return () => window.removeEventListener('keydown', handleWindowKeyDown);
+  }, [showQuickSearch, isPhoneMode, menu, patch]);
 
-  // Search input focus handler.
-  const onBlur = useCallback(() => {
-    state.set({ ...state, focused: false });
-  }, [state]);
+  const handleFocus = useCallback(() => patch({ focused: true }), [patch]);
 
-  // Search input change handler.
-  const onChange = useCallback(
+  const handleBlur = useCallback(() => patch({ focused: false }), [patch]);
+
+  const handleChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
-      setValue(event.currentTarget.value);
-      if (service.onChange) {
-        service.onChange(event.currentTarget.value, state, setValue);
+      const nextValue = event.currentTarget.value;
+      const currentRequestId = ++requestId.current;
+
+      if (!nextValue.trim()) {
+        patch({ value: nextValue, menu: false, searching: false, items: null });
+        return;
       }
+
+      patch({ value: nextValue, menu: true, searching: true });
+
+      void fetchQuickSearchItems(nextValue).then(items => {
+        if (currentRequestId !== requestId.current) return; // stale response, a newer search has started
+        patch({ searching: false, items });
+      });
     },
-    [service, state]
+    [patch]
   );
 
-  // keyboard[ENTER] handler.
-  const onEnter = useCallback(() => {
-    if (service.onEnter) {
-      if (state.autoReset) {
-        const inputRef = menuRef.current.querySelector('input');
-        let newFocus = true;
-        if (inputRef) {
-          inputRef.blur();
-          newFocus = false;
-        }
-        state.set({ ...state, menu: false, mode: 'inline', focused: newFocus });
-        setValue('');
-      } else {
-        state.set({ ...state, menu: true });
-      }
-      service.onEnter(value, state);
-    }
-  }, [value, state, service]);
+  const handleEnter = useCallback(() => {
+    const [first] = items ?? [];
+    if (first) selectItem(first);
+    navigate.to().only({ route: '/search', search: { query: value } });
 
-  // Keyboard handler.
-  const onKeyDown = useCallback(
+    if (autoReset) {
+      const input = rootRef.current?.querySelector('input');
+      let nextFocused = true;
+      if (input) {
+        input.blur();
+        nextFocused = false;
+      }
+      patch({ menu: false, mode: 'inline', focused: nextFocused, value: '' });
+    } else {
+      patch({ menu: true });
+    }
+  }, [items, autoReset, value, selectItem, navigate, patch]);
+
+  const handleKeyDown = useCallback(
     (event: KeyboardEvent<HTMLElement>) => {
-      const { isEnter, isEscape, isTab, isArrowDown } = parseEvent(event);
+      const { isEnter, isEscape, isTab, isArrowDown } = parseQuickSearchKeyEvent(event);
       if (isEnter) {
-        onEnter();
+        handleEnter();
       } else if (isEscape || isTab) {
-        setTimeout(() => menuRef.current.querySelector('input')?.blur(), 50);
-        state.set({ ...state, menu: false });
+        setTimeout(() => rootRef.current?.querySelector('input')?.blur(), 50);
+        patch({ menu: false });
       } else if (isArrowDown) {
-        const result = document.querySelector('[data-tui-id="tui-app-search-result"]') as HTMLElement;
+        const result = document.querySelector<HTMLElement>(`[data-quicksearch-id="${RESULT_LIST_ID}"]`);
         if (result) {
-          // Prevent scolling before menu list gets focus.
-          // Doing this prevents the menu list from scrolling down
-          //  and then back up on second arrow down.
-          event.preventDefault(); // prevent native scroll.
+          // Prevent scrolling before the result list gets focus.
+          event.preventDefault();
           result.focus();
         }
       }
     },
-    [state, onEnter]
+    [patch, handleEnter]
   );
 
-  // Clear search input handler.
-  const onClear = useCallback(() => {
-    setValue('');
-    state.set({ ...state, items: null });
-  }, [state]);
+  const handleClear = useCallback(() => patch({ value: '', items: null, menu: false }), [patch]);
 
-  // Fullscreen modal toggle handler.
-  const onToggleFullscreen = useCallback(() => {
-    state.set({
-      ...state,
-      menu: state.menu || isPhoneMode,
-      mode: state.mode === 'inline' ? 'fullscreen' : 'inline'
+  const handleToggleFullscreen = useCallback(() => {
+    patch({
+      menu: menu || isPhoneMode,
+      mode: mode === 'inline' ? 'fullscreen' : 'inline'
     });
-  }, [isPhoneMode, state]);
+  }, [isPhoneMode, menu, mode, patch]);
+
+  const handleClose = useCallback(() => patch({ menu: false }), [patch]);
+
+  const handleOpenFullscreen = useCallback(() => patch({ menu: !menu, mode: 'fullscreen' }), [menu, patch]);
+
+  if (!showQuickSearch) return null;
 
   return (
-    <ClickAwayListener onClickAway={() => state.set({ ...state, menu: false })}>
-      <AppSearchRoot
-        ref={menuRef}
-        sx={{ mr: isPhoneMode ? 0 : 1, display: 'flex', flexGrow: 1, justifyContent: 'flex-end' }}
-        menuOpen={state.menu}
+    <ClickAwayListener onClickAway={handleClose}>
+      <QuickSearchRoot
+        ref={rootRef}
+        menuOpen={menu}
+        style={{ marginRight: isPhoneMode ? 0 : theme.spacing(1), ...(isTabletMode && { width: '100%' }) }}
       >
         {isPhoneMode ? (
-          <IconButton
-            color="inherit"
-            size="large"
-            onClick={() => state.set({ ...state, menu: !state.menu, mode: 'fullscreen' })}
+          <Tooltip
+            title={
+              <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'center' }}>
+                <span>{t('fullscreen')}</span>
+                <span>CTRL+K</span>
+              </div>
+            }
           >
-            <Tooltip
-              title={
-                <Stack direction="column" textAlign="center">
-                  <span>{t('app.search.fullscreen')}</span> <span>CTLR+K</span>
-                </Stack>
-              }
-            >
-              <Search />
-            </Tooltip>
-          </IconButton>
+            <IconButton color="inherit" size="large" onClick={handleOpenFullscreen}>
+              <SearchIcon />
+            </IconButton>
+          </Tooltip>
         ) : (
           <>
-            <AppSearchInput
+            <QuickSearchInput
               autoFocus={false}
-              focused={state.focused}
+              focused={focused}
               showToggle
-              provided={provided}
-              className="app-search-input"
+              provided
+              className="quicksearch-input"
               value={value}
-              searching={state.searching}
-              open={state.menu}
-              onFocus={onFocus}
-              onBlur={onBlur}
-              onChange={onChange}
-              onKeyDown={onKeyDown}
-              onClear={onClear}
-              onToggleFullscreen={onToggleFullscreen}
+              searching={searching}
+              open={menu}
+              onFocus={handleFocus}
+              onBlur={handleBlur}
+              onChange={handleChange}
+              onKeyDown={handleKeyDown}
+              onClear={handleClear}
+              onToggleFullscreen={handleToggleFullscreen}
               minWidth={isTabletMode ? '100%' : '250px'}
               maxWidth={isTabletMode ? '100%' : '350px'}
             />
-            {provided && (
-              <Popper
-                open={state.menu && state.mode === 'inline'}
-                anchorEl={menuRef.current}
-                placement="bottom-end"
-                sx={_theme => ({ width: '100%', zIndex: _theme.zIndex.appBar + 1 })}
-                disablePortal
-              >
-                <AppSearchResult className="app-search-result" sx={MENU_LIST_SX} />
-              </Popper>
-            )}
+            <Popper
+              open={menu && mode === 'inline'}
+              anchorEl={rootRef.current}
+              placement="bottom-end"
+              sx={_theme => ({ width: '100%', zIndex: _theme.zIndex.appBar + 1 })}
+              disablePortal
+            >
+              <QuickSearchResult items={items} onSelect={selectItem} onEscape={handleClose} />
+            </Popper>
           </>
         )}
         <Dialog
           disableRestoreFocus
           fullWidth
           maxWidth="md"
-          TransitionComponent={ModalTransition}
-          open={state.menu && state.mode === 'fullscreen'}
-          onClose={() => state.set({ ...state, mode: 'inline', menu: false })}
+          TransitionComponent={QuickSearchModalTransition}
+          open={menu && mode === 'fullscreen'}
+          onClose={() => patch({ mode: 'inline', menu: false })}
           sx={{
             maxHeight: '75%',
             margin: 0,
-            '.MuiDialog-container': {
-              alignItems: 'start'
-            }
+            '.MuiDialog-container': { alignItems: 'start' }
           }}
-          PaperProps={{
-            sx: {
-              borderRadius: 0,
-              margin: 0,
-              width: '100%'
-            }
-          }}
+          PaperProps={{ sx: { borderRadius: 0, margin: 0, width: '100%' } }}
         >
-          <DialogTitle
-            sx={{
-              padding: theme.spacing(1, 1.5)
-            }}
-          >
-            <AppSearchInput
-              // eslint-disable-next-line jsx-a11y/no-autofocus
+          <DialogTitle sx={{ padding: theme.spacing(1, 1.5) }}>
+            <QuickSearchInput
               autoFocus
-              focused={state.focused}
-              className="app-search-input"
+              focused={focused}
+              className="quicksearch-input"
               style={{ backgroundColor: emphasize(theme.palette.background.default, 0.1) }}
               showToggle={false}
               value={value}
-              searching={state.searching}
+              searching={searching}
               open={false}
-              onFocus={onFocus}
-              onBlur={onBlur}
-              onChange={onChange}
-              onKeyDown={onKeyDown}
-              onClear={onClear}
-              onToggleFullscreen={onToggleFullscreen}
+              onFocus={handleFocus}
+              onBlur={handleBlur}
+              onChange={handleChange}
+              onKeyDown={handleKeyDown}
+              onClear={handleClear}
+              onToggleFullscreen={handleToggleFullscreen}
             />
           </DialogTitle>
-          {provided && state.items && (
+          {items && items.length > 0 && (
             <DialogContent>
-              <AppSearchResult />
+              <QuickSearchResult items={items} onSelect={selectItem} onEscape={handleClose} />
             </DialogContent>
           )}
         </Dialog>
-      </AppSearchRoot>
+      </QuickSearchRoot>
     </ClickAwayListener>
   );
-}
+});
+
+QuickSearch.displayName = 'QuickSearch';

@@ -1,22 +1,25 @@
-import type { ALRequests } from 'app/core.api';
-import { DEFAULT_INVALIDATE_DELAY } from 'app/core.preference';
-import type { APIQueryKey, APIRequest } from 'core/api/api.models.ts';
-import { queryClient } from 'core/api/api.providers';
+import { DEFAULT_APP_PREFERENCE_STORE } from 'app/core.preference';
+import type { ApiQueryKey, ApiRequest } from 'core/api/api.models';
+import { QUERY_CLIENT } from 'core/api/api.providers';
+import { isObject } from 'core/api/api.utils';
 
-function isObject(variable) {
-  return variable !== null && typeof variable === 'object' && !Array.isArray(variable);
-}
-
-export const invalidateALQuery = <Request extends ALRequests>(
+/**
+ * @name invalidateAppQuery
+ * @description Invalidates all cached queries whose key partially matches the given app request shape, after an optional delay.
+ * @param request - Partial request to match against (url prefix, method, body keys)
+ * @param delay - Milliseconds to wait before invalidating (defaults to app config)
+ * @returns The timeout ID
+ */
+export const invalidateAppQuery = <Request extends ApiRequests>(
   request: Partial<Request>,
-  delay: number = DEFAULT_INVALIDATE_DELAY
+  delay: number = DEFAULT_APP_PREFERENCE_STORE.api.invalidateDelay
 ) =>
   setTimeout(async () => {
-    await queryClient.invalidateQueries({
+    await QUERY_CLIENT.invalidateQueries({
       predicate: ({ queryKey }) => {
         try {
-          const [url, method, bodyStr] = queryKey as unknown as APIQueryKey;
-          let body: APIRequest['body'] = null;
+          const [url, method, bodyStr] = queryKey as unknown as ApiQueryKey;
+          let body: ApiRequest['body'] = null;
           if (typeof bodyStr === 'string') {
             try {
               body = JSON.parse(bodyStr);
@@ -24,7 +27,7 @@ export const invalidateALQuery = <Request extends ALRequests>(
               body = bodyStr;
             }
           }
-          const req: APIRequest = { url, method, body };
+          const req: ApiRequest = { url, method, body };
 
           return (
             (!('url' in request) ? true : req.url.startsWith(request?.url as string)) &&
@@ -38,7 +41,7 @@ export const invalidateALQuery = <Request extends ALRequests>(
                     Object.prototype.hasOwnProperty.call(req.body as object, key)
                   ))
           );
-        } catch (err) {
+        } catch {
           return false;
         }
       }

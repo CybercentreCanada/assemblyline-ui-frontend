@@ -1,13 +1,12 @@
 import type { UseMutationOptions } from '@tanstack/react-query';
-import type { ALRequests, ALResponses } from 'app/core.api';
-import type { APIResponse } from 'core/api/api.models.ts';
-import type { UseAPICallFnProps } from 'core/api/hooks/useApiCallFn';
-import { useAPIMutation } from 'core/api/hooks/useApiMutation';
+import type { ApiResponse } from 'core/api/api.models';
+import type { UseApiCallFnProps } from 'core/api/hooks/useApiCallFn';
+import { useApiMutation } from 'core/api/hooks/useApiMutation';
 
-export const useALMutation = <Props extends unknown[], Request extends ALRequests, Error extends string = string>(
-  mutationFn: (...props: Props) => UseAPICallFnProps<APIResponse<ALResponses<Request>>, Request, APIResponse<Error>>,
+export const useAppMutation = <Props extends unknown[], Request extends ApiRequests, Error extends string = string>(
+  mutationFn: (...props: Props) => UseApiCallFnProps<ApiResponse<ApiResponses<Request>>, Request, ApiResponse<Error>>,
   mutationProps?: Omit<
-    UseMutationOptions<APIResponse<ALResponses<Request>>, APIResponse<Error>, Props, unknown>,
+    UseMutationOptions<ApiResponse<ApiResponses<Request>>, ApiResponse<Error>, Props, unknown>,
     'mutationFn'
   >
-) => useAPIMutation<Props, ALResponses<Request>, Request, Error>(mutationFn, mutationProps);
+) => useApiMutation<Props, ApiResponses<Request>, Request, Error>(mutationFn, mutationProps);

@@ -1,14 +1,15 @@
-import useALContext from 'core/config/useALContext';
-import React, { useMemo } from 'react';
+import { useAppConfigStore } from 'core/config';
+import { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useForm } from 'routes/settings/settings.form.ts';
-import { getProfileNames } from 'routes/settings/settings.utils.ts';
+import { useForm } from 'routes/settings/settings.form';
+import { getProfileNames } from 'routes/settings/settings.utils';
 import { PageNavigation } from 'ui/layouts/PageNavigation';
 
-export const LeftNav = React.memo(() => {
+export const LeftNav = memo(() => {
   const { t } = useTranslation(['settings']);
   const form = useForm();
-  const { configuration, settings } = useALContext();
+  const configuration = useAppConfigStore(s => s.configuration);
+  const settings = useAppConfigStore(s => s.settings);
 
   const profileOptions = useMemo(() => {
     if (!settings || !configuration?.submission) return [];
@@ -22,7 +23,8 @@ export const LeftNav = React.memo(() => {
       return {
         primary: displayName,
         active: false,
-        to: `/settings/${name}`
+        name: name,
+        nav: nav => nav.here({ replace: true }).update({ route: '/settings/:tab', path: { tab: name } })
       };
     });
   }, [settings, configuration, t]);
@@ -34,10 +36,10 @@ export const LeftNav = React.memo(() => {
           {
             primary: t('interface'),
             active: !tab || tab === 'interface',
-            to: `/settings/interface`
+            nav: nav => nav.here({ replace: true }).update({ route: '/settings/:tab', path: { tab: 'interface' } })
           },
           { primary: t('profiles'), subheader: true, readOnly: true },
-          ...profileOptions.map(opt => ({ ...opt, active: opt.to.endsWith(tab) }))
+          ...profileOptions.map(opt => ({ ...opt, active: opt.name.endsWith(tab) }))
         ];
 
         return (

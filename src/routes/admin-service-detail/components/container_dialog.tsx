@@ -18,14 +18,14 @@ import {
 import FormControl from '@mui/material/FormControl';
 import type { DockerConfig, EnvironmentVariable, PersistentVolume } from 'models/base/service';
 import { DEFAULT_DOCKER_CONFIG, DEFAULT_ENVIRONMENT_VARIABLE, DEFAULT_PERSISTENT_VOLUME } from 'models/base/service';
-import { showReset } from 'routes/admin-service-detail/components/service.utils.ts';
+import type { Dispatch, SetStateAction } from 'react';
+import React, { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { showReset } from 'routes/admin-service-detail/components/service.utils';
 import { NumberInput } from 'ui/inputs/NumberInput';
 import { RadioInput } from 'ui/inputs/RadioInput';
 import { SelectInput } from 'ui/inputs/SelectInput';
 import { TextInput } from 'ui/inputs/TextInput';
-import type { Dispatch, SetStateAction } from 'react';
-import React, { useCallback, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 
 type EnvironmentProps = {
   envVar?: EnvironmentVariable;

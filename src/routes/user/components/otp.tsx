@@ -1,8 +1,7 @@
 import { Button, TextField, Typography, useTheme } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
-import useMyAPI from 'core/api/hooks/useMyAPI';
-import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
-import { useState } from 'react';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import TextDivider from 'ui/TextDivider';
 
@@ -39,7 +38,7 @@ export default function OTP({ setDrawerOpen, set2FAEnabled }: OTPProps) {
     });
   }
 
-  useEffectOnce(() => {
+  useEffect(() => {
     // Load OTP setup on start
     apiCall({
       url: '/api/v4/auth/setup_otp/',
@@ -53,7 +52,8 @@ export default function OTP({ setDrawerOpen, set2FAEnabled }: OTPProps) {
         }, 1000);
       }
     });
-  });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <>

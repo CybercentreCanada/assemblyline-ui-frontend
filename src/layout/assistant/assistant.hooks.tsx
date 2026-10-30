@@ -1,7 +1,7 @@
-import type { AssistantContextProps } from 'layout/assistant/assistant.providers';
-import { AssistantContext } from 'layout/assistant/assistant.providers';
+import type { AssistantContextProps } from 'layout/assistant';
+import { AppAssistantContext } from 'layout/assistant/assistant.providers';
 import { useContext } from 'react';
 
-export default function useAssistant(): AssistantContextProps {
-  return useContext(AssistantContext);
+export function useAssistant(): AssistantContextProps {
+  return useContext(AppAssistantContext);
 }

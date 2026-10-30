@@ -5,6 +5,7 @@ import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import OndemandVideoOutlinedIcon from '@mui/icons-material/OndemandVideoOutlined';
+import PageviewOutlinedIcon from '@mui/icons-material/PageviewOutlined';
 import TuneOutlinedIcon from '@mui/icons-material/TuneOutlined';
 import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
 import WrapTextOutlinedIcon from '@mui/icons-material/WrapTextOutlined';
@@ -25,31 +26,37 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import useMyAPI from 'core/api/hooks/useMyAPI';
-import useALContext from 'core/config/useALContext';
-import useMySnackbar from 'core/snackbar/snackbar.hooks';
-import PageFullSize from 'core/template/branding/AppPageCenter';
-import { useAppUser } from 'core/template/components/app/hooks';
-import useAssistant from 'layout/assistant/assistant.hooks';
-import type { CustomUser } from 'models/api/user';
+import {
+  AppLink,
+  AppNavigate,
+  createAppRoute,
+  useAppNavigate,
+  useAppPathParams,
+  useAppSearchParams
+} from 'core/router';
+import { AppPageFullSize } from 'core/template';
+import useALContext from 'deprecated/hooks/useALContext';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useMySnackbar from 'deprecated/hooks/useMySnackbar';
+import { useAssistant } from 'layout/assistant';
 import type { File } from 'models/base/file';
 import type { Submission } from 'models/base/submission';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate, useParams } from 'react-router';
-import { Link } from 'react-router-dom';
-import { ASCIISection } from 'routes/file-viewer/components/ascii';
+import ASCIISection from 'routes/file-viewer/components/ascii';
 import CodeSection from 'routes/file-viewer/components/code_summary';
-import { HexSection } from 'routes/file-viewer/components/hex';
-import { ImageSection } from 'routes/file-viewer/components/image';
-import { StringsSection } from 'routes/file-viewer/components/strings';
-import SelectionProvider, { useSelection } from 'routes/file-viewer/file-viewer.providers';
-import ForbiddenPage from 'routes/forbidden/forbidden.route';
+import HexSection from 'routes/file-viewer/components/hex';
+import ImageSection from 'routes/file-viewer/components/image';
+import StringsSection from 'routes/file-viewer/components/strings';
+import { SelectionProvider, useSelection } from 'routes/file-viewer/file-viewer.providers';
+import { ForbiddenPage } from 'routes/forbidden/forbidden';
 import { FileDownloader } from 'ui/buttons/FileDownloader';
 import { IconButton } from 'ui/buttons/IconButton';
 import { TabContainer } from 'ui/TabContainer';
 
-loader.config({ paths: { vs: '/cdn/monaco_0.35.0/vs' } });
+loader.config({
+  paths: { vs: '/cdn/monaco_0.35.0/vs' }
+});
 
 const TabContent = styled('div')(({ theme }) => ({
   flexGrow: 1,
@@ -58,34 +65,28 @@ const TabContent = styled('div')(({ theme }) => ({
   paddingTop: theme.spacing(2)
 }));
 
-export type Tab = 'ascii' | 'code' | 'strings' | 'hex' | 'image';
+export const TAB_OPTIONS = ['ascii', 'code', 'strings', 'hex', 'image'] as const;
 
-export const TAB_OPTIONS: Tab[] = ['ascii', 'code', 'strings', 'hex', 'image'];
+export type Tab = (typeof TAB_OPTIONS)[number];
 
 export const DEFAULT_TAB: Tab = 'ascii';
 
-type ParamProps = {
-  id: string;
-  tab: Tab;
-};
-
-const WrappedFileViewer = () => {
+const FileViewerPage = React.memo(() => {
   const { t } = useTranslation(['fileViewer']);
   const theme = useTheme();
-  const location = useLocation();
-  const navigate = useNavigate();
+  const navigate = useAppNavigate<'/file/viewer/:id/:tab'>();
   const selection = useSelection();
 
   const { addInsight, removeInsight } = useAssistant();
   const { apiCall } = useMyAPI();
   const { configuration } = useALContext();
-  const { id: sha256, tab: paramTab } = useParams<ParamProps>();
-  const { user: currentUser } = useAppUser<CustomUser>();
+  const { id: sha256, tab: paramTab } = useAppPathParams<'/file/viewer/:id/:tab'>();
+  const { user: currentUser } = useALContext();
   const { closeSnackbar, showSuccessMessage } = useMySnackbar();
 
   const [type, setType] = useState<string>('unknown');
   const [codeAllowed, setCodeAllowed] = useState<boolean>(false);
-  const [imageAllowed, setImageAllowed] = useState<boolean>(null);
+  const [imageAllowed, setImageAllowed] = useState<boolean>(false);
   const [wordwrap, setWordwrap] = useState<'on' | 'off'>('off');
   const [dataTruncated, setDataTruncated] = useState<boolean>(false);
   const [submitAnchor, setSubmitAnchor] = useState<HTMLElement | null>(null);
@@ -113,8 +114,9 @@ const WrappedFileViewer = () => {
         url: `/api/v4/submit/${submitType}/${sha256}/`,
         onSuccess: api_data => {
           showSuccessMessage(t('submit.success'));
+          setSubmitAnchor(null);
           setTimeout(() => {
-            navigate(`/submission/detail/${api_data.api_response.sid}`);
+            navigate.to().create({ route: '/submission/detail/:id', path: { id: api_data.api_response.sid } });
           }, 500);
         }
       });
@@ -139,8 +141,9 @@ const WrappedFileViewer = () => {
         },
         onSuccess: api_data => {
           showSuccessMessage(t('submit.success'));
+          setSubmitAnchor(null);
           setTimeout(() => {
-            navigate(`/submission/detail/${api_data.api_response.sid}`);
+            navigate.to().create({ route: '/submission/detail/:id', path: { id: api_data.api_response.sid } });
           }, 500);
         }
       });
@@ -191,7 +194,7 @@ const WrappedFileViewer = () => {
   }, [codeAllowed]);
 
   return currentUser.roles.includes('file_detail') ? (
-    <PageFullSize margin={4}>
+    <AppPageFullSize>
       <Grid container alignItems="center">
         <Grid flexGrow={1}>
           <Typography variant="h4">{t('title')}</Typography>
@@ -293,16 +296,16 @@ const WrappedFileViewer = () => {
                     </ListItem>
 
                     <ListItemButton
-                      component={Link}
+                      component={AppLink}
                       dense
                       onClick={() => setSubmitAnchor(null)}
                       {...(isSelection
                         ? {
-                            to: '/submit',
-                            state: { raw: selection?.getSelection() }
+                            nav: nav =>
+                              nav.to().create({ route: '/submit', search: { raw: selection?.getSelection() } })
                           }
                         : {
-                            to: `/submit?hash=${sha256}`
+                            nav: nav => nav.to().create({ route: '/submit', search: { hash: sha256 } })
                           })}
                     >
                       <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
@@ -349,7 +352,11 @@ const WrappedFileViewer = () => {
             )}
             {currentUser.roles.includes('submission_view') && (
               <Tooltip title={t('detail')}>
-                <IconButton component={Link} to={`/file/detail/${sha256}`} size="large">
+                <IconButton
+                  nav={nav => nav.to().create({ route: '/file/detail/:id', path: { id: sha256 } })}
+                  navDeps={[sha256]}
+                  size="large"
+                >
                   <DescriptionOutlinedIcon />
                 </IconButton>
               </Tooltip>
@@ -357,8 +364,14 @@ const WrappedFileViewer = () => {
             {currentUser.roles.includes('submission_view') && (
               <Tooltip title={t('related')}>
                 <IconButton
-                  component={Link}
-                  to={`/search/submission?query=files.sha256:${sha256} OR results:${sha256}* OR errors:${sha256}*`}
+                  nav={nav =>
+                    nav.to().create({
+                      route: '/search/:index',
+                      path: { index: 'submission' },
+                      search: { query: `files.sha256:${sha256} OR results:${sha256}* OR errors:${sha256}*` }
+                    })
+                  }
+                  navDeps={[sha256]}
                   size="large"
                 >
                   <ViewCarouselOutlinedIcon />
@@ -392,8 +405,10 @@ const WrappedFileViewer = () => {
             value={paramTab}
             defaultTab={DEFAULT_TAB}
             paper
-            onChange={(_event, value) => {
-              navigate(`/file/viewer/${sha256}/${value}/${location.search}${location.hash}`, { replace: true });
+            onChange={(_event, value: Tab) => {
+              navigate
+                .here({ replace: true })
+                .update({ route: '/file/viewer/:id/:tab', path: { id: sha256, tab: value } });
               selection?.setSelection?.(null);
             }}
             tabs={{
@@ -454,16 +469,87 @@ const WrappedFileViewer = () => {
           />
         </div>
       )}
-    </PageFullSize>
+    </AppPageFullSize>
   ) : (
     <ForbiddenPage />
   );
-};
+});
 
-export const FileViewer = React.memo(props => (
+const WrappedFileViewerPage = React.memo(() => (
   <SelectionProvider>
-    <WrappedFileViewer {...props} />
+    <FileViewerPage />
   </SelectionProvider>
 ));
 
-export default FileViewer;
+export const FileViewerRoute = createAppRoute({
+  component: WrappedFileViewerPage,
+
+  path: '/file/viewer/:id/:tab',
+  params: s => ({
+    id: s.string(),
+    tab: s.enum(TAB_OPTIONS, 'ascii')
+  }),
+  search: s => ({
+    cursor: s.number(null),
+    endIndex: s.number(null),
+    mode: s.enum('text', ['cursor', 'hex', 'text']),
+    query: s.string(''),
+    scroll: s.number(null),
+    selectedResult: s.number(null),
+    startIndex: s.number(null)
+  }),
+
+  ancestor: null,
+  shortname: location => ['app_route.file_viewer_id_tab.shortname', { ns: 'fileViewer', id: location.path.id }],
+  fullname: location => [
+    'app_route.file_viewer_id_tab.fullname',
+    { ns: 'fileViewer', id: location.path.id, tab: location.path.tab }
+  ],
+  shorticon: () => <PageviewOutlinedIcon />,
+  fullicon: () => <PageviewOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
+});
+
+const FileViewerRootPage = React.memo(() => {
+  const { id = null } = useAppPathParams<'/file/viewer/:id'>();
+  const search = useAppSearchParams<'/file/viewer/:id'>();
+  return (
+    <AppNavigate
+      nav={nav =>
+        nav
+          .to({ replace: true })
+          .update({ route: '/file/viewer/:id/:tab', path: { id, tab: null }, search: search as never })
+      }
+      navDeps={[id, search]}
+    />
+  );
+});
+
+export const FileViewerRootRoute = createAppRoute({
+  component: FileViewerRootPage,
+
+  path: '/file/viewer/:id',
+  params: s => ({
+    id: s.string()
+  }),
+  search: s => ({
+    cursor: s.number(null),
+    endIndex: s.number(null),
+    mode: s.enum('text', ['cursor', 'hex', 'text']),
+    query: s.string(''),
+    scroll: s.number(null),
+    selectedResult: s.number(null),
+    startIndex: s.number(null)
+  }),
+
+  ancestor: null,
+  shortname: location => ['app_route.file_viewer_id.shortname', { ns: 'fileViewer', id: location.path.id }],
+  fullname: location => ['app_route.file_viewer_id.fullname', { ns: 'fileViewer', id: location.path.id }],
+  shorticon: () => <PageviewOutlinedIcon />,
+  fullicon: () => <PageviewOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.roles.includes('file_detail')
+});

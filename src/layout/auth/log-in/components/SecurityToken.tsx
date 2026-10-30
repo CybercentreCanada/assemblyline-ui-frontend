@@ -1,56 +1,62 @@
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { Typography } from '@mui/material';
-import useMyAPI from 'core/api/hooks/useMyAPI';
-import useMySnackbar from 'core/snackbar/snackbar.hooks';
-import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
+import { useApiQuery } from 'core/api';
+import { useAppSnackbar } from 'core/snackbar/snackbar.hooks';
+import { useLoginRequest } from 'layout/auth/log-in/log-in.hooks';
+import { useLoginForm } from 'layout/auth/log-in/log-in.providers';
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { decode, encode } from 'shared/utils/cbor';
-import toArrayBuffer from 'shared/utils/toArrayBuffer';
+import { toArrayBuffer } from 'shared/utils/toArrayBuffer';
 
-type SecTokenProps = {
-  setShownControls: (value: string) => void;
-  setWebAuthNResponse: (value) => void;
-  username: string;
-};
+//*****************************************************************************************
+// Security Token Login
+//*****************************************************************************************
 
-export function SecurityTokenLogin({ username, setShownControls, setWebAuthNResponse }: SecTokenProps) {
+export const SecurityTokenLogin = memo(() => {
   const { t } = useTranslation(['login']);
-  const { apiCall } = useMyAPI();
-  const { showErrorMessage } = useMySnackbar();
+  const form = useLoginForm();
+  const { showErrorMessage } = useAppSnackbar();
+  const requestLogin = useLoginRequest();
 
-  useEffectOnce(() => {
-    apiCall({
-      url: `/api/v4/webauthn/authenticate/begin/${username}/`,
-      onSuccess: api_data => {
-        const arrayData = toArrayBuffer(api_data.api_response);
-        const options = decode(arrayData.buffer);
+  useApiQuery({
+    url: `/api/v4/webauthn/authenticate/begin/${form.state.values.username || ''}/`,
+    method: 'GET',
+    onSuccess: ({ api_response }) => {
+      const arrayData = toArrayBuffer(api_response);
+      try {
+        const options = decode(arrayData.buffer) as CredentialRequestOptions;
         const credentialHelper = navigator.credentials;
-        if (credentialHelper !== undefined) {
-          credentialHelper
-            .get(options)
-            .then((assertion: PublicKeyCredential) => {
-              const response = assertion.response as AuthenticatorAssertionResponse;
-              const assertionData = encode({
-                credentialId: new Uint8Array(assertion.rawId),
-                authenticatorData: new Uint8Array(response.authenticatorData),
-                clientDataJSON: new Uint8Array(response.clientDataJSON),
-                signature: new Uint8Array(response.signature)
-              });
+        if (credentialHelper === undefined) throw new Error('WebAuthn unavailable');
 
-              setWebAuthNResponse(Array.from(new Uint8Array(assertionData)));
-            })
-            .catch(ex => {
-              // eslint-disable-next-line no-console
-              console.log(`${ex.name}: ${ex.message}`);
-              setShownControls('otp');
-              showErrorMessage(t('securitytoken.error'));
+        void credentialHelper
+          .get(options)
+          .then((assertion: PublicKeyCredential) => {
+            if (!assertion) throw new Error('WebAuthn assertion unavailable');
+            const response = assertion.response as AuthenticatorAssertionResponse;
+            const assertionData = encode({
+              credentialId: new Uint8Array(assertion.rawId),
+              authenticatorData: new Uint8Array(response.authenticatorData),
+              clientDataJSON: new Uint8Array(response.clientDataJSON),
+              signature: new Uint8Array(response.signature)
             });
-        } else {
-          setShownControls('otp');
-          showErrorMessage(t('securitytoken.unavailable'));
-        }
+
+            form.setFieldValue('webauthn_auth_resp', Array.from(new Uint8Array(assertionData)));
+            requestLogin.mutate();
+          })
+          .catch(() => {
+            form.setFieldValue('mode', 'otp');
+            showErrorMessage(t('securitytoken.error'));
+          });
+      } catch {
+        form.setFieldValue('mode', 'otp');
+        showErrorMessage(t('securitytoken.unavailable'));
       }
-    });
+    },
+    onFailure: () => {
+      form.setFieldValue('mode', 'otp');
+      showErrorMessage(t('securitytoken.unavailable'));
+    }
   });
 
   return (
@@ -63,4 +69,6 @@ export function SecurityTokenLogin({ username, setShownControls, setWebAuthNResp
       </Typography>
     </div>
   );
-}
+});
+
+SecurityTokenLogin.displayName = 'SecurityTokenLogin';

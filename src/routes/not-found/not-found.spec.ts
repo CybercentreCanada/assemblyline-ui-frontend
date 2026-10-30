@@ -1,4 +1,3 @@
-import { MEDIUM_TIMEOUT } from 'app/spec.constant';
 import { test } from 'core/e2e/e2e.fixtures';
 
 test.describe('Not Found page', () => {
@@ -8,7 +7,7 @@ test.describe('Not Found page', () => {
     void userSession.notFoundPage.monitorForError();
     void userSession.snackbarContext.monitorForNoError();
 
-    await userSession.page.goto('/doesnt_exist');
-    await userSession.page.waitForTimeout(MEDIUM_TIMEOUT);
+    await userSession.page.goto('/v1#/doesnt_exist');
+    await userSession.notFoundPage.waitFor();
   });
 });

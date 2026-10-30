@@ -1,11 +1,11 @@
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
 import { Button, Grid, IconButton, Tooltip, Typography, useTheme } from '@mui/material';
-import useALContext from 'core/config/useALContext';
+import useALContext from 'deprecated/hooks/useALContext';
 import type { Service, UpdateSource } from 'models/base/service';
 import { DEFAULT_SOURCE } from 'models/base/service';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { showReset } from 'routes/admin-service-detail/components/service.utils.ts';
+import { showReset } from 'routes/admin-service-detail/components/service.utils';
 import SourceDialog from 'routes/admin-service-detail/components/source_dialog';
 import { SourceCard } from 'routes/manage-signature-sources/manage-signature-sources.route';
 import { NumberInput } from 'ui/inputs/NumberInput';

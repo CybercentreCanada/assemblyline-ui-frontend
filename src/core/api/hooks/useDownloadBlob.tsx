@@ -1,19 +1,19 @@
 import type { UndefinedInitialDataOptions } from '@tanstack/react-query';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { DEFAULT_RETRY_MS } from 'app/core.preference';
-import type { APIQueryKey, APIResponse, BlobResponse } from 'core/api/api.models.ts';
-import { getBlobResponse, isAPIData, stableStringify } from 'core/api/api.utils';
-import useALContext from 'core/config/useALContext';
-import useMySnackbar from 'core/snackbar/snackbar.hooks';
-import useQuota from 'layout/quota/quota.hooks';
+import { DEFAULT_APP_PREFERENCE_STORE } from 'app/core.preference';
+import type { ApiQueryKey, ApiResponse, BlobResponse } from 'core/api/api.models';
+import { getBlobResponse, isApiData, stableStringify } from 'core/api/api.utils';
+import { useAppConfigStore } from 'core/config';
+import { useAppSetInterfaceStore } from 'core/interface';
+import { useAppSnackbar } from 'core/snackbar';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getFileName } from 'shared/utils/utils';
-import getXSRFCookie from 'shared/utils/xsrf';
+import { getXSRFCookie } from 'shared/utils/xsrf.utils';
 
 export type UseDownloadBlobProps = {
   queryProps?: Omit<
-    UndefinedInitialDataOptions<BlobResponse, APIResponse<Error>, BlobResponse, APIQueryKey>,
+    UndefinedInitialDataOptions<BlobResponse, ApiResponse<Error>, BlobResponse, ApiQueryKey>,
     'queryKey' | 'queryFn'
   >;
   allowCache?: boolean;
@@ -28,16 +28,16 @@ export const useDownloadBlob = ({
   disabled,
   queryProps = null,
   reloadOnUnauthorize = true,
-  retryAfter = DEFAULT_RETRY_MS,
+  retryAfter = DEFAULT_APP_PREFERENCE_STORE.api.retryTime,
   url
 }: UseDownloadBlobProps) => {
   const queryClient = useQueryClient();
-  const { t } = useTranslation();
-  const { showErrorMessage, closeSnackbar } = useMySnackbar();
-  const { configuration: systemConfig } = useALContext();
-  const { setApiQuotaremaining, setSubmissionQuotaremaining } = useQuota();
+  const { t } = useTranslation(['api']);
+  const { showErrorMessage, closeSnackbar } = useAppSnackbar();
+  const configuration = useAppConfigStore(s => s?.configuration);
+  const setInterfaceStore = useAppSetInterfaceStore();
 
-  const query = useQuery<BlobResponse, APIResponse<Error>, BlobResponse, APIQueryKey>(
+  const query = useQuery<BlobResponse, ApiResponse<Error>, BlobResponse, ApiQueryKey>(
     {
       ...queryProps,
       queryKey: [url, 'GET', stableStringify(null), allowCache],
@@ -57,19 +57,29 @@ export const useDownloadBlob = ({
 
         // Setting the API quota
         const apiQuota = res.headers.get('X-Remaining-Quota-Api');
-        if (apiQuota) setApiQuotaremaining(parseInt(apiQuota));
+        if (apiQuota) {
+          setInterfaceStore(s => {
+            s.quota.api = parseInt(apiQuota);
+            return s;
+          });
+        }
 
         // Setting the Submission quota
         const submissionQuota = res.headers.get('X-Remaining-Quota-Submission');
-        if (submissionQuota) setSubmissionQuotaremaining(parseInt(submissionQuota));
+        if (submissionQuota) {
+          setInterfaceStore(s => {
+            s.quota.submission = parseInt(submissionQuota);
+            return s;
+          });
+        }
 
         // Handle an unreachable API
         if (res.status === 502) {
-          showErrorMessage(t('api.unreachable'), 10000);
+          showErrorMessage(t('unreachable'), 10000);
           return Promise.reject({
-            api_error_message: t('api.unreachable'),
+            api_error_message: t('unreachable'),
             api_response: '',
-            api_server_version: systemConfig.system.version,
+            api_server_version: configuration?.system?.version,
             api_status_code: 502
           });
         }
@@ -77,12 +87,12 @@ export const useDownloadBlob = ({
         const json = (await res.json()) as BlobResponse;
 
         // Check for an invalid json format
-        if (!isAPIData(json)) {
-          showErrorMessage(t('api.invalid'));
+        if (!isApiData(json)) {
+          showErrorMessage(t('invalid'));
           return Promise.reject({
-            api_error_message: t('api.invalid'),
+            api_error_message: t('invalid'),
             api_response: '',
-            api_server_version: systemConfig.system.version,
+            api_server_version: configuration?.system?.version,
             api_status_code: 400
           });
         }
@@ -91,7 +101,10 @@ export const useDownloadBlob = ({
 
         // Reload when the user has exceeded their daily API call quota.
         if (res.status === 503 && ['API', 'quota', 'daily'].every(v => error.includes(v))) {
-          window.location.reload();
+          setInterfaceStore(s => {
+            s.auth.mode = 'quota';
+            return s;
+          });
           return Promise.reject(json);
         }
 
@@ -102,7 +115,10 @@ export const useDownloadBlob = ({
 
         // Reload when the user is not logged in
         if (res.status === 401 && reloadOnUnauthorize) {
-          window.location.reload();
+          setInterfaceStore(s => {
+            s.auth.mode = 'logout';
+            return s;
+          });
           return Promise.reject(json);
         }
 
@@ -113,7 +129,7 @@ export const useDownloadBlob = ({
         }
 
         // Handle successful request
-        if (retryAfter !== DEFAULT_RETRY_MS) closeSnackbar();
+        if (retryAfter !== DEFAULT_APP_PREFERENCE_STORE.api.retryTime) closeSnackbar();
 
         // Handle all non-successful request
         if (res.status !== 200) {
@@ -124,7 +140,7 @@ export const useDownloadBlob = ({
         return Promise.resolve({
           api_error_message: '',
           api_response: res.body,
-          api_server_version: systemConfig.system.version,
+          api_server_version: configuration?.system?.version,
           api_status_code: res.status,
           filename: getFileName(res.headers.get('Content-Disposition')),
           size: parseInt(res.headers.get('Content-Length')),

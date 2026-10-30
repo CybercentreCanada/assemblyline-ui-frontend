@@ -1,6 +1,8 @@
 {
   "adjust.button.close.tooltip": "Close the panel that displays the submit parameters",
   "adjust.button.open.tooltip": "Open the panel to adjust the submit parameters",
+  "app_route.submit.fullname": "Submit",
+  "app_route.submit.shortname": "Submit",
   "cancel.button.label": "Cancel",
   "cancel.button.tooltip": "Cancel the submission and reset all values",
   "classification.input.label": "The following classification will be applied to your submission:",

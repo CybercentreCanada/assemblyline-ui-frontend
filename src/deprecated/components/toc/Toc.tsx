@@ -1,10 +1,10 @@
 import { styled, useTheme } from '@mui/material';
-import { useAppBar, useAppLayout, useAppUser } from 'core/template/components/app/hooks';
+import { useAppPreferenceStore } from 'core/preference';
+import { AppLink, useAppHashParams } from 'core/router';
+import useALContext from 'deprecated/hooks/useALContext';
 import type { ReactNode } from 'react';
 import React, { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation } from 'react-router';
-import { Link } from 'react-router-dom';
 
 const ToCBar = styled('div')(({ theme }) => ({
   display: 'none',
@@ -74,21 +74,22 @@ export type ContentWithTOCItemProps = {
 };
 
 const ContentWithTOCItem: React.FC<ContentWithTOCItemProps> = ({ translation, item }) => {
-  const { autoHide: autoHideAppbar } = useAppBar();
-  const { current: currentLayout } = useAppLayout();
-  const location = useLocation();
   const { t } = useTranslation([translation]);
-  const currentHash = location.hash && location.hash !== '' ? location.hash.substring(1) : null;
-  const active = currentHash && currentHash.startsWith(item.id) ? 'active' : null;
-  const { user: currentUser } = useAppUser();
+  const hashFragment = useAppHashParams();
+  const { user: currentUser } = useALContext();
+
+  const active = useMemo(
+    () => (hashFragment && hashFragment.startsWith(item.id) ? 'active' : null),
+    [hashFragment, item.id]
+  );
 
   return (
     (!item.is_admin || (currentUser.is_admin && item.is_admin)) && (
       <>
         <li className={active}>
-          <Link to={`#${item.id}`} target="_self">
+          <AppLink nav={nav => nav.here().update(s => ({ ...s, hash: item.id }) as never)} target="_self">
             {t(item.id)}
-          </Link>
+          </AppLink>
         </li>
         {active && item.subItems && (
           <ToC style={{ fontSize: 'smaller', paddingInlineStart: '8px' }}>
@@ -117,24 +118,24 @@ const WrappedContentWithTOC: React.FC<ContentWithTOCProps> = ({
   titleI18nKey = 'toc',
   topI18nKey = 'top'
 }) => {
-  const { autoHide: autoHideAppbar } = useAppBar();
-  const { current: currentLayout } = useAppLayout();
+  const autoHideAppbar = useAppPreferenceStore(s => s?.template?.autoHideAppbar);
+  const currentLayout = useAppPreferenceStore(s => s?.template?.layout);
   const theme = useTheme();
-  const location = useLocation();
+  const hash = useAppHashParams();
   const { t } = useTranslation([translation]);
 
   useEffect(() => {
-    if (location.hash && location.hash !== '') {
-      const scrollElement = document.getElementById(location.hash.substring(1));
+    if (hash && hash !== '') {
+      const scrollElement = document.getElementById(hash);
       if (scrollElement) {
         // If element exists already, use native scrollIntoView.
         scrollElement.scrollIntoView(true);
       } else {
         // eslint-disable-next-line no-console
-        console.log('[WARN] Trying to scroll to unknown ID:', location.hash);
+        console.log('[WARN] Trying to scroll to unknown ID:', hash);
       }
     }
-  }, [location.hash]);
+  }, [hash]);
 
   return (
     <div id="top" style={{ display: 'flex' }}>
@@ -155,9 +156,9 @@ const WrappedContentWithTOC: React.FC<ContentWithTOCProps> = ({
                     items.map(item => <ContentWithTOCItem key={item.id} item={item} translation={translation} />)}
                   {topI18nKey && (
                     <Top>
-                      <Link to="#top" target="_self">
+                      <AppLink nav={nav => nav.here().update(s => ({ ...s, hash: 'top' }) as never)} target="_self">
                         {t(topI18nKey)}
-                      </Link>
+                      </AppLink>
                     </Top>
                   )}
                 </ToC>

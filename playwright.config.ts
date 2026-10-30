@@ -66,6 +66,7 @@ export default defineConfig({
   fullyParallel: true,
   globalTeardown: path.resolve(__dirname, './src/core/e2e/e2e.teardown.ts'),
   outputDir: `${RESULTS_DIR}/results`,
+  snapshotPathTemplate: `${RESULTS_DIR}/smoke-test-screenshots/{testFilePath}/{arg}{ext}`,
   reporter: [
     ['list'],
     ['html', { open: 'always', outputFolder: `${RESULTS_DIR}/html-report` }],

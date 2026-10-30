@@ -1,11 +1,6 @@
 import type { Browser, BrowserContext } from '@playwright/test';
-import { ForbiddenPage } from 'routes/forbidden/forbidden.pom.ts';
-import { NotFoundPage } from 'routes/not-found/not-found.pom.ts';
-import { CrashPage } from 'core/error/error.pom.ts';
-import { LoginPage } from 'layout/auth/log-in/log-in.pom.ts';
-import { SubmitPage } from 'routes/submit/submit.pom.ts';
-import { TermsOfServicePage } from 'layout/auth/terms-of-service/terms-of-service.pom.ts';
 import {
+  LONG_TIMEOUT,
   RESULTS_DIR,
   TEST_ADMIN_PASSWORD,
   TEST_ADMIN_USERNAME,
@@ -13,8 +8,14 @@ import {
   TEST_USER_USERNAME
 } from 'app/spec.constant';
 import { test } from 'core/e2e/e2e.fixtures';
+import { CrashPage } from 'core/error/error.pom';
 import fs from 'fs';
+import { LoginPage } from 'layout/auth/log-in/log-in.pom';
+import { TermsOfServicePage } from 'layout/auth/terms-of-service/terms-of-service.pom';
 import path from 'path';
+import { ForbiddenPage } from 'routes/forbidden/forbidden.pom';
+import { NotFoundPage } from 'routes/not-found/not-found.pom';
+import { SubmitPage } from 'routes/submit/submit.pom';
 
 type LoginAndSaveProps = {
   browser: Browser;
@@ -48,8 +49,18 @@ test.describe('Authentication setup', () => {
     await test.step(`Check if ${username} is already authenticated`, async () => {
       await submitPage.goto();
 
-      if (await loginPage.isVisible()) {
-        // Not logged in → perform login
+      // The app resolves the session before it paints, so settle on whichever screen it lands on rather than
+      // treating a slow first paint as an authenticated session.
+      const landing = await Promise.race([
+        loginPage.isVisible({ timeout: LONG_TIMEOUT }).then(visible => (visible ? 'login' : 'none')),
+        submitPage.isVisible({ timeout: LONG_TIMEOUT }).then(visible => (visible ? 'submit' : 'none'))
+      ]);
+
+      if (landing === 'none') {
+        throw new Error(`The application never rendered the login or the submit page for "${username}".`);
+      }
+
+      if (landing === 'login') {
         await loginPage.login(username, password);
         await submitPage.waitFor({ state: 'visible' });
 
@@ -57,9 +68,6 @@ test.describe('Authentication setup', () => {
         await test.step(`Persist authenticated session for ${username}`, async () => {
           await context.storageState({ path: storagePath });
         });
-      } else {
-        // Already authenticated, nothing else to do
-        await submitPage.waitFor({ state: 'visible' });
       }
     });
 

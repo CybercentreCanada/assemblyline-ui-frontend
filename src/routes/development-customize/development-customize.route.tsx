@@ -1,70 +1,19 @@
-import { Box, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, styled, useTheme } from '@mui/material';
-import type { CustomizeMethod } from 'routes/development-customize/development-customize.form.tsx';
-import { CUSTOMIZE_METHODS, useForm } from 'routes/development-customize/development-customize.form.tsx';
-import 'routes/development-customize/development-customize.styles.css';
+import DataObjectOutlinedIcon from '@mui/icons-material/DataObjectOutlined';
+import { Box, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, useTheme } from '@mui/material';
+import { createAppRoute } from 'core/router';
+import { memo, Profiler } from 'react';
+import {
+  Performance,
+  StyledBox2,
+  StyledDiv,
+  StyledDiv2
+} from 'routes/development-customize/development-customize.components';
+import type { CustomizeMethod } from 'routes/development-customize/development-customize.form';
+import { CUSTOMIZE_METHODS, FormProvider, useForm } from 'routes/development-customize/development-customize.form';
 import { PageHeader } from 'ui/layouts/PageHeader';
 import { PageLayout } from 'ui/layouts/PageLayout';
-import { memo, Profiler, useEffect } from 'react';
 
-const Performance = ({ method, children }) => {
-  const form = useForm();
-
-  // Save the start time before the component renders
-  const startRenderTime = performance.now();
-
-  useEffect(() => {
-    // Measure the end time after the component has mounted
-    const endRenderTime = performance.now();
-    const timeToRender = endRenderTime - startRenderTime;
-
-    // Update the state with the time to render in milliseconds
-    form.setFieldValue('performances', p => ({ ...p, [method]: timeToRender.toFixed(2) }));
-  }, [method]); // Empty dependency array ensures this only runs once after mount
-
-  return children;
-};
-
-const StyledDiv = ({ children }) => {
-  const theme = useTheme();
-
-  return (
-    <div
-      style={{
-        color: theme.vars.palette.text.secondary,
-        border: `1px solid ${theme.vars.palette.text.secondary}`,
-        borderRadius: theme.spacing(0.5),
-        margin: theme.spacing(0.5),
-        padding: theme.spacing(0.5)
-      }}
-    >
-      {children}
-    </div>
-  );
-};
-
-const StyledDiv2 = styled('div')(({ theme }) => ({
-  color: theme.vars.palette.text.secondary,
-  border: `1px solid ${theme.vars.palette.text.secondary}`,
-  borderRadius: theme.spacing(0.5),
-  margin: theme.spacing(0.5),
-  padding: theme.spacing(0.5),
-  '&:hover': {
-    backgroundColor: theme.vars.palette.primary.main
-  }
-}));
-
-const StyledBox2 = styled(Box)(({ theme }) => ({
-  color: theme.vars.palette.text.secondary,
-  border: `1px solid ${theme.vars.palette.text.secondary}`,
-  borderRadius: theme.spacing(0.5),
-  margin: theme.spacing(0.5),
-  padding: theme.spacing(0.5),
-  '&:hover': {
-    backgroundColor: theme.vars.palette.primary.main
-  }
-}));
-
-export const CustomizeRoute = memo(() => {
+export const DevelopmentCustomizePage = memo(() => {
   const theme = useTheme();
   const form = useForm();
 
@@ -99,12 +48,10 @@ export const CustomizeRoute = memo(() => {
                     <>
                       <span>{label}</span>
                       {!times?.[label] ? null : (
-                        <span style={{ color: theme.vars.palette.text.secondary }}>{` (${times?.[label]} ms)`}</span>
+                        <span style={{ color: theme.palette.text.secondary }}>{` (${times?.[label]} ms)`}</span>
                       )}
                       {!performances?.[label] ? null : (
-                        <span style={{ color: theme.vars.palette.text.secondary }}>
-                          {` (${performances?.[label]} ms)`}
-                        </span>
+                        <span style={{ color: theme.palette.text.secondary }}>{` (${performances?.[label]} ms)`}</span>
                       )}
                     </>
                   }
@@ -134,8 +81,8 @@ export const CustomizeRoute = memo(() => {
                           <div
                             key={i}
                             style={{
-                              color: theme.vars.palette.text.secondary,
-                              border: `1px solid ${theme.vars.palette.text.secondary}`,
+                              color: theme.palette.text.secondary,
+                              border: `1px solid ${theme.palette.text.secondary}`,
                               borderRadius: theme.spacing(0.5),
                               margin: theme.spacing(0.5),
                               padding: theme.spacing(0.5)
@@ -170,8 +117,8 @@ export const CustomizeRoute = memo(() => {
                           <Box
                             key={i}
                             style={{
-                              color: theme.vars.palette.text.secondary,
-                              border: `1px solid ${theme.vars.palette.text.secondary}`,
+                              color: theme.palette.text.secondary,
+                              border: `1px solid ${theme.palette.text.secondary}`,
                               borderRadius: theme.spacing(0.5),
                               margin: theme.spacing(0.5),
                               padding: theme.spacing(0.5)
@@ -186,13 +133,13 @@ export const CustomizeRoute = memo(() => {
                           <Box
                             key={i}
                             sx={{
-                              color: theme.vars.palette.text.secondary,
-                              border: `1px solid ${theme.vars.palette.text.secondary}`,
+                              color: theme.palette.text.secondary,
+                              border: `1px solid ${theme.palette.text.secondary}`,
                               borderRadius: theme.spacing(0.5),
                               margin: theme.spacing(0.5),
                               padding: theme.spacing(0.5),
                               '&:hover': {
-                                backgroundColor: theme.vars.palette.primary.main
+                                backgroundColor: theme.palette.primary.main
                               }
                             }}
                           >
@@ -214,4 +161,26 @@ export const CustomizeRoute = memo(() => {
       </div>
     </PageLayout>
   );
+});
+
+const WrappedDevelopmentCustomizePage = memo(() => (
+  <FormProvider>
+    <DevelopmentCustomizePage />
+  </FormProvider>
+));
+
+export const DevelopmentCustomizeRoute = createAppRoute({
+  component: WrappedDevelopmentCustomizePage,
+
+  path: '/development/customize',
+
+  ancestor: '/development',
+  shortname: () => ['app_route.development_customize.shortname', { ns: 'developmentAPI' }],
+  fullname: () => ['app_route.development_customize.fullname', { ns: 'developmentAPI' }],
+  shorticon: () => <DataObjectOutlinedIcon />,
+  fullicon: () => <DataObjectOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) =>
+    !config.user.is_admin || !['development', 'staging'].includes(config.configuration.system.type)
 });

@@ -3,42 +3,26 @@ import DataObjectOutlinedIcon from '@mui/icons-material/DataObjectOutlined';
 import DoneOutlinedIcon from '@mui/icons-material/DoneOutlined';
 import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import {
-  AlertTitle,
-  Divider,
-  Grid,
-  Pagination,
-  Paper,
-  Skeleton,
-  styled,
-  Tooltip,
-  Typography,
-  useTheme
-} from '@mui/material';
+import ListOutlinedIcon from '@mui/icons-material/ListOutlined';
+import { AlertTitle, Divider, Grid, Paper, Skeleton, styled, Tooltip, Typography, useTheme } from '@mui/material';
 import TableContainer from '@mui/material/TableContainer';
-import useMyAPI from 'core/api/hooks/useMyAPI';
-import useALContext from 'core/config/useALContext';
-import PageFullSize from 'core/template/branding/AppPageCenter';
-import { useAppUser } from 'core/template/components/app/hooks';
-import useDrawer from 'layout/drawer/drawer.hooks';
+import { createAppRoute, useAppNavigate, useAppPathParams, useAppSearchSnapshot } from 'core/router';
+import { AppPageFullSize } from 'core/template';
+import useALContext from 'deprecated/hooks/useALContext';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
 import type { SearchResult } from 'models/api/search';
-import type { CustomUser, IndexDefinition } from 'models/api/user';
+import type { IndexDefinition } from 'models/api/user';
 import type { FileIndexed } from 'models/base/file';
 import type { Retrohunt, RetrohuntProgress } from 'models/base/retrohunt';
-import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate, useParams } from 'react-router';
-import { Link } from 'react-router-dom';
-import FileDetail from 'routes/file-detail/file-detail.route';
-import ForbiddenPage from 'routes/forbidden/forbidden.route';
-import NotFoundPage from 'routes/not-found/not-found.route';
-import RetrohuntErrors from 'routes/retrohunt-detail/components/errors';
+import { ForbiddenPage } from 'routes/forbidden/forbidden';
+import { NotFoundPage } from 'routes/not-found/not-found';
+import { RetrohuntErrors } from 'routes/retrohunt-detail/components/errors';
 import { RetrohuntRepeat } from 'routes/retrohunt-detail/components/repeat';
 import { safeFieldValue } from 'shared/utils/utils';
 import { io } from 'socket.io-client';
-import { ChipList } from 'ui/ChipList';
 import Classification from 'ui/Classification';
-import type { CustomChipProps } from 'ui/CustomChip';
 import CustomChip from 'ui/CustomChip';
 import {
   DivTable,
@@ -54,10 +38,8 @@ import { PageHeader } from 'ui/layouts/PageHeader';
 import LineGraph from 'ui/LineGraph';
 import Moment from 'ui/Moment';
 import MonacoEditor from 'ui/MonacoEditor';
-import SearchBar from 'ui/SearchBar/search-bar';
 import { DEFAULT_SUGGESTION } from 'ui/SearchBar/search-textfield';
-import SearchCount from 'ui/SearchBar/SearchCount';
-import SimpleSearchQuery from 'ui/SearchBar/simple-search-query';
+import SearchHeader from 'ui/SearchBar/SearchHeader';
 import SteppedProgress from 'ui/SteppedProgress';
 import { TabContainer } from 'ui/TabContainer';
 
@@ -71,52 +53,23 @@ const SkeletonCustomChip = memo(
   }))
 );
 
-type Params = {
-  key: string;
-};
-
-type Props = {
-  search_key?: string;
-  isDrawer?: boolean;
-};
-
-const PAGE_SIZE = 10;
-
-const MAX_TRACKED_RECORDS = 10_000;
-
 const SOCKETIO_NAMESPACE = '/retrohunt';
 
-const DEFAULT_PARAMS = {
-  query: '*',
-  offset: 0,
-  rows: PAGE_SIZE,
-  sort: 'seen.last+desc'
-};
-
-const DEFAULT_QUERY: string = Object.keys(DEFAULT_PARAMS)
-  .map(k => `${k}=${DEFAULT_PARAMS[k]}`)
-  .join('&');
-
-function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = false }: Props) {
+export const RetrohuntDetailPage = memo(() => {
   const { t } = useTranslation(['retrohunt']);
   const theme = useTheme();
-  const location = useLocation();
-  const navigate = useNavigate();
+  const navigate = useAppNavigate<'/retrohunt/detail/:id'>();
   const { apiCall } = useMyAPI();
-  const { globalDrawerOpened, setGlobalDrawer, closeGlobalDrawer, subscribeCloseDrawer } = useDrawer();
   const { indexes } = useALContext();
-  const { c12nDef, configuration } = useALContext();
-  const { key: paramKey } = useParams<Params>();
-  const { user: currentUser } = useAppUser<CustomUser>();
+  const { c12nDef, configuration, user: currentUser } = useALContext();
+  const paramKey = useAppPathParams<'/retrohunt/detail/:id'>()?.id;
+  const search = useAppSearchSnapshot<'/retrohunt/detail/:id'>();
 
   const [retrohunt, setRetrohunt] = useState<Retrohunt>(null);
   const [hitResults, setHitResults] = useState<SearchResult<FileIndexed>>(null);
   const [typeDataSet, setTypeDataSet] = useState<Record<string, number>>(null);
   const [isReloading, setIsReloading] = useState<boolean>(true);
   const [isInitialized, setIsInitialized] = useState<boolean>(false);
-  const [query, setQuery] = useState<SimpleSearchQuery>(null);
-
-  const filterValue = useRef<string>('');
 
   const DEFAULT_RETROHUNT = useMemo<Partial<Retrohunt>>(
     () => ({
@@ -147,64 +100,13 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
     [c12nDef.UNRESTRICTED, currentUser.classification]
   );
 
-  const searchKey = useMemo<string>(() => (isDrawer ? propKey.split('?')[0] : paramKey), [isDrawer, paramKey, propKey]);
-
   const suggestions = useMemo<IndexDefinition>(() => ({ ...indexes.file, ...DEFAULT_SUGGESTION }), [indexes.file]);
-
-  const hitPageCount = useMemo<number>(
-    () =>
-      hitResults && 'total' in hitResults ? Math.ceil(Math.min(hitResults.total, MAX_TRACKED_RECORDS) / PAGE_SIZE) : 0,
-    [hitResults]
-  );
-
-  const PageLayout = useCallback<React.FC<any>>(
-    props =>
-      isDrawer ? (
-        <PageFullSize margin={2} {...props} />
-      ) : (
-        <PageFullSize
-          margin={2}
-          styles={{ root: { alignItems: 'center' }, paper: { width: '95%', maxWidth: '1200px' } }}
-          {...props}
-        />
-      ),
-    [isDrawer]
-  );
-
-  const handleNavigate = useCallback(
-    (searchQuery: SimpleSearchQuery) => {
-      const search = new SimpleSearchQuery(searchQuery.toString(), DEFAULT_QUERY);
-      if (isDrawer) {
-        const delta = search.getDeltaString();
-        const searchParam = delta && delta !== '' ? `?${delta}` : '';
-        navigate(`${location.pathname}${location.search}#${searchKey}${searchParam}`);
-      } else navigate(`${location.pathname}?${search.getDeltaString()}${location.hash}`);
-    },
-    [isDrawer, location.hash, location.pathname, location.search, navigate, searchKey]
-  );
-
-  const handleQueryChange = useCallback(
-    (key: string, value: string | number) => {
-      query.set(key, value);
-      handleNavigate(query);
-    },
-    [handleNavigate, query]
-  );
-
-  const handleQueryRemove = useCallback(
-    (key: string | string[]) => {
-      if (typeof key === 'string') query.delete(key);
-      else key.forEach(k => query.delete(k));
-      handleNavigate(query);
-    },
-    [handleNavigate, query]
-  );
 
   const reloadData = useCallback(
     () => {
       if (currentUser.roles.includes('retrohunt_view') && configuration?.retrohunt?.enabled) {
         apiCall({
-          url: `/api/v4/retrohunt/${searchKey}/`,
+          url: `/api/v4/retrohunt/${paramKey}/`,
           onSuccess: api_data => setRetrohunt({ ...DEFAULT_RETROHUNT, ...api_data.api_response }),
           onEnter: () => setIsReloading(true),
           onExit: () => setIsReloading(false)
@@ -212,39 +114,36 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [currentUser.roles, configuration?.retrohunt?.enabled, searchKey, DEFAULT_RETROHUNT]
+    [currentUser.roles, configuration?.retrohunt?.enabled, paramKey, DEFAULT_RETROHUNT]
   );
 
   const reloadHits = useCallback(
-    (curQuery: SimpleSearchQuery) => {
+    (curQuery: typeof search) => {
       if (currentUser.roles.includes('retrohunt_view') && configuration?.retrohunt?.enabled) {
         apiCall({
           method: 'POST',
-          url: `/api/v4/retrohunt/hits/${searchKey}/`,
-          body: {
-            ...curQuery.getParams(),
-            filters: curQuery.getAll('filters', [])
-          },
+          url: `/api/v4/retrohunt/hits/${paramKey}/`,
+          body: curQuery.toObject(),
           onSuccess: api_data => {
             const { items, total, rows, offset } = api_data.api_response;
             if (items.length === 0 && offset !== 0 && offset >= total) {
-              curQuery.set('offset', Math.floor(total / rows) * rows);
-              reloadHits(curQuery);
+              navigate.here().update(s => ({
+                ...s,
+                search: { ...s.search, offset: Math.floor(total / rows) * rows }
+              }));
             } else {
               setHitResults(api_data.api_response);
             }
           },
           onEnter: () => setIsReloading(true),
-          onExit: () => {
-            setIsReloading(false);
-          }
+          onExit: () => setIsReloading(false)
         });
         apiCall({
           method: 'POST',
-          url: `/api/v4/retrohunt/types/${searchKey}/`,
+          url: `/api/v4/retrohunt/types/${paramKey}/`,
           body: {
-            query: curQuery.get('query', DEFAULT_PARAMS?.query),
-            filters: curQuery.getAll('filters', [])
+            query: curQuery.get('query') ?? '',
+            filters: curQuery.get('filters') ?? []
           },
           onSuccess: api_data => {
             let dataset: Record<string, number> = api_data.api_response;
@@ -259,14 +158,7 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [currentUser.roles, configuration?.retrohunt?.enabled, searchKey]
-  );
-
-  const handleHitRowClick = useCallback(
-    (file: FileIndexed, queryString: string) => {
-      navigate({ pathname: `/retrohunt/${searchKey}${queryString ? `?${queryString}` : ''}`, hash: file.sha256 });
-    },
-    [navigate, searchKey]
+    [currentUser.roles, configuration?.retrohunt?.enabled, paramKey]
   );
 
   const handleRepeat = useCallback(
@@ -285,62 +177,25 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
   }, [theme.transitions.duration.complex]);
 
   useEffect(() => {
-    if (isDrawer) {
-      const url = new URL(`${window.location.origin}/${location.hash.slice(1)}`);
-      setQuery(new SimpleSearchQuery(url.search, DEFAULT_QUERY));
-    }
-  }, [isDrawer, location.hash]);
-
-  useEffect(() => {
-    if (!isDrawer) setQuery(new SimpleSearchQuery(location.search, DEFAULT_QUERY));
-  }, [isDrawer, location.search]);
-
-  useEffect(() => {
     reloadData();
-  }, [searchKey, reloadData]);
+  }, [paramKey, reloadData]);
 
   useEffect(() => {
-    if (query && retrohunt?.finished) reloadHits(query);
-  }, [query, reloadHits, retrohunt?.finished]);
-
-  useEffect(() => {
-    if (!isDrawer && location.hash) {
-      setGlobalDrawer(<FileDetail sha256={location.hash.substr(1)} />, { hasMaximize: true });
-    }
-  }, [isDrawer, location.hash, setGlobalDrawer]);
-
-  useEffect(() => {
-    if (hitResults !== null && !globalDrawerOpened && location.hash) {
-      navigate(`${location.pathname}${location.search ? location.search : ''}`);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [globalDrawerOpened]);
-
-  useEffect(() => {
-    if (isDrawer) {
-      subscribeCloseDrawer(() =>
-        navigate(`${window.location.pathname}${window.location.search ? window.location.search : ''}`)
-      );
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isDrawer, subscribeCloseDrawer]);
-
-  useEffect(() => {
-    if (!['/retrohunt', '/file/detail'].some(p => location.pathname.startsWith(p))) closeGlobalDrawer();
-  }, [closeGlobalDrawer, location.pathname]);
+    if (search && retrohunt?.finished) reloadHits(search);
+  }, [search, reloadHits, retrohunt?.finished]);
 
   useEffect(() => {
     const socket = io(SOCKETIO_NAMESPACE);
 
-    if (!searchKey || !retrohunt || retrohunt?.finished) return;
+    if (!paramKey || !retrohunt || retrohunt?.finished) return;
 
     socket.on('connect', () => {
       // eslint-disable-next-line no-console
       console.debug(`Socket-IO :: /retrohunt/detail (connect)`);
 
-      socket.emit('listen', { key: searchKey });
+      socket.emit('listen', { key: paramKey });
       // eslint-disable-next-line no-console
-      console.debug(`Socket-IO :: /retrohunt/detail (listen) :: ${searchKey}`);
+      console.debug(`Socket-IO :: /retrohunt/detail (listen) :: ${paramKey}`);
     });
 
     socket.on('disconnect', () => {
@@ -376,13 +231,13 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
       socket.disconnect();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [retrohunt?.finished, searchKey]);
+  }, [retrohunt?.finished, paramKey]);
 
   if (!configuration?.retrohunt?.enabled) return <NotFoundPage />;
   else if (!currentUser.roles.includes('retrohunt_view')) return <ForbiddenPage />;
   else
     return (
-      <PageLayout>
+      <AppPageFullSize>
         <Grid container flexDirection="column" flexWrap="nowrap" flex={1} rowGap={2} marginBottom={theme.spacing(4)}>
           {c12nDef.enforce && (
             <Grid paddingBottom={1}>
@@ -424,8 +279,7 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
           )}
 
           <TabContainer
-            paper={!isDrawer}
-            style={{ marginTop: theme.spacing(1), marginBottom: theme.spacing(1) }}
+            paper
             tabs={{
               details: {
                 label: t('details'),
@@ -602,90 +456,24 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
                       <>
                         <Grid>
                           {isInitialized && (
-                            <SearchBar
-                              initValue={query ? query.get('query', '') : ''}
-                              placeholder={t('hits.filter')}
-                              searching={isReloading}
-                              suggestions={suggestions}
-                              onValueChange={value => {
-                                filterValue.current = value;
-                              }}
-                              onClear={() => handleQueryRemove(['query', 'rows', 'offset'])}
-                              onSearch={() => {
-                                if (filterValue.current !== '') {
-                                  handleQueryChange('query', filterValue.current);
-                                  handleQueryChange('offset', 0);
-                                } else handleQueryRemove(['query', 'rows', 'offset']);
-                              }}
-                            >
-                              <div
-                                style={{
-                                  fontStyle: 'italic',
-                                  paddingTop: theme.spacing(0.5),
-                                  display: 'flex',
-                                  justifyContent: 'flex-end',
-                                  flexWrap: 'wrap'
-                                }}
-                              >
-                                {hitResults && hitResults.total !== 0 && (
-                                  <Typography variant="subtitle1" color="secondary" style={{ flexGrow: 1 }}>
-                                    {isReloading ? (
-                                      <span>{t('searching')}</span>
-                                    ) : (
-                                      <span>
-                                        <SearchCount
-                                          currentMax={MAX_TRACKED_RECORDS}
-                                          defaultMax={MAX_TRACKED_RECORDS}
-                                          disabled
-                                          loading={isReloading}
-                                          total={hitResults?.total}
-                                          suffix={
-                                            query.get('query') || query.get('filters')
-                                              ? t(`hits.filtered${hitResults.total === 1 ? '' : 's'}`)
-                                              : t(`hits.total${hitResults.total === 1 ? '' : 's'}`)
-                                          }
-                                        />
-                                      </span>
-                                    )}
-                                  </Typography>
-                                )}
-                                {hitPageCount > 1 && (
-                                  <Pagination
-                                    page={Math.ceil(1 + query.get('offset') / PAGE_SIZE)}
-                                    onChange={(e, value) => handleQueryChange('offset', (value - 1) * PAGE_SIZE)}
-                                    count={hitPageCount}
-                                    shape="rounded"
-                                    size="small"
-                                  />
-                                )}
-                              </div>
-                              {query && (
-                                <div>
-                                  <ChipList
-                                    items={query.getAll('filters', []).map(
-                                      f =>
-                                        ({
-                                          color: f.indexOf('NOT ') === 0 ? 'error' : null,
-                                          label: `${f}`,
-                                          variant: 'outlined',
-                                          onClick: () => {
-                                            query.replace(
-                                              'filters',
-                                              f,
-                                              f.indexOf('NOT ') === 0 ? f.substring(5, f.length - 1) : `NOT (${f})`
-                                            );
-                                            handleNavigate(query);
-                                          },
-                                          onDelete: () => {
-                                            query.remove('filters', f);
-                                            handleNavigate(query);
-                                          }
-                                        }) as CustomChipProps
-                                    )}
-                                  />
-                                </div>
-                              )}
-                            </SearchBar>
+                            <SearchHeader
+                              params={search.toParams()}
+                              loading={isReloading}
+                              results={hitResults}
+                              resultLabel={
+                                search.get('query')
+                                  ? t(`filtered${hitResults?.total === 1 ? '' : 's'}`)
+                                  : t(`total${hitResults?.total === 1 ? '' : 's'}`)
+                              }
+                              onChange={v =>
+                                navigate.here().update(s => ({
+                                  ...s,
+                                  search: { ...s.search, ...RetrohuntDetailRoute.search.full(v).toObject() }
+                                }))
+                              }
+                              paramDefaults={search.defaults().toObject()}
+                              searchInputProps={{ placeholder: t('filter'), options: suggestions }}
+                            />
                           )}
                         </Grid>
 
@@ -698,8 +486,16 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
                             onClick={(evt, element) => {
                               if (!isReloading && element.length > 0) {
                                 const ind = element[0].index;
-                                query.add('filters', `type:${safeFieldValue(Object.keys(typeDataSet)[ind])}`);
-                                handleNavigate(query);
+                                navigate.here().update(s => ({
+                                  ...s,
+                                  search: {
+                                    ...s.search,
+                                    filters: [
+                                      ...s.search.filters,
+                                      `type:${safeFieldValue(Object.keys(typeDataSet)[ind])}`
+                                    ]
+                                  }
+                                }));
                               }
                             }}
                           />
@@ -716,62 +512,19 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
                               </InformativeAlert>
                             </div>
                           ) : (
-                            <TableContainer
-                              id="hits-table"
-                              component={Paper}
-                              sx={{ border: isDrawer && `1px solid ${theme.palette.divider}` }}
-                            >
+                            <TableContainer id="hits-table" component={Paper}>
                               <DivTable stickyHeader>
                                 <DivTableHead>
                                   <DivTableRow>
-                                    <SortableHeaderCell
-                                      query={query}
-                                      children={t('details.lasttimeseen')}
-                                      sortName="sort"
-                                      sortField="seen.last"
-                                      onSort={(e, { name, field }) => handleQueryChange(name, field)}
-                                      sx={{ zIndex: 'auto' }}
-                                    />
-                                    <SortableHeaderCell
-                                      query={query}
-                                      children={t('details.count')}
-                                      sortName="sort"
-                                      sortField="seen.count"
-                                      onSort={(e, { name, field }) => handleQueryChange(name, field)}
-                                      sx={{ zIndex: 'auto' }}
-                                    />
-                                    <SortableHeaderCell
-                                      query={query}
-                                      children={t('details.sha256')}
-                                      sortName="sort"
-                                      sortField="sha256"
-                                      onSort={(e, { name, field }) => handleQueryChange(name, field)}
-                                      sx={{ zIndex: 'auto' }}
-                                    />
-                                    <SortableHeaderCell
-                                      query={query}
-                                      children={t('details.filetype')}
-                                      sortName="sort"
-                                      sortField="type"
-                                      onSort={(e, { name, field }) => handleQueryChange(name, field)}
-                                      sx={{ zIndex: 'auto' }}
-                                    />
-                                    <SortableHeaderCell
-                                      query={query}
-                                      children={t('details.size')}
-                                      sortName="sort"
-                                      sortField="size"
-                                      onSort={(e, { name, field }) => handleQueryChange(name, field)}
-                                      sx={{ zIndex: 'auto' }}
-                                    />
+                                    <SortableHeaderCell children={t('details.lasttimeseen')} sortField="seen.last" />
+                                    <SortableHeaderCell children={t('details.count')} sortField="seen.count" />
+                                    <SortableHeaderCell children={t('details.sha256')} sortField="sha256" />
+                                    <SortableHeaderCell children={t('details.filetype')} sortField="type" />
+                                    <SortableHeaderCell children={t('details.size')} sortField="size" />
                                     {c12nDef.enforce && (
                                       <SortableHeaderCell
-                                        query={query}
                                         children={t('details.classification')}
-                                        sortName="sort"
                                         sortField="classification"
-                                        onSort={(e, { name, field }) => handleQueryChange(name, field)}
-                                        sx={{ zIndex: 'auto' }}
                                       />
                                     )}
                                     <DivTableCell sx={{ zIndex: 'auto' }} />
@@ -781,19 +534,11 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
                                   {hitResults.items.map((file, i) => (
                                     <LinkRow
                                       key={`${file.sha256}-${i}`}
-                                      component={Link}
-                                      to={`/file/detail/${file.sha256}`}
+                                      nav={nav =>
+                                        nav.to().create({ route: '/file/detail/:id', path: { id: file.sha256 } })
+                                      }
                                       hover
                                       style={{ textDecoration: 'none' }}
-                                      onClick={event => {
-                                        event.preventDefault();
-                                        handleHitRowClick(file, query?.toString());
-                                      }}
-                                      selected={
-                                        isDrawer
-                                          ? location.pathname.endsWith(`/${file?.sha256}`)
-                                          : location.hash.startsWith(`#${file?.sha256}`)
-                                      }
                                     >
                                       <DivTableCell>
                                         <Tooltip title={file.seen.last}>
@@ -862,14 +607,37 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
                   (retrohunt.total_warnings > 0 || retrohunt.total_errors > 0) &&
                   currentUser.is_admin
                 ),
-                inner: <RetrohuntErrors retrohunt={retrohunt} isDrawer={isDrawer} />
+                inner: <RetrohuntErrors retrohunt={retrohunt} isDrawer={false} />
               }
             }}
           />
         </Grid>
-      </PageLayout>
+      </AppPageFullSize>
     );
-}
+});
 
-export const RetrohuntDetailPage = React.memo(WrappedRetrohuntDetailPage);
-export default WrappedRetrohuntDetailPage;
+export const RetrohuntDetailRoute = createAppRoute({
+  component: RetrohuntDetailPage,
+
+  path: '/retrohunt/detail/:id',
+  params: s => ({
+    id: s.string()
+  }),
+  search: s => ({
+    query: s.string(''),
+    offset: s.number(0).min(0).source('transient').ephemeral(),
+    rows: s.number(10).locked().source('transient').ephemeral(),
+    sort: s.string('seen.last desc'),
+    filters: s.filters([]),
+    track_total_hits: s.number(null).source('transient').nullable().ephemeral()
+  }),
+
+  ancestor: '/retrohunt',
+  shortname: location => ['app_route.retrohunt_detail.shortname', { ns: 'retrohunt', id: location.path.id }],
+  fullname: location => ['app_route.retrohunt_detail.fullname', { ns: 'retrohunt', id: location.path.id }],
+  shorticon: () => <ListOutlinedIcon />,
+  fullicon: () => <ListOutlinedIcon />,
+
+  disabled: (_location, config) => !config.configuration?.retrohunt?.enabled,
+  forbidden: (_location, config) => !config.user.roles.includes('retrohunt_view')
+});

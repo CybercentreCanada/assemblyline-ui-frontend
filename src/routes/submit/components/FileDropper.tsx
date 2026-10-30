@@ -1,7 +1,7 @@
 import BlockIcon from '@mui/icons-material/Block';
 import { styled } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
-import useALContext from 'core/config/useALContext';
+import { useAppConfigStore } from 'core/config';
 import { memo, useCallback, useMemo } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useTranslation } from 'react-i18next';
@@ -44,15 +44,18 @@ const DropZone = styled('div', {
   })
 }));
 
+DropZone.displayName = 'DropZone';
+
 type FileDropperProps = {
   file: File | null;
   setFile: (file: File | null) => void;
   disabled: boolean;
 };
 
-const FileDropper = ({ file, setFile, disabled }: FileDropperProps) => {
+const FileDropperComponent = ({ file, setFile, disabled }: FileDropperProps) => {
   const { t } = useTranslation(['submit']);
-  const { user, configuration } = useALContext();
+  const user = useAppConfigStore(s => s.user);
+  const configuration = useAppConfigStore(s => s.configuration);
 
   const canSubmit = useMemo(() => user.roles.includes('submission_create'), [user.roles]);
 
@@ -99,4 +102,5 @@ const FileDropper = ({ file, setFile, disabled }: FileDropperProps) => {
   );
 };
 
-export default memo(FileDropper);
+export const FileDropper = memo(FileDropperComponent);
+FileDropper.displayName = 'FileDropper';

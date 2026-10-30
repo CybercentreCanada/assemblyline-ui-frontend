@@ -5,6 +5,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import CloudDownloadOutlinedIcon from '@mui/icons-material/CloudDownloadOutlined';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ListAltOutlinedIcon from '@mui/icons-material/ListAltOutlined';
 import OndemandVideoOutlinedIcon from '@mui/icons-material/OndemandVideoOutlined';
 import PauseCircleOutlineOutlinedIcon from '@mui/icons-material/PauseCircleOutlineOutlined';
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
@@ -32,36 +33,31 @@ import {
   Skeleton,
   Stack,
   Tooltip,
-  Typography,
   useTheme
 } from '@mui/material';
-import useMyAPI from 'core/api/hooks/useMyAPI';
-import useALContext from 'core/config/useALContext';
-import useMySnackbar from 'core/snackbar/snackbar.hooks';
-import PageCenter from 'core/template/components/pages/PageCenter';
-import useAssistant from 'layout/assistant/assistant.hooks';
-import useDrawer from 'layout/drawer/drawer.hooks';
-import useHighlighter from 'layout/highlighter/highlighter.hooks';
-import type { HighlighMapProps } from 'layout/highlighter/highlighter.providers';
-import type { Configuration } from 'models/api/help';
+import Typography from '@mui/material/Typography';
+import { AppLink, createAppRoute, useAppLocation, useAppNavigate, useAppPathParams } from 'core/router';
+import { AppPageCenter } from 'core/template';
+import useALContext from 'deprecated/hooks/useALContext';
+import type { HighlighMapProps } from 'deprecated/hooks/useHighlighter';
+import useHighlighter from 'deprecated/hooks/useHighlighter';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useMySnackbar from 'deprecated/hooks/useMySnackbar';
+import { useAppAssistant } from 'layout/assistant';
 import type { LiveStatus, OutstandingServices, WatchQueue } from 'models/api/live';
 import type { MultipleKeys } from 'models/api/result';
 import type { SubmissionSummary, SubmissionTags, SubmissionTree, Tree } from 'models/api/submission';
 import type { Verdict } from 'models/base/alert';
-import type { ArchiverMetadata, TagTypes } from 'models/base/config';
+import type { ArchiverMetadata, Configuration, TagTypes } from 'models/base/config';
 import type { ParsedErrors } from 'models/base/error';
 import type { Result } from 'models/base/result';
 import type { ParsedSubmission, Submission } from 'models/base/submission';
 import type { Attack, Tag } from 'models/base/tagging';
 import moment from 'moment';
-import React, { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate, useParams } from 'react-router';
-import { Link } from 'react-router-dom';
 import Detection from 'routes/file-detail/components/detection';
-import FileDetail from 'routes/file-detail/file-detail.route';
-import ForbiddenPage from 'routes/forbidden/forbidden.route';
-import HeuristicDetail from 'routes/manage-heuristic-detail/manage-heuristic-detail.route';
+import { ForbiddenPage } from 'routes/forbidden/forbidden';
 import AISummarySection from 'routes/submission-detail/components/ai_summary';
 import AttackSection from 'routes/submission-detail/components/attack';
 import ErrorSection from 'routes/submission-detail/components/errors';
@@ -84,11 +80,6 @@ import VerdictBar from 'ui/VerdictBar';
 const NAMESPACE = '/live_submission';
 const MESSAGE_TIMEOUT = 5000;
 const OUTSTANDING_TRIGGER_COUNT = 4;
-
-type ParamProps = {
-  id: string;
-  fid?: string;
-};
 
 const resultReducer = (currentResults: MultipleKeys, newResults: MultipleKeys) => {
   if (newResults === null) return null;
@@ -115,18 +106,16 @@ const incrementReducer = (old: number, increment: number) => {
   return old + increment;
 };
 
-function WrappedSubmissionDetail() {
+const SubmissionDetail = memo(() => {
   const { t, i18n } = useTranslation(['submissionDetail']);
   const theme = useTheme();
-  const location = useLocation();
-  const navigate = useNavigate();
+  const navigate = useAppNavigate();
   const { apiCall } = useMyAPI();
-  const { addInsight, removeInsight } = useAssistant();
+  const { addInsight, removeInsight } = useAppAssistant();
   const { showSuccessMessage, showErrorMessage } = useMySnackbar();
   const { user: currentUser, configuration: systemConfig, settings } = useALContext();
   const { setHighlightMap } = useHighlighter();
-  const { setGlobalDrawer, globalDrawerOpened } = useDrawer();
-  const { id, fid } = useParams<ParamProps>();
+  const id = useAppPathParams<'/submission/detail/:id'>()?.id;
 
   const [submission, setSubmission] = useState<ParsedSubmission>(null);
   const [summary, setSummary] = useState<SubmissionSummary>(null);
@@ -137,7 +126,7 @@ function WrappedSubmissionDetail() {
   const [configuration, setConfiguration] = useState<Configuration>(null);
   const [liveErrors, setLiveErrors] = useState<string[]>(null);
   const [liveTagMap, setLiveTagMap] = useState<SubmissionTags>(null);
-  const [outstanding, setOutstanding] = useState<OutstandingServices>({ test: 2 });
+  const [outstanding, setOutstanding] = useState<OutstandingServices>(null);
   const [liveStatus, setLiveStatus] = useState<LiveStatus>('queued');
   const [socket, setSocket] = useState<Socket>(null);
   const [loadInterval, setLoadInterval] = useState<NodeJS.Timeout>(null);
@@ -156,6 +145,8 @@ function WrappedSubmissionDetail() {
   const [processedKeys, setProcessedKeys] = useReducer(messageReducer, []);
   const [liveResults, setLiveResults] = useReducer(resultReducer, null);
   const [loadTrigger, incrementLoadTrigger] = useReducer(incrementReducer, 0);
+
+  const fid = useAppLocation<'/file/detail/:id'>('to')(s => (s.route === '/file/detail/:id' ? s.path.id : null));
 
   const anchorRef = useRef<HTMLDivElement>(null);
 
@@ -490,6 +481,11 @@ function WrappedSubmissionDetail() {
   );
 
   const resetLiveMode = useCallback(() => {
+    if (loadInterval) {
+      clearInterval(loadInterval);
+      setLoadInterval(null);
+    }
+
     if (socket) {
       // Disconnect socket
       socket.disconnect();
@@ -507,7 +503,7 @@ function WrappedSubmissionDetail() {
       setLastSuccessfulTrigger(0);
       setWatchQueue(null);
     }
-  }, [socket]);
+  }, [loadInterval, socket]);
 
   const archive = useCallback(
     (
@@ -555,7 +551,7 @@ function WrappedSubmissionDetail() {
           setSummary(null);
           setTree(null);
           setTimeout(() => {
-            navigate(`/submission/detail/${api_data.api_response.sid}`);
+            navigate.here().update({ route: '/submission/detail/:id', path: { id: api_data.api_response.sid } });
           }, 500);
         }
       });
@@ -577,7 +573,7 @@ function WrappedSubmissionDetail() {
             setSummary(null);
             setTree(null);
             setTimeout(() => {
-              navigate(`/submission/detail/${api_data.api_response.sid}`);
+              navigate.here().update({ route: '/submission/detail/:id', path: { id: api_data.api_response.sid } });
             }, 500);
           }
         });
@@ -611,7 +607,7 @@ function WrappedSubmissionDetail() {
           showSuccessMessage(t('delete.success'));
           setDeleteDialog(false);
           setTimeout(() => {
-            navigate('/submissions');
+            navigate.here().closePanel({ route: '/submissions' });
           }, 500);
         },
         onEnter: () => setWaitingDialog(true),
@@ -675,21 +671,26 @@ function WrappedSubmissionDetail() {
   };
 
   useEffect(() => {
+    let active = true;
+
     if (currentUser.roles.includes('submission_view')) {
       apiCall<Configuration>({
         url: '/api/v4/help/configuration/',
         onSuccess: api_data => {
+          if (!active) return;
           setConfiguration(api_data.api_response);
         }
       });
       apiCall<Submission>({
         url: `/api/v4/submission/${id}/`,
         onSuccess: api_data => {
+          if (!active) return;
           setSubmission(parseSubmissionErrors(api_data.api_response));
         }
       });
     }
     return () => {
+      active = false;
       setSubmission(null);
       setSummary(null);
       setTree(null);
@@ -716,6 +717,8 @@ function WrappedSubmissionDetail() {
   }, [id]);
 
   useEffect(() => {
+    let active = true;
+
     if (submission) {
       if (submission.state === 'completed') {
         if (socket) setNotifyFavicon();
@@ -723,6 +726,7 @@ function WrappedSubmissionDetail() {
         apiCall<SubmissionSummary>({
           url: `/api/v4/submission/summary/${id}/`,
           onSuccess: summ_data => {
+            if (!active) return;
             setHighlightMap(summ_data.api_response.map);
             setSummary(summ_data.api_response);
             if (summ_data.api_response.filtered) {
@@ -736,6 +740,7 @@ function WrappedSubmissionDetail() {
         apiCall<SubmissionTree>({
           url: `/api/v4/submission/tree/${id}/`,
           onSuccess: tree_data => {
+            if (!active) return;
             setTree(tree_data.api_response.tree);
             if (tree_data.api_response.filtered) {
               setFiltered(true);
@@ -768,6 +773,10 @@ function WrappedSubmissionDetail() {
       }
       setBaseFiles(submission.files.map(f => f.sha256));
     }
+
+    return () => {
+      active = false;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [submission, systemConfig]);
 
@@ -877,13 +886,6 @@ function WrappedSubmissionDetail() {
   }, [watchQueue, socket, handleErrorMessage]);
 
   useEffect(() => {
-    if (submission !== null && !globalDrawerOpened && fid !== undefined) {
-      navigate(`/submission/detail/${id}`);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [globalDrawerOpened]);
-
-  useEffect(() => {
     if (fid) {
       if (liveResults) {
         const curFileLiveResults = [];
@@ -898,52 +900,37 @@ function WrappedSubmissionDetail() {
             curFileLiveErrors.push(error);
           }
         });
-        setGlobalDrawer(
-          <FileDetail
-            sha256={fid}
-            sid={id}
-            metadata={submission?.metadata}
-            liveResultKeys={liveResultKeys}
-            liveErrors={curFileLiveErrors}
-            force={submission && submission.max_score < 0}
-            filetype_override={submission?.files?.[0]?.sha256 !== fid ? null : submission?.params?.filetype_override}
-          />,
-          { hasMaximize: true }
-        );
-      } else {
-        setGlobalDrawer(
-          <FileDetail
-            sha256={fid}
-            sid={id}
-            metadata={submission?.metadata}
-            force={submission && submission.max_score < 0}
-            filetype_override={submission?.files?.[0]?.sha256 !== fid ? null : submission?.params?.filetype_override}
-          />,
-          {
-            hasMaximize: true
+
+        curFileLiveResults.sort();
+        curFileLiveErrors.sort();
+
+        navigate.to<'/file/detail/:id'>({ replace: true }).update(s => ({
+          ...s,
+          search: {
+            name: s?.search?.name ?? null,
+            sid: submission?.sid ?? null,
+            metadata: submission?.metadata,
+            liveResultKeys: liveResultKeys,
+            liveErrors: curFileLiveErrors,
+            force: submission && submission.max_score < 0,
+            filetypeOverride: submission?.files?.[0]?.sha256 !== fid ? null : submission?.params?.filetype_override
           }
-        );
+        }));
+      } else {
+        navigate.to<'/file/detail/:id'>({ replace: true }).update(s => ({
+          ...s,
+          search: {
+            name: s?.search?.name ?? null,
+            sid: submission?.sid ?? null,
+            metadata: submission?.metadata,
+            force: submission && submission.max_score < 0,
+            filetypeOverride: submission?.files?.[0]?.sha256 !== fid ? null : submission?.params?.filetype_override
+          }
+        }));
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fid, submission]);
-
-  useEffect(() => {
-    if (!fid && location.hash) {
-      setGlobalDrawer(<HeuristicDetail heur_id={location.hash.slice(1)} />);
-    }
-  }, [fid, location.hash, setGlobalDrawer]);
-
-  useEffect(() => {
-    if (!fid && !location.hash) setGlobalDrawer(null);
-  }, [fid, location.hash, setGlobalDrawer]);
-
-  useEffect(() => {
-    if (!fid && !globalDrawerOpened && location.hash) {
-      navigate(`${location.pathname}${location.search ? location.search : ''}`);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fid, globalDrawerOpened]);
 
   useEffect(() => {
     if (loadTrigger === 0) return;
@@ -1032,7 +1019,7 @@ function WrappedSubmissionDetail() {
   }, [id]);
 
   return currentUser.roles.includes('submission_view') ? (
-    <PageCenter margin={4} width="100%">
+    <AppPageCenter>
       <ConfirmationDialog
         open={deleteDialog}
         handleClose={() => setDeleteDialog(false)}
@@ -1121,11 +1108,11 @@ function WrappedSubmissionDetail() {
       />
 
       <div ref={anchorRef} style={{ width: '100%' }} />
-      {outstandingOpen && outstanding && Object.keys(outstanding).length > 0 && (
+      {outstandingOpen && submission && submission.state !== 'completed' && (
         <Popper
           anchorEl={anchorRef.current}
           placement="bottom-end"
-          open={outstanding !== null}
+          open={true}
           disablePortal
           style={{ zIndex: 100 }}
           modifiers={[
@@ -1153,23 +1140,29 @@ function WrappedSubmissionDetail() {
               </IconButton>
             }
           >
-            <span style={{ fontWeight: 500, textAlign: 'left' }}>{t('outstanding.title')}</span>
-            <Grid container style={{ marginTop: theme.spacing(1) }}>
-              <Grid size={{ xs: 6 }}>
-                <b>{t('outstanding.services')}</b>
-              </Grid>
-              <Grid size={{ xs: 6 }}>
-                <b>{t('outstanding.files')}</b>
-              </Grid>
-            </Grid>
-            {Object.keys(outstanding).map(service => (
-              <Grid key={service} container>
-                <Grid size={{ xs: 6 }}>
-                  <b>{service}</b>
+            {outstanding && Object.keys(outstanding).length > 0 ? (
+              <>
+                <span style={{ fontWeight: 500, textAlign: 'left' }}>{t('outstanding.title')}</span>
+                <Grid container style={{ marginTop: theme.spacing(1) }}>
+                  <Grid size={{ xs: 6 }}>
+                    <b>{t('outstanding.services')}</b>
+                  </Grid>
+                  <Grid size={{ xs: 6 }}>
+                    <b>{t('outstanding.files')}</b>
+                  </Grid>
                 </Grid>
-                <Grid size={{ xs: 6 }}>{outstanding[service]}</Grid>
-              </Grid>
-            ))}
+                {Object.keys(outstanding).map(service => (
+                  <Grid key={service} container>
+                    <Grid size={{ xs: 6 }}>
+                      <b>{service}</b>
+                    </Grid>
+                    <Grid size={{ xs: 6 }}>{outstanding[service]}</Grid>
+                  </Grid>
+                ))}
+              </>
+            ) : (
+              <span style={{ fontWeight: 500, textAlign: 'left' }}>{t('outstanding.empty')}</span>
+            )}
           </Alert>
         </Popper>
       )}
@@ -1262,15 +1255,19 @@ function WrappedSubmissionDetail() {
                     <List disablePadding>
                       {submission?.files?.[0]?.sha256 && (
                         <ListItemButton
-                          component={Link}
-                          to={`/submit?hash=${submission.files[0].sha256}`}
-                          state={{
-                            c12n: submission.classification,
-                            metadata: submission.metadata,
-                            params: {
-                              filetype_override: submission?.params?.filetype_override
-                            }
-                          }}
+                          component={AppLink}
+                          nav={nav =>
+                            nav.to().create({
+                              route: '/submit',
+                              search: {
+                                classification: submission.classification,
+                                filetypeOverride: submission?.params?.filetype_override,
+                                hash: submission.files[0].sha256,
+                                metadata: submission.metadata
+                              }
+                            })
+                          }
+                          navDeps={[submission.files, submission.classification, submission.metadata]}
                           dense
                           onClick={() => setResubmitAnchor(null)}
                         >
@@ -1327,14 +1324,13 @@ function WrappedSubmissionDetail() {
             </IconButton>
 
             <IconButton
-              component={Link}
               size="large"
               tooltip={t('report_view')}
               {...(!submission
                 ? { loading: true }
                 : {
                     preventRender: submission.state !== 'completed',
-                    to: `/submission/report/${submission.sid}`
+                    nav: nav => nav.here().update({ route: '/submission/report/:id', path: { id: submission.sid } })
                   })}
             >
               <ChromeReaderModeOutlinedIcon />
@@ -1347,16 +1343,19 @@ function WrappedSubmissionDetail() {
               <Typography variant="caption" component={'div'}>
                 <i>
                   <span>{t('psid')}: </span>
-                  <Link
+                  <AppLink
                     style={{ textDecoration: 'none', color: theme.palette.primary.main }}
-                    to={`/submission/detail/${submission.params.psid}`}
+                    nav={nav =>
+                      nav.to().create({ route: '/submission/detail/:id', path: { id: submission.params.psid } })
+                    }
+                    navDeps={[submission.params.psid]}
                   >
                     {submission.params.psid}
-                  </Link>
+                  </AppLink>
                 </i>
               </Typography>
             )}
-            {socket && (
+            {submission && submission.state !== 'completed' && (
               <div
                 style={{
                   width: '100%',
@@ -1367,7 +1366,6 @@ function WrappedSubmissionDetail() {
                 }}
               >
                 <Button
-                  disabled
                   sx={{
                     color: `${theme.palette.mode === 'dark' ? theme.palette.primary.light : theme.palette.primary.dark} !important`,
                     display: 'flex',
@@ -1377,12 +1375,8 @@ function WrappedSubmissionDetail() {
                     textTransform: 'none',
                     width: '100%'
                   }}
-                  {...(outstanding &&
-                    Object.keys(outstanding).length > 0 && {
-                      disabled: false,
-                      tooltip: t('outstanding_services.show'),
-                      onClick: () => setOutstandingOpen(true)
-                    })}
+                  tooltip={t('outstanding_services.show')}
+                  onClick={() => setOutstandingOpen(true)}
                 >
                   {liveStatus === 'processing' ? (
                     <PlayCircleOutlineIcon
@@ -1546,14 +1540,29 @@ function WrappedSubmissionDetail() {
           sid={id}
           baseFiles={baseFiles}
           force={submission && submission.max_score < 0}
-          filetype_override={submission?.params?.filetype_override}
+          filetypeOverride={submission?.params?.filetype_override}
         />
       </div>
-    </PageCenter>
+    </AppPageCenter>
   ) : (
     <ForbiddenPage />
   );
-}
+});
 
-const SubmissionDetail = React.memo(WrappedSubmissionDetail);
-export default SubmissionDetail;
+export const SubmissionDetailRoute = createAppRoute({
+  component: SubmissionDetail,
+
+  path: '/submission/detail/:id',
+  params: s => ({
+    id: s.string()
+  }),
+
+  ancestor: '/submissions',
+  shortname: location => ['app_route.submission_detail.shortname', { ns: 'submissionDetail', id: location.path.id }],
+  fullname: location => ['app_route.submission_detail.fullname', { ns: 'submissionDetail', id: location.path.id }],
+  shorticon: () => <ListAltOutlinedIcon />,
+  fullicon: () => <ListAltOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.roles.includes('submission_view')
+});

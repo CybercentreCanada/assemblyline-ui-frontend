@@ -22,13 +22,14 @@ import {
 } from '@mui/material';
 import MuiPopper from '@mui/material/Popper';
 import { styled } from '@mui/material/styles';
-import useMyAPI from 'core/api/hooks/useMyAPI';
-import useALContext from 'core/config/useALContext';
-import type { AppUser } from 'core/template/components/app/AppUserService';
-import { useAppUser } from 'core/template/components/app/hooks';
-import AppAvatar from 'core/template/components/display/AppAvatar';
+import { AppAvatar } from '@tui/core';
+import { useAppInterfaceStore, useAppSetInterfaceStore } from 'core/interface';
+import useALContext from 'deprecated/hooks/useALContext';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
 import { isEnter } from 'deprecated/utils/keyboard';
-import React, { useEffect, useRef, useState } from 'react';
+import type { AssistantContextProps, AssistantInsightProps, ContextMessageProps } from 'layout/assistant';
+import type { PropsWithChildren } from 'react';
+import React, { createContext, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import AIMarkdown from 'ui/AiMarkdown';
 import CustomChip from 'ui/CustomChip';
@@ -62,210 +63,326 @@ const Arrow = styled('div')(({ theme }) => ({
   }
 }));
 
-export type AssistantContextProps = {
-  assistantAllowed: boolean;
-  hasInsights: boolean;
-  addInsight: (insigh: AssistantInsightProps) => void;
-  removeInsight: (insigh: AssistantInsightProps) => void;
-  toggleAssistant: (event: any) => void;
-};
+export const AppAssistantContext = createContext<AssistantContextProps>(null);
 
-export interface AssistantProviderProps {
-  children: React.ReactNode;
-}
+export const AppAssistantProvider = memo(({ children }: PropsWithChildren) => {
+  const { user: currentUser, configuration } = useALContext();
 
-export interface AssistantInsightProps {
-  type: 'file' | 'submission' | 'code' | 'report';
-  value: string;
-}
+  const setInterfaceStore = useAppSetInterfaceStore();
+  const hasInsights = useAppInterfaceStore(s => s.assistant.currentInsights.length > 0);
 
-interface ContextMessageProps {
-  role: 'system' | 'user' | 'assistant';
-  content: string;
-  isError?: boolean;
-  isInsight?: boolean;
-}
+  const assistantAllowed = useMemo<boolean>(
+    () => !!(currentUser?.roles.includes('assistant_use') && configuration?.ui.ai.enabled),
+    [configuration, currentUser]
+  );
 
-export const AssistantContext = React.createContext<AssistantContextProps>(null);
+  const toggleAssistant = useCallback(() => {
+    setInterfaceStore(s => {
+      s.assistant.open = !s.assistant.open;
+      return s;
+    });
+  }, [setInterfaceStore]);
 
-function AssistantProvider({ children }: AssistantProviderProps) {
+  const addInsight = useCallback(
+    (insight: AssistantInsightProps) => {
+      setInterfaceStore(s => {
+        if (!s.assistant.currentInsights.some(i => i.type === insight.type && i.value === insight.value)) {
+          s.assistant.currentInsights = [...s.assistant.currentInsights, insight];
+        }
+        return s;
+      });
+    },
+    [setInterfaceStore]
+  );
+
+  const removeInsight = useCallback(
+    (insight: AssistantInsightProps) => {
+      setInterfaceStore(s => {
+        s.assistant.currentInsights = s.assistant.currentInsights.filter(
+          i => !(i.type === insight.type && i.value === insight.value)
+        );
+        return s;
+      });
+    },
+    [setInterfaceStore]
+  );
+
+  const contextValue = useMemo(
+    () => ({ assistantAllowed, addInsight, hasInsights, removeInsight, toggleAssistant }),
+    [assistantAllowed, addInsight, hasInsights, removeInsight, toggleAssistant]
+  );
+
+  return <AppAssistantContext.Provider value={contextValue}>{children}</AppAssistantContext.Provider>;
+});
+
+AppAssistantProvider.displayName = 'AppAssistantProvider';
+
+export const AppAssistantLayout = memo(({ children }: PropsWithChildren) => {
   const { t, i18n } = useTranslation(['assistant']);
   const theme = useTheme();
-  const appUser = useAppUser<AppUser>();
   const { user: currentUser, configuration } = useALContext();
   const { apiCall } = useMyAPI();
 
-  const [open, setOpen] = useState(false);
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [currentInsights, setCurrentInsights] = useState<AssistantInsightProps[]>([]);
-  const [thinking, setThinking] = useState(false);
-  const [currentContext, setCurrentContext] = useState<ContextMessageProps[]>([]);
-  const [currentHistory, setCurrentHistory] = useState<ContextMessageProps[]>([]);
-  const [currentInput, setCurrentInput] = useState<string>('');
-  const [hasInsights, setHasInsights] = useState<boolean>(false);
+  const currentInsights = useAppInterfaceStore(s => s.assistant.currentInsights);
+  const hasInsights = useAppInterfaceStore(s => s.assistant.currentInsights.length > 0);
+  const open = useAppInterfaceStore(s => s.assistant.open);
+  const thinking = useAppInterfaceStore(s => s.assistant.thinking);
+  const currentContext = useAppInterfaceStore(s => s.assistant.currentContext);
+  const currentHistory = useAppInterfaceStore(s => s.assistant.currentHistory);
+  const currentInput = useAppInterfaceStore(s => s.assistant.currentInput);
+
+  const setInterfaceStore = useAppSetInterfaceStore();
+
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const chatRef = useRef<HTMLDivElement | null>(null);
+
   const upSM = useMediaQuery(theme.breakpoints.up('md'));
   const isXS = useMediaQuery(theme.breakpoints.only('xs'));
-  const inputRef = useRef(null);
-  const chatRef = useRef(null);
 
-  const assistantAllowed =
-    currentUser && currentUser.roles.includes('assistant_use') && configuration && configuration.ui.ai.enabled;
+  const assistantAllowed = useMemo<boolean>(
+    () => currentUser && currentUser.roles.includes('assistant_use') && configuration && configuration.ui.ai.enabled,
+    [configuration, currentUser]
+  );
 
-  const toggleAssistant = target => {
-    setAnchorEl(target);
-    setOpen(!open);
-  };
+  const toggleAssistant = useCallback(
+    (target: HTMLElement) => {
+      setAnchorEl(target);
+      setInterfaceStore(s => {
+        s.assistant.open = !s.assistant.open;
+        return s;
+      });
+    },
+    [setInterfaceStore]
+  );
 
-  const addInsight = (insight: AssistantInsightProps) => {
-    setCurrentInsights(current =>
-      !current.some(i => i.type === insight.type && i.value === insight.value) ? [...current, insight] : current
-    );
-  };
+  const closeAssistant = useCallback(() => {
+    setInterfaceStore(s => {
+      s.assistant.open = false;
+      return s;
+    });
+  }, [setInterfaceStore]);
 
-  const removeInsight = (insight: AssistantInsightProps) => {
-    setCurrentInsights(current => [...current.filter(i => !(i.type === insight.type && i.value === insight.value))]);
-  };
-
-  const askAssistant = () => {
+  const askAssistant = useCallback(() => {
     const data = [...currentContext];
     const history = [...currentHistory];
     const newUserQuestion = { role: 'user' as const, content: currentInput };
     data.push(newUserQuestion);
     history.push(newUserQuestion);
-    setCurrentContext(data);
-    setCurrentHistory(history);
-    setCurrentInput('');
+
+    setInterfaceStore(s => {
+      s.assistant.currentContext = data;
+      s.assistant.currentHistory = history;
+      s.assistant.currentInput = '';
+      return s;
+    });
+
     apiCall({
       method: 'POST',
       body: data,
       url: `/api/v4/assistant/?lang=${i18n.language === 'en' ? 'english' : 'french'}`,
       onSuccess: api_data => {
-        setCurrentContext(api_data.api_response.trace);
-        setCurrentHistory([...history, ...api_data.api_response.trace.slice(-1)]);
+        setInterfaceStore(s => {
+          s.assistant.currentContext = api_data.api_response.trace;
+          s.assistant.currentHistory = [...history, ...api_data.api_response.trace.slice(-1)];
+          return s;
+        });
       },
       onFailure: api_data =>
-        setCurrentHistory([...history, { role: 'assistant', content: api_data.api_error_message, isError: true }]),
-      onEnter: () => setThinking(true),
+        setInterfaceStore(s => {
+          s.assistant.currentHistory = [
+            ...history,
+            { role: 'assistant', content: api_data.api_error_message, isError: true }
+          ];
+          return s;
+        }),
+      onEnter: () =>
+        setInterfaceStore(s => {
+          s.assistant.thinking = true;
+          return s;
+        }),
       onFinalize: () => {
-        setThinking(false);
+        setInterfaceStore(s => {
+          s.assistant.thinking = false;
+          return s;
+        });
 
         setTimeout(() => {
-          inputRef.current.focus();
+          inputRef.current?.focus();
         }, 250);
       }
     });
-  };
+  }, [currentContext, currentHistory, currentInput, i18n.language, setInterfaceStore]);
 
-  const askAssistantWithInsight = (insight: AssistantInsightProps) => {
-    setCurrentHistory(history => [
-      ...history,
-      { role: 'system', content: `"Default system prompt for insight: ${insight.type}`, isInsight: true },
-      { role: 'user', content: `${t(`insight.${insight.type}`)}: ${insight.value}`, isInsight: true }
-    ]);
-    if (insight.type === 'submission' || insight.type === 'report') {
-      apiCall({
-        method: 'GET',
-        url: `/api/v4/submission/ai/${insight.value}/?lang=${i18n.language === 'en' ? 'english' : 'french'}&${
-          insight.type === 'report' ? 'detailed&' : ''
-        }with_trace`,
-        onSuccess: api_data => {
-          setCurrentContext(api_data.api_response.trace);
-          setCurrentHistory(history => [...history, ...api_data.api_response.trace.splice(-1)]);
-        },
-        onFailure: api_data =>
-          setCurrentHistory(history => [
-            ...history,
-            { role: 'assistant', content: api_data.api_error_message, isError: true }
-          ]),
-        onEnter: () => setThinking(true),
-        onFinalize: () => {
-          setThinking(false);
-
-          setTimeout(() => {
-            inputRef.current.focus();
-          }, 250);
-        }
+  const askAssistantWithInsight = useCallback(
+    (insight: AssistantInsightProps) => {
+      setInterfaceStore(s => {
+        s.assistant.currentHistory = [
+          ...s.assistant.currentHistory,
+          { role: 'system', content: `"Default system prompt for insight: ${insight.type}`, isInsight: true },
+          { role: 'user', content: `${t(`insight.${insight.type}`)}: ${insight.value}`, isInsight: true }
+        ];
+        return s;
       });
-    } else if (insight.type === 'file') {
-      apiCall({
-        method: 'GET',
-        url: `/api/v4/file/ai/${insight.value}/?lang=${i18n.language === 'en' ? 'english' : 'french'}&with_trace`,
-        onSuccess: api_data => {
-          setCurrentContext(api_data.api_response.trace);
-          setCurrentHistory(history => [...history, ...api_data.api_response.trace.splice(-1)]);
-        },
-        onFailure: api_data =>
-          setCurrentHistory(history => [
-            ...history,
-            { role: 'assistant', content: api_data.api_error_message, isError: true }
-          ]),
-        onEnter: () => setThinking(true),
-        onFinalize: () => {
-          setThinking(false);
+      if (insight.type === 'submission' || insight.type === 'report') {
+        apiCall({
+          method: 'GET',
+          url: `/api/v4/submission/ai/${insight.value}/?lang=${i18n.language === 'en' ? 'english' : 'french'}&${
+            insight.type === 'report' ? 'detailed&' : ''
+          }with_trace`,
+          onSuccess: api_data => {
+            setInterfaceStore(s => {
+              s.assistant.currentContext = api_data.api_response.trace;
+              s.assistant.currentHistory = [...s.assistant.currentHistory, ...api_data.api_response.trace.splice(-1)];
+              return s;
+            });
+          },
+          onFailure: api_data =>
+            setInterfaceStore(s => {
+              s.assistant.currentHistory = [
+                ...s.assistant.currentHistory,
+                { role: 'assistant', content: api_data.api_error_message, isError: true }
+              ];
+              return s;
+            }),
+          onEnter: () =>
+            setInterfaceStore(s => {
+              s.assistant.thinking = true;
+              return s;
+            }),
+          onFinalize: () => {
+            setInterfaceStore(s => {
+              s.assistant.thinking = false;
+              return s;
+            });
 
-          setTimeout(() => {
-            inputRef.current.focus();
-          }, 250);
-        }
-      });
-    } else if (insight.type === 'code') {
-      apiCall({
-        method: 'GET',
-        url: `/api/v4/file/code_summary/${insight.value}/?lang=${
-          i18n.language === 'en' ? 'english' : 'french'
-        }&with_trace`,
-        onSuccess: api_data => {
-          setCurrentContext(api_data.api_response.trace);
-          setCurrentHistory(history => [...history, ...api_data.api_response.trace.splice(-1)]);
-        },
-        onFailure: api_data =>
-          setCurrentHistory(history => [
-            ...history,
-            { role: 'assistant', content: api_data.api_error_message, isError: true }
-          ]),
-        onEnter: () => setThinking(true),
-        onFinalize: () => {
-          setThinking(false);
+            setTimeout(() => {
+              inputRef.current?.focus();
+            }, 250);
+          }
+        });
+      } else if (insight.type === 'file') {
+        apiCall({
+          method: 'GET',
+          url: `/api/v4/file/ai/${insight.value}/?lang=${i18n.language === 'en' ? 'english' : 'french'}&with_trace`,
+          onSuccess: api_data => {
+            setInterfaceStore(s => {
+              s.assistant.currentContext = api_data.api_response.trace;
+              s.assistant.currentHistory = [...s.assistant.currentHistory, ...api_data.api_response.trace.splice(-1)];
+              return s;
+            });
+          },
+          onFailure: api_data =>
+            setInterfaceStore(s => {
+              s.assistant.currentHistory = [
+                ...s.assistant.currentHistory,
+                { role: 'assistant', content: api_data.api_error_message, isError: true }
+              ];
+              return s;
+            }),
+          onEnter: () =>
+            setInterfaceStore(s => {
+              s.assistant.thinking = true;
+              return s;
+            }),
+          onFinalize: () => {
+            setInterfaceStore(s => {
+              s.assistant.thinking = false;
+              return s;
+            });
 
-          setTimeout(() => {
-            inputRef.current.focus();
-          }, 250);
-        }
-      });
-    }
-  };
+            setTimeout(() => {
+              inputRef.current?.focus();
+            }, 250);
+          }
+        });
+      } else if (insight.type === 'code') {
+        apiCall({
+          method: 'GET',
+          url: `/api/v4/file/code_summary/${insight.value}/?lang=${
+            i18n.language === 'en' ? 'english' : 'french'
+          }&with_trace`,
+          onSuccess: api_data => {
+            setInterfaceStore(s => {
+              s.assistant.currentContext = api_data.api_response.trace;
+              s.assistant.currentHistory = [...s.assistant.currentHistory, ...api_data.api_response.trace.splice(-1)];
+              return s;
+            });
+          },
+          onFailure: api_data =>
+            setInterfaceStore(s => {
+              s.assistant.currentHistory = [
+                ...s.assistant.currentHistory,
+                { role: 'assistant', content: api_data.api_error_message, isError: true }
+              ];
+              return s;
+            }),
+          onEnter: () =>
+            setInterfaceStore(s => {
+              s.assistant.thinking = true;
+              return s;
+            }),
+          onFinalize: () => {
+            setInterfaceStore(s => {
+              s.assistant.thinking = false;
+              return s;
+            });
 
-  const buildDefaultSystemMessage = (): ContextMessageProps => {
-    return {
-      role: 'system' as const,
-      content: null
-    };
-  };
+            setTimeout(() => {
+              inputRef.current?.focus();
+            }, 250);
+          }
+        });
+      }
+    },
+    [i18n.language, setInterfaceStore, t]
+  );
 
-  const clearAssistant = () => {
+  const buildDefaultSystemMessage = useCallback(
+    (): ContextMessageProps => ({ role: 'system' as const, content: null }),
+    []
+  );
+
+  const clearAssistant = useCallback(() => {
     const defaultSystemPrompt = buildDefaultSystemMessage();
-    setCurrentContext([defaultSystemPrompt]);
-    setCurrentHistory([defaultSystemPrompt]);
-  };
+    setInterfaceStore(s => {
+      s.assistant.currentContext = [defaultSystemPrompt];
+      s.assistant.currentHistory = [defaultSystemPrompt];
+      return s;
+    });
+  }, [buildDefaultSystemMessage, setInterfaceStore]);
 
-  const resetAssistant = () => {
+  const resetAssistant = useCallback(() => {
     const defaultSystemPrompt = buildDefaultSystemMessage();
     const lastPrompt = currentHistory[currentHistory.length - 1];
-    setCurrentContext([defaultSystemPrompt]);
-    if (lastPrompt?.content !== defaultSystemPrompt.content) {
-      setCurrentHistory([...currentHistory, defaultSystemPrompt]);
-    }
-  };
+    setInterfaceStore(s => {
+      s.assistant.currentContext = [defaultSystemPrompt];
+      if (lastPrompt?.content !== defaultSystemPrompt.content) {
+        s.assistant.currentHistory = [...currentHistory, defaultSystemPrompt];
+      }
+      return s;
+    });
+  }, [buildDefaultSystemMessage, currentHistory, setInterfaceStore]);
 
-  const onKeyDown = (event: React.KeyboardEvent) => {
-    if (isEnter(event.key)) {
-      askAssistant();
-    }
-  };
+  const onKeyDown = useCallback(
+    (event: React.KeyboardEvent) => {
+      if (isEnter(event.key)) {
+        askAssistant();
+      }
+    },
+    [askAssistant]
+  );
 
-  const handleInputChange = event => {
-    setCurrentInput(event.target.value);
-  };
+  const handleInputChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setInterfaceStore(s => {
+        s.assistant.currentInput = event.target.value;
+        return s;
+      });
+    },
+    [setInterfaceStore]
+  );
 
   useEffect(() => {
     if (open && currentContext.length === 1) {
@@ -286,8 +403,6 @@ function AssistantProvider({ children }: AssistantProviderProps) {
       chatRef.current.scrollTo({ top: chatRef.current.scrollHeight, left: 0, behavior: 'smooth' });
   }, [currentHistory, thinking]);
 
-  useEffect(() => setHasInsights(currentInsights.length !== 0), [currentInsights]);
-
   useEffect(() => {
     if (open) {
       setTimeout(() => {
@@ -295,21 +410,13 @@ function AssistantProvider({ children }: AssistantProviderProps) {
       }, 50);
 
       setTimeout(() => {
-        inputRef.current.focus();
+        inputRef.current?.focus();
       }, 250);
     }
   }, [open]);
 
   return (
-    <AssistantContext.Provider
-      value={{
-        assistantAllowed,
-        addInsight,
-        hasInsights,
-        removeInsight,
-        toggleAssistant
-      }}
-    >
+    <>
       {children}
       {assistantAllowed && (
         <div
@@ -322,7 +429,7 @@ function AssistantProvider({ children }: AssistantProviderProps) {
             zIndex: 1300
           }}
         >
-          <Backdrop open={open} onClick={() => setOpen(false)}>
+          <Backdrop open={open} onClick={closeAssistant}>
             <Popper
               sx={{
                 zIndex: 1301,
@@ -424,7 +531,7 @@ function AssistantProvider({ children }: AssistantProviderProps) {
                                       <SmartToyOutlinedIcon />
                                     </Avatar>
                                   ) : (
-                                    <AppAvatar url={appUser.user.avatar} email={appUser.user.email} />
+                                    <AppAvatar url={currentUser.avatar} email={currentUser.email} />
                                   )}
                                   <Paper
                                     sx={{
@@ -542,8 +649,8 @@ function AssistantProvider({ children }: AssistantProviderProps) {
           </Tooltip>
         </div>
       )}
-    </AssistantContext.Provider>
+    </>
   );
-}
+});
 
-export default AssistantProvider;
+AppAssistantLayout.displayName = 'AppAssistantLayout';

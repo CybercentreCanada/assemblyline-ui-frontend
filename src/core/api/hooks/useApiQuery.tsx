@@ -1,26 +1,26 @@
 import type { UndefinedInitialDataOptions } from '@tanstack/react-query';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { DEFAULT_RETRY_MS } from 'app/core.preference';
-import type { APIQueryKey, APIRequest, APIResponse } from 'core/api/api.models.ts';
-import { getAPIResponse, stableStringify } from 'core/api/api.utils';
-import type { UseAPICallFnProps } from 'core/api/hooks/useApiCallFn';
-import { useAPICallFn } from 'core/api/hooks/useApiCallFn';
+import { DEFAULT_APP_PREFERENCE_STORE } from 'app/core.preference';
+import type { ApiQueryKey, ApiRequest, ApiResponse } from 'core/api/api.models';
+import { getApiResponse, stableStringify } from 'core/api/api.utils';
+import type { UseApiCallFnProps } from 'core/api/hooks/useApiCallFn';
+import { useApiCallFn } from 'core/api/hooks/useApiCallFn';
 import { useIsDebouncing } from 'core/api/hooks/useIsDebouncing';
 
-export type UseAPIQueryProps<Response = unknown, Request extends APIRequest = APIRequest, Error = string> = {
+export type UseApiQueryProps<Response = unknown, Request extends ApiRequest = ApiRequest, Error = string> = {
   queryProps?: Omit<
-    UndefinedInitialDataOptions<APIResponse<Response>, APIResponse<Error>, APIResponse<Response>, APIQueryKey>,
+    UndefinedInitialDataOptions<ApiResponse<Response>, ApiResponse<Error>, ApiResponse<Response>, ApiQueryKey>,
     'queryKey' | 'queryFn'
   >;
   allowCache?: boolean;
   delay?: number;
   disabled?: boolean;
   retryAfter?: number;
-} & Omit<UseAPICallFnProps<APIResponse<Response>, Request, APIResponse<Error>>, 'signal' | 'disabled' | 'retryAfter'>;
+} & Omit<UseApiCallFnProps<ApiResponse<Response>, Request, ApiResponse<Error>>, 'disabled' | 'retryAfter'>;
 
-export const useAPIQuery = <
+export const useApiQuery = <
   Response = unknown,
-  Request extends APIRequest = APIRequest,
+  Request extends ApiRequest = ApiRequest,
   Error extends string = string
 >({
   allowCache = false,
@@ -29,28 +29,28 @@ export const useAPIQuery = <
   disabled = false,
   method,
   queryProps = null,
-  retryAfter = DEFAULT_RETRY_MS,
+  retryAfter = DEFAULT_APP_PREFERENCE_STORE.api.retryTime,
   url,
   ...params
-}: UseAPIQueryProps<Response, Request, Error>) => {
+}: UseApiQueryProps<Response, Request, Error>) => {
   const queryClient = useQueryClient();
-  const apiCallFn = useAPICallFn<APIResponse<Response>>();
+  const apiCallFn = useApiCallFn<ApiResponse<Response>>();
 
   const isDebouncing = useIsDebouncing(delay, [url, method ?? 'GET', stableStringify(body), allowCache]);
 
-  const query = useQuery<APIResponse<Response>, APIResponse<Error>, APIResponse<Response>, APIQueryKey>(
+  const query = useQuery<ApiResponse<Response>, ApiResponse<Error>, ApiResponse<Response>, ApiQueryKey>(
     {
       ...queryProps,
       enabled: !disabled && !isDebouncing,
       queryKey: [url, method ?? 'GET', stableStringify(body), allowCache],
-      queryFn: async ({ signal }) => apiCallFn({ url, method, body, signal, enabled: !disabled, ...params }),
+      queryFn: async () => apiCallFn({ url, method, body, enabled: !disabled, ...params }),
       retry: (failureCount, error) => failureCount < 3 && error?.api_status_code === 502,
       retryDelay: failureCount => Math.min(retryAfter * (failureCount + 1), 10000)
     },
     queryClient
   );
 
-  const { data, error, serverVersion, statusCode } = getAPIResponse(query.data, query.error, query.failureReason);
+  const { data, error, serverVersion, statusCode } = getApiResponse(query.data, query.error, query.failureReason);
 
   return {
     ...query,

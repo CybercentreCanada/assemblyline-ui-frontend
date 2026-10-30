@@ -1,8 +1,8 @@
 import { Paper, useTheme } from '@mui/material';
-import useALContext from 'core/config/useALContext';
-import React, { useMemo } from 'react';
+import { useAppConfigStore } from 'core/config';
+import { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useForm } from 'routes/settings/settings.form.ts';
+import { useForm } from 'routes/settings/settings.form';
 import { PageSection } from 'ui/layouts/PageSection';
 import { BooleanListInput } from 'ui/list-inputs/BooleanListInput';
 import { ClassificationListInput } from 'ui/list-inputs/ClassificationListInput';
@@ -10,11 +10,11 @@ import { NumberListInput } from 'ui/list-inputs/NumberListInput';
 import { List } from 'ui/list/List';
 import { Markdown } from 'ui/Markdown';
 
-export const SubmissionProfileDescription = React.memo(() => {
+export const SubmissionProfileDescription = memo(() => {
   const { t } = useTranslation(['settings']);
   const theme = useTheme();
   const form = useForm();
-  const { configuration } = useALContext();
+  const configuration = useAppConfigStore(s => s.configuration);
 
   return (
     <form.Subscribe selector={state => [state.values.state.tab] as const}>
@@ -36,20 +36,19 @@ export const SubmissionProfileDescription = React.memo(() => {
 
 SubmissionProfileDescription.displayName = 'SubmissionProfileDescription';
 
-export const SubmissionOptionsSection = React.memo(() => {
+export const SubmissionOptionsSection = memo(() => {
   const { t } = useTranslation(['settings']);
   const theme = useTheme();
   const form = useForm();
-  const { configuration, c12nDef } = useALContext();
+  const configuration = useAppConfigStore(s => s.configuration);
+  const c12nDef = useAppConfigStore(s => s.c12nDef);
 
   const maxTTL = useMemo<number>(() => {
     if (!configuration?.submission) return 365;
     return configuration.submission.max_dtl !== 0 ? configuration.submission.max_dtl : 365;
   }, [configuration]);
 
-  if (!configuration || !c12nDef) return null;
-
-  return (
+  return !configuration || !c12nDef ? null : (
     <form.Subscribe
       selector={state =>
         [state.values.state.customize, state.values.state.disabled, state.values.state.loading] as const

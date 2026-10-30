@@ -1,11 +1,10 @@
 import { Alert, Tooltip, Typography, useTheme } from '@mui/material';
-import { useAPIMutation } from 'core/api/hooks/useApiMutation';
-import { invalidateAPIQuery } from 'core/api/utils/invalidateApiQuery';
-import useALContext from 'core/config/useALContext';
-import useMySnackbar from 'core/snackbar/snackbar.hooks';
-import React from 'react';
+import { invalidateApiQuery, useApiMutation } from 'core/api';
+import { useAppConfigStore } from 'core/config';
+import { useAppSnackbar } from 'core/snackbar';
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useForm } from 'routes/settings/settings.form.ts';
+import { useForm } from 'routes/settings/settings.form';
 import {
   hasDifferentDefaultSubmissionValues,
   hasDifferentPreviousSubmissionValues,
@@ -16,16 +15,17 @@ import {
 } from 'routes/settings/settings.utils';
 import { Button } from 'ui/buttons/Button';
 import { PageHeader } from 'ui/layouts/PageHeader';
-import { RouterPrompt } from 'ui/RouterPrompt';
 
-export const HeaderSection = React.memo(() => {
+export const HeaderSection = memo(() => {
   const { t } = useTranslation(['settings', 'submit']);
   const theme = useTheme();
   const form = useForm();
-  const { user: currentUser, configuration, settings } = useALContext();
-  const { showErrorMessage, showSuccessMessage } = useMySnackbar();
+  const currentUser = useAppConfigStore(s => s.user);
+  const configuration = useAppConfigStore(s => s.configuration);
+  const settings = useAppConfigStore(s => s.settings);
+  const { showErrorMessage, showSuccessMessage } = useAppSnackbar();
 
-  const handleSubmit = useAPIMutation(() => {
+  const handleSubmit = useApiMutation(() => {
     const tab = form.getFieldValue('state.tab');
     const profileSettings = form.getFieldValue('settings');
     if (!profileSettings) return;
@@ -40,7 +40,7 @@ export const HeaderSection = React.memo(() => {
         showSuccessMessage(t('success_save'));
         form.setFieldValue('settings', s => updatePreviousSubmissionValues(s));
         form.setFieldValue('user', body);
-        invalidateAPIQuery(({ url }) => url === '/api/v4/user/whoami/');
+        invalidateApiQuery(({ url }) => url === '/api/v4/user/whoami/');
       },
       onFailure: ({ api_status_code, api_error_message }) => {
         showErrorMessage(api_error_message);
@@ -66,7 +66,7 @@ export const HeaderSection = React.memo(() => {
       }
       children={([tab, loading, submitting, modified, hasReset]) => (
         <>
-          {modified && (
+          {/* {modified && (
             <RouterPrompt
               when={modified}
               onAccept={() => {
@@ -74,7 +74,7 @@ export const HeaderSection = React.memo(() => {
                 return true;
               }}
             />
-          )}
+          )} */}
 
           <PageHeader
             primary={

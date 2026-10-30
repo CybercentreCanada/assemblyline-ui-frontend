@@ -1,5 +1,7 @@
 {
   "access": "is requesting access to your account.",
+  "app_route.authorize.fullname": "Authorize",
+  "app_route.authorize.shortname": "Authorize",
   "button.allow": "Allow",
   "button.back": "Go back",
   "button.cancel": "Cancel",

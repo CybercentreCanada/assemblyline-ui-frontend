@@ -1,17 +1,17 @@
 import type { CheckboxProps } from '@mui/material';
 import { Checkbox, ListItemIcon } from '@mui/material';
-import { PropProvider, usePropStore } from 'features/prop-provider/prop-provider.providers';
-import type { AnchorProps } from 'features/table-of-content/table-of-content.components';
-import { Anchor } from 'features/table-of-content/table-of-content.components';
-import { ResetInputAdornment } from 'ui/inputs/components/inputs.component.adornment.tsx';
-import { InputCircularSkeleton } from 'ui/inputs/components/inputs.component.buttons.tsx';
-import { useInputId, useInputLabel } from 'ui/inputs/hooks/inputs.hook.renderer.tsx';
-import { useInputValidation } from 'ui/inputs/hooks/inputs.hook.validation.tsx';
-import type { InputRuntimeState, InputValueModel } from 'ui/inputs/models/inputs.model.ts';
-import { ListInputButtonRoot, ListInputRoot, ListInputText } from 'ui/list-inputs/lib/listinputs.components.tsx';
-import type { ListInputOptions, ListInputSlotProps } from 'ui/list-inputs/lib/listinputs.model.ts';
-import { DEFAULT_LIST_INPUT_CONTROLLER_PROPS } from 'ui/list-inputs/lib/listinputs.model.ts';
+import { PropProvider, usePropStore } from 'features/prop-provider';
+import type { AnchorProps } from 'features/table-of-content';
+import { Anchor } from 'features/table-of-content';
 import React from 'react';
+import { ResetInputAdornment } from 'ui/inputs/components/inputs.component.adornment';
+import { InputCircularSkeleton } from 'ui/inputs/components/inputs.component.buttons';
+import { useInputId, useInputLabel } from 'ui/inputs/hooks/inputs.hook.renderer';
+import { useInputValidation } from 'ui/inputs/hooks/inputs.hook.validation';
+import type { InputRuntimeState, InputValueModel } from 'ui/inputs/models/inputs.model';
+import { ListInputButtonRoot, ListInputRoot, ListInputText } from 'ui/list-inputs/lib/listinputs.components';
+import type { ListInputOptions, ListInputSlotProps } from 'ui/list-inputs/lib/listinputs.model';
+import { DEFAULT_LIST_INPUT_CONTROLLER_PROPS } from 'ui/list-inputs/lib/listinputs.model';
 
 export type ListHeaderProps = Omit<
   InputValueModel<boolean, React.MouseEvent<HTMLDivElement, globalThis.MouseEvent>>,

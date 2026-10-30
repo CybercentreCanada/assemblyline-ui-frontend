@@ -213,7 +213,7 @@ export type StoredConfig = z.infer<typeof StoredConfigSchema>;
 ```
 
 - Only for localStorage/sessionStorage parsing
-- Never for API responses or props
+- Never for API responses, props, or store state
 
 ## Hook Typing
 

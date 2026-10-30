@@ -1,14 +1,14 @@
-import useALContext from 'core/config/useALContext';
-import { useTableOfContent } from 'features/table-of-content/table-of-content.providers';
-import React, { useCallback } from 'react';
+import { useAppConfigStore } from 'core/config';
+import { useTableOfContent } from 'features/table-of-content';
+import { memo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useForm } from 'routes/settings/settings.form.ts';
+import { useForm } from 'routes/settings/settings.form';
 import { PageNavigation, PageNavigationItem } from 'ui/layouts/PageNavigation';
 
-export const RightNav = React.memo(() => {
+export const RightNav = memo(() => {
   const { t } = useTranslation(['settings']);
   const form = useForm();
-  const { settings } = useALContext();
+  const settings = useAppConfigStore(s => s.settings);
   const { ActiveAnchor, scrollTo } = useTableOfContent();
 
   const handleCategoryChange = useCallback(

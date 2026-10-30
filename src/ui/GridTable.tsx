@@ -7,12 +7,10 @@ import type {
   TableRowProps
 } from '@mui/material';
 import { Paper, Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel, styled } from '@mui/material';
-import type SimpleSearchQuery from 'ui/SearchBar/simple-search-query';
+import type { InferAppNavigationPropsFromPath } from 'core/router';
+import { AppLink, useAppNavigate, useAppSearchSnapshot } from 'core/router';
 import type { FC } from 'react';
 import React, { forwardRef, memo } from 'react';
-import type { To } from 'react-router';
-import { useLocation, useNavigate } from 'react-router';
-import { Link } from 'react-router-dom';
 
 interface StyledPaperProps extends PaperProps {
   component?: any;
@@ -131,14 +129,14 @@ export const GridTableRow: FC<GridTableRowProps> = memo(
   }))
 );
 
-export interface GridLinkRowProps extends GridTableRowProps {
-  component?: never;
-  to: To;
-}
+export type GridLinkRowProps<Origin extends AppRoute['path'] = AppRoute['path']> = GridTableRowProps &
+  InferAppNavigationPropsFromPath<Origin> & {
+    component?: never;
+  };
 
 export const GridLinkRow: FC<GridLinkRowProps> = memo(
-  styled(({ to, ...other }: GridLinkRowProps) => (
-    <GridTableRow {...(other as any)} component={Link} to={to} />
+  styled(({ nav = null, navDeps = null, ...other }: GridLinkRowProps) => (
+    <GridTableRow {...(other as GridLinkRowProps)} {...(!nav ? null : { component: AppLink, nav, navDeps })} />
   ))<GridLinkRowProps>(() => ({
     cursor: 'pointer',
     textDecoration: 'none'
@@ -191,7 +189,6 @@ export const GridTableCell: FC<GridTableCellProps> = memo(
 
 interface SortableGridHeaderCellProps extends GridTableCellProps {
   allowSort?: boolean;
-  query?: SimpleSearchQuery;
   sortField: string;
   sortName?: string;
   inverted?: boolean;
@@ -202,33 +199,34 @@ export const SortableGridHeaderCell: FC<SortableGridHeaderCellProps> = memo(
   ({
     allowSort = true,
     children,
-    query = null,
     sortField,
-    sortName = 'sort',
+    sortName: sortNameProp = 'sort',
     inverted = false,
     onSort = null,
     ...other
   }: SortableGridHeaderCellProps) => {
-    const location = useLocation();
-    const searchParams = new URLSearchParams(location.search);
-    const curSort = query ? query.get(sortName) : searchParams.get(sortName);
-    const navigate = useNavigate();
+    const search = useAppSearchSnapshot<'/search'>();
+    const navigate = useAppNavigate();
+
+    const sortName = sortNameProp as 'sort';
+    const curSort = search.get(sortName as 'sort');
     const active = curSort && curSort.indexOf(sortField) !== -1;
     const ascending = inverted ? 'asc' : 'desc';
     const descending = inverted ? 'desc' : 'asc';
     const dir = active && curSort.indexOf(ascending) !== -1 ? ascending : descending;
 
     const triggerSort = (event: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
-      if (curSort && curSort.indexOf(sortField) !== -1 && curSort.indexOf(ascending) === -1) {
-        searchParams.set(sortName, `${sortField} ${ascending}`);
-      } else {
-        searchParams.set(sortName, `${sortField} ${descending}`);
-      }
+      const nextSearch =
+        curSort && curSort.indexOf(sortField) !== -1 && curSort.indexOf(ascending) === -1
+          ? search.set(s => ({ ...s, [sortName]: `${sortField} ${ascending}` }))
+          : search.set(s => ({ ...s, [sortName]: `${sortField} ${ascending}` }));
 
       if (onSort) {
-        onSort(event, { name: sortName, field: searchParams.get(sortName) });
+        onSort(event, { name: sortName, field: nextSearch.get(sortName) });
       } else {
-        navigate(`${location.pathname}?${searchParams.toString()}${location.hash}`);
+        navigate
+          .here<'/search'>()
+          .update(s => ({ ...s, search: { ...s.search, [sortName]: nextSearch.get(sortName) } }));
       }
     };
 

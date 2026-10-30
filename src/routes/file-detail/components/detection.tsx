@@ -2,17 +2,17 @@ import OpenInNewOutlinedIcon from '@mui/icons-material/OpenInNewOutlined';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import SelectAllOutlinedIcon from '@mui/icons-material/SelectAllOutlined';
 import { Box, Collapse, IconButton, Skeleton, Tooltip, useTheme } from '@mui/material';
-import useHighlighter from 'layout/highlighter/highlighter.hooks';
-import useSafeResults from 'layout/safe-results/safe-results.hooks';
+import { AppLink } from 'core/router';
+import useHighlighter from 'deprecated/hooks/useHighlighter';
+import useSafeResults from 'deprecated/hooks/useSafeResults';
+import { useAppIsHighlighted } from 'layout/highlighter/highlighter.hooks';
 import type { File } from 'models/api/file';
 import type { HeuristicLevel } from 'models/base/heuristic';
 import { HEURISTIC_LEVELS } from 'models/base/heuristic';
 import type { Section } from 'models/base/result';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router';
-import { Link } from 'react-router-dom';
-import { safeFieldValueURI } from 'shared/utils/utils';
+import { safeFieldValue } from 'shared/utils/utils';
 import ResultSection from 'ui/ResultCard/result_section';
 import SectionContainer from 'ui/SectionContainer';
 
@@ -31,13 +31,11 @@ const WrappedHeuristic: React.FC<HeuristicProps> = ({ name, id, sections, level,
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [render, setRender] = useState(false);
-  const { isHighlighted, triggerHighlight, getKey } = useHighlighter();
+  const { triggerHighlight, getKey } = useHighlighter();
   const theme = useTheme();
-  const navigate = useNavigate();
-  const location = useLocation();
   const { showSafeResults } = useSafeResults();
 
-  const highlighted = isHighlighted(getKey('heuristic', id));
+  const highlighted = useAppIsHighlighted(getKey('heuristic', id));
 
   const stopPropagating = useCallback(event => event.stopPropagation(), []);
 
@@ -146,9 +144,16 @@ const WrappedHeuristic: React.FC<HeuristicProps> = ({ name, id, sections, level,
         <div onClick={stopPropagating} style={{ display: 'flex', justifyContent: 'flex-end', flexGrow: 0 }}>
           <Tooltip title={t('related')}>
             <IconButton
-              component={Link}
+              component={AppLink}
               size="small"
-              to={`/search/result?query=result.sections.heuristic.heur_id:${safeFieldValueURI(id)}`}
+              nav={nav =>
+                nav.to().create({
+                  route: '/search/:index',
+                  path: { index: 'result' },
+                  search: { query: `result.sections.heuristic.heur_id:${safeFieldValue(id)}` }
+                })
+              }
+              navDeps={[id]}
               color="inherit"
             >
               <SearchOutlinedIcon />
@@ -161,14 +166,11 @@ const WrappedHeuristic: React.FC<HeuristicProps> = ({ name, id, sections, level,
           </Tooltip>
           <Tooltip title={t('goto_heuristic')}>
             <IconButton
-              component={Link}
+              component={AppLink}
               size="small"
-              to={`/manage/heuristic/${id}`}
+              nav={nav => nav.to().create({ route: '/manage/heuristic/detail/:id', path: { id } })}
+              navDeps={[id]}
               color="inherit"
-              onClick={e => {
-                e.preventDefault();
-                navigate(`${location.pathname.split('/').slice(0, 4).join('/')}#${id}`);
-              }}
             >
               <OpenInNewOutlinedIcon />
             </IconButton>

@@ -1,16 +1,16 @@
 import OpenInNewOutlinedIcon from '@mui/icons-material/OpenInNewOutlined';
 import { Typography, useTheme } from '@mui/material';
-import type { ProfileSettings } from 'routes/settings/settings.utils.ts';
-import { useForm } from 'routes/submit/submit.form.ts';
+import { memo, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
+import type { ProfileSettings } from 'routes/settings/settings.utils';
+import { useForm } from 'routes/submit/submit.form';
 import { CheckboxInput } from 'ui/inputs/CheckboxInput';
-import type { InputOptions, InputSlotProps, InputValueModel } from 'ui/inputs/models/inputs.model.ts';
+import type { InputOptions, InputSlotProps, InputValueModel } from 'ui/inputs/models/inputs.model';
 import { NumberInput } from 'ui/inputs/NumberInput';
 import { SelectInput } from 'ui/inputs/SelectInput';
 import { TextInput } from 'ui/inputs/TextInput';
 import { CollapseSection } from 'ui/layouts/CollapseSection';
 import { ShowMore } from 'ui/ShowMore';
-import React, { useCallback } from 'react';
-import { useTranslation } from 'react-i18next';
 
 type SpecParamList = {
   show: number[];
@@ -23,7 +23,7 @@ type ParamProps = {
   service: ProfileSettings['services'][number]['services'][number];
 };
 
-const Param: React.FC<ParamProps> = React.memo(({ param_id, spec_id, service }) => {
+const Param = memo(({ param_id, spec_id, service }: ParamProps) => {
   const theme = useTheme();
   const form = useForm();
 
@@ -101,13 +101,15 @@ const Param: React.FC<ParamProps> = React.memo(({ param_id, spec_id, service }) 
   );
 });
 
+Param.displayName = 'Param';
+
 type ServiceProps = {
   cat_id: number;
   svr_id: number;
   service: ProfileSettings['services'][number]['services'][number];
 };
 
-const Service: React.FC<ServiceProps> = React.memo(({ cat_id, svr_id, service }) => {
+const Service = memo(({ cat_id, svr_id, service }: ServiceProps) => {
   const form = useForm();
 
   const handleHasParams = useCallback(
@@ -245,12 +247,14 @@ const Service: React.FC<ServiceProps> = React.memo(({ cat_id, svr_id, service })
   );
 });
 
+Service.displayName = 'Service';
+
 type CategoryProps = {
   cat_id: number;
   category: ProfileSettings['services'][number];
 };
 
-const Category = React.memo(({ cat_id, category }: CategoryProps) => {
+const Category = memo(({ cat_id, category }: CategoryProps) => {
   const form = useForm();
 
   const handleChange = useCallback(
@@ -314,7 +318,9 @@ const Category = React.memo(({ cat_id, category }: CategoryProps) => {
   );
 });
 
-export const ServiceParameters = React.memo(() => {
+Category.displayName = 'Category';
+
+export const ServiceParameters = memo(() => {
   const { t } = useTranslation(['submit']);
   const theme = useTheme();
   const form = useForm();
@@ -333,3 +339,5 @@ export const ServiceParameters = React.memo(() => {
     </div>
   );
 });
+
+ServiceParameters.displayName = 'ServiceParameters';

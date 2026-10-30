@@ -1,14 +1,12 @@
+import NotificationImportantOutlinedIcon from '@mui/icons-material/NotificationImportantOutlined';
 import { CircularProgress } from '@mui/material';
-import React, { useMemo } from 'react';
-import { Navigate } from 'react-router';
-import type { AlertSearchParams } from 'routes/alerts/alerts.route';
-import { ALERT_DEFAULT_PARAMS, ALERT_STORAGE_KEY } from 'routes/alerts/alerts.route';
-import { SearchParser } from 'routes/alerts/utils/SearchParser';
+import { AppNavigate, createAppRoute } from 'core/router';
+import { memo, useMemo } from 'react';
+import { ALERT_STORAGE_KEY, AlertsRoute } from 'routes/alerts/alerts.route';
 
-export const WrappedAlertsRedirect: React.FC = () => {
-  const parser = useMemo(() => new SearchParser<AlertSearchParams>(ALERT_DEFAULT_PARAMS, { enforced: ['rows'] }), []);
+export const AlertRedirectPage = memo(() => {
   const storageData = useMemo(() => new URLSearchParams(localStorage.getItem(ALERT_STORAGE_KEY) || ''), []);
-  const search = useMemo(() => parser.deltaParams(storageData), [parser, storageData]);
+  const search = useMemo(() => AlertsRoute.search.full(storageData), [storageData]);
 
   if (!search)
     return (
@@ -24,8 +22,23 @@ export const WrappedAlertsRedirect: React.FC = () => {
         <CircularProgress variant="indeterminate" />
       </div>
     );
-  else return <Navigate to={`/alerts?${search.toString()}`} replace />;
-};
+  else
+    return (
+      <AppNavigate nav={nav => nav.here({ replace: true }).update({ route: '/alerts', search: search.toObject() })} />
+    );
+});
 
-export const AlertsRedirect = React.memo(WrappedAlertsRedirect);
-export default AlertsRedirect;
+export const AlertRedirectRoute = createAppRoute({
+  component: AlertRedirectPage,
+
+  path: '/alerts-redirect',
+
+  ancestor: null,
+  shortname: () => ['app_route.alert_redirect.shortname', { ns: 'alerts' }],
+  fullname: () => ['app_route.alert_redirect.fullname', { ns: 'alerts' }],
+  shorticon: () => <NotificationImportantOutlinedIcon />,
+  fullicon: () => <NotificationImportantOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
+});

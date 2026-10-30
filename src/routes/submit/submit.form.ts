@@ -1,27 +1,8 @@
 import Flow from '@flowjs/flow.js';
-import { createFormContext } from 'features/form/form.factories';
+import { createFormContext } from 'features/form';
 import type { HashPatternMap } from 'models/base/config';
-import type { Metadata } from 'models/base/submission';
-import type { ProfileSettings } from 'routes/settings/settings.utils.ts';
-import generateUUID from 'shared/utils/uuid';
-
-/**
- * State used when submitting to the backend.
- * Includes classification and server-side metadata.
- */
-export type SubmitState = {
-  c12n: string;
-  description?: string | null;
-  hash: string;
-  metadata?: Metadata;
-  priority?: string | null;
-  profile?: string | null;
-  raw?: string | null;
-  ttl?: string | null;
-  params?: {
-    filetype_override?: string | null;
-  };
-};
+import type { ProfileSettings } from 'routes/settings/settings.utils';
+import { generateSubmitUUID } from 'routes/submit/submit.utils';
 
 /**
  * Metadata collected from the user on the Submit page.
@@ -161,7 +142,7 @@ export const DEFAULT_SUBMIT_FORM: SubmitStore = {
     profile: null,
     tab: 'file',
     progress: 0,
-    uuid: generateUUID()
+    uuid: generateSubmitUUID()
   },
   autoURLServiceSelection: {
     open: false,

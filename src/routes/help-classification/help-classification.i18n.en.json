@@ -1,4 +1,6 @@
 {
+  "app_route.help_classification.fullname": "Classification Help",
+  "app_route.help_classification.shortname": "Classification Help",
   "assumptions": "Lets assume the following:",
   "desc_1": "When you submit a file to Assemblyline, you are required to provide it's classification. This classification is for the submission itself and will be applied to all the children files in the submission as well as the results associated to the submission.",
   "desc_2": "If you realize that you've submitted a file with the wrong classification, you can always use the delete button in the submission detail page to get rid of it.",

@@ -1,9 +1,9 @@
 import { Tooltip } from '@mui/material';
 import type { Verdict } from 'models/base/alert';
-import CustomChip from 'ui/CustomChip';
-import type { PossibleColor } from 'shared/utils/colors';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import type { PossibleColor } from 'shared/utils/colors';
+import CustomChip from 'ui/CustomChip';
 
 const VERDICT_COLOR_MAP: Record<Verdict, PossibleColor> = {
   info: 'default',

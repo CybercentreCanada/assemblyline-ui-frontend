@@ -1,6 +1,7 @@
 import type { AutocompleteProps, AutocompleteRenderInputParams, TextFieldProps } from '@mui/material';
 import { Autocomplete, InputAdornment, TextField, useTheme } from '@mui/material';
-import { usePropStore } from 'features/prop-provider/prop-provider.providers';
+import { usePropStore } from 'features/prop-provider';
+import React, { useMemo } from 'react';
 import type { CustomChipProps } from 'ui/CustomChip';
 import { CustomChip } from 'ui/CustomChip';
 import {
@@ -11,10 +12,9 @@ import {
   PasswordInputAdornment,
   ProgressInputAdornment,
   ResetInputAdornment
-} from 'ui/inputs/components/inputs.component.adornment.tsx';
-import { useInputId, useInputLabel } from 'ui/inputs/hooks/inputs.hook.renderer.tsx';
-import type { InputControllerProps } from 'ui/inputs/models/inputs.model.ts';
-import React, { useMemo } from 'react';
+} from 'ui/inputs/components/inputs.component.adornment';
+import { useInputId, useInputLabel } from 'ui/inputs/hooks/inputs.hook.renderer';
+import type { InputControllerProps } from 'ui/inputs/models/inputs.model';
 
 export const useInputTextFieldSlots = (overrides?: Partial<TextFieldProps>) => {
   const theme = useTheme();

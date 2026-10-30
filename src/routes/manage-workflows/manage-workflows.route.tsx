@@ -2,57 +2,30 @@ import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOu
 import EventBusyOutlinedIcon from '@mui/icons-material/EventBusyOutlined';
 import EventOutlinedIcon from '@mui/icons-material/EventOutlined';
 import { Grid, IconButton, Tooltip, useTheme } from '@mui/material';
-import useMyAPI from 'core/api/hooks/useMyAPI';
-import useALContext from 'core/config/useALContext';
-import PageContainer from 'core/template/branding/AppPageContainer';
-import { useAppUser } from 'core/template/components/app/hooks';
-import PageFullWidth from 'core/template/components/pages/PageFullWidth';
-import { createSearchParams, SearchParamsProvider, useSearchParams } from 'features/SearchParams/createSearchParams';
-import useDrawer from 'layout/drawer/drawer.hooks';
-import type { CustomUser, IndexDefinition } from 'models/api/user';
+import { createAppRoute, useAppNavigate, useAppSearchSnapshot } from 'core/router';
+import { AppPageContainer, AppPageFullWidth } from 'core/template';
+import useALContext from 'deprecated/hooks/useALContext';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
+import type { SearchResult } from 'models/api/search';
+import type { IndexDefinition } from 'models/api/user';
 import type { WorkflowIndexed } from 'models/base/workflow';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router';
-import ForbiddenPage from 'routes/forbidden/forbidden.route';
-import WorkflowCreate from 'routes/manage-workflow-create/manage-workflow-create.route';
-import WorkflowDetail from 'routes/manage-workflow-detail/manage-workflow-detail.route';
-import WorkflowTable from 'routes/search/components/workflow';
+import { BiNetworkChart } from 'react-icons/bi';
+import { WorkflowTable } from 'routes/search/components/workflow';
 import { PageHeader } from 'ui/layouts/PageHeader';
 import { DEFAULT_SUGGESTION } from 'ui/SearchBar/search-textfield';
 import SearchHeader from 'ui/SearchBar/SearchHeader';
 
-type SearchResults = {
-  items: WorkflowIndexed[];
-  offset: number;
-  rows: number;
-  total: number;
-};
-
-const WORKFLOWS_PARAMS = createSearchParams(p => ({
-  query: p.string(''),
-  offset: p.number(0).min(0).origin('snapshot').ephemeral(),
-  rows: p.number(25).locked().origin('snapshot').ephemeral(),
-  sort: p.string('last_seen desc').ephemeral(),
-  filters: p.filters([]),
-  track_total_hits: p.number(10000).nullable().ephemeral(),
-  refresh: p.boolean(false).origin('snapshot').ephemeral()
-}));
-
-type WorkflowsParams = typeof WORKFLOWS_PARAMS;
-
-const WorkflowsSearch = () => {
+export const ManageWorkflowsPage = memo(() => {
   const { t } = useTranslation(['manageWorkflows']);
   const theme = useTheme();
-  const location = useLocation();
-  const navigate = useNavigate();
+  const navigate = useAppNavigate<'/manage/workflows'>();
+  const search = useAppSearchSnapshot<'/manage/workflows'>();
   const { apiCall } = useMyAPI();
-  const { indexes } = useALContext();
-  const { user: currentUser } = useAppUser<CustomUser>();
-  const { globalDrawerOpened, setGlobalDrawer, closeGlobalDrawer } = useDrawer();
-  const { search, setSearchParams, setSearchObject } = useSearchParams<WorkflowsParams>();
+  const { indexes, user: currentUser } = useALContext();
 
-  const [workflowResults, setWorkflowResults] = useState<SearchResults>(null);
+  const [workflowResults, setWorkflowResults] = useState<SearchResult<WorkflowIndexed>>(null);
   const [searching, setSearching] = useState<boolean>(false);
 
   const suggestions = useMemo<IndexDefinition>(
@@ -62,12 +35,17 @@ const WorkflowsSearch = () => {
 
   const handleToggleFilter = useCallback(
     (filter: string) => {
-      setSearchObject(o => {
-        const filters = o.filters.includes(filter) ? o.filters.filter(f => f !== filter) : [...o.filters, filter];
-        return { ...o, offset: 0, filters };
-      });
+      navigate.here<'/manage/workflows'>().update(s => ({
+        ...s,
+        search: {
+          ...s.search,
+          filters: s.search.filters.includes(filter)
+            ? s.search.filters.filter(f => f !== filter)
+            : [...s.search.filters, filter]
+        }
+      }));
     },
-    [setSearchObject]
+    [navigate]
   );
 
   const handleReload = useCallback(
@@ -81,7 +59,7 @@ const WorkflowsSearch = () => {
           .set(o => ({ ...o, query: o.query || '*' }))
           .omit(['refresh'])
           .toObject(),
-        onSuccess: ({ api_response }) => setWorkflowResults(api_response as SearchResults),
+        onSuccess: ({ api_response }) => setWorkflowResults(api_response),
         onEnter: () => setSearching(true),
         onExit: () => setSearching(false)
       });
@@ -90,44 +68,6 @@ const WorkflowsSearch = () => {
     [currentUser.roles]
   );
 
-  const setWorkflowID = useCallback(
-    (wf_id: string) => navigate(`${location.pathname}${location.search}#/detail/${wf_id}`),
-    [location.pathname, location.search, navigate]
-  );
-
-  useEffect(() => {
-    if (!location.hash || globalDrawerOpened || !workflowResults) return;
-    navigate(`${location.pathname}${location.search || ''}`);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [globalDrawerOpened]);
-
-  useEffect(() => {
-    const url = new URL(`${window.location.origin}${location.hash.slice(1)}`);
-
-    if (url.pathname.startsWith('/detail/')) {
-      setGlobalDrawer(
-        <WorkflowDetail
-          id={url.pathname.slice('/detail/'.length)}
-          onClose={() => navigate(`${location.pathname}${location.search}`)}
-        />
-      );
-    } else if (url.pathname.startsWith('/create/')) {
-      setGlobalDrawer(
-        <WorkflowCreate
-          id={url.pathname.slice('/create/'.length)}
-          onClose={id =>
-            id
-              ? navigate(`${location.pathname}${location.search}#/detail/${id}`)
-              : navigate(`${location.pathname}${location.search}`)
-          }
-        />
-      );
-    } else {
-      closeGlobalDrawer();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location.hash]);
-
   useEffect(() => {
     handleReload(search);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -135,17 +75,19 @@ const WorkflowsSearch = () => {
 
   useEffect(() => {
     function reload() {
-      setSearchObject(o => ({ ...o, offset: 0, refresh: !o.refresh }));
+      navigate
+        .here<'/manage/workflows'>()
+        .update(s => ({ ...s, search: { ...s.search, offset: 0, refresh: !s.search.refresh } }));
     }
 
     window.addEventListener('reloadWorkflows', reload);
     return () => {
       window.removeEventListener('reloadWorkflows', reload);
     };
-  }, [setSearchObject]);
+  }, [navigate]);
 
-  return currentUser.roles.includes('workflow_view') ? (
-    <PageFullWidth margin={4}>
+  return (
+    <AppPageFullWidth>
       <PageHeader
         primary={t('title')}
         slotProps={{
@@ -159,7 +101,7 @@ const WorkflowsSearch = () => {
                   style={{
                     color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark
                   }}
-                  onClick={() => navigate(`${location.pathname}${location.search}#/create/`)}
+                  onClick={() => navigate.to().create({ route: '/manage/workflow/create' })}
                   size="large"
                 >
                   <AddCircleOutlineOutlinedIcon />
@@ -170,7 +112,7 @@ const WorkflowsSearch = () => {
         }
       />
 
-      <PageContainer isSticky>
+      <AppPageContainer isSticky>
         <div style={{ paddingTop: theme.spacing(1) }}>
           <SearchHeader
             params={search.toParams()}
@@ -181,7 +123,11 @@ const WorkflowsSearch = () => {
                 ? t(`filtered${workflowResults?.total === 1 ? '' : 's'}`)
                 : t(`total${workflowResults?.total === 1 ? '' : 's'}`)
             }
-            onChange={v => setSearchParams(v)}
+            onChange={v =>
+              navigate
+                .here()
+                .update(s => ({ ...s, search: { ...s.search, ...ManageWorkflowsRoute.search.full(v).toObject() } }))
+            }
             paramDefaults={search.defaults().toObject()}
             searchInputProps={{ placeholder: t('filter'), options: suggestions }}
             actionProps={[
@@ -210,22 +156,35 @@ const WorkflowsSearch = () => {
             ]}
           />
         </div>
-      </PageContainer>
+      </AppPageContainer>
 
       <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
-        <WorkflowTable workflowResults={workflowResults} setWorkflowID={setWorkflowID} />
+        <WorkflowTable workflowResults={workflowResults} />
       </div>
-    </PageFullWidth>
-  ) : (
-    <ForbiddenPage />
+    </AppPageFullWidth>
   );
-};
+});
 
-const WrappedWorkflowsPage = () => (
-  <SearchParamsProvider params={WORKFLOWS_PARAMS}>
-    <WorkflowsSearch />
-  </SearchParamsProvider>
-);
+export const ManageWorkflowsRoute = createAppRoute({
+  component: ManageWorkflowsPage,
 
-export const WorkflowsPage = React.memo(WrappedWorkflowsPage);
-export default WorkflowsPage;
+  path: '/manage/workflows',
+  search: s => ({
+    query: s.string(''),
+    offset: s.number(0).min(0).source('transient').ephemeral(),
+    rows: s.number(25).locked().source('transient').ephemeral(),
+    sort: s.string('last_seen desc').ephemeral(),
+    filters: s.filters([]),
+    track_total_hits: s.number(10000).nullable().ephemeral(),
+    refresh: s.boolean(false).source('transient').ephemeral()
+  }),
+
+  ancestor: '/manage',
+  shortname: () => ['app_route.manage_workflows.shortname', { ns: 'manageWorkflows' }],
+  fullname: () => ['app_route.manage_workflows.fullname', { ns: 'manageWorkflows' }],
+  shorticon: () => <BiNetworkChart fontSize="1.3rem" />,
+  fullicon: () => <BiNetworkChart fontSize="1.3rem" />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.roles.includes('workflow_view')
+});

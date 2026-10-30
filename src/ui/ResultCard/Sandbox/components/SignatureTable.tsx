@@ -1,7 +1,7 @@
 import { useTheme } from '@mui/material';
 import type { ColumnDef } from '@tanstack/react-table';
 import { createColumnHelper } from '@tanstack/react-table';
-import useSafeResults from 'layout/safe-results/safe-results.hooks';
+import { useAppSafeResults } from 'layout/safe-results';
 import type { SandboxBody, SandboxProcessItem, SandboxSignatureItem } from 'models/base/result_body';
 import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -10,11 +10,7 @@ import CustomChip from 'ui/CustomChip';
 import { ProcessChip } from 'ui/ResultCard/Sandbox/common/ProcessChip';
 import { TableContainer } from 'ui/ResultCard/Sandbox/common/TableContainer';
 import { DetailTableCellValue, DetailTableRow } from 'ui/ResultCard/Sandbox/common/Tables';
-import {
-  getProcessMapByPid,
-  getVisibleProcessesByPids,
-  type SandboxFilter
-} from 'ui/ResultCard/Sandbox/sandbox.utils.ts';
+import { getProcessMapByPid, getVisibleProcessesByPids, type SandboxFilter } from 'ui/ResultCard/Sandbox/sandbox.utils';
 import Verdict from 'ui/Verdict';
 
 type FlatSignatures = SandboxSignatureItem & {
@@ -48,7 +44,7 @@ export const SignatureTable = React.memo(
   }: SignatureTableProps) => {
     const { t } = useTranslation('sandboxResult');
     const theme = useTheme();
-    const { showSafeResults: showSafeResultsContext } = useSafeResults();
+    const { showSafeResults: showSafeResultsContext } = useAppSafeResults();
     const showSafeResults = showSafeResultsProp ?? showSafeResultsContext;
     const columnHelper = createColumnHelper<FlatSignatures>();
 

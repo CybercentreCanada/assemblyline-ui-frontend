@@ -4,12 +4,12 @@ import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
 import { AlertTitle, IconButton, Skeleton, Tooltip, useTheme } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
-import useALContext from 'core/config/useALContext';
+import useALContext from 'deprecated/hooks/useALContext';
 import type { SearchResult } from 'models/api/search';
-import { LABELS_COLOR_MAP, type FileIndexed, type LabelCategories } from 'models/base/file';
-import React, { useMemo, useState } from 'react';
+import type { FileIndexed, LabelCategories } from 'models/base/file';
+import { LABELS_COLOR_MAP } from 'models/base/file';
+import React, { memo, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
 import { FileDownloader } from 'ui/buttons/FileDownloader';
 import Classification from 'ui/Classification';
 import CustomChip from 'ui/CustomChip';
@@ -98,30 +98,34 @@ const WrappedLabelCell = ({ label_categories = null, onLabelClick = null }: Labe
 
 const LabelCell = React.memo(WrappedLabelCell);
 
-type Props = {
+export type ArchivesTableProps = {
   fileResults: SearchResult<FileIndexed>;
   allowSort?: boolean;
-  setFileID?: (id: string) => void;
   onLabelClick?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>, label: string) => void;
+  onRowClick?: (event: React.MouseEvent<HTMLElement>, file: FileIndexed) => void;
 };
 
-const WrappedArchivesTable: React.FC<Props> = ({
-  fileResults,
-  allowSort = true,
-  setFileID = null,
-  onLabelClick = null
-}) => {
-  const { t } = useTranslation(['archive']);
-  const theme = useTheme();
-  const { c12nDef, user: currentUser } = useALContext();
+export const ArchivesTable = memo(
+  ({ fileResults, allowSort = true, onLabelClick = null, onRowClick = () => null }: ArchivesTableProps) => {
+    const { t } = useTranslation(['archive']);
+    const theme = useTheme();
+    const { c12nDef, user: currentUser } = useALContext();
 
-  const hasSupplementary = useMemo<boolean>(
-    () => fileResults && fileResults?.total > 0 && fileResults?.items.some(item => item.is_supplementary),
-    [fileResults]
-  );
+    const hasSupplementary = useMemo<boolean>(
+      () => fileResults && fileResults?.total > 0 && fileResults?.items.some(item => item.is_supplementary),
+      [fileResults]
+    );
 
-  return fileResults ? (
-    fileResults.total !== 0 ? (
+    return !fileResults ? (
+      <Skeleton variant="rectangular" sx={{ height: '6rem', borderRadius: '4px' }} />
+    ) : !fileResults?.total ? (
+      <div style={{ width: '100%' }}>
+        <InformativeAlert>
+          <AlertTitle>{t('no_errors_title')}</AlertTitle>
+          {t('no_results_desc')}
+        </InformativeAlert>
+      </div>
+    ) : (
       <TableContainer component={Paper}>
         <DivTable>
           <DivTableHead>
@@ -143,14 +147,17 @@ const WrappedArchivesTable: React.FC<Props> = ({
             {fileResults.items.map((file, i) => (
               <LinkRow
                 key={`${file.sha256}-${i}`}
-                component={Link}
-                to={`/archive/${file.sha256}`}
-                onClick={event => {
-                  if (setFileID) {
-                    event.preventDefault();
-                    setFileID(file.sha256);
-                  }
-                }}
+                nav={nav =>
+                  nav
+                    .to()
+                    .create(s =>
+                      s?.route === '/archive/:id/:tab'
+                        ? { route: '/archive/:id/:tab', path: { id: file.sha256, tab: s.path.tab } }
+                        : { route: '/archive/:id', path: { id: file.sha256 } }
+                    )
+                }
+                navDeps={[file.sha256]}
+                onClick={event => onRowClick(event, file)}
                 hover
                 style={{ textDecoration: 'none' }}
               >
@@ -231,18 +238,6 @@ const WrappedArchivesTable: React.FC<Props> = ({
           </DivTableBody>
         </DivTable>
       </TableContainer>
-    ) : (
-      <div style={{ width: '100%' }}>
-        <InformativeAlert>
-          <AlertTitle>{t('no_errors_title')}</AlertTitle>
-          {t('no_results_desc')}
-        </InformativeAlert>
-      </div>
-    )
-  ) : (
-    <Skeleton variant="rectangular" style={{ height: '6rem', borderRadius: '4px' }} />
-  );
-};
-
-const ArchivesTable = React.memo(WrappedArchivesTable);
-export default ArchivesTable;
+    );
+  }
+);

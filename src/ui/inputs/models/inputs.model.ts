@@ -15,7 +15,7 @@ import type {
   ValidationSchema,
   ValidationStatus,
   Validator
-} from 'ui/inputs/utils/inputs.util.validation.tsx';
+} from 'ui/inputs/utils/inputs.util.validation';
 
 /**********************************************************************************************************************
  * Input Models

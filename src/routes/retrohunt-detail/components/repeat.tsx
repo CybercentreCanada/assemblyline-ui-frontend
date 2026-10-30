@@ -15,16 +15,14 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
-import useMyAPI from 'core/api/hooks/useMyAPI';
-import useALContext from 'core/config/useALContext';
-import useMySnackbar from 'core/snackbar/snackbar.hooks';
-import { useAppUser } from 'core/template/components/app/hooks';
-import type { CustomUser } from 'models/api/user';
+import useALContext from 'deprecated/hooks/useALContext';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useMySnackbar from 'deprecated/hooks/useMySnackbar';
 import type { Retrohunt } from 'models/base/retrohunt';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import ForbiddenPage from 'routes/forbidden/forbidden.route';
-import NotFoundPage from 'routes/not-found/not-found.route';
+import { ForbiddenPage } from 'routes/forbidden/forbidden';
+import { NotFoundPage } from 'routes/not-found/not-found';
 import Classification from 'ui/Classification';
 
 type RetrohuntData = Pick<Retrohunt, 'key' | 'search_classification' | 'ttl'>;
@@ -38,8 +36,7 @@ function WrappedRetrohuntRepeat({ retrohunt = null, onRepeat = () => null }: Pro
   const { t } = useTranslation(['retrohunt']);
   const theme = useTheme();
   const { apiCall } = useMyAPI();
-  const { c12nDef, configuration } = useALContext();
-  const { user: currentUser } = useAppUser<CustomUser>();
+  const { c12nDef, configuration, user: currentUser } = useALContext();
   const { showSuccessMessage, showErrorMessage } = useMySnackbar();
 
   const [data, setData] = useState<RetrohuntData>(null);

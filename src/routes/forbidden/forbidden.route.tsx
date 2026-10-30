@@ -1,39 +1,34 @@
 import BlockIcon from '@mui/icons-material/Block';
-import { useTheme } from '@mui/material';
-import Typography from '@mui/material/Typography';
-import PageCenter from 'core/template/components/pages/PageCenter';
-import React from 'react';
-import { useTranslation } from 'react-i18next';
+import { createAppRoute } from 'core/router';
+import { memo } from 'react';
+import { ForbiddenPage } from 'routes/forbidden/forbidden';
 
-type ForbiddenPageProps = {
-  disabled?: boolean;
-};
+export const ForbiddenRoute = createAppRoute({
+  component: ForbiddenPage,
 
-const ForbiddenPage: React.FC<ForbiddenPageProps> = ({ disabled = false }) => {
-  const { t } = useTranslation(['error403']);
-  const theme = useTheme();
-  return (
-    <PageCenter width="65%" margin={4}>
-      <div style={{ paddingTop: theme.spacing(10), fontSize: 200 }}>
-        <BlockIcon
-          style={{ color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark }}
-          fontSize="inherit"
-        />
-      </div>
-      <div style={{ paddingBottom: theme.spacing(2) }}>
-        <Typography variant="h3">{t('title')}</Typography>
-      </div>
-      {disabled ? (
-        <div>
-          <Typography variant="h6">{t('disabled')}</Typography>
-        </div>
-      ) : (
-        <div>
-          <Typography variant="h6">{t('not_allowed')}</Typography>
-        </div>
-      )}
-    </PageCenter>
-  );
-};
+  path: '/forbidden',
 
-export default ForbiddenPage;
+  ancestor: null,
+  shortname: () => ['app_route.forbidden.shortname', { ns: 'error403' }],
+  fullname: () => ['app_route.forbidden.fullname', { ns: 'error403' }],
+  shorticon: () => <BlockIcon />,
+  fullicon: () => <BlockIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
+});
+
+export const DisabledRoute = createAppRoute({
+  component: memo(() => <ForbiddenPage disabled />),
+
+  path: '/disabled',
+
+  ancestor: null,
+  shortname: () => ['app_route.disabled.shortname', { ns: 'error403' }],
+  fullname: () => ['app_route.disabled.fullname', { ns: 'error403' }],
+  shorticon: () => <BlockIcon />,
+  fullicon: () => <BlockIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
+});

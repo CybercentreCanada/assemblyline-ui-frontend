@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unnecessary-type-constraint */
-import { usePropStore } from 'features/prop-provider/prop-provider.providers';
-import type { InputControllerProps } from 'ui/inputs/models/inputs.model.ts';
-import type { ListInputControllerProps } from 'ui/list-inputs/lib/listinputs.model.ts';
+import { usePropStore } from 'features/prop-provider';
+import type { InputControllerProps } from 'ui/inputs/models/inputs.model';
+import type { ListInputControllerProps } from 'ui/list-inputs/lib/listinputs.model';
 
 /**
  * Returns the label for an input, or a non-breaking space if not defined

@@ -1,67 +1,64 @@
-// Shamelessly stolen from https://raw.githubusercontent.com/CybercentreCanada/howler-ui-internal/refs/heads/develop/src/components/hooks/useMySnackbar.tsx
+import type { AppSnackbarShowMessage, AppSnackbarVariant } from 'core/snackbar';
 import type { OptionsObject, SnackbarMessage } from 'notistack';
 import { useSnackbar } from 'notistack';
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 
-export default function useMySnackbar() {
+/**
+ * @name useAppSnackbar
+ * @description Provides variant-specific show methods and closeSnackbar.
+ * @returns Object with showErrorMessage, showInfoMessage, showSuccessMessage, showWarningMessage, closeSnackbar
+ */
+export const useAppSnackbar = () => {
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
-  const snackBarOptions: OptionsObject = useMemo(
-    () => ({
-      preventDuplicate: true,
-      anchorOrigin: {
-        vertical: 'bottom',
-        horizontal: 'center'
-      },
-      SnackbarProps: {
-        onClick: () => {
-          closeSnackbar();
-        }
-      }
-    }),
-    [closeSnackbar]
-  );
 
-  const enqueue = useCallback(
-    (variant: 'error' | 'success' | 'warning' | 'info') =>
-      (message: SnackbarMessage, timeout = 5000, options: OptionsObject = {}) =>
-        enqueueSnackbar(message, {
-          variant,
-          autoHideDuration: timeout,
-          ...snackBarOptions,
-          ...options,
-          SnackbarProps: {
-            ...(options.SnackbarProps ?? {}),
-            onClick: options.SnackbarProps?.onClick
-              ? e => {
-                  options.SnackbarProps?.onClick(e);
-                  snackBarOptions.SnackbarProps.onClick(e);
-                }
-              : snackBarOptions.SnackbarProps.onClick
+  const show = useCallback(
+    (variant: AppSnackbarVariant, message: SnackbarMessage, timeout = 5000, options: OptionsObject = {}) => {
+      enqueueSnackbar(message, {
+        preventDuplicate: true,
+        variant,
+        autoHideDuration: timeout,
+        anchorOrigin: {
+          vertical: 'bottom',
+          horizontal: 'center'
+        },
+        ...options,
+        SnackbarProps: {
+          ...options.SnackbarProps,
+          onClick: e => {
+            options.SnackbarProps?.onClick?.(e);
+            closeSnackbar();
           }
-        }),
-    [enqueueSnackbar, snackBarOptions]
+        }
+      });
+    },
+    [enqueueSnackbar, closeSnackbar]
   );
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const showErrorMessage = useCallback(enqueue('error'), [enqueue]);
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const showWarningMessage = useCallback(enqueue('warning'), [enqueue]);
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const showSuccessMessage = useCallback(enqueue('success'), [enqueue]);
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const showInfoMessage = useCallback(enqueue('info'), [enqueue]);
-
-  return useMemo(
-    () => ({
-      showErrorMessage,
-      showWarningMessage,
-      showSuccessMessage,
-      showInfoMessage,
-      closeSnackbar
-    }),
-    [closeSnackbar, showErrorMessage, showInfoMessage, showSuccessMessage, showWarningMessage]
+  const showErrorMessage: AppSnackbarShowMessage = useCallback(
+    (message, timeout, options) => show('error', message, timeout, options),
+    [show]
   );
-}
+
+  const showWarningMessage: AppSnackbarShowMessage = useCallback(
+    (message, timeout, options) => show('warning', message, timeout, options),
+    [show]
+  );
+
+  const showSuccessMessage: AppSnackbarShowMessage = useCallback(
+    (message, timeout, options) => show('success', message, timeout, options),
+    [show]
+  );
+
+  const showInfoMessage: AppSnackbarShowMessage = useCallback(
+    (message, timeout, options) => show('info', message, timeout, options),
+    [show]
+  );
+
+  return {
+    closeSnackbar,
+    showErrorMessage,
+    showInfoMessage,
+    showSuccessMessage,
+    showWarningMessage
+  };
+};

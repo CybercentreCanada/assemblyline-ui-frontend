@@ -1,5 +1,5 @@
 import { Grid, Skeleton, useMediaQuery, useTheme } from '@mui/material';
-import useALContext from 'core/config/useALContext';
+import useALContext from 'deprecated/hooks/useALContext';
 import type { File as FileInfo } from 'models/base/file';
 import type { Section } from 'models/base/result';
 import type { KeyValueBody, OrderedKeyValueBody } from 'models/base/result_body';
@@ -136,7 +136,7 @@ const WrappedURIIdentificationSection: React.FC<URIIdentificationSectionProps> =
           <span style={{ fontWeight: 500, marginRight: theme.spacing(0.5), display: 'flex' }}>{t('hostname')}</span>
         </Grid>
         <Grid size={{ xs: 8, sm: 9, lg: 10 }} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
-          {fileinfo.uri_info.hostname}
+          {fileinfo?.uri_info ? fileinfo.uri_info.hostname : <Skeleton />}
         </Grid>
 
         {fileinfo?.uri_info?.port && (

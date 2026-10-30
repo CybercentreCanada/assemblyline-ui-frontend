@@ -6,13 +6,13 @@ import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import type { InputAdornmentProps } from '@mui/material';
 import { CircularProgress, InputAdornment, Tooltip, useTheme } from '@mui/material';
-import { usePropStore } from 'features/prop-provider/prop-provider.providers';
+import { usePropStore } from 'features/prop-provider';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { ButtonProps } from 'ui/buttons/Button';
 import { Button } from 'ui/buttons/Button';
 import { IconButton } from 'ui/buttons/IconButton';
-import { useInputBlur, useInputChange } from 'ui/inputs/hooks/inputs.hook.event_handlers.tsx';
+import { useInputBlur, useInputChange } from 'ui/inputs/hooks/inputs.hook.event_handlers';
 import {
   useInputId,
   useShouldRenderAdornments,
@@ -24,8 +24,8 @@ import {
   useShouldRenderPassword,
   useShouldRenderProgress,
   useShouldRenderReset
-} from 'ui/inputs/hooks/inputs.hook.renderer.tsx';
-import type { InputControllerProps } from 'ui/inputs/models/inputs.model.ts';
+} from 'ui/inputs/hooks/inputs.hook.renderer';
+import type { InputControllerProps } from 'ui/inputs/models/inputs.model';
 
 export type InputButtonAdornmentProps = {
   variant?: 'icon' | 'text';
@@ -202,7 +202,7 @@ export const HelpInputAdornment = React.memo(({ variant = 'icon' }: InputButtonA
         color="secondary"
         disabled={disabled}
         tabIndex={-1}
-        to={helpLink}
+        {...(helpLink && { nav: nav => nav.to().create(helpLink), navDeps: [helpLink] })}
         tooltip={
           <>
             <span style={{ color: theme.palette.text.secondary }}>{t('adornment.help.tooltip')}</span>
@@ -233,7 +233,7 @@ export const HelpInputAdornment = React.memo(({ variant = 'icon' }: InputButtonA
         disableElevation
         size="small"
         tabIndex={-1}
-        to={helpLink}
+        {...(helpLink && { nav: nav => nav.to().create(helpLink), navDeps: [helpLink] })}
         tooltip={
           <>
             <span style={{ color: theme.palette.text.secondary }}>{t('adornment.help.tooltip')}</span>

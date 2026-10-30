@@ -1,10 +1,10 @@
 import { Divider, Skeleton, Typography, useTheme } from '@mui/material';
-import type { Verdict } from 'models/base/alert';
 import type { SubmissionReport } from 'models/api/submission_report';
-import ResultSection from 'ui/ResultCard/result_section';
+import type { Verdict } from 'models/base/alert';
 import type { CSSProperties } from 'react';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import ResultSection from 'ui/ResultCard/result_section';
 
 type HeuristicsListProps = {
   verdict: Verdict;

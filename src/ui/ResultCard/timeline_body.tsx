@@ -8,7 +8,7 @@ import {
   TimelineSeparator
 } from '@mui/lab';
 import { Tooltip, Typography, useTheme } from '@mui/material';
-import useALContext from 'core/config/useALContext';
+import useALContext from 'deprecated/hooks/useALContext';
 import type { TimelineBody as TimelineData } from 'models/base/result_body';
 import React, { useMemo } from 'react';
 import { AiOutlineFile, AiOutlineFileImage, AiOutlineFileUnknown, AiOutlineFileZip } from 'react-icons/ai';
@@ -83,7 +83,6 @@ const TimelineBodyComponent: React.FC<Props> = ({ body }) => {
             <TimelineItem key={title + idx}>
               {opposite && (
                 <TimelineOppositeContent
-                  variant="body2"
                   sx={{
                     alignSelf: 'center',
                     whiteSpace: 'nowrap',
@@ -91,7 +90,9 @@ const TimelineBodyComponent: React.FC<Props> = ({ body }) => {
                     textOverflow: 'ellipsis'
                   }}
                 >
-                  {opposite}
+                  <Typography variant="body2" component="span">
+                    {opposite}
+                  </Typography>
                 </TimelineOppositeContent>
               )}
 

@@ -1,7 +1,8 @@
-import type { AppUser } from 'core/template/components/app/AppUserService';
-import type { ClassificationDefinition } from 'features/classification/classification.utils';
-import type { ClassificationAliases } from 'layout/auth/auth.hooks';
-import type { Indexes, SystemMessage } from 'models/api/user';
+import type { AppUser } from '@tui/core';
+import type { SystemMessage } from '@tui/notis';
+import type { ClassificationAliases, ClassificationDefinition } from 'features/classification';
+import { DEFAULT_CLASSIFICATION_ALIASES, DEFAULT_CLASSIFICATION_DEFINITION } from 'features/classification';
+import type { Indexes } from 'models/api/user';
 import { CONFIGURATION, type Configuration } from 'models/base/config';
 import type { User } from 'models/base/user';
 import type { UserSettings } from 'models/base/user_settings';
@@ -82,6 +83,8 @@ const DEFAULT_USER_SETTINGS: UserSettings = {
 };
 
 export const DEFAULT_APP_CONFIG_STORE: AppConfigStore = {
+  c12nDef: DEFAULT_CLASSIFICATION_DEFINITION,
+  classificationAliases: DEFAULT_CLASSIFICATION_ALIASES,
   configuration: CONFIGURATION,
   indexes: DEFAULT_INDEXES,
   settings: DEFAULT_USER_SETTINGS,

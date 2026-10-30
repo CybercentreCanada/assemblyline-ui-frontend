@@ -13,11 +13,11 @@ import {
   useTheme
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import { AppLink } from 'core/router';
 import type { Submission } from 'models/base/submission';
-import { getErrorIDFromKey, getErrorTypeFromKey, getHashFromKey, getServiceFromKey } from 'shared/utils/errors';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { getErrorIDFromKey, getErrorTypeFromKey, getHashFromKey, getServiceFromKey } from 'shared/utils/errors';
 
 const MAX_ERROR_COUNT = 500;
 
@@ -130,9 +130,11 @@ const Errors = ({ sid = null, service = null, errors = [] }: ErrorsProps) => {
           &nbsp;::&nbsp;
           <strong>
             <MaterialLink
-              component={Link}
+              component={AppLink}
               color={theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark}
-              to={`/submission/detail/${sid}/${getHashFromKey(errors[0])}`}
+              nav={nav => nav.to().create({ route: '/file/detail/:id', path: { id: getHashFromKey(errors[0]) } })}
+              navDeps={[errors[0]]}
+              sx={{ textAlign: 'left' }}
             >
               {getHashFromKey(errors[0])}
             </MaterialLink>
@@ -173,9 +175,11 @@ const Errors = ({ sid = null, service = null, errors = [] }: ErrorsProps) => {
                     &nbsp;::&nbsp;
                     <strong>
                       <MaterialLink
-                        component={Link}
+                        component={AppLink}
                         color={theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark}
-                        to={`/submission/detail/${sid}/${getHashFromKey(error)}`}
+                        nav={nav => nav.to().create({ route: '/file/detail/:id', path: { id: getHashFromKey(error) } })}
+                        navDeps={[error]}
+                        sx={{ textAlign: 'left' }}
                       >
                         {getHashFromKey(error)}
                       </MaterialLink>

@@ -1,35 +1,25 @@
-import type { UndefinedInitialDataOptions } from '@tanstack/react-query';
-import type { ALRequests, ALResponses } from 'app/core.api';
-import type { APIQueryKey, APIResponse } from 'core/api/api.models.ts';
-import type { UseAPICallFnProps } from 'core/api/hooks/useApiCallFn';
-import type { UseAPIQueryProps } from 'core/api/hooks/useApiQuery';
-import { useAPIQuery } from 'core/api/hooks/useApiQuery';
+import type { ApiResponse } from 'core/api/api.models';
+import type { UseApiCallFnProps } from 'core/api/hooks/useApiCallFn';
+import type { UseApiQueryProps } from 'core/api/hooks/useApiQuery';
+import { useApiQuery } from 'core/api/hooks/useApiQuery';
 
-export type UseALQueryProps<Request extends ALRequests> = {
-  queryProps?: Omit<
-    UndefinedInitialDataOptions<
-      APIResponse<ALResponses<Request>>,
-      APIResponse<string>,
-      APIResponse<ALResponses<Request>>,
-      APIQueryKey
-    >,
-    'queryKey' | 'queryFn'
-  >;
+export type UseAppQueryProps<Request extends ApiRequests> = {
+  queryProps?: UseApiQueryProps<ApiResponses<Request>, Request, string>['queryProps'];
   allowCache?: boolean;
   delay?: number;
   disabled?: boolean;
   retryAfter?: number;
-} & UseAPICallFnProps<APIResponse<ALResponses<Request>>, Request>;
+} & UseApiCallFnProps<ApiResponse<ApiResponses<Request>>, Request>;
 
-export const useALQuery = <Request extends ALRequests>({
+export const useAppQuery = <Request extends ApiRequests>({
   url,
   method = 'GET',
   body = null,
   allowCache = false,
   disabled = false,
   ...props
-}: UseALQueryProps<Request>) =>
-  useAPIQuery<ALResponses<Request>, Request, string>({
+}: UseAppQueryProps<Request>) =>
+  useApiQuery<ApiResponses<Request>, Request, string>({
     url:
       method !== 'GET'
         ? url
@@ -41,4 +31,4 @@ export const useALQuery = <Request extends ALRequests>({
     disabled,
     allowCache,
     ...props
-  } as UseAPIQueryProps<ALResponses<Request>, Request, string>);
+  } as UseApiQueryProps<ApiResponses<Request>, Request, string>);

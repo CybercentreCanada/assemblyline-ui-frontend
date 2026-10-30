@@ -1,8 +1,8 @@
-import useALContext from 'core/config/useALContext';
-import { useTableOfContent } from 'features/table-of-content/table-of-content.providers';
-import React, { useCallback, useEffect } from 'react';
-import { useParams } from 'react-router';
-import ForbiddenPage from 'routes/forbidden/forbidden.route';
+import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
+import { useAppConfigStore } from 'core/config';
+import { createAppRoute, useAppPathParams } from 'core/router';
+import { TableOfContentLayout, useTableOfContent } from 'features/table-of-content';
+import { memo, useCallback, useEffect } from 'react';
 import { DefaultMetadataSection } from 'routes/settings/components/DefaultMetadata';
 import { ExternalSourcesSection } from 'routes/settings/components/ExternalSources';
 import { HeaderSection } from 'routes/settings/components/Header';
@@ -11,20 +11,18 @@ import { LeftNav } from 'routes/settings/components/LeftNav';
 import { RightNav } from 'routes/settings/components/RightNav';
 import { ServicesSection } from 'routes/settings/components/Services';
 import { SubmissionOptionsSection, SubmissionProfileDescription } from 'routes/settings/components/Submission';
-import type { SettingsStore } from 'routes/settings/settings.form.ts';
-import { useForm } from 'routes/settings/settings.form.ts';
-import { initializeSettings, loadDefaultProfile, loadSubmissionProfile } from 'routes/settings/settings.utils.ts';
+import { FormProvider, useForm } from 'routes/settings/settings.form';
+import { initializeSettings, loadDefaultProfile, loadSubmissionProfile } from 'routes/settings/settings.utils';
+import { ForbiddenRedirect } from 'ui/layouts/ForbiddenRedirect';
 import { PageLayout } from 'ui/layouts/PageLayout';
 
-type Params = {
-  tab: SettingsStore['state']['tab'];
-};
-
-const WrappedSettingsRoute = () => {
+const WrappedSettingsPage = memo(() => {
   const form = useForm();
   const { rootRef, headerRef } = useTableOfContent();
-  const { tab: tabParam } = useParams<Params>();
-  const { user: currentUser, configuration, settings } = useALContext();
+  const { tab: tabParam } = useAppPathParams<'/settings/:tab'>();
+  const currentUser = useAppConfigStore(s => s.user);
+  const configuration = useAppConfigStore(s => s.configuration);
+  const settings = useAppConfigStore(s => s.settings);
 
   const handleProfileChange = useCallback(() => {
     let s = form.getFieldValue('settings');
@@ -56,36 +54,77 @@ const WrappedSettingsRoute = () => {
     handleProfileChange();
   }, [currentUser.is_admin, currentUser.roles, form, handleProfileChange, settings]);
 
-  if (!currentUser.is_admin && !currentUser.roles.includes('self_manage')) return <ForbiddenPage />;
-  else
-    return (
-      <form.Subscribe
-        selector={state => [state.values.state.tab, !!state.values.settings] as const}
-        children={([tab, hasSettings]) => (
-          <PageLayout
-            rootRef={rootRef}
-            headerRef={headerRef}
-            header={!hasSettings ? null : <HeaderSection />}
-            leftNav={!hasSettings ? null : <LeftNav />}
-            rightNav={!hasSettings ? null : <RightNav />}
-          >
-            {!hasSettings ? null : tab in settings.submission_profiles ? (
-              <>
-                <SubmissionProfileDescription />
-                <SubmissionOptionsSection />
-                <ServicesSection />
-              </>
-            ) : (
-              <>
-                <InterfaceSection />
-                <ExternalSourcesSection />
-                <DefaultMetadataSection />
-              </>
-            )}
-          </PageLayout>
-        )}
-      />
-    );
-};
+  return !currentUser.is_admin && !currentUser.roles.includes('self_manage') ? (
+    <ForbiddenRedirect />
+  ) : (
+    <form.Subscribe
+      selector={state => [state.values.state.tab, !!state.values.settings] as const}
+      children={([tab, hasSettings]) => (
+        <PageLayout
+          rootRef={rootRef}
+          headerRef={headerRef}
+          header={!hasSettings ? null : <HeaderSection />}
+          leftNav={!hasSettings ? null : <LeftNav />}
+          rightNav={!hasSettings ? null : <RightNav />}
+        >
+          {!hasSettings ? null : tab in settings.submission_profiles ? (
+            <>
+              <SubmissionProfileDescription />
+              <SubmissionOptionsSection />
+              <ServicesSection />
+            </>
+          ) : (
+            <>
+              <InterfaceSection />
+              <ExternalSourcesSection />
+              <DefaultMetadataSection />
+            </>
+          )}
+        </PageLayout>
+      )}
+    />
+  );
+});
+WrappedSettingsPage.displayName = 'WrappedSettingsPage';
 
-export const SettingsRoute = React.memo(WrappedSettingsRoute);
+const SettingsPage = memo(() => (
+  <TableOfContentLayout>
+    <FormProvider>
+      <WrappedSettingsPage />
+    </FormProvider>
+  </TableOfContentLayout>
+));
+SettingsPage.displayName = 'SettingsPage';
+
+export const SettingsRoute = createAppRoute({
+  component: SettingsPage,
+
+  path: '/settings/:tab',
+  params: s => ({
+    tab: s.string()
+  }),
+
+  ancestor: null,
+  shortname: location => ['app_route.settings_tab.shortname', { ns: 'settings', tab: location.path.tab }],
+  fullname: location => ['app_route.settings_tab.fullname', { ns: 'settings', tab: location.path.tab }],
+  shorticon: () => <SettingsOutlinedIcon />,
+  fullicon: () => <SettingsOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.is_admin && !config.user.roles.includes('self_manage')
+});
+
+export const SettingsRootRoute = createAppRoute({
+  component: SettingsPage,
+
+  path: '/settings',
+
+  ancestor: null,
+  shortname: () => ['app_route.settings_root.shortname', { ns: 'settings' }],
+  fullname: () => ['app_route.settings_root.fullname', { ns: 'settings' }],
+  shorticon: () => <SettingsOutlinedIcon />,
+  fullicon: () => <SettingsOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.is_admin && !config.user.roles.includes('self_manage')
+});

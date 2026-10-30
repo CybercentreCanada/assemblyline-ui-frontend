@@ -1,21 +1,90 @@
-import { useAppConfigs, useAppUser } from 'core/template/components/app/hooks';
-import PageCenter from 'core/template/components/pages/PageCenter';
-import type { CustomUser } from 'models/api/user';
-import LinkGrid from 'ui/linkgrid';
+import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
+import LinkIcon from '@mui/icons-material/Link';
+import { Button, useTheme } from '@mui/material';
+import { useAppTemplateLeftNav } from 'app/core.template';
+import { getAppConfigStateFromApi, useAppConfigStoreApi } from 'core/config';
+import {
+  AppLink,
+  AppRouteName,
+  createAppRoute,
+  findAppRouteFromPath,
+  getAppLocationParamStateFromApi,
+  useAppLocationParamStoreApi
+} from 'core/router';
+import { AppPageCenter } from 'core/template';
+import React, { memo, useMemo } from 'react';
 
-export default function Help() {
-  const { preferences: layout } = useAppConfigs();
-  const { validateProps } = useAppUser<CustomUser>();
-  let items = [];
-  for (const item of layout.leftnav.elements) {
-    if (item.type === 'group' && item.element.id === 'help') {
-      items = item.element['items'].filter(obj => validateProps(obj.userPropValidators));
-    }
-  }
+export const HelpPage = memo(() => {
+  const theme = useTheme();
+  const configStoreApi = useAppConfigStoreApi();
+  const locationParamStoreApi = useAppLocationParamStoreApi();
+  const leftNav = useAppTemplateLeftNav();
+
+  const items = useMemo(() => {
+    const configState = getAppConfigStateFromApi(configStoreApi);
+    const locationState = getAppLocationParamStateFromApi(locationParamStoreApi);
+    const section = leftNav.find(item => item.link?.route === '/help');
+
+    return (section?.items ?? []).map(item => {
+      const route = item.link?.route ? findAppRouteFromPath(locationState, item.link.route as never) : null;
+
+      return {
+        nav: nav => nav.to().only(item.link),
+        icon: route?.shorticon?.(item?.link, configState),
+        label: <AppRouteName name={route?.shortname?.(item?.link, configState)} />
+      };
+    });
+  }, [configStoreApi, locationParamStoreApi, leftNav]);
 
   return (
-    <PageCenter margin={4} width="100%">
-      <LinkGrid items={items} />
-    </PageCenter>
+    <AppPageCenter>
+      <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-around' }}>
+        {items.map((item, i) => {
+          const icon = React.isValidElement(item.icon)
+            ? (item.icon as React.ReactElement<{ style?: React.CSSProperties }>)
+            : null;
+
+          return (
+            <Button
+              key={i}
+              component={AppLink as React.ElementType}
+              nav={item.nav}
+              sx={{ textTransform: 'none', color: 'text.secondary' }}
+            >
+              <div
+                style={{
+                  height: '300px',
+                  width: '300px',
+                  padding: theme.spacing(10),
+                  textAlign: 'center'
+                }}
+              >
+                {icon ? (
+                  React.cloneElement(icon, { style: { color: theme.palette.text.primary, fontSize: '8rem' } })
+                ) : (
+                  <LinkIcon style={{ fontSize: '8rem' }} />
+                )}
+                <span style={{ fontSize: 'medium' }}>{item.label}</span>
+              </div>
+            </Button>
+          );
+        })}
+      </div>
+    </AppPageCenter>
   );
-}
+});
+
+export const HelpRoute = createAppRoute({
+  component: HelpPage,
+
+  path: '/help',
+
+  ancestor: null,
+  shortname: () => ['app_route.help.shortname', { ns: 'helpServices' }],
+  fullname: () => ['app_route.help.fullname', { ns: 'helpServices' }],
+  shorticon: () => <HelpOutlineOutlinedIcon />,
+  fullicon: () => <HelpOutlineOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
+});

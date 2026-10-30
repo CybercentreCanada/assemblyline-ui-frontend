@@ -2,10 +2,10 @@ import { EnrichedChip } from '@cccsaurora/clue-ui';
 import type { TooltipProps } from '@mui/material';
 import { Tooltip, styled } from '@mui/material';
 import { darken } from '@mui/material/styles';
-import type { CustomChipProps } from 'ui/CustomChip';
-import { COLOR_MAP, SIZE_MAP } from 'ui/CustomChip';
 import type { FC } from 'react';
 import { memo } from 'react';
+import type { CustomChipProps } from 'ui/CustomChip';
+import { COLOR_MAP, SIZE_MAP } from 'ui/CustomChip';
 
 export const CLUE_TYPE_MAP = {
   'network.static.ip': 'ip',

@@ -1,17 +1,77 @@
+import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import CheckOutlinedIcon from '@mui/icons-material/CheckOutlined';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { Box, Card, Collapse, Grid, styled, Typography, useMediaQuery, useTheme } from '@mui/material';
-import Skeleton from '@mui/material/Skeleton';
-import useMyAPI from 'core/api/hooks/useMyAPI';
-import useALContext from 'core/config/useALContext';
-import PageFullWidth from 'core/template/components/pages/PageFullWidth';
-import { memo, useEffect, useState } from 'react';
+import { Box, Card, Collapse, Grid, Skeleton, styled, Typography, useMediaQuery, useTheme } from '@mui/material';
+import { useApiQuery } from 'core/api';
+import { useAppConfigStore } from 'core/config';
+import { createAppRoute } from 'core/router';
+import { AppPageFullWidth } from 'core/template';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import CustomChip from 'ui/CustomChip';
+import { CustomChip } from 'ui/CustomChip';
 import { PageHeader } from 'ui/layouts/PageHeader';
 
 const apiHeight = '48px';
+
+type MethodType = 'DELETE' | 'GET' | 'POST' | 'PUT';
+
+type APIItem = {
+  count_towards_quota?: boolean;
+  complete?: boolean;
+  description?: string;
+  methods?: string[];
+  name: string;
+  path: string;
+  protected?: boolean;
+  require_role?: string[];
+};
+
+type APIDefinition = {
+  apis: APIItem[];
+  blueprints: Record<string, string>;
+};
+
+const METHOD_COLORS: Record<MethodType, 'error' | 'info' | 'success' | 'warning'> = {
+  DELETE: 'error',
+  GET: 'info',
+  POST: 'success',
+  PUT: 'warning'
+};
+
+const USER_COLORS: Record<string, 'default' | 'error' | 'info' | 'success' | 'warning'> = {
+  signature_import: 'success',
+  signature_manage: 'info',
+  signature_view: 'default',
+  signature_download: 'warning',
+  administration: 'error',
+  alert_view: 'default',
+  alert_manage: 'info',
+  archive_view: 'default',
+  archive_download: 'warning',
+  archive_trigger: 'warning',
+  archive_manage: 'info',
+  self_manage: 'info',
+  safelist_view: 'default',
+  safelist_manage: 'info',
+  badlist_view: 'default',
+  badlist_manage: 'info',
+  workflow_view: 'default',
+  workflow_manage: 'info',
+  apikey_access: 'default',
+  obo_access: 'default',
+  bundle_download: 'warning',
+  submission_create: 'success',
+  submission_view: 'default',
+  submission_delete: 'error',
+  submission_manage: 'info',
+  file_detail: 'default',
+  file_download: 'warning',
+  replay_trigger: 'warning',
+  replay_system: 'info'
+};
+
+const SKELETON_ROWS = [...Array(21)];
 
 const Expand = memo(
   styled(ExpandMoreIcon)<{ open?: boolean }>(({ theme, open = false }) => ({
@@ -27,114 +87,79 @@ const Expand = memo(
   }))
 );
 
-export default function ApiDoc() {
-  const { apiCall } = useMyAPI();
-  const [apiSelected, setApiSelected] = useState<string | null>(null);
-  const [apiDefinition, setApiDefinition] = useState(null);
-  const { configuration } = useALContext();
-  const [expandMap, setExpandMap] = useState({});
-  const theme = useTheme();
+//*****************************************************************************************
+// HelpAPI Page
+//*****************************************************************************************
+
+export const HelpAPIPage = memo(() => {
   const { t } = useTranslation(['helpAPI']);
-  const sp1 = theme.spacing(1);
-  const sp2 = theme.spacing(2);
+  const theme = useTheme();
+
+  const [apiSelected, setApiSelected] = useState<string | null>(null);
+  const [expandMap, setExpandMap] = useState<Record<string, boolean>>({});
+
+  const configuration = useAppConfigStore(s => s?.configuration);
+
+  const sp1 = useMemo(() => theme.spacing(1), [theme]);
+  const sp2 = useMemo(() => theme.spacing(2), [theme]);
 
   const downSM = useMediaQuery(theme.breakpoints.down('md'));
   const xs = useMediaQuery(theme.breakpoints.only('xs'));
-  const isDark = theme.palette.mode === 'dark';
-  const methodColor = {
-    DELETE: 'error',
-    GET: 'info',
-    POST: 'success',
-    PUT: 'warning'
-  };
-  const userColor = {
-    signature_import: 'success',
-    signature_manage: 'info',
-    signature_view: 'default',
-    signature_download: 'warning',
-    administration: 'error',
-    alert_view: 'default',
-    alert_manage: 'info',
-    archive_view: 'default',
-    archive_download: 'warning',
-    archive_trigger: 'warning',
-    archive_manage: 'info',
-    self_manage: 'info',
-    safelist_view: 'default',
-    safelist_manage: 'info',
-    badlist_view: 'default',
-    badlist_manage: 'info',
-    workflow_view: 'default',
-    workflow_manage: 'info',
-    apikey_access: 'default',
-    obo_access: 'default',
-    bundle_download: 'warning',
-    submission_create: 'success',
-    submission_view: 'default',
-    submission_delete: 'error',
-    submission_manage: 'info',
-    file_detail: 'default',
-    file_download: 'warning',
-    replay_trigger: 'warning',
-    replay_system: 'info'
-  };
+  const isDark = useMemo(() => theme.palette.mode === 'dark', [theme.palette.mode]);
 
-  function toggleBlueprintExpand(bp) {
-    const newValue = {};
-    newValue[bp] = !expandMap[bp];
-    setExpandMap({ ...expandMap, ...newValue });
-  }
-
-  function blueprintAPIs(bp) {
-    const out = [];
-    if (apiDefinition) {
-      for (const item of apiDefinition.apis) {
-        if (bp === 'documentation') {
-          if (item.path === `/api/${apiSelected}/`) {
-            out.push(item);
-          }
-        } else if (item.path.indexOf(`/api/${apiSelected}/${bp}/`) === 0) {
-          out.push(item);
-        }
-      }
-    }
-    return out.sort(compare);
-  }
-
-  function compare(a, b) {
-    if (a.name < b.name) {
-      return -1;
-    }
-    if (a.name > b.name) {
-      return 1;
-    }
-    return 0;
-  }
+  const { data: apiList, isLoading: isLoadingApiList } = useApiQuery<string[]>({
+    method: 'GET',
+    url: '/api/'
+  });
 
   useEffect(() => {
-    apiCall<string[]>({
-      url: '/api/',
-      onSuccess: api_data => {
-        setApiSelected(api_data.api_response[0]);
-      }
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (!apiSelected && (apiList ?? []).length > 0) {
+      setApiSelected(apiList[0]);
+    }
+  }, [apiList, apiSelected]);
+
+  const { data: apiDefinition, isLoading: isLoadingApiDefinition } = useApiQuery<APIDefinition>({
+    disabled: !apiSelected,
+    method: 'GET',
+    url: `/api/${apiSelected}/`
+  });
+
+  const compareAPIs = useCallback((a: APIItem, b: APIItem) => a.name.localeCompare(b.name), []);
+
+  const toggleBlueprintExpand = useCallback((bp: string) => {
+    setExpandMap(prev => ({ ...prev, [bp]: !prev[bp] }));
   }, []);
 
-  useEffect(() => {
-    if (apiSelected) {
-      apiCall({
-        url: `/api/${apiSelected}/`,
-        onSuccess: api_data => {
-          setApiDefinition(api_data.api_response);
-        }
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [apiSelected]);
+  const getBlueprintAPIs = useCallback(
+    (bp: string) => {
+      if (!apiDefinition || !apiSelected) return [];
+
+      return apiDefinition.apis
+        .filter(item => {
+          if (bp === 'documentation') {
+            return item.path === `/api/${apiSelected}/`;
+          }
+
+          return item.path.startsWith(`/api/${apiSelected}/${bp}/`);
+        })
+        .sort(compareAPIs);
+    },
+    [apiDefinition, apiSelected, compareAPIs]
+  );
+
+  const getMethodColor = useCallback((method: string) => METHOD_COLORS[method as MethodType] ?? 'info', []);
+
+  const getUserColor = useCallback((role: string) => USER_COLORS[role] ?? 'default', []);
+
+  const blueprintKeys = useMemo(() => Object.keys(apiDefinition?.blueprints ?? {}), [apiDefinition]);
+  const isLoading = useMemo(
+    () => isLoadingApiList || isLoadingApiDefinition,
+    [isLoadingApiDefinition, isLoadingApiList]
+  );
+  const enforceQuota = useMemo(() => Boolean(configuration?.ui?.enforce_quota), [configuration?.ui?.enforce_quota]);
 
   return (
-    <PageFullWidth margin={4}>
+    <AppPageFullWidth>
       <div style={{ textAlign: 'left' }}>
         <PageHeader
           primary={t('title')}
@@ -144,22 +169,22 @@ export default function ApiDoc() {
           }}
         />
 
-        {apiDefinition ? (
+        {!isLoading && apiDefinition ? (
           <div style={{ display: 'flex', flexDirection: 'column' }}>
-            {Object.keys(apiDefinition.blueprints).map((bp, i) => (
-              <div key={i}>
+            {blueprintKeys.map(bp => (
+              <div key={bp}>
                 <Box
-                  display="flex"
-                  flexDirection="row"
-                  flexWrap="wrap"
-                  borderBottom={1}
-                  px={1}
                   onClick={() => toggleBlueprintExpand(bp)}
                   sx={{
-                    minHeight: apiHeight,
                     alignItems: 'center',
+                    borderBottom: 1,
+                    minHeight: apiHeight,
                     borderColor: theme.palette.action.disabledBackground,
                     cursor: 'pointer',
+                    display: 'flex',
+                    flexDirection: 'row',
+                    flexWrap: 'wrap',
+                    px: 1,
                     '&:hover': {
                       backgroundColor: theme.palette.action.selected
                     }
@@ -186,17 +211,17 @@ export default function ApiDoc() {
                       backgroundColor: isDark ? theme.palette.grey[900] : theme.palette.grey[100]
                     }}
                   >
-                    {blueprintAPIs(bp).map((api, idx) => (
-                      <div key={idx}>
+                    {getBlueprintAPIs(bp).map(api => (
+                      <div key={api.name}>
                         <Box
-                          px={1}
-                          display="flex"
-                          flexDirection={xs ? 'column' : 'row'}
-                          flexWrap="wrap"
-                          alignItems={xs ? 'flex-start' : 'center'}
                           onClick={() => toggleBlueprintExpand(api.name)}
                           sx={{
+                            alignItems: xs ? 'flex-start' : 'center',
+                            display: 'flex',
+                            flexDirection: xs ? 'column' : 'row',
+                            flexWrap: 'wrap',
                             minHeight: apiHeight,
+                            px: 1,
                             cursor: 'pointer',
                             '&:hover': {
                               backgroundColor: theme.palette.action.selected
@@ -204,9 +229,9 @@ export default function ApiDoc() {
                           }}
                         >
                           <div>
-                            {api.methods.map((method, midx) => (
+                            {(api.methods || []).map((method, midx) => (
                               <CustomChip
-                                color={methodColor[method]}
+                                color={getMethodColor(method)}
                                 type="rounded"
                                 size="small"
                                 key={midx}
@@ -234,7 +259,7 @@ export default function ApiDoc() {
                               {api.name}
                             </Typography>
 
-                            <Expand open={expandMap?.[bp]} />
+                            <Expand open={expandMap?.[api.name]} />
                           </div>
                         </Box>
                         <Collapse in={expandMap[api.name]} timeout="auto" unmountOnExit>
@@ -248,7 +273,7 @@ export default function ApiDoc() {
                               backgroundColor: theme.palette.background.default
                             }}
                           >
-                            <Grid container alignItems="center">
+                            <Grid container sx={{ alignItems: 'center' }}>
                               <>
                                 <Grid size={{ xs: 8, sm: 4, md: 3, lg: 2 }}>
                                   <div style={{ fontWeight: 500 }}>{t('complete')}:</div>
@@ -273,7 +298,7 @@ export default function ApiDoc() {
                                   )}
                                 </Grid>
                               </>
-                              {configuration.ui.enforce_quota && (
+                              {enforceQuota && (
                                 <>
                                   <Grid size={{ xs: 12, sm: 4, md: 3, lg: 2 }}>
                                     <div style={{ fontWeight: 500 }}>{t('quota')}:</div>
@@ -292,10 +317,10 @@ export default function ApiDoc() {
                                   <div style={{ fontWeight: 500 }}>{t('require_role')}:</div>
                                 </Grid>
                                 <Grid size={{ xs: 12, sm: 8, md: 9, lg: 4 }}>
-                                  {api.require_role.map((utype, uidx) => (
+                                  {(api.require_role || []).map((utype, uidx) => (
                                     <CustomChip
                                       key={uidx}
-                                      color={userColor[utype]}
+                                      color={getUserColor(utype)}
                                       type="rounded"
                                       size="tiny"
                                       label={t(`role.${utype}`)}
@@ -308,10 +333,10 @@ export default function ApiDoc() {
                                   <div style={{ fontWeight: 500 }}>{t('methods')}:</div>
                                 </Grid>
                                 <Grid size={{ xs: 12, sm: 8, md: 9, lg: 4 }}>
-                                  {api.methods.map((met, metid) => (
+                                  {(api.methods || []).map((met, metid) => (
                                     <CustomChip
                                       key={metid}
-                                      color={methodColor[met]}
+                                      color={getMethodColor(met)}
                                       type="rounded"
                                       size="tiny"
                                       label={t(met)}
@@ -335,7 +360,7 @@ export default function ApiDoc() {
                                 </Grid>
                                 <Grid size={{ xs: 12 }}>
                                   <Card variant="outlined" style={{ overflowX: 'auto' }}>
-                                    <pre style={{ paddingLeft: sp2, paddingRight: sp2 }}>{api.description}</pre>
+                                    <pre style={{ paddingLeft: sp2, paddingRight: sp2 }}>{api.description || ''}</pre>
                                   </Card>
                                 </Grid>
                               </>
@@ -351,7 +376,7 @@ export default function ApiDoc() {
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column' }}>
-            {[...Array(21)].map((_, i) => (
+            {SKELETON_ROWS.map((_, i) => (
               <div
                 key={i}
                 style={{
@@ -385,6 +410,27 @@ export default function ApiDoc() {
           </div>
         )}
       </div>
-    </PageFullWidth>
+    </AppPageFullWidth>
   );
-}
+});
+
+HelpAPIPage.displayName = 'HelpAPIPage';
+
+//*****************************************************************************************
+// HelpAPI Route
+//*****************************************************************************************
+
+export const HelpAPIRoute = createAppRoute({
+  component: HelpAPIPage,
+
+  path: '/help/api',
+
+  ancestor: '/help',
+  shortname: () => ['app_route.help_api.shortname', { ns: 'helpAPI' }],
+  fullname: () => ['app_route.help_api.fullname', { ns: 'helpAPI' }],
+  shorticon: () => <AssignmentOutlinedIcon />,
+  fullicon: () => <AssignmentOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
+});

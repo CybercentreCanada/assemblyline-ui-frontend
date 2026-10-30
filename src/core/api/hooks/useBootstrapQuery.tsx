@@ -1,27 +1,24 @@
 import type { UndefinedInitialDataOptions } from '@tanstack/react-query';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { DEFAULT_RETRY_MS } from 'app/core.preference';
-import type { APIQueryKey, APIResponse } from 'core/api/api.models.ts';
-import { useAPIStore } from 'core/api/api.providers';
-import { getAPIResponse, isAPIData, stableStringify } from 'core/api/api.utils';
-import type { LoginParamsProps } from 'core/api/hooks/useMyAPI';
-import useALContext from 'core/config/useALContext';
-import useMySnackbar from 'core/snackbar/snackbar.hooks';
-import useQuota from 'layout/quota/quota.hooks';
+import { DEFAULT_APP_PREFERENCE_STORE } from 'app/core.preference';
+import type { ApiQueryKey, ApiResponse } from 'core/api/api.models';
+import { getApiResponse, isApiData, stableStringify } from 'core/api/api.utils';
+import { useAppConfigStore } from 'core/config';
+import { useAppSetInterfaceStore } from 'core/interface';
+import { useAppSnackbar } from 'core/snackbar';
+import type { LoginParamsProps } from 'layout/auth/auth.models';
 import type { CustomUser, WhoAmIProps } from 'models/api/user';
 import type { Configuration } from 'models/base/config';
-import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation } from 'react-router';
-import getXSRFCookie from 'shared/utils/xsrf';
+import { getXSRFCookie } from 'shared/utils/xsrf.utils';
 
 export type UseBootstrapQueryProps = {
   queryProps?: Omit<
     UndefinedInitialDataOptions<
-      APIResponse<Configuration | LoginParamsProps | WhoAmIProps>,
-      APIResponse<Error>,
-      APIResponse<Configuration | LoginParamsProps | WhoAmIProps>,
-      APIQueryKey
+      ApiResponse<Configuration | LoginParamsProps | WhoAmIProps>,
+      ApiResponse<Error>,
+      ApiResponse<Configuration | LoginParamsProps | WhoAmIProps>,
+      ApiQueryKey
     >,
     'queryKey' | 'queryFn'
   >;
@@ -43,29 +40,24 @@ export const useBootstrapQuery = ({
   setUser = () => null,
   setReady = () => null,
   disabled = false,
-  retryAfter = DEFAULT_RETRY_MS,
+  retryAfter = DEFAULT_APP_PREFERENCE_STORE.api.retryTime,
   allowCache = false
 }: UseBootstrapQueryProps) => {
   const queryClient = useQueryClient();
-  const { pathname } = useLocation();
-  const { t } = useTranslation();
-  const { showErrorMessage, closeSnackbar } = useMySnackbar();
-  const { configuration: systemConfig } = useALContext();
-  const { setApiQuotaremaining, setSubmissionQuotaremaining } = useQuota();
-
-  const [disableWhoAmI] = useAPIStore(s => s.disabledWhoAmI);
-
-  const isAuthenticating = useMemo(() => pathname.includes(`/oauth/`) || pathname.includes(`/saml/`), [pathname]);
+  const { t } = useTranslation(['api']);
+  const { showErrorMessage, closeSnackbar } = useAppSnackbar();
+  const configuration = useAppConfigStore(s => s.configuration);
+  const setInterfaceStore = useAppSetInterfaceStore();
 
   const query = useQuery<
-    APIResponse<Configuration | LoginParamsProps | WhoAmIProps>,
-    APIResponse<Error>,
-    APIResponse<Configuration | LoginParamsProps | WhoAmIProps>,
-    APIQueryKey
+    ApiResponse<Configuration | LoginParamsProps | WhoAmIProps>,
+    ApiResponse<Error>,
+    ApiResponse<Configuration | LoginParamsProps | WhoAmIProps>,
+    ApiQueryKey
   >(
     {
       ...queryProps,
-      enabled: !disabled && !isAuthenticating && !disableWhoAmI,
+      enabled: !disabled,
       queryKey: ['/api/v4/user/whoami/', 'GET', stableStringify(null), allowCache],
       retry: (failureCount, error) => failureCount < 1 || error?.api_status_code === 502,
       retryDelay: failureCount => Math.min(retryAfter * (failureCount + 1), 10000),
@@ -85,33 +77,43 @@ export const useBootstrapQuery = ({
 
         // Setting the API quota
         const apiQuota = res.headers.get('X-Remaining-Quota-Api');
-        if (apiQuota) setApiQuotaremaining(parseInt(apiQuota));
+        if (apiQuota) {
+          setInterfaceStore(s => {
+            s.quota.api = parseInt(apiQuota);
+            return s;
+          });
+        }
 
         // Setting the Submission quota
         const submissionQuota = res.headers.get('X-Remaining-Quota-Submission');
-        if (submissionQuota) setSubmissionQuotaremaining(parseInt(submissionQuota));
+        if (submissionQuota) {
+          setInterfaceStore(s => {
+            s.quota.submission = parseInt(submissionQuota);
+            return s;
+          });
+        }
 
         // Handle an unreachable API
         if (res.status === 502) {
-          showErrorMessage(t('api.unreachable'), 10000);
+          showErrorMessage(t('unreachable'), 10000);
           return Promise.reject({
-            api_error_message: t('api.unreachable'),
+            api_error_message: t('unreachable'),
             api_response: '',
-            api_server_version: systemConfig.system.version,
+            api_server_version: configuration?.system?.version,
             api_status_code: 502
           });
         }
 
-        const json = (await res.json()) as APIResponse<Configuration | LoginParamsProps | WhoAmIProps>;
+        const json = (await res.json()) as ApiResponse<Configuration | LoginParamsProps | WhoAmIProps>;
 
         // Check for an invalid json format
-        if (!isAPIData(json)) {
-          showErrorMessage(t('api.invalid'), 30000);
+        if (!isApiData(json)) {
+          showErrorMessage(t('invalid'), 30000);
           switchRenderedApp('load');
           return Promise.reject({
-            api_error_message: t('api.invalid'),
+            api_error_message: t('invalid'),
             api_response: '',
-            api_server_version: systemConfig.system.version,
+            api_server_version: configuration?.system?.version,
             api_status_code: 400
           });
         }
@@ -120,23 +122,15 @@ export const useBootstrapQuery = ({
 
         // Forbiden response indicate that the user's account is locked.
         if (res.status === 403) {
-          if (retryAfter !== DEFAULT_RETRY_MS) closeSnackbar();
-
-          if (json?.api_error_message?.includes('Invalid XSRF token')) {
-            sessionStorage.clear();
-            setConfiguration(json.api_response as Configuration);
-            switchRenderedApp('login');
-            return Promise.reject(json);
-          } else {
-            setConfiguration(json.api_response as Configuration);
-            switchRenderedApp('locked');
-            return Promise.reject(json);
-          }
+          if (retryAfter !== DEFAULT_APP_PREFERENCE_STORE.api.retryTime) closeSnackbar();
+          setConfiguration(json.api_response as Configuration);
+          switchRenderedApp('locked');
+          return Promise.reject(json);
         }
 
         // Unauthorized response indicate that the user is not logged in.
         if (res.status === 401) {
-          if (retryAfter !== DEFAULT_RETRY_MS) closeSnackbar();
+          if (retryAfter !== DEFAULT_APP_PREFERENCE_STORE.api.retryTime) closeSnackbar();
           localStorage.setItem('loginParams', JSON.stringify(json.api_response));
           sessionStorage.clear();
           setLoginParams(json.api_response as LoginParamsProps);
@@ -157,7 +151,7 @@ export const useBootstrapQuery = ({
         }
 
         if (res.status === 200) {
-          if (retryAfter !== DEFAULT_RETRY_MS) closeSnackbar();
+          if (retryAfter !== DEFAULT_APP_PREFERENCE_STORE.api.retryTime) closeSnackbar();
 
           const user = json.api_response as WhoAmIProps;
 
@@ -185,7 +179,7 @@ export const useBootstrapQuery = ({
     queryClient
   );
 
-  const { data, error, serverVersion, statusCode } = getAPIResponse(query.data, query.error, query.failureReason);
+  const { data, error, serverVersion, statusCode } = getApiResponse(query.data, query.error, query.failureReason);
 
   return {
     ...query,

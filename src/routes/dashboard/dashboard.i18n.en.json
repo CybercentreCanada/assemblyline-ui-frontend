@@ -1,6 +1,8 @@
 {
   "alerter": "Alerter Metrics",
   "alerter.error": "Alerter is generating errors",
+  "app_route.dashboard.fullname": "Dashboard",
+  "app_route.dashboard.shortname": "Dashboard",
   "archive.error.exception": "Archiver is generating uncaught exceptions",
   "archive.error.invalid": "Archiver is receiving invalid messages",
   "archive.error.not_found": "Archiver is trying to archive missing documents",

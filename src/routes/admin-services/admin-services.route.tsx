@@ -1,3 +1,4 @@
+import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import CloudDownloadOutlinedIcon from '@mui/icons-material/CloudDownloadOutlined';
 import RestoreOutlinedIcon from '@mui/icons-material/RestoreOutlined';
@@ -14,44 +15,33 @@ import {
   TextField,
   Tooltip,
   Typography,
-  useMediaQuery,
   useTheme
 } from '@mui/material';
-import useMyAPI from 'core/api/hooks/useMyAPI';
-import { invalidateAPIQuery } from 'core/api/utils/invalidateApiQuery';
-import useALContext from 'core/config/useALContext';
-import useMySnackbar from 'core/snackbar/snackbar.hooks';
-import { useAppUser } from 'core/template/components/app/hooks';
-import PageFullWidth from 'core/template/components/pages/PageFullWidth';
-import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
-import useDrawer from 'layout/drawer/drawer.hooks';
-import type { JSONFeedItem } from 'layout/notifications/notifications.hooks';
-import { useNotificationFeed } from 'layout/notifications/notifications.hooks';
-import type { CustomUser } from 'models/api/user';
+import { invalidateApiQuery } from 'core/api';
+import { createAppRoute } from 'core/router';
+import { AppPageFullWidth } from 'core/template';
+import useALContext from 'deprecated/hooks/useALContext';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useMySnackbar from 'deprecated/hooks/useMySnackbar';
+import type { JSONFeedItem } from 'layout/notifications';
+import { fetchJSONNotifications } from 'layout/notifications/notifications.utils';
 import type { ServiceIndexed, ServiceUpdateData, ServiceUpdates } from 'models/base/service';
 import type { ChangeEvent } from 'react';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate, useLocation, useNavigate } from 'react-router';
-import ServiceDetail from 'routes/admin-service-detail/admin-service-detail.route';
 import CommunityServiceTable from 'routes/admin-services/components/CommunityServiceTable';
 import NewServiceTable from 'routes/admin-services/components/NewServiceTable';
-import ServiceTable from 'routes/search/components/service';
+import { ServiceTable } from 'routes/search/components/service';
 import { FileDownloader } from 'ui/buttons/FileDownloader';
 import ConfirmationDialog from 'ui/ConfirmationDialog';
 import { PageHeader } from 'ui/layouts/PageHeader';
 
-export default function Services() {
+export const AdminServicesPage = memo(() => {
   const { t } = useTranslation(['adminServices']);
   const theme = useTheme();
-  const location = useLocation();
-  const navigate = useNavigate();
-  const { configuration } = useALContext();
-  const { fetchJSONNotifications } = useNotificationFeed();
+  const { configuration, user: currentUser } = useALContext();
   const { apiCall } = useMyAPI();
-  const { user: currentUser } = useAppUser<CustomUser>();
   const { showSuccessMessage, showInfoMessage, showErrorMessage } = useMySnackbar();
-  const { setGlobalDrawer, closeGlobalDrawer, globalDrawerOpened } = useDrawer();
 
   const [serviceResults, setServiceResults] = useState<ServiceIndexed[]>(null);
   const [updates, setUpdates] = useState<ServiceUpdates>(null);
@@ -69,8 +59,6 @@ export default function Services() {
 
   const lastInstallingServices = useRef<string[]>([]);
   const installingServicesTimeout = useRef<NodeJS.Timeout>(null);
-
-  const isXL = useMediaQuery(theme.breakpoints.only('xl'));
 
   const serviceNames = useMemo<string[]>(
     () =>
@@ -120,7 +108,7 @@ export default function Services() {
         showSuccessMessage(t('add.success'));
         closeServiceDialog();
         setTimeout(() => reload(), 1000);
-        invalidateAPIQuery(({ url }) => '/api/v4/user/whoami/' === url, 3000);
+        invalidateApiQuery(({ url }) => '/api/v4/user/whoami/' === url, 3000);
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -137,7 +125,7 @@ export default function Services() {
         closeRestoreDialog();
         setRestoreConfirmation(false);
         setTimeout(() => reload(), 1000);
-        invalidateAPIQuery(({ url }) => '/api/v4/user/whoami/' === url, 3000);
+        invalidateApiQuery(({ url }) => '/api/v4/user/whoami/' === url, 3000);
       },
       onEnter: () => setWaitingDialog(true),
       onExit: () => setWaitingDialog(false)
@@ -173,7 +161,7 @@ export default function Services() {
           const newUpdates = { ...updates };
           newUpdates[svc] = { ...newUpdates[svc], updating: true };
           setUpdates(newUpdates);
-          invalidateAPIQuery(({ url }) => '/api/v4/user/whoami/' === url, 3000);
+          invalidateApiQuery(({ url }) => '/api/v4/user/whoami/' === url, 3000);
         }
       });
     },
@@ -195,7 +183,7 @@ export default function Services() {
             delete newUpdates[srv];
           }
           setUpdates(newUpdates);
-          invalidateAPIQuery(({ url }) => '/api/v4/user/whoami/' === url, 3000);
+          invalidateApiQuery(({ url }) => '/api/v4/user/whoami/' === url, 3000);
         }
       });
     },
@@ -217,19 +205,7 @@ export default function Services() {
     [pollInstalling]
   );
 
-  const onUpdated = useCallback(() => {
-    if (!isXL) closeGlobalDrawer();
-    setTimeout(() => window.dispatchEvent(new CustomEvent('reloadServicesEvent')), 1000);
-    invalidateAPIQuery(({ url }) => '/api/v4/user/whoami/' === url, 3000);
-  }, [closeGlobalDrawer, isXL]);
-
-  const onDeleted = useCallback(() => {
-    closeGlobalDrawer();
-    setTimeout(() => window.dispatchEvent(new CustomEvent('reloadServicesEvent')), 1000);
-    invalidateAPIQuery(({ url }) => '/api/v4/user/whoami/' === url, 3000);
-  }, [closeGlobalDrawer]);
-
-  useEffectOnce(() => {
+  useEffect(() => {
     if (currentUser.is_admin) {
       reload();
       pollInstalling(true);
@@ -238,31 +214,7 @@ export default function Services() {
     return () => {
       window.removeEventListener('reloadServicesEvent', reload);
     };
-  });
-
-  useEffect(() => {
-    if (serviceResults !== null && !globalDrawerOpened && location.hash) {
-      navigate(`${location.pathname}${location.search ? location.search : ''}`);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [globalDrawerOpened]);
-
-  useEffect(() => {
-    if (location.hash) {
-      setGlobalDrawer(<ServiceDetail name={location.hash.slice(1)} onDeleted={onDeleted} onUpdated={onUpdated} />);
-    } else {
-      closeGlobalDrawer();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location.hash, serviceNames]);
-
-  const setService = useCallback(
-    (service_name: string) => {
-      navigate(`${location.pathname}${location.search ? location.search : ''}#${service_name}`);
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [location.pathname, location.search]
-  );
+  }, []);
 
   useEffect(() => {
     fetchJSONNotifications({
@@ -331,8 +283,8 @@ export default function Services() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [installingServices, showErrorMessage, showInfoMessage, showSuccessMessage, t]);
 
-  return currentUser.is_admin ? (
-    <PageFullWidth margin={4}>
+  return (
+    <AppPageFullWidth>
       <ConfirmationDialog
         open={restoreConfirmation}
         handleClose={() => setRestoreConfirmation(false)}
@@ -500,7 +452,7 @@ export default function Services() {
         </Grid>
       </Grid>
       <div style={{ paddingTop: theme.spacing(2) }}>
-        <ServiceTable serviceResults={serviceResults} updates={updates} setService={setService} onUpdate={onUpdate} />
+        <ServiceTable serviceResults={serviceResults} updates={updates} onUpdate={onUpdate} />
       </div>
 
       <Grid container alignItems="center" spacing={3} style={{ marginTop: theme.spacing(2) }}>
@@ -542,8 +494,21 @@ export default function Services() {
           onInstall={onInstallServices}
         />
       </div>
-    </PageFullWidth>
-  ) : (
-    <Navigate to="/forbidden" replace />
+    </AppPageFullWidth>
   );
-}
+});
+
+export const AdminServicesRoute = createAppRoute({
+  component: AdminServicesPage,
+
+  path: '/admin/services',
+
+  ancestor: '/admin',
+  shortname: () => ['app_route.admin_services.shortname', { ns: 'adminServices' }],
+  fullname: () => ['app_route.admin_services.fullname', { ns: 'adminServices' }],
+  shorticon: () => <AccountTreeOutlinedIcon />,
+  fullicon: () => <AccountTreeOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.is_admin
+});

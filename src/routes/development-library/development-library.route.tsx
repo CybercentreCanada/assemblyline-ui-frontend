@@ -1,55 +1,59 @@
-import useALContext from 'core/config/useALContext';
-import { TableOfContentProvider, useTableOfContent } from 'features/table-of-content/table-of-content.providers';
-import React, { useCallback, useEffect, useMemo } from 'react';
-import { Navigate, useLocation, useNavigate } from 'react-router';
-import type { LibraryFormStore } from 'routes/development-library/contexts/form';
+import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
+import { createAppRoute, useAppNavigate, useAppSearchSnapshot } from 'core/router';
+import { TableOfContentLayout, useTableOfContent } from 'features/table-of-content';
+import type { ReactNode } from 'react';
+import { memo, useCallback, useMemo } from 'react';
 import { FormProvider, useForm } from 'routes/development-library/contexts/form';
 import { DateTimeSection } from 'routes/development-library/sections/DateTime';
+import { HashParamsSection } from 'routes/development-library/sections/HashParams';
 import { InputsSection } from 'routes/development-library/sections/Inputs';
 import { LayoutSection } from 'routes/development-library/sections/Layout';
 import { ListSection } from 'routes/development-library/sections/List';
 import { ListInputsSection } from 'routes/development-library/sections/ListInputs';
+import { PathParamsSection } from 'routes/development-library/sections/PathParams';
+import { SearchParamsSection } from 'routes/development-library/sections/search-params/SearchParams';
 import { PageHeader } from 'ui/layouts/PageHeader';
 import { PageLayout } from 'ui/layouts/PageLayout';
 import type { PageNavigationItemProp } from 'ui/layouts/PageNavigation';
 import { PageNavigation } from 'ui/layouts/PageNavigation';
-import SimpleSearchQuery from 'ui/SearchBar/simple-search-query';
 
-type LibraryTab = LibraryFormStore['state']['tab'];
-type ComponentsState = LibraryFormStore['components'];
+// TODO: this whole code should be lazy loaded as it is expensive to be part of the core core.
 
-type LibraryPageContentInnerProps = {
-  tab: LibraryTab;
-  components: ComponentsState;
-};
+// Component types only, so switching tabs doesn't build every section's JSX up front.
+const LIBRARY_SECTIONS = {
+  datetime: DateTimeSection,
+  hash_params: HashParamsSection,
+  inputs: InputsSection,
+  layout: LayoutSection,
+  list_inputs: ListInputsSection,
+  list: ListSection,
+  path_params: PathParamsSection,
+  search_params: SearchParamsSection
+} as const;
 
-const LibraryPageContentInnerComponent: React.FC<LibraryPageContentInnerProps> = ({ tab, components }) => {
-  const location = useLocation();
-  const navigate = useNavigate();
+export const DevelopmentLibraryContent = memo(() => {
+  const form = useForm();
+  const navigate = useAppNavigate();
+  const search = useAppSearchSnapshot<'/development/library'>();
+
   const { rootRef, headerRef, Anchors, ActiveAnchor, scrollTo } = useTableOfContent();
 
-  const selectedName = components?.[tab]?.name ?? '';
-
+  const components = useMemo(() => form.getFieldValue('components'), [form]);
+  const tab = useMemo(() => search.get('tab'), [search]);
+  const selectedName = useMemo<string>(() => components?.[tab]?.name ?? '', [components, tab]);
   const componentEntries = useMemo(() => Object.entries(components ?? {}), [components]);
 
-  const SectionComponent = useMemo<React.ReactNode>(() => {
-    return (
-      {
-        datetime: <DateTimeSection />,
-        inputs: <InputsSection />,
-        layout: <LayoutSection />,
-        list: <ListSection />,
-        list_inputs: <ListInputsSection />
-      }[tab] ?? null
-    );
+  const SectionComponent = useMemo<ReactNode>(() => {
+    const Section = LIBRARY_SECTIONS[tab as keyof typeof LIBRARY_SECTIONS];
+    return Section ? <Section /> : null;
   }, [tab]);
 
   const handleLeftNavClick = useCallback<PageNavigationItemProp['onPageNavigation']>(
     (event, props) => {
       rootRef.current?.scrollTo({ top: 0, behavior: 'instant' });
-      navigate(`${location.pathname}?tab=${props.id}`);
+      navigate.here().update({ route: '/development/library', search: { tab: props.id } });
     },
-    [rootRef, navigate, location.pathname]
+    [rootRef, navigate]
   );
 
   return (
@@ -85,10 +89,10 @@ const LibraryPageContentInnerComponent: React.FC<LibraryPageContentInnerProps> =
                 <ActiveAnchor key={String(item.id)} activeID={item.id}>
                   {isActive => (
                     <NavItem
+                      {...item}
                       primary={item.primary}
                       active={isActive}
                       onPageNavigation={e => scrollTo(e, item.id)}
-                      {...item}
                     />
                   )}
                 </ActiveAnchor>
@@ -101,43 +105,40 @@ const LibraryPageContentInnerComponent: React.FC<LibraryPageContentInnerProps> =
       {SectionComponent}
     </PageLayout>
   );
-};
+});
 
-const LibraryPageContentInner = React.memo(LibraryPageContentInnerComponent);
-
-const LibraryContent: React.FC = () => {
-  const form = useForm();
-  const location = useLocation();
-  const { user: currentUser, configuration } = useALContext();
-
-  useEffect(() => {
-    const url = new SimpleSearchQuery(location.search);
-    form.setFieldValue('state.tab', url.get('tab') as LibraryFormStore['state']['tab']);
-  }, [form, location.search]);
-
-  if (!currentUser.is_admin || !['development', 'staging'].includes(configuration.system.type)) {
-    return <Navigate to="/forbidden" replace />;
-  }
-
-  return (
-    <form.Subscribe
-      selector={s => ({
-        tab: s.values.state.tab,
-        components: s.values.components
-      })}
-    >
-      {props => <LibraryPageContentInner {...props} />}
-    </form.Subscribe>
-  );
-};
-
-const WrappedLibraryPage: React.FC = () => (
-  <TableOfContentProvider>
+export const DevelopmentLibraryPage = memo(() => (
+  <TableOfContentLayout>
     <FormProvider>
-      <LibraryContent />
+      <DevelopmentLibraryContent />
     </FormProvider>
-  </TableOfContentProvider>
-);
+  </TableOfContentLayout>
+));
 
-export const LibraryPage = React.memo(WrappedLibraryPage);
-export default LibraryPage;
+export const DevelopmentLibraryRoute = createAppRoute({
+  component: DevelopmentLibraryPage,
+
+  path: '/development/library',
+  search: s => ({
+    tab: s.enum(null, [
+      'datetime',
+      'hash_params',
+      'inputs',
+      'layout',
+      'list',
+      'list_inputs',
+      'path_params',
+      'search_params'
+    ])
+  }),
+
+  ancestor: '/development',
+  shortname: () => ['app_route.development_library.shortname', { ns: 'developmentAPI' }],
+  fullname: () => ['app_route.development_library.fullname', { ns: 'developmentAPI' }],
+  shorticon: () => <LibraryBooksIcon />,
+  fullicon: () => <LibraryBooksIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) =>
+    !config.user.is_admin || !['development', 'staging'].includes(config.configuration.system.type)
+});

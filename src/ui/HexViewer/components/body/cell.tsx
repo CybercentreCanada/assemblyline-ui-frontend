@@ -1,10 +1,10 @@
 import { useTheme } from '@mui/material';
 import clsx from 'clsx';
+import type { CSSProperties } from 'react';
+import React from 'react';
 import { useSelection } from 'routes/file-viewer/file-viewer.providers';
 import type { CellType, StoreProps } from 'ui/HexViewer';
 import { getCellClasses, getHexValue, getTextValue, LAYOUT_SIZE, useDispatch } from 'ui/HexViewer';
-import type { CSSProperties } from 'react';
-import React from 'react';
 
 export type HexCellProps = StoreProps & {
   columnIndex?: number;

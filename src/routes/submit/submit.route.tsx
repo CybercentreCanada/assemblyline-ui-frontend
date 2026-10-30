@@ -1,13 +1,13 @@
+import PublishOutlinedIcon from '@mui/icons-material/PublishOutlined';
 import { Alert, Collapse, styled, useMediaQuery, useTheme } from '@mui/material';
-import useALContext from 'core/config/useALContext';
-import useMySnackbar from 'core/snackbar/snackbar.hooks';
-import { useAppBanner } from 'core/template/components/app/hooks';
-import PageCenter from 'core/template/components/pages/PageCenter';
+import { useAppConfigStore } from 'core/config';
+import { createAppRoute, useAppSearchSnapshot } from 'core/router';
+import { useAppSnackbar } from 'core/snackbar';
+import { AppBanner, AppPageCenter } from 'core/template';
 import type { Metadata } from 'models/base/submission';
-import React, { useCallback, useEffect } from 'react';
+import { Activity, memo, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation } from 'react-router';
-import { initializeSettings, loadDefaultProfile, loadSubmissionProfile } from 'routes/settings/settings.utils.ts';
+import { initializeSettings, loadDefaultProfile, loadSubmissionProfile } from 'routes/settings/settings.utils';
 import { ServiceParameters } from 'routes/submit/components/ServiceParameters';
 import { SubmissionData } from 'routes/submit/components/SubmissionData';
 import {
@@ -28,18 +28,17 @@ import {
 } from 'routes/submit/components/SubmissionInputs';
 import { SubmissionMetadata } from 'routes/submit/components/SubmissionMetadata';
 import { SubmissionOptions } from 'routes/submit/components/SubmissionOptions';
-import type { SubmitState, SubmitStore } from 'routes/submit/submit.form.ts';
-import { FLOW, useForm } from 'routes/submit/submit.form.ts';
+import type { SubmitStore } from 'routes/submit/submit.form';
+import { FLOW, FormProvider, useForm } from 'routes/submit/submit.form';
+import { useAutoURLServicesSelection } from 'routes/submit/submit.hooks';
 import {
   calculateFileHash,
+  generateSubmitUUID,
   getDefaultExternalSources,
   getPreferredSubmissionProfile,
-  isValidJSON,
-  switchProfile,
-  useAutoURLServicesSelection
-} from 'routes/submit/submit.utils.ts';
+  switchProfile
+} from 'routes/submit/submit.utils';
 import { getSubmitType } from 'shared/utils/utils';
-import generateUUID from 'shared/utils/uuid';
 import { TabContainer } from 'ui/TabContainer';
 
 type AdjustProps = { adjust: boolean };
@@ -109,33 +108,35 @@ const RightPanel = styled('div')<AdjustProps>(({ theme, adjust }) => ({
   }
 }));
 
-const WrappedSubmitRoute = () => {
+const WrappedSubmitRoute = memo(() => {
   const { t, i18n } = useTranslation(['submit']);
   const theme = useTheme();
-  const downMD = useMediaQuery(theme.breakpoints.down('md'));
-  const banner = useAppBanner();
-  const location = useLocation();
-  const { closeSnackbar } = useMySnackbar();
-  const { user: currentUser, configuration, settings } = useALContext();
+  const { closeSnackbar } = useAppSnackbar();
+
   const form = useForm();
+
+  const configuration = useAppConfigStore(s => s.configuration);
+  const currentUser = useAppConfigStore(s => s.user);
+  const settings = useAppConfigStore(s => s.settings);
+
+  const search = useAppSearchSnapshot<'/submit'>();
+
+  const downMD = useMediaQuery(theme.breakpoints.down('md'));
 
   const applyAutoURLServicesSelection = useAutoURLServicesSelection();
 
   const setClassificationFromURL = useCallback(
-    (state: SubmitState, search: URLSearchParams) => {
-      if (state?.c12n) {
-        form.setFieldValue('settings.classification.value', state.c12n);
-      } else {
-        const c12 = search.get('classification');
-        if (c12) form.setFieldValue('settings.classification.value', c12);
-      }
+    (s: typeof search) => {
+      const c12n = s.get('classification');
+      if (!c12n) return;
+      form.setFieldValue('settings.classification.value', c12n);
     },
     [form]
   );
 
   const setHashFromURL = useCallback(
-    (state: SubmitState, search: URLSearchParams) => {
-      const raw = state?.hash || search.get('hash');
+    (s: typeof search) => {
+      const raw = s.get('hash');
       if (!raw) return;
 
       const [type, value] = getSubmitType(raw, configuration);
@@ -147,24 +148,17 @@ const WrappedSubmitRoute = () => {
   );
 
   const setMetadataFromURL = useCallback(
-    (state: SubmitState, search: URLSearchParams) => {
-      if (state?.metadata && typeof state.metadata === 'object' && Object.keys(state.metadata).length > 0) {
-        form.setFieldValue('metadata.data', state.metadata);
-        return;
-      }
-
-      const raw = search.get('metadata');
-      if (isValidJSON(raw)) {
-        const metadata = JSON.parse(raw) as Metadata;
-        form.setFieldValue('metadata.data', metadata);
-      }
+    (s: typeof search) => {
+      const raw = s.get('metadata') as Metadata;
+      if (!raw) return;
+      form.setFieldValue('metadata.data', raw);
     },
     [form]
   );
 
   const setProfileFromURL = useCallback(
-    (state: SubmitState, search: URLSearchParams) => {
-      const name = state?.profile || search.get('profile');
+    (s: typeof search) => {
+      const name = s.get('profile');
       if (!name || !(name in settings.submission_profiles)) return;
 
       form.setFieldValue('state.profile', name);
@@ -174,8 +168,8 @@ const WrappedSubmitRoute = () => {
   );
 
   const setRawFromURL = useCallback(
-    (state: SubmitState, search: URLSearchParams) => {
-      const raw = state?.raw || search.get('raw');
+    (s: typeof search) => {
+      const raw = s.get('raw');
       if (!raw) return;
 
       const encoder = new TextEncoder();
@@ -192,8 +186,8 @@ const WrappedSubmitRoute = () => {
   );
 
   const setDescriptionFromURL = useCallback(
-    (state: SubmitState, search: URLSearchParams) => {
-      const desc = state?.description || search.get('description');
+    (s: typeof search) => {
+      const desc = s.get('description');
       if (!desc) return;
       form.setFieldValue('settings.description.value', desc);
     },
@@ -201,39 +195,33 @@ const WrappedSubmitRoute = () => {
   );
 
   const setPriorityFromURL = useCallback(
-    (state: SubmitState, search: URLSearchParams) => {
-      const priority = state?.priority || search.get('priority');
+    (s: typeof search) => {
+      const priority = s.get('priority');
       if (!priority) return;
-      const val = Number.parseInt(priority, 10);
-      if (val === 500 || val === 1000 || val === 1500) {
-        form.setFieldValue('settings.priority.value', val);
-      }
+      form.setFieldValue('settings.priority.value', priority);
     },
     [form]
   );
 
   const setTTLFromURL = useCallback(
-    (state: SubmitState, search: URLSearchParams) => {
-      const ttl = state?.ttl || search.get('ttl');
-      if (!ttl) return;
-
-      const val = Number.parseInt(ttl, 10);
-      if (Number.isNaN(val)) return;
+    (s: typeof search) => {
+      const ttl = s.get('ttl');
+      if (ttl == null) return;
 
       const maxDTL = configuration.submission.max_dtl;
       const max = maxDTL !== 0 ? maxDTL : 365;
       const min = maxDTL !== 0 ? 1 : 0;
 
-      if (val >= min && val <= max) {
-        form.setFieldValue('settings.ttl.value', val);
+      if (ttl >= min && ttl <= max) {
+        form.setFieldValue('settings.ttl.value', ttl);
       }
     },
     [configuration, form]
   );
 
   const setFileTypeFromURL = useCallback(
-    (state: SubmitState, search: URLSearchParams) => {
-      const fileType = state?.params?.filetype_override || search.get('params.filetype_override');
+    (s: typeof search) => {
+      const fileType = s.get('filetypeOverride');
       if (!fileType) return;
       form.setFieldValue('settings.filetype_override.value', fileType);
     },
@@ -244,7 +232,7 @@ const WrappedSubmitRoute = () => {
     closeSnackbar();
 
     form.reset();
-    form.setFieldValue('state.uuid', generateUUID());
+    form.setFieldValue('state.uuid', generateSubmitUUID());
 
     FLOW.cancel();
     FLOW.off('complete');
@@ -263,29 +251,28 @@ const WrappedSubmitRoute = () => {
     );
     form.setFieldValue('settings.default_external_sources', getDefaultExternalSources(settings, configuration));
 
-    const search = new URLSearchParams(location.search);
-    const state = location.state as SubmitState;
-
-    setClassificationFromURL(state, search);
-    setHashFromURL(state, search);
-    setMetadataFromURL(state, search);
-    setProfileFromURL(state, search);
-    setRawFromURL(state, search);
-    setDescriptionFromURL(state, search);
-    setPriorityFromURL(state, search);
-    setTTLFromURL(state, search);
-    setFileTypeFromURL(state, search);
+    setClassificationFromURL(search);
+    setHashFromURL(search);
+    setMetadataFromURL(search);
+    setProfileFromURL(search);
+    setRawFromURL(search);
+    setDescriptionFromURL(search);
+    setPriorityFromURL(search);
+    setTTLFromURL(search);
+    setFileTypeFromURL(search);
 
     form.setFieldValue('state.phase', 'editing');
 
     applyAutoURLServicesSelection();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [configuration, currentUser, settings]);
+  }, [configuration, currentUser, search?.toString(), settings]);
 
   return (
-    <PageCenter maxWidth={downMD ? '100%' : `${theme.breakpoints.values.md}px`} margin={3.5} width="100%">
-      {banner}
+    <AppPageCenter style={{ maxWidth: downMD ? '100%' : `${theme.breakpoints.values.md}px` }}>
+      <div style={{ marginTop: theme.spacing(4), marginBottom: theme.spacing(4) }}>
+        <AppBanner />
+      </div>
 
       {configuration.ui.banner && (
         <Alert severity={configuration.ui.banner_level}>
@@ -384,11 +371,13 @@ const WrappedSubmitRoute = () => {
                     }
                   }}
                 >
-                  <CustomizabilityAlert />
-                  <SubmissionOptions />
-                  <SubmissionData />
-                  <ServiceParameters />
-                  <SubmissionMetadata />
+                  <Activity mode={adjust ? 'visible' : 'hidden'}>
+                    <CustomizabilityAlert />
+                    <SubmissionOptions />
+                    <SubmissionData />
+                    <ServiceParameters />
+                    <SubmissionMetadata />
+                  </Activity>
                 </Collapse>
               )}
             </RightPanel>
@@ -397,8 +386,72 @@ const WrappedSubmitRoute = () => {
       />
 
       <div style={{ height: '200px' }} />
-    </PageCenter>
+    </AppPageCenter>
   );
-};
+});
 
-export const SubmitRoute = React.memo(WrappedSubmitRoute);
+WrappedSubmitRoute.displayName = 'WrappedSubmitRoute';
+
+//*****************************************************************************************
+// SubmitPage
+//*****************************************************************************************
+
+const SubmitPage = memo(() => (
+  <FormProvider>
+    <WrappedSubmitRoute />
+  </FormProvider>
+));
+
+SubmitPage.displayName = 'SubmitPage';
+
+export const SubmitRoute = createAppRoute({
+  component: SubmitPage,
+
+  path: '/submit',
+  search: s => ({
+    classification: s.string(null).source('transient'),
+    description: s.string('').source('transient'),
+    filetypeOverride: s.string(null).source('transient'),
+    hash: s.string(null),
+    metadata: s.object(null).source('transient'),
+    priority: s.number(null).source('transient'),
+    profile: s.string(null).source('transient'),
+    raw: s.string('').source('transient'),
+    ttl: s.number(null).source('transient')
+  }),
+
+  ancestor: null,
+  shortname: () => ['app_route.submit.shortname', { ns: 'submit' }],
+  fullname: () => ['app_route.submit.fullname', { ns: 'submit' }],
+  shorticon: () => <PublishOutlinedIcon />,
+  fullicon: () => <PublishOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
+});
+
+export const SubmitRootRoute = createAppRoute({
+  component: SubmitPage,
+
+  path: '/',
+  search: s => ({
+    classification: s.string(null).source('transient').nullable(),
+    description: s.string('').source('transient').nullable(),
+    filetypeOverride: s.string(null).source('transient').nullable(),
+    hash: s.string(null),
+    metadata: s.object(null).source('transient').nullable(),
+    priority: s.enum(null, [500, 1000, 1500]).source('transient').nullable(),
+    profile: s.string(null).source('transient').nullable(),
+    raw: s.string('').source('transient').nullable(),
+    ttl: s.number(null).source('transient').nullable()
+  }),
+
+  ancestor: null,
+  shortname: () => ['app_route.submit.shortname', { ns: 'submit' }],
+  fullname: () => ['app_route.submit.fullname', { ns: 'submit' }],
+  shorticon: () => <PublishOutlinedIcon />,
+  fullicon: () => <PublishOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
+});

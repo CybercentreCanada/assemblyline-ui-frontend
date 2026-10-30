@@ -1,22 +1,19 @@
 import { Typography, useTheme } from '@mui/material';
-import useMyAPI from 'core/api/hooks/useMyAPI';
-import useALContext from 'core/config/useALContext';
-import React, { useEffect, useMemo, useState } from 'react';
+import { useApiQuery } from 'core/api';
+import { useAppConfigStore } from 'core/config';
+import { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useForm } from 'routes/submit/submit.form.ts';
+import { useForm } from 'routes/submit/submit.form';
 import { CheckboxInput } from 'ui/inputs/CheckboxInput';
 import { NumberInput } from 'ui/inputs/NumberInput';
 import { SelectInput } from 'ui/inputs/SelectInput';
 import { TextInput } from 'ui/inputs/TextInput';
 
-export const SubmissionOptions = React.memo(() => {
-  const { apiCall } = useMyAPI();
+export const SubmissionOptions = memo(() => {
   const { t } = useTranslation(['submit']);
   const theme = useTheme();
-  const { configuration } = useALContext();
+  const configuration = useAppConfigStore(s => s.configuration);
   const form = useForm();
-
-  const [fileTypes, setFileTypes] = useState<string[]>([]);
 
   const priorityOptions = useMemo(
     () => [
@@ -27,14 +24,12 @@ export const SubmissionOptions = React.memo(() => {
     [t]
   );
 
-  useEffect(() => {
-    apiCall<{ file_types: [string, string[]][] }>({
-      url: '/api/v4/help/constants/',
-      onSuccess: ({ api_response }) =>
-        setFileTypes(api_response?.file_types?.map(i => i?.[0])?.filter(i => i !== '*') || [])
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const { data } = useApiQuery<{ file_types: [string, string[]][] }>({
+    url: '/api/v4/help/constants/',
+    method: 'GET'
+  });
+
+  const fileTypes = useMemo(() => (!data ? [] : data?.file_types?.map(i => i?.[0])?.filter(i => i !== '*')), [data]);
 
   return (
     <div>
@@ -295,3 +290,5 @@ export const SubmissionOptions = React.memo(() => {
     </div>
   );
 });
+
+SubmissionOptions.displayName = 'SubmissionOptions';

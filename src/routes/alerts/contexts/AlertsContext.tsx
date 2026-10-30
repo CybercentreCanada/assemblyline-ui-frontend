@@ -1,7 +1,5 @@
-import useMyAPI from 'core/api/hooks/useMyAPI';
-import useALContext from 'core/config/useALContext';
-import { useAppUser } from 'core/template/components/app/hooks';
-import type { CustomUser } from 'models/api/user';
+import useALContext from 'deprecated/hooks/useALContext';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import type { Favorite } from 'routes/alerts/components/Favorites';
 
@@ -24,7 +22,7 @@ export const useAlerts = (): ContextProps => useContext(AlertsContext);
 export const AlertsProvider = ({ children }: Props) => {
   const { apiCall } = useMyAPI();
   const { c12nDef } = useALContext();
-  const { user: currentUser } = useAppUser<CustomUser>();
+  const { user: currentUser } = useALContext();
 
   const defaultFavorite = useMemo<Favorite>(
     () => ({ classification: c12nDef.UNRESTRICTED, name: '', query: '', created_by: currentUser.username }),

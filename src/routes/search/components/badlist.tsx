@@ -1,13 +1,11 @@
 import { AlertTitle, Skeleton, Tooltip } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
-import useALContext from 'core/config/useALContext';
+import useALContext from 'deprecated/hooks/useALContext';
 import type { SearchResult } from 'models/api/search';
 import type { Badlist } from 'models/base/badlist';
-import React from 'react';
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router';
-import { Link } from 'react-router-dom';
 import { maxLenStr } from 'shared/utils/utils';
 import Classification from 'ui/Classification';
 import CustomChip from 'ui/CustomChip';
@@ -23,20 +21,18 @@ import {
 import InformativeAlert from 'ui/InformativeAlert';
 import Moment from 'ui/Moment';
 
-type Props = {
+export type BadlistTableProps = {
   badlistResults: SearchResult<Badlist>;
   allowSort?: boolean;
-  isLoading?: boolean;
+  onRowClick?: (event: React.MouseEvent<HTMLElement>, item: Badlist) => void;
 };
 
-const WrappedBadlistTable: React.FC<Props> = ({ badlistResults, allowSort = true, isLoading = false }) => {
+export const BadlistTable = memo(({ badlistResults, allowSort = true, onRowClick = () => null }: BadlistTableProps) => {
   const { t } = useTranslation(['search']);
-  const location = useLocation();
-  const navigate = useNavigate();
   const { c12nDef } = useALContext();
 
-  return isLoading ? (
-    <Skeleton variant="rectangular" style={{ height: '6rem', borderRadius: '4px' }} />
+  return !badlistResults ? (
+    <Skeleton variant="rectangular" sx={{ height: '6rem', borderRadius: '4px' }} />
   ) : !badlistResults?.total ? (
     <div style={{ width: '100%' }}>
       <InformativeAlert>
@@ -73,13 +69,10 @@ const WrappedBadlistTable: React.FC<Props> = ({ badlistResults, allowSort = true
           {badlistResults.items.map((sl_item, i) => (
             <LinkRow
               key={`${sl_item.id}-${i}`}
-              component={Link}
               hover
-              to={`/manage/badlist/${sl_item.id}`}
-              onClick={event => {
-                event.preventDefault();
-                navigate(`${location.pathname}${location.search || ''}#${sl_item.id}`);
-              }}
+              nav={nav => nav.to().create({ route: '/manage/badlist/detail/:id', path: { id: sl_item.id } })}
+              navDeps={[sl_item.id]}
+              onClick={event => onRowClick(event, sl_item)}
             >
               <DivTableCell>
                 <Tooltip title={sl_item.added}>
@@ -118,7 +111,4 @@ const WrappedBadlistTable: React.FC<Props> = ({ badlistResults, allowSort = true
       </DivTable>
     </TableContainer>
   );
-};
-
-const BadlistTable = React.memo(WrappedBadlistTable);
-export default BadlistTable;
+});

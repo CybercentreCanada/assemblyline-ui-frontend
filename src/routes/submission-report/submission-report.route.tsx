@@ -1,23 +1,22 @@
 import AssistantIcon from '@mui/icons-material/Assistant';
 import AssistantOutlinedIcon from '@mui/icons-material/AssistantOutlined';
+import ChromeReaderModeOutlinedIcon from '@mui/icons-material/ChromeReaderModeOutlined';
 import InfoIcon from '@mui/icons-material/Info';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import ListAltOutlinedIcon from '@mui/icons-material/ListAltOutlined';
 import PrintOutlinedIcon from '@mui/icons-material/PrintOutlined';
 import type { TooltipProps } from '@mui/material';
-import { Box, Grid, IconButton, Skeleton, styled, Tooltip, Typography, useTheme } from '@mui/material';
-import useMyAPI from 'core/api/hooks/useMyAPI';
-import useALContext from 'core/config/useALContext';
-import useMySnackbar from 'core/snackbar/snackbar.hooks';
-import PageCenter from 'core/template/components/pages/PageCenter';
-import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
-import useAssistant from 'layout/assistant/assistant.hooks';
+import { Box, Grid, Skeleton, styled, Tooltip, Typography, useTheme } from '@mui/material';
+import { createAppRoute, useAppNavigate, useAppPathParams } from 'core/router';
+import { AppPageCenter } from 'core/template';
+import useALContext from 'deprecated/hooks/useALContext';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useMySnackbar from 'deprecated/hooks/useMySnackbar';
+import { useAppAssistant } from 'layout/assistant';
 import type { SubmissionReport } from 'models/api/submission_report';
 import { memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router';
-import { Link } from 'react-router-dom';
-import ForbiddenPage from 'routes/forbidden/forbidden.route';
+import { ForbiddenPage } from 'routes/forbidden/forbidden';
 import AISummarySection from 'routes/submission-detail/components/ai_summary';
 import Attack from 'routes/submission-report/components/attack';
 import AttributionBanner from 'routes/submission-report/components/attribution_banner';
@@ -27,11 +26,8 @@ import Heuristics from 'routes/submission-report/components/heuristics';
 import Metadata from 'routes/submission-report/components/metadata';
 import Tags from 'routes/submission-report/components/tags';
 import { filterObject } from 'shared/utils/utils';
+import { IconButton } from 'ui/buttons/IconButton';
 import Classification from 'ui/Classification';
-
-type ParamProps = {
-  id: string;
-};
 
 const NoPrintTooltip = memo(
   styled(Tooltip)<TooltipProps>(() => ({
@@ -41,15 +37,15 @@ const NoPrintTooltip = memo(
   }))
 );
 
-export default function SubmissionReportPage() {
+const SubmissionReportPage = memo(() => {
   const { t } = useTranslation(['submissionReport']);
-  const { id } = useParams<ParamProps>();
+  const { id = null } = useAppPathParams<'/submission/report/:id'>();
   const { user: currentUser, c12nDef, configuration, settings } = useALContext();
   const { showErrorMessage, showWarningMessage } = useMySnackbar();
-  const navigate = useNavigate();
+  const navigate = useAppNavigate();
   const { apiCall } = useMyAPI();
   const theme = useTheme();
-  const { addInsight, removeInsight } = useAssistant();
+  const { addInsight, removeInsight } = useAppAssistant();
 
   const [report, setReport] = useState<SubmissionReport>(null);
   const [originalReport, setOriginalReport] = useState<SubmissionReport>(null);
@@ -132,7 +128,7 @@ export default function SubmissionReportPage() {
     }
   }, [originalReport, showInfoContent, configuration]);
 
-  useEffectOnce(() => {
+  useEffect(() => {
     if (currentUser.roles.includes('submission_view')) {
       apiCall({
         url: `/api/v4/submission/report/${id}/`,
@@ -142,17 +138,18 @@ export default function SubmissionReportPage() {
         onFailure: api_data => {
           if (api_data.api_status_code === 425) {
             showWarningMessage(t('error.too_early'));
-            navigate(`/submission/detail/${id}`);
+            navigate.to().create({ route: '/submission/detail/:id', path: { id } });
           } else if (api_data.api_status_code === 404) {
             showErrorMessage(t('error.notfound'));
-            navigate('/notfound');
+            navigate.to().create({ route: '/not-found' });
           } else {
             showErrorMessage(api_data.api_error_message);
           }
         }
       });
     }
-  });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (originalReport) {
@@ -185,7 +182,7 @@ export default function SubmissionReportPage() {
   }, [settings]);
 
   return currentUser.roles.includes('submission_view') ? (
-    <PageCenter margin={4} width="100%">
+    <AppPageCenter>
       <Box
         sx={{
           '@media print': {
@@ -242,7 +239,11 @@ export default function SubmissionReportPage() {
                       </IconButton>
                     </NoPrintTooltip>
                     <Tooltip title={t('detail_view')}>
-                      <IconButton component={Link} to={`/submission/detail/${report.sid}`} size="large">
+                      <IconButton
+                        nav={nav => nav.here().update({ route: '/submission/detail/:id', path: { id: report.sid } })}
+                        navDeps={[report.sid]}
+                        size="large"
+                      >
                         <ListAltOutlinedIcon />
                       </IconButton>
                     </Tooltip>
@@ -319,8 +320,26 @@ export default function SubmissionReportPage() {
         <Tags report={report} />
         <FileTreeSection report={report} />
       </Box>
-    </PageCenter>
+    </AppPageCenter>
   ) : (
     <ForbiddenPage />
   );
-}
+});
+
+export const SubmissionReportRoute = createAppRoute({
+  component: SubmissionReportPage,
+
+  path: '/submission/report/:id',
+  params: s => ({
+    id: s.string()
+  }),
+
+  ancestor: '/submissions',
+  shortname: location => ['app_route.submission_report.shortname', { ns: 'submissionReport', id: location.path.id }],
+  fullname: location => ['app_route.submission_report.fullname', { ns: 'submissionReport', id: location.path.id }],
+  shorticon: () => <ChromeReaderModeOutlinedIcon />,
+  fullicon: () => <ChromeReaderModeOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.roles.includes('submission_view')
+});

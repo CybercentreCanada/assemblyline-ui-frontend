@@ -1,10 +1,11 @@
+import type { UserSettings } from 'models/base/user_settings';
 import { MOCK_CONFIGURATION } from 'models/mocks/configuration';
 import { MOCK_SETTINGS } from 'models/mocks/setting';
-import type { UserSettings } from 'models/base/user_settings';
-import { initializeSettings } from 'routes/settings/settings.utils.ts';
-import type { SubmitStore } from 'routes/submit/submit.form.ts';
+import { initializeSettings } from 'routes/settings/settings.utils';
+import type { SubmitStore } from 'routes/submit/submit.form';
 import {
   calculateFileHash,
+  generateSubmitUUID,
   getDefaultExternalSources,
   getHashQuery,
   getPreferredSubmissionProfile,
@@ -13,8 +14,7 @@ import {
   isValidJSON,
   isValidMetadata,
   parseSubmitProfile
-} from 'routes/submit/submit.utils.ts';
-import generateUUID from 'shared/utils/uuid';
+} from 'routes/submit/submit.utils';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // ------------------------ Helpers -----------------------------------------
@@ -29,7 +29,7 @@ const MOCK_SUBMIT_STORE: SubmitStore = {
     profile: null,
     tab: 'file',
     progress: 0,
-    uuid: generateUUID()
+    uuid: generateSubmitUUID()
   },
   file: {
     ...new File(['abc'], 'file.txt'),
@@ -44,6 +44,29 @@ const MOCK_SUBMIT_STORE: SubmitStore = {
   metadata: { data: {}, edit: '' },
   autoURLServiceSelection: { open: false, prev: [] }
 };
+
+// ------------------------ generateSubmitUUID ------------------------------
+describe('generateSubmitUUID', () => {
+  it('returns a 36 character hyphenated string', () => {
+    const uuid = generateSubmitUUID();
+    expect(typeof uuid).toBe('string');
+    expect(uuid).toHaveLength(36);
+    expect(uuid.split('-').map(part => part.length)).toEqual([8, 4, 4, 4, 12]);
+  });
+
+  it('only uses characters accepted in urls and cache keys', () => {
+    expect(generateSubmitUUID()).toMatch(/^[0-9a-f-]+$/);
+  });
+
+  it('marks the uuid as version 4 with a valid variant', () => {
+    expect(generateSubmitUUID()).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
+  });
+
+  it('returns a different value on each call', () => {
+    const uuids = new Set(Array.from({ length: 100 }, () => generateSubmitUUID()));
+    expect(uuids.size).toBe(100);
+  });
+});
 
 // ------------------------ getPreferredSubmissionProfile -------------------
 describe('getPreferredSubmissionProfile', () => {

@@ -1,5 +1,5 @@
 import { useTheme } from '@mui/material';
-import useSafeResults from 'layout/safe-results/safe-results.hooks';
+import { useAppSafeResults } from 'layout/safe-results';
 import type { SandboxBody as SandboxData } from 'models/base/result_body';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -14,7 +14,7 @@ import {
   getProcessMapByPid,
   getSafelistedProcessIds,
   type SandboxFilter
-} from 'ui/ResultCard/Sandbox/sandbox.utils.ts';
+} from 'ui/ResultCard/Sandbox/sandbox.utils';
 import { TabContainer } from 'ui/TabContainer';
 
 type LabelProps = {
@@ -66,7 +66,7 @@ export type SandboxBodyProps = {
 
 export const SandboxBody = React.memo(({ body, printable = false }: SandboxBodyProps) => {
   const { t } = useTranslation('sandboxResult');
-  const { showSafeResults } = useSafeResults();
+  const { showSafeResults } = useAppSafeResults();
 
   const [tab, setTab] = useState<TabKey | undefined>();
   const [filterValue, setFilterValue] = useState<SandboxFilter>();

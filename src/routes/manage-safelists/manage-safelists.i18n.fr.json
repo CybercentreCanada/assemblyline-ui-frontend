@@ -1,5 +1,7 @@
 {
   "add_safelist": "Ajouter un item à la liste sûre",
+  "app_route.manage_safelists.fullname": "Gérer de la Liste sûre",
+  "app_route.manage_safelists.shortname": "Liste sûre",
   "filter": "Filtrer les hachages de la liste sûre...",
   "filter.disabled.add": "Ajouter un filtre pour afficher les hachages désactivés",
   "filter.disabled.remove": "Supprimer le filtre pour afficher les hachages désactivés",

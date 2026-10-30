@@ -1,3 +1,8 @@
+import type { KeyboardEvent, PropsWithChildren } from 'react';
+import React, { memo, useMemo, useRef } from 'react';
+import AutoSizer from 'react-virtualized-auto-sizer';
+import type { FixedSizeListProps, ListOnItemsRenderedProps } from 'react-window';
+import { FixedSizeList } from 'react-window';
 import { useSelection } from 'routes/file-viewer/file-viewer.providers';
 import type { StoreProps } from 'ui/HexViewer';
 import {
@@ -10,11 +15,6 @@ import {
   useStore,
   WindowRow
 } from 'ui/HexViewer';
-import type { KeyboardEvent, PropsWithChildren } from 'react';
-import React, { memo, useMemo, useRef } from 'react';
-import AutoSizer from 'react-virtualized-auto-sizer';
-import type { FixedSizeListProps, ListOnItemsRenderedProps } from 'react-window';
-import { FixedSizeList } from 'react-window';
 
 const List = FixedSizeList as unknown as React.FC<FixedSizeListProps<unknown> & { ref: unknown }>;
 

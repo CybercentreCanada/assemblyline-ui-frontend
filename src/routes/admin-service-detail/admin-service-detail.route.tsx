@@ -1,18 +1,20 @@
 import CompareArrowsOutlinedIcon from '@mui/icons-material/CompareArrowsOutlined';
 import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
+import WebAssetIcon from '@mui/icons-material/WebAsset';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { Button, CircularProgress, Paper, Skeleton, Tab, useTheme } from '@mui/material';
-import useMyAPI from 'core/api/hooks/useMyAPI';
-import useALContext from 'core/config/useALContext';
-import useMySnackbar from 'core/snackbar/snackbar.hooks';
-import PageCenter from 'core/template/components/pages/PageCenter';
-import type { JSONFeedItem } from 'layout/notifications/notifications.hooks';
-import { useNotificationFeed } from 'layout/notifications/notifications.hooks';
+import { invalidateApiQuery } from 'core/api';
+import { createAppRoute, useAppBlocker, useAppNavigate, useAppPathParams } from 'core/router';
+import { AppPageCenter } from 'core/template';
+import useALContext from 'deprecated/hooks/useALContext';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useMySnackbar from 'deprecated/hooks/useMySnackbar';
+import type { JSONFeedItem } from 'layout/notifications';
+import { fetchJSONNotifications } from 'layout/notifications/notifications.utils';
 import type { ServiceConstants, Service as ServiceData } from 'models/base/service';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate, useNavigate, useParams } from 'react-router';
 import ServiceContainer from 'routes/admin-service-detail/components/container';
 import ServiceGeneral from 'routes/admin-service-detail/components/general';
 import ServiceParams from 'routes/admin-service-detail/components/parameters';
@@ -23,29 +25,17 @@ import ConfirmationDialog from 'ui/ConfirmationDialog';
 import CustomChip from 'ui/CustomChip';
 import Empty from 'ui/Empty';
 import { PageHeader } from 'ui/layouts/PageHeader';
-import { RouterPrompt } from 'ui/RouterPrompt';
 
 type TabType = 'general' | 'docker' | 'updater' | 'params';
 
-type ParamProps = {
-  svc: string;
-};
-
-type ServiceProps = {
-  name?: string | null;
-  onDeleted?: () => void;
-  onUpdated?: () => void;
-};
-
-const Service = ({ name = null, onDeleted = () => null, onUpdated = () => null }: ServiceProps) => {
+export const AdminServiceDetailPage = memo(() => {
   const { t } = useTranslation(['adminServices']);
   const theme = useTheme();
-  const navigate = useNavigate();
-  const { svc } = useParams<ParamProps>();
+  const navigate = useAppNavigate();
+  const svc = useAppPathParams<'/admin/services/:svc'>()?.svc;
   const { apiCall } = useMyAPI();
   const { user: currentUser, configuration } = useALContext();
   const { showSuccessMessage } = useMySnackbar();
-  const { fetchJSONNotifications } = useNotificationFeed();
 
   const [service, setService] = useState<ServiceData>(null);
   const [serviceDefault, setServiceDefault] = useState<ServiceData>(null);
@@ -68,12 +58,12 @@ const Service = ({ name = null, onDeleted = () => null, onUpdated = () => null }
     [serviceFeeds]
   );
 
-  const nameOrSvc = useMemo<string>(() => name || svc, [name, svc]);
-
   const isSaveDisabled = useMemo<boolean>(
     () => overallError || buttonLoading || !modified,
     [overallError, buttonLoading, modified]
   );
+
+  useAppBlocker(() => (modified ? 'unsaved_changes' : null), [modified]);
 
   const handleTabChange = useCallback((event, newValue) => {
     setTab(newValue as TabType);
@@ -85,35 +75,38 @@ const Service = ({ name = null, onDeleted = () => null, onUpdated = () => null }
 
   const handleSaveService = useCallback(() => {
     apiCall({
-      url: `/api/v4/service/${nameOrSvc}/`,
+      url: `/api/v4/service/${svc}/`,
       method: 'POST',
       body: service,
       onSuccess: () => {
         setModified(false);
         showSuccessMessage(t('save.success'));
-        onUpdated();
+        if (svc) setTimeout(() => navigate.here().closePanel({ route: '/admin/services' }), 1000);
+        setTimeout(() => window.dispatchEvent(new CustomEvent('reloadServicesEvent')), 1000);
+        invalidateApiQuery(({ url }) => '/api/v4/user/whoami/' === url, 3000);
       },
       onEnter: () => setButtonLoading(true),
       onExit: () => setButtonLoading(false)
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [nameOrSvc, service, showSuccessMessage, t, onUpdated]);
+  }, [svc, service, showSuccessMessage, t]);
 
   const handleExecuteDeleteButtonClick = useCallback(() => {
     handleCloseDialog();
     apiCall({
-      url: `/api/v4/service/${nameOrSvc}/`,
+      url: `/api/v4/service/${svc}/`,
       method: 'DELETE',
       onSuccess: () => {
         showSuccessMessage(t('delete.success'));
-        if (svc) setTimeout(() => navigate('/admin/services'), 1000);
-        onDeleted();
+        if (svc) setTimeout(() => navigate.here().closePanel({ route: '/admin/services' }), 1000);
+        setTimeout(() => window.dispatchEvent(new CustomEvent('reloadServicesEvent')), 1000);
+        invalidateApiQuery(({ url }) => '/api/v4/user/whoami/' === url, 3000);
       },
       onEnter: () => setButtonLoading(true),
       onExit: () => setButtonLoading(false)
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [handleCloseDialog, nameOrSvc, showSuccessMessage, t, svc, onDeleted]);
+  }, [handleCloseDialog, showSuccessMessage, t, svc]);
 
   const handleDeleteButtonClick = useCallback(() => {
     setDeleteDialog(true);
@@ -132,7 +125,7 @@ const Service = ({ name = null, onDeleted = () => null, onUpdated = () => null }
     // Load user on start
     if (currentUser.is_admin) {
       apiCall<ServiceData>({
-        url: `/api/v4/service/${nameOrSvc}/`,
+        url: `/api/v4/service/${svc}/`,
         onEnter: () => {
           setService(null);
           setServiceVersion(null);
@@ -143,19 +136,19 @@ const Service = ({ name = null, onDeleted = () => null, onUpdated = () => null }
         }
       });
       apiCall<string[]>({
-        url: `/api/v4/service/versions/${nameOrSvc}/`,
+        url: `/api/v4/service/versions/${svc}/`,
         onEnter: () => setVersions(null),
         onSuccess: api_data => setVersions(api_data.api_response)
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentUser.is_admin, nameOrSvc]);
+  }, [currentUser.is_admin, svc]);
 
   useEffect(() => {
     // Load user on start
     if (currentUser.is_admin && serviceVersion) {
       apiCall<ServiceData>({
-        url: `/api/v4/service/${nameOrSvc}/${serviceVersion}/`,
+        url: `/api/v4/service/${svc}/${serviceVersion}/`,
         onEnter: () => setServiceDefault(null),
         onSuccess: ({ api_response }) => setServiceDefault(api_response)
       });
@@ -186,10 +179,8 @@ const Service = ({ name = null, onDeleted = () => null, onUpdated = () => null }
     });
   }, [configuration?.ui?.services_feed, fetchJSONNotifications, setServiceFeeds]);
 
-  return !currentUser.is_admin ? (
-    <Navigate to="/forbidden" replace />
-  ) : (
-    <PageCenter margin={!svc ? 2 : 4} width="100%" textAlign="left">
+  return (
+    <AppPageCenter>
       <ConfirmationDialog
         open={deleteDialog}
         handleClose={() => setDeleteDialog(false)}
@@ -215,11 +206,13 @@ const Service = ({ name = null, onDeleted = () => null, onUpdated = () => null }
               size="large"
               sx={{ color: theme.palette.action.active }}
               tooltip={t('errors')}
-              to={() =>
-                `/admin/errors?filters=response.service_name%3A${service?.name}&filters=${getVersionQuery(
-                  service?.version
-                )}`
+              nav={nav =>
+                nav.to().create({
+                  route: '/admin/errors',
+                  search: { filters: [`response.service_name:${service?.name}`, getVersionQuery(service?.version)] }
+                })
               }
+              navDeps={[service?.name, service?.version]}
             >
               <ErrorOutlineOutlinedIcon />
             </IconButton>
@@ -228,7 +221,13 @@ const Service = ({ name = null, onDeleted = () => null, onUpdated = () => null }
               loading={!service}
               size="large"
               sx={{ color: theme.palette.action.active }}
-              to={() => `/admin/service_review?service=${service?.name}&v1=${service?.version}`}
+              nav={nav =>
+                nav.to().create({
+                  route: '/admin/service_review',
+                  search: { service: service?.name, v1: service?.version }
+                })
+              }
+              navDeps={[service?.name, service?.version]}
               tooltip={t('compare')}
             >
               <CompareArrowsOutlinedIcon />
@@ -264,10 +263,7 @@ const Service = ({ name = null, onDeleted = () => null, onUpdated = () => null }
 
       {service ? (
         <TabContext value={tab}>
-          <Paper
-            square
-            style={{ backgroundColor: name ? theme.palette.background.default : theme.palette.background.paper }}
-          >
+          <Paper square>
             <TabList
               onChange={handleTabChange}
               indicatorColor="primary"
@@ -281,7 +277,7 @@ const Service = ({ name = null, onDeleted = () => null, onUpdated = () => null }
               <Tab label={t('tab.params')} value="params" />
             </TabList>
           </Paper>
-          <TabPanel value="general" style={{ paddingLeft: 0, paddingRight: 0 }}>
+          <TabPanel value="general" sx={{ paddingLeft: 0, paddingRight: 0, textAlign: 'left' }}>
             <ServiceGeneral
               constants={constants}
               defaults={serviceDefault}
@@ -294,7 +290,7 @@ const Service = ({ name = null, onDeleted = () => null, onUpdated = () => null }
               setServiceVersion={setServiceVersion}
             />
           </TabPanel>
-          <TabPanel value="docker" style={{ paddingLeft: 0, paddingRight: 0 }}>
+          <TabPanel value="docker" sx={{ paddingLeft: 0, paddingRight: 0, textAlign: 'left' }}>
             <ServiceContainer
               service={service}
               defaults={serviceDefault}
@@ -303,7 +299,7 @@ const Service = ({ name = null, onDeleted = () => null, onUpdated = () => null }
             />
           </TabPanel>
           {service.update_config && (
-            <TabPanel value="updater" style={{ paddingLeft: 0, paddingRight: 0 }}>
+            <TabPanel value="updater" sx={{ paddingLeft: 0, paddingRight: 0, textAlign: 'left' }}>
               <ServiceUpdater
                 service={service}
                 defaults={serviceDefault}
@@ -312,7 +308,7 @@ const Service = ({ name = null, onDeleted = () => null, onUpdated = () => null }
               />
             </TabPanel>
           )}
-          <TabPanel value="params" style={{ paddingLeft: 0, paddingRight: 0 }}>
+          <TabPanel value="params" sx={{ paddingLeft: 0, paddingRight: 0, textAlign: 'left' }}>
             <ServiceParams
               service={service}
               defaults={serviceDefault}
@@ -324,8 +320,6 @@ const Service = ({ name = null, onDeleted = () => null, onUpdated = () => null }
       ) : (
         <Skeleton variant="rectangular" height="10rem" />
       )}
-
-      <RouterPrompt when={modified} />
 
       {service && modified ? (
         <div
@@ -348,8 +342,24 @@ const Service = ({ name = null, onDeleted = () => null, onUpdated = () => null }
           </Button>
         </div>
       ) : null}
-    </PageCenter>
+    </AppPageCenter>
   );
-};
+});
 
-export default Service;
+export const AdminServiceDetailRoute = createAppRoute({
+  component: AdminServiceDetailPage,
+
+  path: '/admin/services/:svc',
+  params: s => ({
+    svc: s.string()
+  }),
+
+  ancestor: '/admin/services',
+  shortname: location => ['app_route.admin_service_detail.shortname', { ns: 'adminServices', svc: location.path.svc }],
+  fullname: location => ['app_route.admin_service_detail.fullname', { ns: 'adminServices', svc: location.path.svc }],
+  shorticon: () => <WebAssetIcon />,
+  fullicon: () => <WebAssetIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.is_admin
+});

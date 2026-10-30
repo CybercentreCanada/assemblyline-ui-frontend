@@ -1,0 +1,7 @@
+{
+  "app_route.quota.fullname": "Quota",
+  "app_route.quota.shortname": "Quota",
+  "description": "Vous avez atteint votre quota quotidien. Contactez les administrateurs système si vous pensez qu'il s'agit d'une erreur.",
+  "logout": "Déconnexion",
+  "title": "Oups, votre jauge de quota est au maximum"
+}

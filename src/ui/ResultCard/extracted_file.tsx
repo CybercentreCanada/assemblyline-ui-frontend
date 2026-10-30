@@ -14,16 +14,14 @@ import {
   Tooltip,
   useTheme
 } from '@mui/material';
-import useMyAPI from 'core/api/hooks/useMyAPI';
-import useALContext from 'core/config/useALContext';
-import useMySnackbar from 'core/snackbar/snackbar.hooks';
+import { AppLink, useAppNavigate } from 'core/router';
+import useALContext from 'deprecated/hooks/useALContext';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useMySnackbar from 'deprecated/hooks/useMySnackbar';
 import type { File } from 'models/base/result';
 import type { Submission } from 'models/base/submission';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router';
-import { Link } from 'react-router-dom';
-import { DEFAULT_TAB, TAB_OPTIONS } from 'routes/file-viewer/file-viewer.route';
 import { IconButton } from 'ui/buttons/IconButton';
 
 export type ExtractedFileProps = {
@@ -35,8 +33,7 @@ export type ExtractedFileProps = {
 export const ExtractedFile: React.FC<ExtractedFileProps> = React.memo(({ file, download = false, sid = null }) => {
   const { t } = useTranslation(['fileDetail']);
   const theme = useTheme();
-  const location = useLocation();
-  const navigate = useNavigate();
+  const navigate = useAppNavigate();
   const { apiCall } = useMyAPI();
   const { configuration } = useALContext();
   const { user: currentUser } = useALContext();
@@ -45,13 +42,6 @@ export const ExtractedFile: React.FC<ExtractedFileProps> = React.memo(({ file, d
   const [submitAnchor, setSubmitAnchor] = useState<HTMLElement | null>(null);
 
   const submitPopoverOpen = Boolean(submitAnchor);
-
-  const fileViewerPath = useMemo<string>(() => {
-    const tab = TAB_OPTIONS.find(option => location.pathname.indexOf(option) >= 0);
-    if (!location.pathname.startsWith('/file/viewer') || !tab)
-      return `/file/viewer/${file?.sha256}/${DEFAULT_TAB}/${location.search}${location.hash}`;
-    else return `/file/viewer/${file?.sha256}/${tab}/${location.search}${location.hash}`;
-  }, [file?.sha256, location.hash, location.pathname, location.search]);
 
   const submissionProfiles = useMemo<Record<string, string>>(() => {
     const profiles = configuration?.submission?.profiles ?? {};
@@ -72,7 +62,7 @@ export const ExtractedFile: React.FC<ExtractedFileProps> = React.memo(({ file, d
         onSuccess: api_data => {
           showSuccessMessage(t('submit.success'));
           setTimeout(() => {
-            navigate(`/submission/detail/${api_data.api_response.sid}`);
+            navigate.to().create({ route: '/submission/detail/:id', path: { id: api_data.api_response.sid } });
           }, 500);
         }
       });
@@ -93,15 +83,14 @@ export const ExtractedFile: React.FC<ExtractedFileProps> = React.memo(({ file, d
               {file.name}
             </MuiLink>
           ) : (
-            <Link
-              to={
-                sid
-                  ? `/submission/detail/${sid}/${file.sha256}?name=${encodeURIComponent(file.name)}`
-                  : `/file/detail/${file.sha256}?name=${encodeURIComponent(file.name)}`
+            <AppLink
+              nav={nav =>
+                nav.to().create({ route: '/file/detail/:id', path: { id: file.sha256 }, search: { name: file.name } })
               }
+              navDeps={[file.sha256, file.name]}
             >
               {file.name}
-            </Link>
+            </AppLink>
           )}
         </div>
         <div style={{ color: theme.palette.text.secondary, marginRight: theme.spacing(1), fontSize: 'smaller' }}>
@@ -139,9 +128,18 @@ export const ExtractedFile: React.FC<ExtractedFileProps> = React.memo(({ file, d
             >
               <List disablePadding>
                 <ListItemButton
-                  component={Link}
-                  to={`/submit?hash=${file.sha256}&description=${encodeURIComponent(`Inspection of file: ${file.name}`)}`}
-                  state={{ c12n: file.classification }}
+                  component={AppLink}
+                  nav={nav =>
+                    nav.to().create({
+                      route: '/submit',
+                      search: {
+                        hash: file.sha256,
+                        description: `Inspection of file: ${file.name}`,
+                        classification: file.classification
+                      }
+                    })
+                  }
+                  navDeps={[file.sha256, file.name, file.classification]}
                   dense
                   onClick={() => setSubmitAnchor(null)}
                 >
@@ -171,7 +169,18 @@ export const ExtractedFile: React.FC<ExtractedFileProps> = React.memo(({ file, d
         )}
 
         <Tooltip title={`${t('view_file')}: ${file.name}`} placement="left">
-          <IconButton to={fileViewerPath} size="small" color="primary" sx={{ padding: 0 }}>
+          <IconButton
+            nav={nav =>
+              nav.to<'/file/viewer/:id/:tab'>().create(prev => ({
+                route: '/file/viewer/:id/:tab',
+                path: { id: file?.sha256, tab: prev.route === '/file/viewer/:id/:tab' ? prev.path.tab : null }
+              }))
+            }
+            navDeps={[file?.sha256]}
+            size="small"
+            color="primary"
+            sx={{ padding: 0 }}
+          >
             <PageviewOutlinedIcon />
           </IconButton>
         </Tooltip>

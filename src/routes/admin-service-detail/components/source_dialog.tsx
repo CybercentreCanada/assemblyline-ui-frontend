@@ -1,5 +1,5 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, useTheme } from '@mui/material';
-import useALContext from 'core/config/useALContext';
+import useALContext from 'deprecated/hooks/useALContext';
 import type { UpdateSource } from 'models/base/service';
 import { DEFAULT_SOURCE } from 'models/base/service';
 import React, { useCallback, useEffect, useState } from 'react';

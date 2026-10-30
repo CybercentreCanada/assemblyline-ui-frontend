@@ -1,41 +1,66 @@
 import HourglassEmptyOutlinedIcon from '@mui/icons-material/HourglassEmptyOutlined';
-import { useTheme } from '@mui/material';
-import Typography from '@mui/material/Typography';
-import useALContext from 'core/config/useALContext';
-import PageCenter from 'core/template/components/pages/PageCenter';
+import { Typography, useMediaQuery, useTheme } from '@mui/material';
+import { useAppConfigStore } from 'core/config';
+import { createAppRoute } from 'core/router';
+import { AppPageCenter } from 'core/template';
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
-import ForbiddenPage from 'routes/forbidden/forbidden.route';
+import { ForbiddenPage } from 'routes/forbidden/forbidden';
 
-const LockedPage = () => {
+//*****************************************************************************************
+// Locked Page
+//*****************************************************************************************
+
+export const LockedPage = memo(() => {
   const { t } = useTranslation(['locked']);
-  const { configuration } = useALContext();
   const theme = useTheme();
+  const downSM = useMediaQuery(theme.breakpoints.down('md'));
+
+  const tos = useAppConfigStore(s => s.configuration?.ui?.tos);
+  const tosLockoutNotify = useAppConfigStore(s => s.configuration?.ui?.tos_lockout_notify);
 
   return (
     <>
-      {configuration.ui.tos ? (
-        <PageCenter width="65%" margin={4}>
-          <div style={{ paddingTop: theme.spacing(10), fontSize: 200 }}>
-            <HourglassEmptyOutlinedIcon color="secondary" fontSize="inherit" />
+      {tos ? (
+        <AppPageCenter>
+          <div style={{ paddingTop: theme.spacing(10), fontSize: 200, color: theme.palette.secondary.main }}>
+            <HourglassEmptyOutlinedIcon fontSize="inherit" />
           </div>
           <div style={{ paddingBottom: theme.spacing(2) }}>
-            <Typography variant="h3">{t('title')}</Typography>
+            <Typography children={t('title')} variant={downSM ? 'h4' : 'h3'} gutterBottom />
           </div>
-          {configuration.ui.tos_lockout_notify ? (
-            <div>
-              <Typography variant="h6">{t('auto_notify')}</Typography>
-            </div>
-          ) : (
-            <div>
-              <Typography variant="h6">{t('contact_admin')}</Typography>
-            </div>
-          )}
-        </PageCenter>
+          <div style={{ width: '100%', maxWidth: '720px', margin: '0 auto' }}>
+            <Typography
+              children={tosLockoutNotify ? t('auto_notify') : t('contact_admin')}
+              variant={downSM ? 'body1' : 'h6'}
+              gutterBottom
+            />
+          </div>
+        </AppPageCenter>
       ) : (
         <ForbiddenPage disabled />
       )}
     </>
   );
-};
+});
 
-export default LockedPage;
+LockedPage.displayName = 'LockedPage';
+
+//*****************************************************************************************
+// Locked Route
+//*****************************************************************************************
+
+export const LockedRoute = createAppRoute({
+  component: LockedPage,
+
+  path: '/locked',
+
+  ancestor: null,
+  shortname: () => ['app_route.locked.shortname', { ns: 'locked' }],
+  fullname: () => ['app_route.locked.fullname', { ns: 'locked' }],
+  shorticon: () => <HourglassEmptyOutlinedIcon />,
+  fullicon: () => <HourglassEmptyOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
+});

@@ -1,24 +1,27 @@
+import KeyOutlinedIcon from '@mui/icons-material/KeyOutlined';
 import { Backdrop, Button, Typography, useTheme } from '@mui/material';
-import useALContext from 'core/config/useALContext';
-import PageCardCentered from 'core/template/branding/AppPageCardCentered';
-import { useAppUser } from 'core/template/components/app/hooks';
-import useAppBannerVert from 'core/template/components/app/hooks/useAppBannerVert';
+import { createAppRoute } from 'core/router';
+import { AppPageCardCentered, AppVerticalBanner } from 'core/template';
+import useALContext from 'deprecated/hooks/useALContext';
+import useAppUser from 'deprecated/hooks/useAppUser';
 import type { CustomUser } from 'models/api/user';
 import type { Role, Scope } from 'models/base/user';
 import { SCOPES } from 'models/base/user';
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
-import getXSRFCookie from 'shared/utils/xsrf';
+import { getXSRFCookie } from 'shared/utils/xsrf.utils';
 
 const VALID_SCOPES: Omit<Scope, 'c'>[] = SCOPES.filter(s => s !== 'c');
 
-export default function AppRegistration() {
+// TODO: makes sure this works properly
+// TODO: using the browser's navigate back button back on that page doesn't work for some reason,
+export const AppRegistrationPage = memo(() => {
   const location = useLocation();
   const navigate = useNavigate();
   const { t } = useTranslation(['authorize']);
   const theme = useTheme();
-  const banner = useAppBannerVert();
-  const { user: currentUser } = useAppUser<CustomUser>();
+  const currentUser = useAppUser() as CustomUser;
   const { configuration } = useALContext();
 
   const params = new URLSearchParams(location.search);
@@ -28,15 +31,15 @@ export default function AppRegistration() {
   const rolesP = params.get('roles');
   const server = params.get('server');
 
-  let roles = [];
+  let roles: Role[] = [];
   if (rolesP) {
     roles = (rolesP.split(',') as Role[]).filter(r => configuration.user.roles.includes(r));
   }
 
   return (
     <Backdrop open style={{ backgroundColor: theme.palette.background.default, zIndex: 10000 }} transitionDuration={0}>
-      <PageCardCentered>
-        {banner}
+      <AppPageCardCentered>
+        <AppVerticalBanner />
         <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'center', justifyContent: 'center' }}>
           {!currentUser.roles.includes('obo_access') ? (
             <>
@@ -45,9 +48,14 @@ export default function AppRegistration() {
                 {t('button.back')}
               </Button>
             </>
-          ) : !rUrl || !clientID || (!scope && !roles) || !server || (scope && VALID_SCOPES.indexOf(scope) === -1) ? (
+          ) : !rUrl ||
+            !clientID ||
+            (!scope && !roles) ||
+            !server ||
+            (scope && VALID_SCOPES.indexOf(scope as Scope) === -1) ? (
             <>
               <div style={{ marginBottom: '3rem' }}>{t('invalid')}</div>
+              {/** TODO: fix this, so that navigating either navigates back or brings you back to the login page */}
               <Button variant="contained" color="primary" onClick={() => navigate(-1)}>
                 {t('button.back')}
               </Button>
@@ -107,7 +115,22 @@ export default function AppRegistration() {
             </>
           )}
         </div>
-      </PageCardCentered>
+      </AppPageCardCentered>
     </Backdrop>
   );
-}
+});
+
+export const AuthorizeRoute = createAppRoute({
+  component: AppRegistrationPage,
+
+  path: '/authorize',
+
+  ancestor: null,
+  shortname: () => ['app_route.authorize.shortname', { ns: 'authorize' }],
+  fullname: () => ['app_route.authorize.fullname', { ns: 'authorize' }],
+  shorticon: () => <KeyOutlinedIcon />,
+  fullicon: () => <KeyOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
+});

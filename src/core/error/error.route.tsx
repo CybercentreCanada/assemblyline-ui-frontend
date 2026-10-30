@@ -1,16 +1,31 @@
-import React, { useEffect } from 'react';
+import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
+import { createAppRoute } from 'core/router';
+import { memo, useEffect } from 'react';
 
-type CrashTestProps = {
+export type CrashPageProps = {
   message?: string;
 };
 
-const CrashTest: React.FC<CrashTestProps> = ({ message = null }) => {
+export const CrashPage = memo(({ message = null }: CrashPageProps) => {
   // This page makes the UI crash so we can test the frontend exception handling
   useEffect(() => {
     throw new Error(message || 'This is a test crash !');
   }, [message]);
 
   return <div />;
-};
+});
 
-export default CrashTest;
+export const CrashRoute = createAppRoute({
+  component: CrashPage,
+
+  path: '/crash',
+
+  ancestor: null,
+  shortname: () => ['app_route.error.shortname', { ns: 'error' }],
+  fullname: () => ['app_route.error.fullname', { ns: 'error' }],
+  shorticon: () => <BugReportOutlinedIcon />,
+  fullicon: () => <BugReportOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
+});

@@ -1,36 +1,35 @@
-import type { ALRequests, ALResponses } from 'app/core.api';
-import type { APIResponse } from 'core/api/api.models.ts';
-import type { UseAPICallFnProps } from 'core/api/hooks/useApiCallFn';
-import { useInfiniteAPIQuery } from 'core/api/hooks/useInfiniteApiQuery';
+import type { ApiResponse } from 'core/api/api.models';
+import type { UseApiCallFnProps } from 'core/api/hooks/useApiCallFn';
+import { useInfiniteApiQuery } from 'core/api/hooks/useInfiniteApiQuery';
 
-export type UseInfiniteALQueryProps<Request extends ALRequests, Error extends string = string> = {
+export type UseInfiniteAppQueryProps<Request extends ApiRequests, Error extends string = string> = {
   initialOffset?: number;
-  getParams: (offset: number) => UseAPICallFnProps<APIResponse<ALResponses<Request>>, Request, APIResponse<Error>>;
+  getParams: (offset: number) => UseApiCallFnProps<ApiResponse<ApiResponses<Request>>, Request, ApiResponse<Error>>;
   getPreviousOffset?: (
-    firstPage: APIResponse<ALResponses<Request>>,
-    allPages: Array<APIResponse<ALResponses<Request>>>,
+    firstPage: ApiResponse<ApiResponses<Request>>,
+    allPages: ApiResponse<ApiResponses<Request>>[],
     firstPageParam: number,
-    allPageParams: Array<number>
+    allPageParams: number[]
   ) => number | undefined;
   getNextOffset?: (
-    lastPage: APIResponse<ALResponses<Request>>,
-    allPages: Array<APIResponse<ALResponses<Request>>>,
+    lastPage: ApiResponse<ApiResponses<Request>>,
+    allPages: ApiResponse<ApiResponses<Request>>[],
     lastPageParam: number,
-    allPageParams: Array<number>
+    allPageParams: number[]
   ) => number | undefined;
   allowCache?: boolean;
   retryAfter?: number;
 };
 
-export const useInfiniteALQuery = <Request extends ALRequests, Error extends string = string>({
+export const useInfiniteAppQuery = <Request extends ApiRequests, Error extends string = string>({
   initialOffset = 0,
   getParams = () => null,
   getPreviousOffset = () => null,
   getNextOffset = () => null,
   allowCache = false,
   retryAfter
-}: UseInfiniteALQueryProps<Request, Error>) =>
-  useInfiniteAPIQuery<ALResponses<Request>, Request, Error>({
+}: UseInfiniteAppQueryProps<Request, Error>) =>
+  useInfiniteApiQuery<ApiResponses<Request>, Request, Error>({
     initialOffset,
     getParams,
     getPreviousOffset,

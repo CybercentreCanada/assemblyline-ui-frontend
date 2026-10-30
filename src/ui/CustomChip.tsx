@@ -1,9 +1,9 @@
 import type { ChipProps, TooltipProps } from '@mui/material';
 import { Chip, Tooltip, styled } from '@mui/material';
 import { darken } from '@mui/material/styles';
-import type { PossibleColor } from 'shared/utils/colors';
 import type { FC } from 'react';
 import { memo } from 'react';
+import type { PossibleColor } from 'shared/utils/colors';
 
 export const SIZE_MAP: Record<ChipProps['size'], ChipProps['size']> = {
   small: 'small',

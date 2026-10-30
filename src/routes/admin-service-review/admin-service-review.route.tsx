@@ -1,22 +1,21 @@
 import ArrowDownwardOutlinedIcon from '@mui/icons-material/ArrowDownwardOutlined';
 import ArrowUpwardOutlinedIcon from '@mui/icons-material/ArrowUpwardOutlined';
+import CompareArrowsOutlinedIcon from '@mui/icons-material/CompareArrowsOutlined';
 import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import type { TypographyProps } from '@mui/material';
-import { Grid, IconButton, MenuItem, Select, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
+import { Grid, MenuItem, Select, Skeleton, Typography, useTheme } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
-import useMyAPI from 'core/api/hooks/useMyAPI';
-import { useAppUser } from 'core/template/components/app/hooks';
-import PageFullWidth from 'core/template/components/pages/PageFullWidth';
-import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
+import { createAppRoute, useAppSearchSnapshot } from 'core/router';
+import { AppPageFullWidth } from 'core/template';
+import useALContext from 'deprecated/hooks/useALContext';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
 import type { ServiceStats as ServiceStatsData } from 'models/api/service';
-import type { CustomUser } from 'models/api/user';
 import type { Service as ServiceData } from 'models/base/service';
 import type { Dispatch, SetStateAction } from 'react';
-import { useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate, useLocation } from 'react-router';
-import { Link } from 'react-router-dom';
 import { getVersionQuery } from 'shared/utils/utils';
+import { IconButton } from 'ui/buttons/IconButton';
 import LineGraph from 'ui/LineGraph';
 
 // TODO: version doesn't seem to be set correctly
@@ -118,18 +117,26 @@ function ServiceDetail({ stats, comp, show }: ServiceDetailProps) {
         </div>
         <div style={{ marginBottom: theme.spacing(2), display: 'flex', flexDirection: 'column' }}>
           {stats ? (
-            <Tooltip title={t('errors')}>
+            <div style={{ alignSelf: 'self-end' }}>
               <IconButton
-                component={Link}
-                style={{ color: theme.palette.action.active, alignSelf: 'self-end' }}
-                to={`/admin/errors?tc=1y&filters=response.service_name%3A${
-                  stats.service.name
-                }&filters=${getVersionQuery(stats.service.version)}`}
+                tooltip={t('errors')}
+                nav={nav =>
+                  nav.here().create({
+                    route: '/admin/errors',
+                    search: {
+                      start: 'now-1y/d',
+                      gap: '30d',
+                      filters: [`response.service_name:${stats.service.name}`, getVersionQuery(stats.service.version)]
+                    }
+                  })
+                }
+                navDeps={[stats.service.name, stats.service.version]}
+                style={{ color: theme.palette.action.active }}
                 size="large"
               >
                 <ErrorOutlineOutlinedIcon />
               </IconButton>
-            </Tooltip>
+            </div>
           ) : (
             <Skeleton
               component="div"
@@ -190,15 +197,14 @@ function VersionSelector({ possibleVersions, selectedService, version, setVersio
   );
 }
 
-export default function ServiceReview() {
+export const AdminServiceReviewPage = memo(() => {
   const { t } = useTranslation(['adminServiceReview']);
   const theme = useTheme();
+  const search = useAppSearchSnapshot<'/admin/service_review'>();
 
-  const location = useLocation();
-  const params = new URLSearchParams(location.search);
-  const defaultSelectedService = params.get('service') || '';
-  const defaultVersion1 = params.get('v1') || '';
-  const defaultVersion2 = params.get('v2') || '';
+  const defaultSelectedService = search.get('service');
+  const defaultVersion1 = search.get('v1');
+  const defaultVersion2 = search.get('v2');
 
   const [services, setServices] = useState<ServiceData['name'][]>(null);
   const [selectedService, setSelectedService] = useState<string>(defaultSelectedService);
@@ -209,7 +215,7 @@ export default function ServiceReview() {
   const [stats2, setStats2] = useState<ServiceStats>(null);
 
   const { apiCall } = useMyAPI();
-  const { user: currentUser } = useAppUser<CustomUser>();
+  const { user: currentUser } = useALContext();
 
   const handleServiceChange = event => {
     setVersion1('');
@@ -255,7 +261,7 @@ export default function ServiceReview() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedService]);
 
-  useEffectOnce(() => {
+  useEffect(() => {
     if (currentUser.is_admin) {
       apiCall<ServiceData[]>({
         url: '/api/v4/service/all/',
@@ -264,10 +270,10 @@ export default function ServiceReview() {
         }
       });
     }
-  });
+  }, []);
 
-  return currentUser.is_admin ? (
-    <PageFullWidth margin={4}>
+  return (
+    <AppPageFullWidth>
       <Grid
         container
         alignItems="center"
@@ -348,8 +354,26 @@ export default function ServiceReview() {
           </Grid>
         </>
       )}
-    </PageFullWidth>
-  ) : (
-    <Navigate to="/forbidden" replace />
+    </AppPageFullWidth>
   );
-}
+});
+
+export const AdminServiceReviewRoute = createAppRoute({
+  component: AdminServiceReviewPage,
+
+  path: '/admin/service_review',
+  search: s => ({
+    service: s.string(''),
+    v1: s.string(''),
+    v2: s.string('')
+  }),
+
+  ancestor: '/admin',
+  shortname: () => ['app_route.admin_service_review.shortname', { ns: 'adminServiceReview' }],
+  fullname: () => ['app_route.admin_service_review.fullname', { ns: 'adminServiceReview' }],
+  shorticon: () => <CompareArrowsOutlinedIcon />,
+  fullicon: () => <CompareArrowsOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.is_admin
+});

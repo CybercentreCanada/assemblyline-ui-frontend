@@ -1,9 +1,9 @@
 import { Grid, Typography, useTheme } from '@mui/material';
 import type { Service } from 'models/base/service';
-import MultiTypeConfig from 'routes/admin-service-detail/components/multi_type_config';
-import MultiTypeParam from 'routes/admin-service-detail/components/multi_type_param';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import MultiTypeConfig from 'routes/admin-service-detail/components/multi_type_config';
+import MultiTypeParam from 'routes/admin-service-detail/components/multi_type_param';
 
 type ServiceParamsProps = {
   service: Service;

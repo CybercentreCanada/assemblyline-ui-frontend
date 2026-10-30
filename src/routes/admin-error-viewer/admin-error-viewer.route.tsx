@@ -1,56 +1,37 @@
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
+import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import PanToolOutlinedIcon from '@mui/icons-material/PanToolOutlined';
 import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
 import { Grid, Typography, useTheme } from '@mui/material';
-import useMyAPI from 'core/api/hooks/useMyAPI';
-import PageContainer from 'core/template/branding/AppPageContainer';
-import { useAppUser } from 'core/template/components/app/hooks';
-import PageFullWidth from 'core/template/components/pages/PageFullWidth';
-import { createSearchParams, SearchParamsProvider, useSearchParams } from 'features/SearchParams/createSearchParams';
-import useDrawer from 'layout/drawer/drawer.hooks';
+import { createAppRoute, useAppNavigate, useAppSearchSnapshot } from 'core/router';
+import { AppPageContainer, AppPageFullWidth } from 'core/template';
+import useALContext from 'deprecated/hooks/useALContext';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
 import type { FacetResult, HistogramResult, SearchResult } from 'models/api/search';
-import type { CustomUser, IndexDefinition } from 'models/api/user';
+import type { IndexDefinition } from 'models/api/user';
 import type { Error } from 'models/base/error';
-import React, { useCallback, useEffect, useState } from 'react';
+import { memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate, useLocation, useNavigate } from 'react-router';
-import { ErrorDetail } from 'routes/admin-error-detail/admin-error-detail.route';
-import ErrorsTable from 'routes/search/components/errors';
+import { ErrorsTable } from 'routes/search/components/errors';
 import { safeFieldValue } from 'shared/utils/utils';
 import { DateTimeRangePicker } from 'ui/DateTime/DateTimeRangePicker';
 import { LuceneDateTime, LuceneDateTimeGap } from 'ui/DateTime/LuceneDateTime';
 import Histogram from 'ui/Histogram';
 import LineGraph from 'ui/LineGraph';
-import SearchHeader from 'ui/SearchBar/SearchHeader';
 import { DEFAULT_SUGGESTION } from 'ui/SearchBar/search-textfield';
+import SearchHeader from 'ui/SearchBar/SearchHeader';
 
-const ERROR_VIEWER_PARAMS = createSearchParams(p => ({
-  query: p.string(''),
-  offset: p.number(0).min(0).origin('snapshot').ephemeral(),
-  rows: p.number(25).locked().origin('snapshot').ephemeral(),
-  sort: p.string('created desc').ephemeral(),
-  start: p.string('now-4d'),
-  end: p.string('now'),
-  gap: p.string('4h'),
-  filters: p.filters([]),
-  track_total_hits: p.number(10000).nullable().ephemeral(),
-  mincount: p.number(0).min(0).origin('snapshot').ephemeral(),
-  use_archive: p.boolean(false),
-  archive_only: p.boolean(false),
-  timeout: p.string('').origin('snapshot').ephemeral()
-}));
+//*****************************************************************************************
+// AdminErrorViewer Page
+//*****************************************************************************************
 
-type ErrorViewerParams = typeof ERROR_VIEWER_PARAMS;
-
-const ErrorViewer = () => {
+export const AdminErrorViewerPage = memo(() => {
   const { t, i18n } = useTranslation(['adminErrorViewer']);
   const theme = useTheme();
-  const location = useLocation();
-  const navigate = useNavigate();
+  const navigate = useAppNavigate<'/admin/errors'>();
   const { apiCall } = useMyAPI();
-  const { user: currentUser } = useAppUser<CustomUser>();
-  const { globalDrawerOpened, setGlobalDrawer, closeGlobalDrawer } = useDrawer();
-  const { search, setSearchParams, setSearchObject } = useSearchParams<ErrorViewerParams>();
+  const { user: currentUser } = useALContext();
+  const search = useAppSearchSnapshot<'/admin/errors'>();
 
   const [errorResults, setErrorResults] = useState<SearchResult<Error>>(null);
   const [histogram, setHistogram] = useState<HistogramResult>(null);
@@ -59,20 +40,20 @@ const ErrorViewer = () => {
   const [searching, setSearching] = useState<boolean>(false);
   const [suggestions, setSuggestions] = useState<IndexDefinition>(DEFAULT_SUGGESTION);
 
-  const setErrorKey = useCallback(
-    (error_key: string) => navigate(`${location.pathname}${location.search || ''}#${error_key}`),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [location.search]
-  );
-
   const handleToggleFilter = useCallback(
     (filter: string) => {
-      setSearchObject(o => {
-        const filters = o.filters.includes(filter) ? o.filters.filter(f => f !== filter) : [...o.filters, filter];
-        return { ...o, offset: 0, filters };
-      });
+      navigate.here().update(s => ({
+        ...s,
+        search: {
+          ...s.search,
+          offset: 0,
+          filters: s.search.filters.includes(filter)
+            ? s.search.filters.filter(f => f !== filter)
+            : [...s.search.filters, filter]
+        }
+      }));
     },
-    [setSearchObject]
+    [navigate]
   );
 
   useEffect(() => {
@@ -116,10 +97,7 @@ const ErrorViewer = () => {
       method: 'POST',
       body: body
         .pick(['query', 'mincount', 'filters', 'timeout', 'use_archive', 'archive_only'])
-        .set(s => {
-          s.mincount = 1;
-          return s;
-        })
+        .set(s => ({ ...s, mincount: 1 }))
         .toObject(),
       onSuccess: ({ api_response }) =>
         setNames(
@@ -136,10 +114,7 @@ const ErrorViewer = () => {
       method: 'POST',
       body: body
         .pick(['query', 'mincount', 'filters', 'timeout', 'use_archive', 'archive_only'])
-        .set(s => {
-          s.mincount = 1;
-          return s;
-        })
+        .set(s => ({ ...s, mincount: 1 }))
         .toObject(),
       onSuccess: ({ api_response }) =>
         setTypes(
@@ -152,7 +127,7 @@ const ErrorViewer = () => {
     });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentUser.is_admin, search]);
+  }, [currentUser.is_admin, search?.toString()]);
 
   useEffect(() => {
     apiCall<IndexDefinition>({
@@ -162,20 +137,8 @@ const ErrorViewer = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    if (!location.hash || globalDrawerOpened || !errorResults) return;
-    navigate(`${location.pathname}${location.search || ''}`);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [globalDrawerOpened]);
-
-  useEffect(() => {
-    if (location.hash) setGlobalDrawer(<ErrorDetail error_key={location.hash.substr(1)} />);
-    else closeGlobalDrawer();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location.hash]);
-
-  return currentUser.is_admin ? (
-    <PageFullWidth margin={4}>
+  return (
+    <AppPageFullWidth>
       <div
         style={{
           width: '100%',
@@ -194,11 +157,13 @@ const ErrorViewer = () => {
           value={{ start: search.get('start'), end: search.get('end'), gap: search.get('gap') }}
           disabled={searching}
           hasGap
-          onChange={(e, { start, end, gap }) => setSearchObject(o => ({ ...o, offset: 0, start, end, gap }))}
+          onChange={(e, { start, end, gap }) =>
+            navigate.here().update(s => ({ ...s, search: { ...s.search, offset: 0, start, end, gap } }))
+          }
         />
       </div>
 
-      <PageContainer isSticky>
+      <AppPageContainer isSticky>
         <div style={{ paddingTop: theme.spacing(1) }}>
           <SearchHeader
             params={search.toParams()}
@@ -209,7 +174,11 @@ const ErrorViewer = () => {
                 ? t(`filtered${errorResults?.total === 1 ? '' : 's'}`)
                 : t(`total${errorResults?.total === 1 ? '' : 's'}`)
             }
-            onChange={v => setSearchParams(v)}
+            onChange={v =>
+              navigate
+                .here()
+                .update(s => ({ ...s, search: { ...s.search, ...AdminErrorViewerRoute.search.full(v).toObject() } }))
+            }
             searchInputProps={{ placeholder: t('filter'), options: suggestions }}
             actionProps={[
               {
@@ -249,7 +218,7 @@ const ErrorViewer = () => {
             ]}
           />
         </div>
-      </PageContainer>
+      </AppPageContainer>
 
       {errorResults !== null && errorResults.total !== 0 && (
         <Grid container spacing={2}>
@@ -272,7 +241,10 @@ const ErrorViewer = () => {
               onClick={(evt, element) => {
                 if (!searching && element.length > 0) {
                   const filter = `response.service_name:${Object.keys(names)[element[0].index]}`;
-                  setSearchObject(o => ({ ...o, offset: 0, filters: [...o.filters, filter] }));
+                  navigate.here().update(s => ({
+                    ...s,
+                    search: { ...s.search, offset: 0, filters: [...s.search.filters, filter] }
+                  }));
                 }
               }}
             />
@@ -286,7 +258,10 @@ const ErrorViewer = () => {
               onClick={(evt, element) => {
                 if (!searching && element.length > 0) {
                   const filter = `type:${safeFieldValue(Object.keys(types)[element[0].index])}`;
-                  setSearchObject(o => ({ ...o, offset: 0, filters: [...o.filters, filter] }));
+                  navigate.here().update(s => ({
+                    ...s,
+                    search: { ...s.search, offset: 0, filters: [...s.search.filters, filter] }
+                  }));
                 }
               }}
             />
@@ -295,19 +270,44 @@ const ErrorViewer = () => {
       )}
 
       <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
-        <ErrorsTable errorResults={errorResults} setErrorKey={setErrorKey} />
+        <ErrorsTable errorResults={errorResults} />
       </div>
-    </PageFullWidth>
-  ) : (
-    <Navigate to="/forbidden" replace />
+    </AppPageFullWidth>
   );
-};
+});
 
-const WrappedErrorViewerPage = () => (
-  <SearchParamsProvider params={ERROR_VIEWER_PARAMS}>
-    <ErrorViewer />
-  </SearchParamsProvider>
-);
+AdminErrorViewerPage.displayName = 'AdminErrorViewerPage';
 
-export const ErrorViewerPage = React.memo(WrappedErrorViewerPage);
-export default ErrorViewerPage;
+//*****************************************************************************************
+// AdminErrorViewer Route
+//*****************************************************************************************
+
+export const AdminErrorViewerRoute = createAppRoute({
+  component: AdminErrorViewerPage,
+
+  path: '/admin/errors',
+  search: s => ({
+    query: s.string(''),
+    offset: s.number(0).min(0).source('transient').ephemeral(),
+    rows: s.number(25).locked().source('transient').ephemeral(),
+    sort: s.string('created desc').ephemeral(),
+    start: s.string('now-4d'),
+    end: s.string('now'),
+    gap: s.string('4h'),
+    filters: s.filters([]),
+    track_total_hits: s.number(10000).nullable().ephemeral(),
+    mincount: s.number(0).min(0).source('transient').ephemeral(),
+    use_archive: s.boolean(false),
+    archive_only: s.boolean(false),
+    timeout: s.string('').source('transient').ephemeral()
+  }),
+
+  ancestor: '/admin',
+  shortname: () => ['app_route.admin_error_viewer.shortname', { ns: 'adminErrorViewer' }],
+  fullname: () => ['app_route.admin_error_viewer.fullname', { ns: 'adminErrorViewer' }],
+  shorticon: () => <ErrorOutlineOutlinedIcon />,
+  fullicon: () => <ErrorOutlineOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.is_admin
+});

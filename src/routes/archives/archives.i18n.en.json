@@ -1,4 +1,10 @@
 {
+  "app_route.archive_detail_id.fullname": "Archive File Detail {{id}}",
+  "app_route.archive_detail_id.shortname": "{{id}}",
+  "app_route.archive_detail_id_tab.fullname": "Archive File Detail {{id}} {{tab}}",
+  "app_route.archive_detail_id_tab.shortname": "{{id}}",
+  "app_route.archives.fullname": "Malware Archive",
+  "app_route.archives.shortname": "Archive",
   "ascii": "ASCII",
   "attribution": "Attribution",
   "beta.description": "Malware Archive is a work-in-progress feature that may change over time. Use at your own risk!",

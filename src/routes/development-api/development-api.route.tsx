@@ -1,32 +1,34 @@
 import type { Monaco } from '@monaco-editor/react';
 import Editor, { loader } from '@monaco-editor/react';
+import ApiIcon from '@mui/icons-material/Api';
 import { Button, Grid, Paper, Skeleton, Typography, useTheme } from '@mui/material';
-import { useAPIMutation } from 'core/api/hooks/useApiMutation';
-import { useALQuery } from 'core/api/hooks/useAppQuery';
-import useALContext from 'core/config/useALContext';
-import useMySnackbar from 'core/snackbar/snackbar.hooks';
-import PageFullSize from 'core/template/branding/AppPageCenter';
+import type { Method } from 'core/api';
+import { useApiMutation, useAppQuery } from 'core/api';
+import { createAppRoute } from 'core/router';
+import { AppPageFullSize } from 'core/template';
+import useALContext from 'deprecated/hooks/useALContext';
+import useMySnackbar from 'deprecated/hooks/useMySnackbar';
 import type { ApiDocumentation } from 'models/api';
-import type { Method } from 'models/utils/request';
 import type { editor } from 'monaco-editor';
-import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate } from 'react-router';
 import AutoSizer from 'react-virtualized-auto-sizer';
-import type { Request, Response } from 'routes/development-api/development-api.models.ts';
+import type { Request, Response } from 'routes/development-api/development-api.models';
 import {
-  formatMilliseconds,
   METHOD_COLOR_MAP,
-  parseRequest,
   STATUS_CODES,
+  formatMilliseconds,
+  parseRequest,
   stringifyRequest
-} from 'routes/development-api/development-api.utils.ts';
+} from 'routes/development-api/development-api.utils';
 import CustomChip from 'ui/CustomChip';
 import { PageHeader } from 'ui/layouts/PageHeader';
 
-loader.config({ paths: { vs: '/cdn/monaco_0.35.0/vs' } });
+loader.config({
+  paths: { vs: '/cdn/monaco_0.35.0/vs' }
+});
 
-export const DevelopmentAPI = () => {
+export const DevelopmentAPIPage = memo(() => {
   const { t } = useTranslation(['developmentAPI', 'user']);
   const theme = useTheme();
   const { user: currentUser, configuration } = useALContext();
@@ -37,7 +39,7 @@ export const DevelopmentAPI = () => {
 
   const deferredValue = useDeferredValue<string>(value);
 
-  const { data: routes, isLoading } = useALQuery({ url: `/api/v4/` });
+  const { data: routes, isLoading } = useAppQuery({ url: `/api/v4/` });
 
   const request = useMemo<Request>(() => parseRequest(deferredValue), [deferredValue]);
 
@@ -60,7 +62,7 @@ export const DevelopmentAPI = () => {
   const requestRef = useRef<Request>(request);
   const currentRouteRef = useRef<ApiDocumentation | null>(currentRoute);
 
-  const handleSubmit = useAPIMutation((req: Request, route: ApiDocumentation) => {
+  const handleSubmit = useApiMutation((req: Request, route: ApiDocumentation) => {
     const startTime = performance.now(); // Start timestamp
 
     return {
@@ -191,196 +193,207 @@ export const DevelopmentAPI = () => {
     currentRouteRef.current = currentRoute;
   }, [currentRoute, request]);
 
-  if (!currentUser.is_admin || !['development', 'staging'].includes(configuration.system.type))
-    return <Navigate to="/forbidden" replace />;
-  else
-    return (
-      <PageFullSize margin={4}>
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', rowGap: theme.spacing(2) }}>
-          <PageHeader
-            primary={t('title')}
-            actions={
-              <Button
-                disabled={!currentRoute}
-                variant="contained"
-                onClick={() => handleSubmit.mutate(request, currentRoute)}
-              >
-                {t('submit')}
-              </Button>
-            }
-          />
+  return (
+    <AppPageFullSize>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', rowGap: theme.spacing(2) }}>
+        <PageHeader
+          primary={t('title')}
+          actions={
+            <Button
+              disabled={!currentRoute}
+              variant="contained"
+              onClick={() => handleSubmit.mutate(request, currentRoute)}
+            >
+              {t('submit')}
+            </Button>
+          }
+        />
 
-          <Grid container component={Paper}>
-            <Grid size={{ xs: 12, sm: 6 }} sx={{ padding: theme.spacing(1) }}>
-              <Typography variant="body1">{t('request')}</Typography>
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'auto 1fr',
-                  columnGap: theme.spacing(1),
-                  rowGap: theme.spacing(0.25)
-                }}
-              >
-                <div style={{ color: theme.palette.text.secondary }}>{t('name')}:</div>
-                <div>{currentRoute?.name}</div>
-
-                <div style={{ color: theme.palette.text.secondary }}>{t('path')}:</div>
-                <div>{currentRoute?.path}</div>
-
-                <div style={{ color: theme.palette.text.secondary }}>{t('method')}:</div>
-                <div
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    flexWrap: 'wrap',
-                    columnGap: theme.spacing(0.5)
-                  }}
-                >
-                  {currentRoute?.methods.map((method, i) => (
-                    <CustomChip
-                      key={`${method}-${i}`}
-                      label={method}
-                      color={METHOD_COLOR_MAP?.[method] || 'default'}
-                      size="tiny"
-                      variant={request?.method === method ? 'filled' : 'outlined'}
-                    />
-                  ))}
-                </div>
-
-                <div style={{ color: theme.palette.text.secondary }}>{t('required_role')}:</div>
-                <div
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    flexWrap: 'wrap',
-                    columnGap: theme.spacing(0.5)
-                  }}
-                >
-                  {currentRoute?.require_role.map((role, i) => (
-                    <CustomChip
-                      key={`${role}-${i}`}
-                      label={t(`user:role.${role}`)}
-                      color={currentUser.roles.includes(role) ? 'primary' : 'default'}
-                      size="tiny"
-                      type="rounded"
-                    />
-                  ))}
-                </div>
-
-                <div></div>
-                <div
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    flexWrap: 'wrap',
-                    columnGap: theme.spacing(0.5)
-                  }}
-                >
-                  {!currentRoute ? null : (
-                    <>
-                      {currentRoute?.complete && (
-                        <CustomChip label={t('complete')} size="tiny" type="rounded" variant="outlined" />
-                      )}
-                      {currentRoute?.count_towards_quota && (
-                        <CustomChip label={t('count_towards_quota')} size="tiny" type="rounded" variant="outlined" />
-                      )}
-                      {currentRoute?.protected && (
-                        <CustomChip label={t('protected')} size="tiny" type="rounded" variant="outlined" />
-                      )}
-                      {currentRoute?.ui_only && (
-                        <CustomChip label={t('ui_only')} size="tiny" type="rounded" variant="outlined" />
-                      )}
-                    </>
-                  )}
-                </div>
-              </div>
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6 }} sx={{ padding: theme.spacing(1) }}>
-              <Typography variant="body1">{t('response')}</Typography>
-              <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', columnGap: theme.spacing(1) }}>
-                <div style={{ color: theme.palette.text.secondary }}>{t('version')}:</div>
-                <div>{response?.serverVersion}</div>
-
-                <div style={{ color: theme.palette.text.secondary }}>{t('status_code')}:</div>
-                <div>
-                  {response?.statusCode && (
-                    <CustomChip
-                      label={response?.statusCode}
-                      size="tiny"
-                      color={(() => {
-                        switch (response?.statusCode?.toString()[0]) {
-                          case '1':
-                            return 'info';
-                          case '2':
-                            return 'success';
-                          case '3':
-                            return 'warning';
-                          case '4':
-                            return 'error';
-                          case '5':
-                            return 'primary';
-                          default:
-                            return 'default';
-                        }
-                      })()}
-                    />
-                  )}
-                </div>
-
-                <div style={{ color: theme.palette.text.secondary }}>{t('name')}:</div>
-                <div>{STATUS_CODES?.[response?.statusCode]?.name || null}</div>
-
-                <div style={{ color: theme.palette.text.secondary }}>{t('description')}:</div>
-                <div>{STATUS_CODES?.[response?.statusCode]?.description || null}</div>
-
-                <div style={{ color: theme.palette.text.secondary }}>{t('elapse_time')}:</div>
-                <div>{formatMilliseconds(response?.elapseTime)}</div>
-
-                <div style={{ color: theme.palette.text.secondary }}>{t('error')}:</div>
-                <div
-                  style={{
-                    color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
-                  }}
-                >
-                  {handleSubmit?.failureReason?.message || handleSubmit?.error}
-                </div>
-              </div>
-            </Grid>
-          </Grid>
-
-          {isLoading ? (
-            <Skeleton />
-          ) : (
+        <Grid container component={Paper}>
+          <Grid size={{ xs: 12, sm: 6 }} sx={{ padding: theme.spacing(1) }}>
+            <Typography variant="body1">{t('request')}</Typography>
             <div
               style={{
-                flexGrow: 1,
-                border: `1px solid ${theme.palette.divider}`,
-                position: 'relative'
+                display: 'grid',
+                gridTemplateColumns: 'auto 1fr',
+                columnGap: theme.spacing(1),
+                rowGap: theme.spacing(0.25)
               }}
             >
-              <div style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}>
-                <AutoSizer>
-                  {({ width, height }: { width: number; height: number }) => (
-                    <Editor
-                      language="json"
-                      width={width}
-                      height={height}
-                      theme={theme.palette.mode === 'dark' ? 'vs-dark' : 'vs'}
-                      loading={t('loading')}
-                      value={value}
-                      onChange={setValue}
-                      beforeMount={beforeMount}
-                      onMount={onMount}
-                      options={{ links: false }}
-                    />
-                  )}
-                </AutoSizer>
+              <div style={{ color: theme.palette.text.secondary }}>{t('name')}:</div>
+              <div>{currentRoute?.name}</div>
+
+              <div style={{ color: theme.palette.text.secondary }}>{t('path')}:</div>
+              <div>{currentRoute?.path}</div>
+
+              <div style={{ color: theme.palette.text.secondary }}>{t('method')}:</div>
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  flexWrap: 'wrap',
+                  columnGap: theme.spacing(0.5)
+                }}
+              >
+                {currentRoute?.methods.map((method, i) => (
+                  <CustomChip
+                    key={`${method}-${i}`}
+                    label={method}
+                    color={METHOD_COLOR_MAP?.[method] || 'default'}
+                    size="tiny"
+                    variant={request?.method === method ? 'filled' : 'outlined'}
+                  />
+                ))}
+              </div>
+
+              <div style={{ color: theme.palette.text.secondary }}>{t('required_role')}:</div>
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  flexWrap: 'wrap',
+                  columnGap: theme.spacing(0.5)
+                }}
+              >
+                {currentRoute?.require_role.map((role, i) => (
+                  <CustomChip
+                    key={`${role}-${i}`}
+                    label={t(`user:role.${role}`)}
+                    color={currentUser.roles.includes(role) ? 'primary' : 'default'}
+                    size="tiny"
+                    type="rounded"
+                  />
+                ))}
+              </div>
+
+              <div></div>
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  flexWrap: 'wrap',
+                  columnGap: theme.spacing(0.5)
+                }}
+              >
+                {!currentRoute ? null : (
+                  <>
+                    {currentRoute?.complete && (
+                      <CustomChip label={t('complete')} size="tiny" type="rounded" variant="outlined" />
+                    )}
+                    {currentRoute?.count_towards_quota && (
+                      <CustomChip label={t('count_towards_quota')} size="tiny" type="rounded" variant="outlined" />
+                    )}
+                    {currentRoute?.protected && (
+                      <CustomChip label={t('protected')} size="tiny" type="rounded" variant="outlined" />
+                    )}
+                    {currentRoute?.ui_only && (
+                      <CustomChip label={t('ui_only')} size="tiny" type="rounded" variant="outlined" />
+                    )}
+                  </>
+                )}
               </div>
             </div>
-          )}
-        </div>
-      </PageFullSize>
-    );
-};
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6 }} sx={{ padding: theme.spacing(1) }}>
+            <Typography variant="body1">{t('response')}</Typography>
+            <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', columnGap: theme.spacing(1) }}>
+              <div style={{ color: theme.palette.text.secondary }}>{t('version')}:</div>
+              <div>{response?.serverVersion}</div>
 
-export default DevelopmentAPI;
+              <div style={{ color: theme.palette.text.secondary }}>{t('status_code')}:</div>
+              <div>
+                {response?.statusCode && (
+                  <CustomChip
+                    label={response?.statusCode}
+                    size="tiny"
+                    color={(() => {
+                      switch (response?.statusCode?.toString()[0]) {
+                        case '1':
+                          return 'info';
+                        case '2':
+                          return 'success';
+                        case '3':
+                          return 'warning';
+                        case '4':
+                          return 'error';
+                        case '5':
+                          return 'primary';
+                        default:
+                          return 'default';
+                      }
+                    })()}
+                  />
+                )}
+              </div>
+
+              <div style={{ color: theme.palette.text.secondary }}>{t('name')}:</div>
+              <div>{STATUS_CODES?.[response?.statusCode]?.name || null}</div>
+
+              <div style={{ color: theme.palette.text.secondary }}>{t('description')}:</div>
+              <div>{STATUS_CODES?.[response?.statusCode]?.description || null}</div>
+
+              <div style={{ color: theme.palette.text.secondary }}>{t('elapse_time')}:</div>
+              <div>{formatMilliseconds(response?.elapseTime)}</div>
+
+              <div style={{ color: theme.palette.text.secondary }}>{t('error')}:</div>
+              <div
+                style={{
+                  color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+                }}
+              >
+                {handleSubmit?.failureReason?.message || handleSubmit?.error}
+              </div>
+            </div>
+          </Grid>
+        </Grid>
+
+        {isLoading ? (
+          <Skeleton />
+        ) : (
+          <div
+            style={{
+              flexGrow: 1,
+              border: `1px solid ${theme.palette.divider}`,
+              position: 'relative'
+            }}
+          >
+            <div style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}>
+              <AutoSizer>
+                {({ width, height }: { width: number; height: number }) => (
+                  <Editor
+                    language="json"
+                    width={width}
+                    height={height}
+                    theme={theme.palette.mode === 'dark' ? 'vs-dark' : 'vs'}
+                    loading={t('loading')}
+                    value={value}
+                    onChange={setValue}
+                    beforeMount={beforeMount}
+                    onMount={onMount}
+                    options={{ links: false }}
+                  />
+                )}
+              </AutoSizer>
+            </div>
+          </div>
+        )}
+      </div>
+    </AppPageFullSize>
+  );
+});
+
+export const DevelopmentAPIRoute = createAppRoute({
+  component: DevelopmentAPIPage,
+
+  path: '/development/api',
+
+  ancestor: '/development',
+  shortname: () => ['app_route.development_api.shortname', { ns: 'developmentAPI' }],
+  fullname: () => ['app_route.development_api.fullname', { ns: 'developmentAPI' }],
+  shorticon: () => <ApiIcon />,
+  fullicon: () => <ApiIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) =>
+    !config.user.is_admin || !['development', 'staging'].includes(config.configuration.system.type)
+});

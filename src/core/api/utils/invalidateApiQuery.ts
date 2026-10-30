@@ -1,14 +1,24 @@
-import { DEFAULT_INVALIDATE_DELAY } from 'app/core.preference';
-import type { APIQueryKey, APIRequest } from 'core/api/api.models.ts';
-import { queryClient } from 'core/api/api.providers';
+import { DEFAULT_APP_PREFERENCE_STORE } from 'app/core.preference';
+import type { ApiQueryKey, ApiRequest } from 'core/api/api.models';
+import { QUERY_CLIENT } from 'core/api/api.providers';
 
-export const invalidateAPIQuery = (filter: (key: APIRequest) => boolean, delay: number = DEFAULT_INVALIDATE_DELAY) =>
+/**
+ * @name invalidateAPIQuery
+ * @description Invalidates all cached queries whose key matches the provided filter function, after an optional delay.
+ * @param filter - Predicate receiving a parsed APIRequest; return true to invalidate
+ * @param delay - Milliseconds to wait before invalidating (defaults to app config)
+ * @returns The timeout ID
+ */
+export const invalidateApiQuery = (
+  filter: (key: ApiRequest) => boolean,
+  delay: number = DEFAULT_APP_PREFERENCE_STORE.api.invalidateDelay
+) =>
   setTimeout(async () => {
-    await queryClient.invalidateQueries({
+    await QUERY_CLIENT.invalidateQueries({
       predicate: ({ queryKey }) => {
         try {
-          const [url, method, bodyStr] = queryKey as unknown as APIQueryKey;
-          let body: APIRequest['body'] = null;
+          const [url, method, bodyStr] = queryKey as unknown as ApiQueryKey;
+          let body: ApiRequest['body'] = null;
           if (typeof bodyStr === 'string') {
             try {
               body = JSON.parse(bodyStr);
@@ -16,7 +26,7 @@ export const invalidateAPIQuery = (filter: (key: APIRequest) => boolean, delay: 
               body = bodyStr;
             }
           }
-          const req: APIRequest = { url, method, body };
+          const req: ApiRequest = { url, method, body };
           return filter(req);
         } catch {
           return false;

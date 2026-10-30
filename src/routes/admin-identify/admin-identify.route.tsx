@@ -1,20 +1,19 @@
 import { loader } from '@monaco-editor/react';
+import FindInPageOutlinedIcon from '@mui/icons-material/FindInPageOutlined';
 import { Alert, Box, Grid, Paper, styled, Tab, Tabs, Typography, useTheme } from '@mui/material';
-import useMyAPI from 'core/api/hooks/useMyAPI';
-import PageFullSize from 'core/template/branding/AppPageCenter';
-import { useAppUser } from 'core/template/components/app/hooks';
-import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
-import type { CustomUser } from 'models/api/user';
-import { useState } from 'react';
+import { createAppRoute, useAppBlocker } from 'core/router';
+import { AppPageFullSize } from 'core/template';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
+import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate } from 'react-router';
-import LibMagic from 'routes/admin-identify/components/libmagic';
-import Mimes from 'routes/admin-identify/components/mimes';
-import Patterns from 'routes/admin-identify/components/patterns';
-import Yara from 'routes/admin-identify/components/yara';
-import { RouterPrompt } from 'ui/RouterPrompt';
+import { LibMagic } from 'routes/admin-identify/components/libmagic';
+import { Mimes } from 'routes/admin-identify/components/mimes';
+import { Patterns } from 'routes/admin-identify/components/patterns';
+import { Yara } from 'routes/admin-identify/components/yara';
 
-loader.config({ paths: { vs: '/cdn/monaco_0.35.0/vs' } });
+loader.config({
+  paths: { vs: '/cdn/monaco_0.35.0/vs' }
+});
 
 const TabContent = styled('div')(({ theme }) => ({
   flexGrow: 1,
@@ -23,23 +22,31 @@ const TabContent = styled('div')(({ theme }) => ({
   paddingTop: theme.spacing(2)
 }));
 
-export default function AdminIdentify() {
+export const AdminIdentifyPage = memo(() => {
   const { t, i18n } = useTranslation(['adminIdentify']);
   const theme = useTheme();
-  const { user: currentUser } = useAppUser<CustomUser>();
   const { apiCall } = useMyAPI();
 
   const [value, setValue] = useState('magic');
-  const [magicFile, setMagicFile] = useState(null);
-  const [originalMagicFile, setOriginalMagicFile] = useState(null);
-  const [yaraFile, setYaraFile] = useState(null);
-  const [originalYaraFile, setOriginalYaraFile] = useState(null);
-  const [mimesFile, setMimesFile] = useState(null);
-  const [originalMimesFile, setOriginalMimesFile] = useState(null);
-  const [patternsFile, setPatternsFile] = useState(null);
-  const [originalPatternsFile, setOriginalPatternsFile] = useState(null);
+  const [magicFile, setMagicFile] = useState<string | null>(null);
+  const [originalMagicFile, setOriginalMagicFile] = useState<string | null>(null);
+  const [yaraFile, setYaraFile] = useState<string | null>(null);
+  const [originalYaraFile, setOriginalYaraFile] = useState<string | null>(null);
+  const [mimesFile, setMimesFile] = useState<string | null>(null);
+  const [originalMimesFile, setOriginalMimesFile] = useState<string | null>(null);
+  const [patternsFile, setPatternsFile] = useState<string | null>(null);
+  const [originalPatternsFile, setOriginalPatternsFile] = useState<string | null>(null);
 
-  useEffectOnce(() => {
+  useAppBlocker(() =>
+    magicFile !== originalMagicFile ||
+    mimesFile !== originalMimesFile ||
+    patternsFile !== originalPatternsFile ||
+    yaraFile !== originalYaraFile
+      ? 'unsaved_changes'
+      : null
+  );
+
+  useEffect(() => {
     // I cannot find a way to hot switch monaco editor's locale but at least I can load
     // the right language on first load...
     if (i18n.language === 'fr') {
@@ -47,13 +54,13 @@ export default function AdminIdentify() {
     } else {
       loader.config({ 'vs/nls': { availableLanguages: { '*': '' } } });
     }
-  });
+  }, []);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
 
-  const loadMagic = (defValue, autoOpen) => {
+  const loadMagic = (defValue?: boolean, autoOpen?: (open: boolean) => void) => {
     apiCall({
       method: 'GET',
       url: `/api/v4/system/identify/magic/${defValue ? '?default' : ''}`,
@@ -65,7 +72,7 @@ export default function AdminIdentify() {
     });
   };
 
-  const loadYara = (defValue, autoOpen) => {
+  const loadYara = (defValue?: boolean, autoOpen?: (open: boolean) => void) => {
     apiCall({
       method: 'GET',
       url: `/api/v4/system/identify/yara/${defValue ? '?default' : ''}`,
@@ -77,7 +84,7 @@ export default function AdminIdentify() {
     });
   };
 
-  const loadMimes = (defValue, autoOpen) => {
+  const loadMimes = (defValue?: boolean, autoOpen?: (open: boolean) => void) => {
     apiCall({
       method: 'GET',
       url: `/api/v4/system/identify/mimes/${defValue ? '?default' : ''}`,
@@ -89,7 +96,7 @@ export default function AdminIdentify() {
     });
   };
 
-  const loadPatterns = (defValue, autoOpen) => {
+  const loadPatterns = (defValue?: boolean, autoOpen?: (open: boolean) => void) => {
     apiCall({
       method: 'GET',
       url: `/api/v4/system/identify/patterns/${defValue ? '?default' : ''}`,
@@ -101,16 +108,8 @@ export default function AdminIdentify() {
     });
   };
 
-  return currentUser.is_admin ? (
-    <PageFullSize margin={4}>
-      <RouterPrompt
-        when={
-          magicFile !== originalMagicFile ||
-          mimesFile !== originalMimesFile ||
-          patternsFile !== originalPatternsFile ||
-          yaraFile !== originalYaraFile
-        }
-      />
+  return (
+    <AppPageFullSize>
       <div style={{ marginBottom: theme.spacing(2), textAlign: 'left' }}>
         <Grid container alignItems="center" spacing={1}>
           <Grid size={{ xs: 12 }}>
@@ -183,8 +182,21 @@ export default function AdminIdentify() {
           </TabContent>
         )}
       </div>
-    </PageFullSize>
-  ) : (
-    <Navigate to="/forbidden" replace />
+    </AppPageFullSize>
   );
-}
+});
+
+export const AdminIdentifyRoute = createAppRoute({
+  component: AdminIdentifyPage,
+
+  path: '/admin/identify',
+
+  ancestor: '/admin',
+  shortname: () => ['app_route.admin_identify.shortname', { ns: 'adminIdentify' }],
+  fullname: () => ['app_route.admin_identify.fullname', { ns: 'adminIdentify' }],
+  shorticon: () => <FindInPageOutlinedIcon />,
+  fullicon: () => <FindInPageOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.is_admin
+});

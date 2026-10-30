@@ -1,5 +1,5 @@
 import { Tooltip, useTheme } from '@mui/material';
-import useALContext from 'core/config/useALContext';
+import useALContext from 'deprecated/hooks/useALContext';
 import type { Verdict as VerdictType } from 'models/base/alert';
 import React from 'react';
 import { useTranslation } from 'react-i18next';

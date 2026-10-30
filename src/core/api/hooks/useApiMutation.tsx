@@ -1,23 +1,23 @@
 import type { UseMutationOptions } from '@tanstack/react-query';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { APIRequest, APIResponse } from 'core/api/api.models.ts';
-import type { UseAPICallFnProps } from 'core/api/hooks/useApiCallFn';
-import { useAPICallFn } from 'core/api/hooks/useApiCallFn';
-import { getAPIResponse } from 'core/api/api.utils';
+import type { ApiRequest, ApiResponse } from 'core/api/api.models';
+import { getApiResponse } from 'core/api/api.utils';
+import type { UseApiCallFnProps } from 'core/api/hooks/useApiCallFn';
+import { useApiCallFn } from 'core/api/hooks/useApiCallFn';
 
-export const useAPIMutation = <
+export const useApiMutation = <
   Props extends unknown[],
   Response = unknown,
-  Request extends APIRequest = APIRequest,
+  Request extends ApiRequest = ApiRequest,
   Error extends string = string
 >(
-  mutationFn: (...props: Props) => UseAPICallFnProps<APIResponse<Response>, Request, APIResponse<Error>>,
-  mutationProps?: Omit<UseMutationOptions<APIResponse<Response>, APIResponse<Error>, Props, unknown>, 'mutationFn'>
+  mutationFn: (...props: Props) => UseApiCallFnProps<ApiResponse<Response>, Request, ApiResponse<Error>>,
+  mutationProps?: Omit<UseMutationOptions<ApiResponse<Response>, ApiResponse<Error>, Props, unknown>, 'mutationFn'>
 ) => {
   const queryClient = useQueryClient();
-  const apiCallFn = useAPICallFn<APIResponse<Response>>();
+  const apiCallFn = useApiCallFn<ApiResponse<Response>>();
 
-  const mutation = useMutation<APIResponse<Response>, APIResponse<Error>, Props>(
+  const mutation = useMutation<ApiResponse<Response>, ApiResponse<Error>, Props>(
     {
       ...mutationProps,
       mutationFn: (props: Props) => apiCallFn(mutationFn(...props)),
@@ -26,7 +26,7 @@ export const useAPIMutation = <
     queryClient
   );
 
-  const { data, error, serverVersion, statusCode } = getAPIResponse(
+  const { data, error, serverVersion, statusCode } = getApiResponse(
     mutation.data,
     mutation.error,
     mutation.failureReason

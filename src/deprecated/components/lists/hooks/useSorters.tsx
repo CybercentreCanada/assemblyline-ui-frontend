@@ -1,14 +1,17 @@
 import { ArrowDownward, ArrowUpward, Remove } from '@mui/icons-material';
 import type { SorterField } from 'deprecated/components/lists/sorters/SorterSelector';
-import lodash from 'lodash';
+import lodashGet from 'lodash/get';
+import lodashIsEmpty from 'lodash/isEmpty';
+import lodashIsNumber from 'lodash/isNumber';
+import lodashIsString from 'lodash/isString';
 import React from 'react';
 
 //
-const isNumber = (value: any): boolean => lodash.isNumber(value) || (!lodash.isEmpty(value) && !isNaN(value));
+const isNumber = (value: any): boolean => lodashIsNumber(value) || (!lodashIsEmpty(value) && !isNaN(value));
 
 // extract the value in the specified object at the given path.
 const extractValue = (object: any, path: string) => {
-  const _value = lodash.get(object, path, '');
+  const _value = lodashGet(object, path, '');
   return _value || '';
 };
 
@@ -40,7 +43,7 @@ const compare = (v1: any, v2: any, sorter: SorterField) => {
   let result = 0;
   if (isNumber(_v1)) {
     result = compareNumber(_v1, _v2);
-  } else if (lodash.isString(v1)) {
+  } else if (lodashIsString(v1)) {
     result = compareString(_v1, _v2);
   } else {
     result = compareString(_v1, _v2);

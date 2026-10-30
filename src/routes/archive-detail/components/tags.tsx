@@ -21,17 +21,17 @@ import {
 } from '@mui/material';
 import match from 'autosuggest-highlight/match';
 import parse from 'autosuggest-highlight/parse';
-import useMyAPI from 'core/api/hooks/useMyAPI';
-import useALContext from 'core/config/useALContext';
-import useMySnackbar from 'core/snackbar/snackbar.hooks';
-import useSafeResults from 'layout/safe-results/safe-results.hooks';
+import useALContext from 'deprecated/hooks/useALContext';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useMySnackbar from 'deprecated/hooks/useMySnackbar';
+import useSafeResults from 'deprecated/hooks/useSafeResults';
 import type { SearchResult } from 'models/api/search';
 import type { ResultIndexed } from 'models/base/result';
 import type { Signature, Tag } from 'models/base/tagging';
 import React, { useCallback, useEffect, useMemo, useState, useTransition } from 'react';
 import { useTranslation } from 'react-i18next';
 import AutoSizer from 'react-virtualized-auto-sizer';
-import ResultsTable from 'routes/search/components/results';
+import { ResultsTable } from 'routes/search/components/results';
 import { safeFieldValue } from 'shared/utils/utils';
 import ActionMenu from 'ui/ActionMenu';
 import Classification from 'ui/Classification';
@@ -299,14 +299,12 @@ const WrappedArchivedTagSection: React.FC<Props> = ({
                           <SortableGridHeaderCell
                             allowSort
                             children={t('type')}
-                            query={query}
                             sortField="tag_type"
                             onSort={handleSort}
                           />
                           <SortableGridHeaderCell
                             allowSort
                             children={t('verdict')}
-                            query={query}
                             sortField="h_type"
                             inverted
                             onSort={handleSort}
@@ -314,7 +312,6 @@ const WrappedArchivedTagSection: React.FC<Props> = ({
                           <SortableGridHeaderCell
                             allowSort
                             children={t('value')}
-                            query={query}
                             sortField="value"
                             onSort={handleSort}
                           />
@@ -322,7 +319,6 @@ const WrappedArchivedTagSection: React.FC<Props> = ({
                             <SortableGridHeaderCell
                               allowSort
                               children={t('classification')}
-                              query={query}
                               sortField="classification"
                               onSort={handleSort}
                             />
@@ -517,11 +513,19 @@ const WrappedRow: React.FC<RowProps> = ({
       )}
       <GridLinkRow
         hover
-        to={
-          tag_type === 'heuristic.signature'
-            ? `/search/result?query=result.sections.${tag_type}.name:${safeFieldValue(value)}`
-            : `/search/result?query=result.sections.tags.${tag_type}:${safeFieldValue(value)}`
+        nav={nav =>
+          nav.to().create({
+            route: '/search/:index',
+            path: { index: 'result' },
+            search: {
+              query:
+                tag_type === 'heuristic.signature'
+                  ? `result.sections.${tag_type}.name:${safeFieldValue(value)}`
+                  : `result.sections.tags.${tag_type}:${safeFieldValue(value)}`
+            }
+          })
         }
+        navDeps={[tag_type, value]}
         onClick={handleRowClick}
         onContextMenu={handleMenuClick}
       >
@@ -607,7 +611,7 @@ const WrappedRow: React.FC<RowProps> = ({
           <Collapse in={open && resultResults?.total > 0} timeout="auto" onEnter={() => setRender(true)}>
             {render && (
               <div style={{ paddingTop: theme.spacing(2), paddingBottom: theme.spacing(2) }}>
-                <ResultsTable resultResults={resultResults} allowSort={false} allowHash />
+                <ResultsTable resultResults={resultResults} allowSort={false} />
               </div>
             )}
           </Collapse>

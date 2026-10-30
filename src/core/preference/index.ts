@@ -5,6 +5,7 @@ export {
   getAppPreferenceStateFromApi,
   useAppPreferenceStore,
   useAppPreferenceStoreApi,
+  useAppPreferenceStoreSubscriberCount,
   useAppSetPreferenceStore
 } from './preference.providers';
 export type { AppPreferenceProviderProps } from './preference.providers';

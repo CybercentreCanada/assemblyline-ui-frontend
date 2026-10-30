@@ -5,15 +5,15 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-import useMyAPI from 'core/api/hooks/useMyAPI';
-import useALContext from 'core/config/useALContext';
-import _ from 'lodash';
+import { useAppConfigStore } from 'core/config';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
+import lodashOmit from 'lodash/omit';
 import type { Metadata, MetadataFieldTypeMap } from 'models/base/config';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { Fragment, memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { SubmitMetadata } from 'routes/submit/submit.form.ts';
-import { useForm } from 'routes/submit/submit.form.ts';
-import { isValidMetadata } from 'routes/submit/submit.utils.ts';
+import type { SubmitMetadata } from 'routes/submit/submit.form';
+import { useForm } from 'routes/submit/submit.form';
+import { isValidMetadata } from 'routes/submit/submit.utils';
 import { isURL } from 'shared/utils/utils';
 import { Button } from 'ui/buttons/Button';
 import { IconButton } from 'ui/buttons/IconButton';
@@ -27,8 +27,8 @@ import type { SwitchInputProps } from 'ui/inputs/SwitchInput';
 import { SwitchInput } from 'ui/inputs/SwitchInput';
 import type { TextInputProps } from 'ui/inputs/TextInput';
 import { TextInput } from 'ui/inputs/TextInput';
-import type { Validator } from 'ui/inputs/utils/inputs.util.validation.tsx';
-import MonacoEditor from 'ui/MonacoEditor';
+import type { Validator } from 'ui/inputs/utils/inputs.util.validation';
+import { MonacoEditor } from 'ui/MonacoEditor';
 
 const STATIC_VALIDATOR_TYPES_SET = new Set<MetadataFieldTypeMap>(['enum', 'boolean', 'integer', 'date']);
 
@@ -42,171 +42,169 @@ type MetadataParamProps = {
   editing: boolean;
 };
 
-export const MetadataParam: React.FC<MetadataParamProps> = React.memo(
-  ({ name, metadata, loading, disabled, editing }) => {
-    const { t } = useTranslation(['submit', 'settings']);
-    const theme = useTheme();
-    const form = useForm();
-    const { apiCall } = useMyAPI();
+export const MetadataParam = memo(({ name, metadata, loading, disabled, editing }: MetadataParamProps) => {
+  const { t } = useTranslation(['submit', 'settings']);
+  const theme = useTheme();
+  const form = useForm();
+  const { apiCall } = useMyAPI();
 
-    const [options, setOptions] = useState<string[]>(
-      [...new Set(Array.isArray(metadata?.suggestions) ? metadata.suggestions : [])].sort()
-    );
+  const [options, setOptions] = useState<string[]>(
+    [...new Set(Array.isArray(metadata?.suggestions) ? metadata.suggestions : [])].sort()
+  );
 
-    const validatorType = useMemo<MetadataFieldTypeMap>(
-      () => (metadata?.validator_type ?? 'string') as MetadataFieldTypeMap,
-      [metadata?.validator_type]
-    );
+  const validatorType = useMemo<MetadataFieldTypeMap>(
+    () => (metadata?.validator_type ?? 'string') as MetadataFieldTypeMap,
+    [metadata?.validator_type]
+  );
 
-    const validatorParams = useMemo<Record<string, unknown>>(
-      () => metadata?.validator_params ?? {},
-      [metadata?.validator_params]
-    );
+  const validatorParams = useMemo<Record<string, unknown>>(
+    () => metadata?.validator_params ?? {},
+    [metadata?.validator_params]
+  );
 
-    const compiledRegex = useMemo<RegExp>(() => {
-      if (validatorType !== 'regex') return null;
-      const pattern = safeString(validatorParams.validation_regex);
-      if (!pattern) return null;
-      try {
-        return new RegExp(pattern);
-      } catch {
-        return null;
+  const compiledRegex = useMemo<RegExp>(() => {
+    if (validatorType !== 'regex') return null;
+    const pattern = safeString(validatorParams.validation_regex);
+    if (!pattern) return null;
+    try {
+      return new RegExp(pattern);
+    } catch {
+      return null;
+    }
+  }, [validatorParams, validatorType]);
+
+  const handleValidate = useCallback<Validator<unknown>>(
+    value => {
+      if (!value) return metadata.required ? { status: 'error', message: t('required') } : null;
+      const strValue = safeString(value);
+      if (validatorType === 'uri') return isURL(strValue) ? null : { status: 'error', message: t('invalid_url') };
+      if (validatorType === 'regex') {
+        if (!compiledRegex) return { status: 'error', message: t('invalid_regex') };
+        return compiledRegex.test(strValue) ? null : { status: 'error', message: t('invalid_regex') };
       }
-    }, [validatorParams, validatorType]);
+      return null;
+    },
+    [metadata.required, t, validatorType, compiledRegex]
+  );
 
-    const handleValidate = useCallback<Validator<unknown>>(
-      value => {
-        if (!value) return metadata.required ? { status: 'error', message: t('required') } : null;
-        const strValue = safeString(value);
-        if (validatorType === 'uri') return isURL(strValue) ? null : { status: 'error', message: t('invalid_url') };
-        if (validatorType === 'regex') {
-          if (!compiledRegex) return { status: 'error', message: t('invalid_regex') };
-          return compiledRegex.test(strValue) ? null : { status: 'error', message: t('invalid_regex') };
-        }
-        return null;
-      },
-      [metadata.required, t, validatorType, compiledRegex]
-    );
+  const handleChange = useCallback(
+    (value: unknown) => {
+      form.setFieldValue('metadata.data', m => {
+        const prev = m ?? {};
+        return value == null || value === '' ? lodashOmit(prev, name) : { ...prev, [name]: value };
+      });
+    },
+    [form, name]
+  );
 
-    const handleChange = useCallback(
-      (value: unknown) => {
-        form.setFieldValue('metadata.data', m => {
-          const prev = m ?? {};
-          return value == null || value === '' ? _.omit(prev, name) : { ...prev, [name]: value };
+  const handleReset = useCallback(() => {
+    form.setFieldValue('metadata.data', m => lodashOmit(m ?? {}, name));
+  }, [form, name]);
+
+  useEffect(() => {
+    if (disabled) return;
+    if (STATIC_VALIDATOR_TYPES_SET.has(validatorType)) return;
+    let mounted = true;
+    apiCall({
+      url: `/api/v4/search/facet/submission/metadata.${name}/`,
+      onSuccess: apiData => {
+        if (!mounted) return;
+        const apiResponse = apiData?.api_response ?? {};
+        const keys = Object.keys(apiResponse);
+        if (!keys.length) return;
+        setOptions(prev => {
+          const merged = [...new Set([...prev, ...keys])].sort();
+          return merged;
         });
       },
-      [form, name]
-    );
+      onFailure: () => null
+    });
+    return () => {
+      mounted = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [disabled, name, validatorType]);
 
-    const handleReset = useCallback(() => {
-      form.setFieldValue('metadata.data', m => _.omit(m ?? {}, name));
-    }, [form, name]);
+  const baseProps = useMemo<unknown>(
+    () =>
+      ({
+        id: `metadata-${name.replaceAll('_', ' ')}`,
+        label: `${name.replaceAll('_', ' ')}  [ ${validatorType.toUpperCase()} ]`,
+        labelProps: { textTransform: 'capitalize' as const },
+        disabled: disabled || !editing,
+        loading,
+        width: '60%',
+        rootProps: { style: { margin: theme.spacing(1) } },
+        onChange: (e, v) => handleChange(v),
+        onReset: () => handleReset()
+      }) as const,
+    [disabled, editing, handleChange, handleReset, loading, name, theme, validatorType]
+  );
 
-    useEffect(() => {
-      if (disabled) return;
-      if (STATIC_VALIDATOR_TYPES_SET.has(validatorType)) return;
-      let mounted = true;
-      apiCall<string[]>({
-        url: `/api/v4/search/facet/submission/metadata.${name}/`,
-        onSuccess: apiData => {
-          if (!mounted) return;
-          const apiResponse = apiData?.api_response ?? {};
-          const keys = Object.keys(apiResponse);
-          if (!keys.length) return;
-          setOptions(prev => {
-            const merged = [...new Set([...prev, ...keys])].sort();
-            return merged;
-          });
-        },
-        onFailure: () => null
-      });
-      return () => {
-        mounted = false;
-      };
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [disabled, name, validatorType]);
-
-    const baseProps = useMemo<unknown>(
-      () =>
-        ({
-          id: `metadata-${name.replaceAll('_', ' ')}`,
-          label: `${name.replaceAll('_', ' ')}  [ ${validatorType.toUpperCase()} ]`,
-          labelProps: { textTransform: 'capitalize' as const },
-          disabled: disabled || !editing,
-          loading,
-          width: '60%',
-          rootProps: { style: { margin: theme.spacing(1) } },
-          onChange: (e, v) => handleChange(v),
-          onReset: () => handleReset()
-        }) as const,
-      [disabled, editing, handleChange, handleReset, loading, name, theme, validatorType]
-    );
-
-    return (
-      <form.Subscribe selector={state => state.values?.metadata?.data?.[name]}>
-        {value => {
-          const val = value ?? metadata.default;
-          switch (validatorType) {
-            case 'boolean':
-              return <SwitchInput {...(baseProps as SwitchInputProps)} value={Boolean(val)} reset={Boolean(val)} />;
-            case 'date':
-              return <DateInput {...(baseProps as DateInputProps)} value={safeString(val)} reset={!!val} />;
-            case 'enum': {
-              return (
-                <SelectInput
-                  {...(baseProps as SelectInputProps<{ primary: string; value: string }[]>)}
-                  value={safeString(val)}
-                  options={((validatorParams?.values as string[]) ?? [])
-                    .map(v => ({ primary: v.replaceAll('_', ' '), value: v }))
-                    .sort((a, b) => a.primary.localeCompare(b.primary))}
-                  reset={!!val}
-                  capitalize
-                />
-              );
-            }
-            case 'integer':
-              return (
-                <NumberInput
-                  {...(baseProps as NumberInputProps)}
-                  value={typeof val === 'number' ? val : null}
-                  min={Number(validatorParams?.min ?? 0)}
-                  max={Number(validatorParams?.max ?? Number.MAX_SAFE_INTEGER)}
-                  reset={!!val}
-                />
-              );
-            case 'regex':
-              return (
-                <TextInput
-                  {...(baseProps as TextInputProps)}
-                  value={safeString(val)}
-                  options={options}
-                  reset={!!val}
-                  validate={handleValidate}
-                  tooltip={safeString(validatorParams?.validation_regex)}
-                  slotProps={{ formLabelTooltip: { placement: 'right' } }}
-                />
-              );
-            default:
-              return (
-                <TextInput
-                  {...(baseProps as TextInputProps)}
-                  value={safeString(val)}
-                  options={options}
-                  reset={!!val}
-                  validate={handleValidate}
-                />
-              );
+  return (
+    <form.Subscribe selector={state => state.values?.metadata?.data?.[name]}>
+      {value => {
+        const val = value ?? metadata.default;
+        switch (validatorType) {
+          case 'boolean':
+            return <SwitchInput {...(baseProps as SwitchInputProps)} value={Boolean(val)} reset={Boolean(val)} />;
+          case 'date':
+            return <DateInput {...(baseProps as DateInputProps)} value={safeString(val)} reset={!!val} />;
+          case 'enum': {
+            return (
+              <SelectInput
+                {...(baseProps as SelectInputProps<{ primary: string; value: string }[]>)}
+                value={safeString(val)}
+                options={((validatorParams?.values as string[]) ?? [])
+                  .map(v => ({ primary: v.replaceAll('_', ' '), value: v }))
+                  .sort((a, b) => a.primary.localeCompare(b.primary))}
+                reset={!!val}
+                capitalize
+              />
+            );
           }
-        }}
-      </form.Subscribe>
-    );
-  }
-);
+          case 'integer':
+            return (
+              <NumberInput
+                {...(baseProps as NumberInputProps)}
+                value={typeof val === 'number' ? val : null}
+                min={Number(validatorParams?.min ?? 0)}
+                max={Number(validatorParams?.max ?? Number.MAX_SAFE_INTEGER)}
+                reset={!!val}
+              />
+            );
+          case 'regex':
+            return (
+              <TextInput
+                {...(baseProps as TextInputProps)}
+                value={safeString(val)}
+                options={options}
+                reset={!!val}
+                validate={handleValidate}
+                tooltip={safeString(validatorParams?.validation_regex)}
+                slotProps={{ formLabelTooltip: { placement: 'right' } }}
+              />
+            );
+          default:
+            return (
+              <TextInput
+                {...(baseProps as TextInputProps)}
+                value={safeString(val)}
+                options={options}
+                reset={!!val}
+                validate={handleValidate}
+              />
+            );
+        }
+      }}
+    </form.Subscribe>
+  );
+});
 
-const ExtraMetadata = React.memo(() => {
+const ExtraMetadata = memo(() => {
   const { t } = useTranslation(['submit']);
   const theme = useTheme();
-  const { configuration } = useALContext();
+  const configuration = useAppConfigStore(s => s.configuration);
   const form = useForm();
 
   const submitKeys = useMemo(
@@ -322,7 +320,7 @@ const ExtraMetadata = React.memo(() => {
                 }}
               >
                 {extra.map(([k, v]) => (
-                  <React.Fragment key={k}>
+                  <Fragment key={k}>
                     <Typography
                       color="textSecondary"
                       variant="body2"
@@ -334,7 +332,7 @@ const ExtraMetadata = React.memo(() => {
                     <Typography variant="body2" sx={{ wordBreak: 'break-word' }}>
                       {safeString(v)}
                     </Typography>
-                  </React.Fragment>
+                  </Fragment>
                 ))}
               </div>
             </div>
@@ -344,10 +342,12 @@ const ExtraMetadata = React.memo(() => {
     </>
   );
 });
+MetadataParam.displayName = 'MetadataParam';
+ExtraMetadata.displayName = 'ExtraMetadata';
 
-export const SubmissionMetadata = React.memo(() => {
+export const SubmissionMetadata = memo(() => {
   const { t } = useTranslation(['submit']);
-  const { configuration } = useALContext();
+  const configuration = useAppConfigStore(s => s.configuration);
   const form = useForm();
 
   const entries = useMemo(
@@ -380,3 +380,4 @@ export const SubmissionMetadata = React.memo(() => {
     </div>
   );
 });
+SubmissionMetadata.displayName = 'SubmissionMetadata';

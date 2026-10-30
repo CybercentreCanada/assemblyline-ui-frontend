@@ -1,113 +1,69 @@
-import { Box, Button, CircularProgress, Link, Typography, useTheme } from '@mui/material';
-import Skeleton from '@mui/material/Skeleton';
-import useMyAPI from 'core/api/hooks/useMyAPI';
-import useALContext from 'core/config/useALContext';
-import NotFoundPage from 'core/template/branding/AppBanner';
-import { useAppBanner } from 'core/template/components/app/hooks';
-import PageCenter from 'core/template/components/pages/PageCenter';
-import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
-import { useState } from 'react';
+import ReceiptOutlinedIcon from '@mui/icons-material/ReceiptOutlined';
+import { Link, Skeleton, Typography, styled, useTheme } from '@mui/material';
+import { useApiMutation, useApiQuery } from 'core/api';
+import { useAppConfigStore } from 'core/config';
+import { useAppSetInterfaceStore } from 'core/interface';
+import { createAppRoute } from 'core/router';
+import { AppBanner, AppPageCenter } from 'core/template';
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import Markdown from 'react-markdown';
+import { NotFoundPage } from 'routes/not-found/not-found';
+import { Button } from 'ui/buttons/Button';
 
-export default function Tos() {
+//*****************************************************************************************
+// ToS Page
+//*****************************************************************************************
+
+const TosContainer = styled('div')(({ theme }) => ({
+  display: 'inline-block',
+  textAlign: 'center',
+  maxWidth: '960px',
+  width: '100%',
+  [theme.breakpoints.down('sm')]: {
+    maxWidth: '100%'
+  },
+  [theme.breakpoints.only('md')]: {
+    maxWidth: '630px'
+  }
+}));
+
+TosContainer.displayName = 'TosContainer';
+
+export const ToSPage = memo(() => {
   const { t } = useTranslation(['tos']);
   const theme = useTheme();
-  const banner = useAppBanner();
-  const { apiCall } = useMyAPI();
-  const { user: currentUser, configuration } = useALContext();
 
-  const [tos, setTos] = useState('');
-  const [buttonLoading, setButtonLoading] = useState(false);
+  const currentUser = useAppConfigStore(s => s.user);
+  const configuration = useAppConfigStore(s => s.configuration);
+  const setInterfaceStore = useAppSetInterfaceStore();
 
-  const sp6 = theme.spacing(6);
+  const handleAccept = useApiMutation(() => ({
+    url: `/api/v4/user/tos/${currentUser.username}/`,
+    onSuccess: () =>
+      setInterfaceStore(s => {
+        s.auth.mode = 'app';
+        return s;
+      })
+  }));
 
-  function acceptTOS() {
-    apiCall({
-      url: `/api/v4/user/tos/${currentUser.username}/`,
-      onSuccess: () => window.location.reload(),
-      onEnter: () => setButtonLoading(true),
-      onExit: () => setButtonLoading(false)
-    });
-  }
-
-  function cancelTOS() {
-    apiCall({
-      url: '/api/v4/auth/logout/',
-      onSuccess: () => window.location.reload(),
-      onEnter: () => setButtonLoading(true),
-      onExit: () => setButtonLoading(false)
-    });
-  }
-
-  useEffectOnce(() => {
-    if (configuration.ui.tos) {
-      apiCall({
-        url: '/api/v4/help/tos/',
-        onSuccess: api_data => setTos(api_data.api_response)
-      });
-    }
+  const { data: tos } = useApiQuery<string>({
+    url: '/api/v4/help/tos/',
+    disabled: !configuration?.ui?.tos
   });
 
-  return configuration.ui.tos ? (
-    <PageCenter margin={4} width="100%">
-      <Box
-        sx={{
-          display: 'inline-block',
-          textAlign: 'center',
-          maxWidth: '960px',
-          width: '100%',
-          [theme.breakpoints.down('sm')]: {
-            maxWidth: '100%'
-          },
-          [theme.breakpoints.only('md')]: {
-            maxWidth: '630px'
-          }
-        }}
-      >
-        <div>{banner}</div>
-        <div style={{ marginBottom: sp6, textAlign: 'left' }}>
+  return !configuration?.ui?.tos ? (
+    <NotFoundPage />
+  ) : (
+    <AppPageCenter>
+      <TosContainer>
+        <AppBanner />
+        <div style={{ marginBottom: theme.spacing(6), textAlign: 'left' }}>
           <Typography variant="h3" gutterBottom>
             {t('title')}
           </Typography>
         </div>
-        {tos ? (
-          <>
-            <div style={{ textAlign: 'left' }}>
-              <Markdown components={{ a: props => <Link href={props.href}>{props.children}</Link> }}>{tos}</Markdown>
-            </div>
-            {currentUser.agrees_with_tos ? (
-              <div style={{ marginTop: sp6 }}>
-                <Typography variant="subtitle1" color="secondary">
-                  {t('agreed')}
-                </Typography>
-              </div>
-            ) : (
-              <div>
-                <Button
-                  style={{ marginTop: '3rem', marginBottom: '3rem' }}
-                  variant="contained"
-                  color="primary"
-                  disabled={buttonLoading}
-                  onClick={acceptTOS}
-                >
-                  {t('button')}
-                  {buttonLoading && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
-                </Button>
-                <Button
-                  style={{ marginLeft: '1rem', marginTop: '3rem', marginBottom: '3rem' }}
-                  variant="contained"
-                  color="secondary"
-                  disabled={buttonLoading}
-                  onClick={cancelTOS}
-                >
-                  {t('logout')}
-                  {buttonLoading && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
-                </Button>
-              </div>
-            )}
-          </>
-        ) : (
+        {!tos ? (
           <>
             <Skeleton style={{ marginBottom: 12 }} />
             <Skeleton style={{ marginBottom: 12 }} />
@@ -116,10 +72,70 @@ export default function Tos() {
             <Skeleton style={{ marginBottom: 12 }} />
             <Skeleton />
           </>
+        ) : (
+          <>
+            <div style={{ textAlign: 'left' }}>
+              <Markdown components={{ a: props => <Link href={props.href}>{props.children}</Link> }}>{tos}</Markdown>
+            </div>
+            {currentUser.agrees_with_tos ? (
+              <div style={{ marginTop: theme.spacing(6) }}>
+                <Typography variant="subtitle1" color="secondary">
+                  {t('agreed')}
+                </Typography>
+              </div>
+            ) : (
+              <div>
+                <Button
+                  color="primary"
+                  disabled={handleAccept.isPending}
+                  progress={handleAccept.isPending}
+                  style={{ marginTop: '3rem', marginBottom: '3rem' }}
+                  variant="contained"
+                  onClick={handleAccept.mutate}
+                >
+                  {t('button')}
+                </Button>
+                <Button
+                  color="secondary"
+                  disabled={handleAccept.isPending}
+                  progress={handleAccept.isPending}
+                  style={{ marginLeft: '1rem', marginTop: '3rem', marginBottom: '3rem' }}
+                  variant="contained"
+                  onClick={() => {
+                    setInterfaceStore(s => {
+                      s.auth.mode = 'logout';
+                      return s;
+                    });
+                  }}
+                >
+                  {t('logout')}
+                </Button>
+              </div>
+            )}
+          </>
         )}
-      </Box>
-    </PageCenter>
-  ) : (
-    <NotFoundPage />
+      </TosContainer>
+    </AppPageCenter>
   );
-}
+});
+
+ToSPage.displayName = 'ToSPage';
+
+//*****************************************************************************************
+// ToS Route
+//*****************************************************************************************
+
+export const ToSRoute = createAppRoute({
+  component: ToSPage,
+
+  path: '/tos',
+
+  ancestor: null,
+  shortname: () => ['app_route.terms_of_service.shortname', { ns: 'tos' }],
+  fullname: () => ['app_route.terms_of_service.fullname', { ns: 'tos' }],
+  shorticon: () => <ReceiptOutlinedIcon />,
+  fullicon: () => <ReceiptOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
+});

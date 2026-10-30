@@ -1,8 +1,19 @@
 import clueEN from '@cccsaurora/clue-ui/en/translation.json';
 import clueFR from '@cccsaurora/clue-ui/fr/translation.json';
-import translationEN from 'app/core.i18n.en.json';
-import translationFR from 'app/core.i18n.fr.json';
-import { default as i18n } from 'i18next';
+import { addTranslations as addA11yTranslations } from '@tui/a11y';
+import { addTranslations as addClassiTranslations } from '@tui/classi';
+import { addTranslations as addCoreTranslations } from '@tui/core';
+import { addTranslations as addDrawerTranslations } from '@tui/drawer';
+import { addTranslations as addNotisTranslations } from '@tui/notis';
+import appEN from 'app/core.i18n.en.json';
+import appFR from 'app/core.i18n.fr.json';
+import apiEN from 'core/api/api.i18n.en.json';
+import apiFR from 'core/api/api.i18n.fr.json';
+import errorEN from 'core/error/error.i18n.en.json';
+import errorFR from 'core/error/error.i18n.fr.json';
+import routerEN from 'core/router/router.i18n.en.json';
+import routerFR from 'core/router/router.i18n.fr.json';
+import i18n from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import assistantEN from 'layout/assistant/assistant.i18n.en.json';
 import assistantFR from 'layout/assistant/assistant.i18n.fr.json';
@@ -12,19 +23,27 @@ import loginEN from 'layout/auth/log-in/log-in.i18n.en.json';
 import loginFR from 'layout/auth/log-in/log-in.i18n.fr.json';
 import logoutEN from 'layout/auth/log-out/log-out.i18n.en.json';
 import logoutFR from 'layout/auth/log-out/log-out.i18n.fr.json';
+import quotaEN from 'layout/auth/quota/quota.i18n.en.json';
+import quotaFR from 'layout/auth/quota/quota.i18n.fr.json';
 import tosEN from 'layout/auth/terms-of-service/terms-of-service.i18n.en.json';
 import tosFR from 'layout/auth/terms-of-service/terms-of-service.i18n.fr.json';
+import breadcrumbsEN from 'layout/breadcrumbs/breadcrumbs.i18n.en.json';
+import breadcrumbsFR from 'layout/breadcrumbs/breadcrumbs.i18n.fr.json';
 import carouselEN from 'layout/carousel/carousel.i18n.en.json';
 import carouselFR from 'layout/carousel/carousel.i18n.fr.json';
-import notificationEN from 'layout/notifications/notifications.i18n.en.json';
-import notificationFR from 'layout/notifications/notifications.i18n.fr.json';
+import drawerEN from 'layout/drawer/drawer.i18n.en.json';
+import drawerFR from 'layout/drawer/drawer.i18n.fr.json';
+import externalLookupEN from 'layout/external-lookup/external-lookup.i18n.en.json';
+import externalLookupFR from 'layout/external-lookup/external-lookup.i18n.fr.json';
+import notificationsEN from 'layout/notifications/notifications.i18n.en.json';
+import notificationsFR from 'layout/notifications/notifications.i18n.fr.json';
+import quickSearchEN from 'layout/quick-search/quick-search.i18n.en.json';
+import quickSearchFR from 'layout/quick-search/quick-search.i18n.fr.json';
 import { initReactI18next } from 'react-i18next';
 import adminActionsEN from 'routes/admin-actions/admin-actions.i18n.en.json';
 import adminActionsFR from 'routes/admin-actions/admin-actions.i18n.fr.json';
 import adminAPIkeysEN from 'routes/admin-api-keys/admin-api-keys.i18n.en.json';
 import adminAPIkeysFR from 'routes/admin-api-keys/admin-api-keys.i18n.fr.json';
-import adminCommunityServicesEN from 'routes/admin-community-services/admin-community-services.i18n.en.json';
-import adminCommunityServicesFR from 'routes/admin-community-services/admin-community-services.i18n.fr.json';
 import adminErrorViewerEN from 'routes/admin-error-viewer/admin-error-viewer.i18n.en.json';
 import adminErrorViewerFR from 'routes/admin-error-viewer/admin-error-viewer.i18n.fr.json';
 import adminIdentifyEN from 'routes/admin-identify/admin-identify.i18n.en.json';
@@ -43,20 +62,22 @@ import alertsEN from 'routes/alerts/alerts.i18n.en.json';
 import alertsFR from 'routes/alerts/alerts.i18n.fr.json';
 import favoritesEN from 'routes/alerts/components/favorites.i18n.en.json';
 import favoritesFR from 'routes/alerts/components/favorites.i18n.fr.json';
-import archiveEN from 'routes/archives/archives.i18n.en.json';
-import archiveFR from 'routes/archives/archives.i18n.fr.json';
+import archivesEN from 'routes/archives/archives.i18n.en.json';
+import archivesFR from 'routes/archives/archives.i18n.fr.json';
 import authorizeEN from 'routes/authorize/authorize.i18n.en.json';
 import authorizeFR from 'routes/authorize/authorize.i18n.fr.json';
 import dashboardEN from 'routes/dashboard/dashboard.i18n.en.json';
 import dashboardFR from 'routes/dashboard/dashboard.i18n.fr.json';
 import developmentAPIEN from 'routes/development-api/development-api.i18n.en.json';
 import developmentAPIFR from 'routes/development-api/development-api.i18n.fr.json';
+import developmentRoutesEN from 'routes/development-routes/development-routes.i18n.en.json';
+import developmentRoutesFR from 'routes/development-routes/development-routes.i18n.fr.json';
 import fileDetailEN from 'routes/file-detail/file-detail.i18n.en.json';
 import fileDetailFR from 'routes/file-detail/file-detail.i18n.fr.json';
 import fileViewerEN from 'routes/file-viewer/file-viewer.i18n.en.json';
 import fileViewerFR from 'routes/file-viewer/file-viewer.i18n.fr.json';
-import error403EN from 'routes/forbidden/forbidden.i18n.en.json';
-import error403FR from 'routes/forbidden/forbidden.i18n.fr.json';
+import forbiddenEN from 'routes/forbidden/forbidden.i18n.en.json';
+import forbiddenFR from 'routes/forbidden/forbidden.i18n.fr.json';
 import helpAPIEN from 'routes/help-api/help-api.i18n.en.json';
 import helpAPIFR from 'routes/help-api/help-api.i18n.fr.json';
 import helpClassificationEN from 'routes/help-classification/help-classification.i18n.en.json';
@@ -71,8 +92,8 @@ import manageBadlistAddEN from 'routes/manage-badlist-add/manage-badlist-add.i18
 import manageBadlistAddFR from 'routes/manage-badlist-add/manage-badlist-add.i18n.fr.json';
 import manageBadlistDetailEN from 'routes/manage-badlist-detail/manage-badlist-detail.i18n.en.json';
 import manageBadlistDetailFR from 'routes/manage-badlist-detail/manage-badlist-detail.i18n.fr.json';
-import manageBadlistEN from 'routes/manage-badlists/manage-badlists.i18n.en.json';
-import manageBadlistFR from 'routes/manage-badlists/manage-badlists.i18n.fr.json';
+import manageBadlistsEN from 'routes/manage-badlists/manage-badlists.i18n.en.json';
+import manageBadlistsFR from 'routes/manage-badlists/manage-badlists.i18n.fr.json';
 import manageHeuristicDetailEN from 'routes/manage-heuristic-detail/manage-heuristic-detail.i18n.en.json';
 import manageHeuristicDetailFR from 'routes/manage-heuristic-detail/manage-heuristic-detail.i18n.fr.json';
 import manageHeuristicsEN from 'routes/manage-heuristics/manage-heuristics.i18n.en.json';
@@ -81,8 +102,8 @@ import manageSafelistAddEN from 'routes/manage-safelist-add/manage-safelist-add.
 import manageSafelistAddFR from 'routes/manage-safelist-add/manage-safelist-add.i18n.fr.json';
 import manageSafelistDetailEN from 'routes/manage-safelist-detail/manage-safelist-detail.i18n.en.json';
 import manageSafelistDetailFR from 'routes/manage-safelist-detail/manage-safelist-detail.i18n.fr.json';
-import manageSafelistEN from 'routes/manage-safelists/manage-safelists.i18n.en.json';
-import manageSafelistFR from 'routes/manage-safelists/manage-safelists.i18n.fr.json';
+import manageSafelistsEN from 'routes/manage-safelists/manage-safelists.i18n.en.json';
+import manageSafelistsFR from 'routes/manage-safelists/manage-safelists.i18n.fr.json';
 import manageSignatureDetailEN from 'routes/manage-signature-detail/manage-signature-detail.i18n.en.json';
 import manageSignatureDetailFR from 'routes/manage-signature-detail/manage-signature-detail.i18n.fr.json';
 import manageSignatureSourcesEN from 'routes/manage-signature-sources/manage-signature-sources.i18n.en.json';
@@ -93,8 +114,10 @@ import manageWorkflowDetailEN from 'routes/manage-workflow-detail/manage-workflo
 import manageWorkflowDetailFR from 'routes/manage-workflow-detail/manage-workflow-detail.i18n.fr.json';
 import manageWorkflowsEN from 'routes/manage-workflows/manage-workflows.i18n.en.json';
 import manageWorkflowsFR from 'routes/manage-workflows/manage-workflows.i18n.fr.json';
-import error404EN from 'routes/not-found/not-found.i18n.en.json';
-import error404FR from 'routes/not-found/not-found.i18n.fr.json';
+import missingNodeEN from 'routes/missing-node/missing-node.i18n.en.json';
+import missingNodeFR from 'routes/missing-node/missing-node.i18n.fr.json';
+import notFoundEN from 'routes/not-found/not-found.i18n.en.json';
+import notFoundFR from 'routes/not-found/not-found.i18n.fr.json';
 import retrohuntEN from 'routes/retrohunt/retrohunt.i18n.en.json';
 import retrohuntFR from 'routes/retrohunt/retrohunt.i18n.fr.json';
 import searchEN from 'routes/search/search.i18n.en.json';
@@ -121,14 +144,15 @@ import hexViewerEN from 'ui/HexViewer/hex-viewer.i18n.en.json';
 import hexViewerFR from 'ui/HexViewer/hex-viewer.i18n.fr.json';
 import inputsEN from 'ui/inputs/i18n/inputs.i18n.en.json';
 import inputsFR from 'ui/inputs/i18n/inputs.i18n.fr.json';
-import sandboxResultEN from 'ui/ResultCard/Sandbox/sandbox.i18n.en.json';
-import sandboxResultFR from 'ui/ResultCard/Sandbox/sandbox.i18n.fr.json';
+import sandboxEN from 'ui/ResultCard/Sandbox/sandbox.i18n.en.json';
+import sandboxFR from 'ui/ResultCard/Sandbox/sandbox.i18n.fr.json';
 
-const resources = {
+// TODO: Add lazy loading on the french translation
+
+export const I18N_RESSOURCES = {
   en: {
     adminActions: adminActionsEN,
     adminAPIkeys: adminAPIkeysEN,
-    adminCommunityServices: adminCommunityServicesEN,
     adminErrorViewer: adminErrorViewerEN,
     adminIdentify: adminIdentifyEN,
     adminServiceReview: adminServiceReviewEN,
@@ -137,16 +161,23 @@ const resources = {
     adminTagSafelist: adminTagSafelistEN,
     adminUsers: adminUsersEN,
     alerts: alertsEN,
-    archive: archiveEN,
+    api: apiEN,
+    app: appEN,
+    archive: archivesEN,
     assistant: assistantEN,
     authorize: authorizeEN,
+    breadcrumbs: breadcrumbsEN,
     carousel: carouselEN,
     clue: clueEN,
     dashboard: dashboardEN,
     dateTime: dateTimeEN,
     developmentAPI: developmentAPIEN,
-    error403: error403EN,
-    error404: error404EN,
+    developmentRoutes: developmentRoutesEN,
+    drawer: drawerEN,
+    error: errorEN,
+    error403: forbiddenEN,
+    error404: notFoundEN,
+    externalLookup: externalLookupEN,
     favorites: favoritesEN,
     fileDetail: fileDetailEN,
     fileViewer: fileViewerEN,
@@ -160,22 +191,26 @@ const resources = {
     locked: lockedEN,
     login: loginEN,
     logout: logoutEN,
-    manageBadlist: manageBadlistEN,
     manageBadlistAdd: manageBadlistAddEN,
     manageBadlistDetail: manageBadlistDetailEN,
+    manageBadlists: manageBadlistsEN,
     manageHeuristicDetail: manageHeuristicDetailEN,
     manageHeuristics: manageHeuristicsEN,
-    manageSafelist: manageSafelistEN,
     manageSafelistAdd: manageSafelistAddEN,
     manageSafelistDetail: manageSafelistDetailEN,
+    manageSafelists: manageSafelistsEN,
     manageSignatureDetail: manageSignatureDetailEN,
     manageSignatures: manageSignaturesEN,
     manageSignatureSources: manageSignatureSourcesEN,
     manageWorkflowDetail: manageWorkflowDetailEN,
     manageWorkflows: manageWorkflowsEN,
-    notification: notificationEN,
+    missingNode: missingNodeEN,
+    notifications: notificationsEN,
+    quicksearch: quickSearchEN,
+    quota: quotaEN,
     retrohunt: retrohuntEN,
-    sandboxResult: sandboxResultEN,
+    router: routerEN,
+    sandbox: sandboxEN,
     search: searchEN,
     settings: settingsEN,
     statisticsHeuristics: statisticsHeuristicsEN,
@@ -185,13 +220,11 @@ const resources = {
     submissions: submissionsEN,
     submit: submitEN,
     tos: tosEN,
-    translation: translationEN,
     user: userEN
   },
   fr: {
     adminActions: adminActionsFR,
     adminAPIkeys: adminAPIkeysFR,
-    adminCommunityServices: adminCommunityServicesFR,
     adminErrorViewer: adminErrorViewerFR,
     adminIdentify: adminIdentifyFR,
     adminServiceReview: adminServiceReviewFR,
@@ -200,16 +233,23 @@ const resources = {
     adminTagSafelist: adminTagSafelistFR,
     adminUsers: adminUsersFR,
     alerts: alertsFR,
-    archive: archiveFR,
+    api: apiFR,
+    app: appFR,
+    archive: archivesFR,
     assistant: assistantFR,
     authorize: authorizeFR,
+    breadcrumbs: breadcrumbsFR,
     carousel: carouselFR,
     clue: clueFR,
     dashboard: dashboardFR,
     dateTime: dateTimeFR,
     developmentAPI: developmentAPIFR,
-    error403: error403FR,
-    error404: error404FR,
+    developmentRoutes: developmentRoutesFR,
+    drawer: drawerFR,
+    error: errorFR,
+    error403: forbiddenFR,
+    error404: notFoundFR,
+    externalLookup: externalLookupFR,
     favorites: favoritesFR,
     fileDetail: fileDetailFR,
     fileViewer: fileViewerFR,
@@ -223,22 +263,26 @@ const resources = {
     locked: lockedFR,
     login: loginFR,
     logout: logoutFR,
-    manageBadlist: manageBadlistFR,
     manageBadlistAdd: manageBadlistAddFR,
     manageBadlistDetail: manageBadlistDetailFR,
+    manageBadlists: manageBadlistsFR,
     manageHeuristicDetail: manageHeuristicDetailFR,
     manageHeuristics: manageHeuristicsFR,
-    manageSafelist: manageSafelistFR,
     manageSafelistAdd: manageSafelistAddFR,
     manageSafelistDetail: manageSafelistDetailFR,
+    manageSafelists: manageSafelistsFR,
     manageSignatureDetail: manageSignatureDetailFR,
     manageSignatures: manageSignaturesFR,
     manageSignatureSources: manageSignatureSourcesFR,
     manageWorkflowDetail: manageWorkflowDetailFR,
     manageWorkflows: manageWorkflowsFR,
-    notification: notificationFR,
+    missingNode: missingNodeFR,
+    notifications: notificationsFR,
+    quicksearch: quickSearchFR,
+    quota: quotaFR,
     retrohunt: retrohuntFR,
-    sandboxResult: sandboxResultFR,
+    router: routerFR,
+    sandbox: sandboxFR,
     search: searchFR,
     settings: settingsFR,
     statisticsHeuristics: statisticsHeuristicsFR,
@@ -248,7 +292,6 @@ const resources = {
     submissions: submissionsFR,
     submit: submitFR,
     tos: tosFR,
-    translation: translationFR,
     user: userFR
   }
 };
@@ -258,6 +301,7 @@ void i18n
   .use(initReactI18next)
   .init({
     fallbackLng: 'en',
+    defaultNS: 'app',
     keySeparator: false,
     interpolation: {
       escapeValue: false
@@ -265,7 +309,14 @@ void i18n
     detection: {
       order: ['localStorage', 'cookie']
     },
-    resources
+    resources: I18N_RESSOURCES
   });
 
-export default i18n;
+addCoreTranslations(i18n);
+addA11yTranslations(i18n);
+addNotisTranslations(i18n);
+addClassiTranslations(i18n);
+addClassiTranslations(i18n);
+addDrawerTranslations(i18n);
+
+export { i18n };

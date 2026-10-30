@@ -17,12 +17,12 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
-import { usePropStore } from 'features/prop-provider/prop-provider.providers';
+import { usePropStore } from 'features/prop-provider';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IconButton } from 'ui/buttons/IconButton';
-import { useInputId, useInputLabel } from 'ui/inputs/hooks/inputs.hook.renderer.tsx';
-import type { InputControllerProps, SelectInputOption } from 'ui/inputs/models/inputs.model.ts';
+import { useInputId, useInputLabel } from 'ui/inputs/hooks/inputs.hook.renderer';
+import type { InputControllerProps, SelectInputOption } from 'ui/inputs/models/inputs.model';
 import { Tooltip } from 'ui/Tooltip';
 
 /**********************************************************************************************************************
@@ -93,7 +93,6 @@ export const InputFormControl = React.memo(({ children }: { children: React.Reac
       error={isError}
       color={color}
       onSubmit={(e: React.SyntheticEvent) => e.preventDefault()}
-      {...(readOnly && !disabled && { isFocused: null })}
       {...formControlProps}
       sx={{
         ...(color && {
@@ -452,7 +451,7 @@ export const SelectInputOptionMenuItem = React.memo(
             <IconButton
               color="secondary"
               tabIndex={-1}
-              to={helpLink}
+              {...(helpLink && { nav: nav => nav.to().create(helpLink), navDeps: [helpLink] })}
               tooltip={
                 <>
                   <span style={{ color: theme.palette.text.secondary }}>{t('adornment.help.tooltip')}</span>

@@ -4,9 +4,9 @@ import { test } from 'core/e2e/e2e.fixtures';
 import type { WaitForOptions } from 'core/e2e/e2e.models';
 import { PageObjectModel } from 'core/e2e/utils/PageObjectModel';
 import path from 'path';
-import { SelectInput } from 'ui/inputs/pom/SelectInput.pom.ts';
-import { TextInput } from 'ui/inputs/pom/TextInput.pom.ts';
-import { TabContainer } from 'ui/TabContainer.pom.ts';
+import { SelectInput } from 'ui/inputs/pom/SelectInput.pom';
+import { TextInput } from 'ui/inputs/pom/TextInput.pom';
+import { TabContainer } from 'ui/TabContainer.pom';
 
 type SubmitTab = 'File' | 'Hash/URL';
 

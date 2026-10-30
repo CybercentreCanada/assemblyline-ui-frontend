@@ -1,11 +1,12 @@
 import type { TypographyProps } from '@mui/material';
 import { Skeleton, Typography, useTheme } from '@mui/material';
-import useALContext from 'core/config/useALContext';
-import { useAppBar, useAppBarHeight, useAppLayout } from 'core/template/components/app/hooks';
+import { useAppInterfaceStore } from 'core/interface';
+import { useAppPreferenceStore } from 'core/preference';
+import useALContext from 'deprecated/hooks/useALContext';
 import type { CSSProperties, DetailedHTMLProps, HTMLAttributes, ReactNode } from 'react';
-import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { memo, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import type { ClassificationProps } from 'ui/Classification';
-import Classification from 'ui/Classification';
+import { Classification } from 'ui/Classification';
 
 export type PageHeaderProps = {
   actions?: ReactNode;
@@ -30,7 +31,7 @@ export type PageHeaderProps = {
   };
 };
 
-export const PageHeader: React.FC<PageHeaderProps> = React.memo(
+export const PageHeader = memo(
   ({
     actions = null,
     classification: classificationProp,
@@ -45,11 +46,11 @@ export const PageHeader: React.FC<PageHeaderProps> = React.memo(
     top = null,
     wrapStart = false,
     onClassificationChange = null
-  }) => {
+  }: PageHeaderProps) => {
     const theme = useTheme();
-    const layout = useAppLayout();
-    const appbar = useAppBar();
-    const appBarHeight = useAppBarHeight();
+    const barWillHide = useAppPreferenceStore(s => s.template.layout !== 'top' && s.template.autoHideAppbar);
+    const appBarHeight = useAppInterfaceStore(s => s.template.appBarHeight);
+
     const { c12nDef } = useALContext();
 
     const [flexColumn, setFlexColumn] = useState<boolean>(false);
@@ -57,11 +58,6 @@ export const PageHeader: React.FC<PageHeaderProps> = React.memo(
     const containerRef = useRef<HTMLDivElement>(null);
     const primaryRef = useRef<HTMLSpanElement>(null);
     const actionsRef = useRef<HTMLDivElement>(null);
-
-    const barWillHide = useMemo(
-      () => (layout?.current !== 'top' ? appbar?.autoHide : null),
-      [layout?.current, appbar?.autoHide]
-    );
 
     const {
       root = {},

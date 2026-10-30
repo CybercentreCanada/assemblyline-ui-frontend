@@ -1,5 +1,5 @@
 import { Grid, Skeleton, Typography, useMediaQuery, useTheme } from '@mui/material';
-import useALContext from 'core/config/useALContext';
+import useALContext from 'deprecated/hooks/useALContext';
 import type { File as FileInfo } from 'models/base/file';
 import type { Section } from 'models/base/result';
 import React from 'react';
@@ -16,14 +16,14 @@ type IdentificationSectionProps = {
   fileinfo: FileInfo;
   promotedSections?: Section[];
   nocollapse?: boolean;
-  filetype_override?: string;
+  filetypeOverride?: string;
 };
 
 const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({
   fileinfo,
   promotedSections = [],
   nocollapse = false,
-  filetype_override = null
+  filetypeOverride = null
 }) => {
   const { t } = useTranslation(['fileDetail']);
   const theme = useTheme();
@@ -165,9 +165,9 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({
         </Grid>
         <Grid size={{ xs: 8, sm: 9, lg: 10 }} style={{ wordBreak: 'break-word' }}>
           {fileinfo ? (
-            filetype_override ? (
+            filetypeOverride ? (
               <>
-                <span style={{ paddingRight: theme.spacing(0.5) }}>{`${filetype_override}`}</span>
+                <span style={{ paddingRight: theme.spacing(0.5) }}>{`${filetypeOverride}`}</span>
                 <span
                   style={{
                     textDecoration: 'line-through',

@@ -1,4 +1,8 @@
 {
+  "app_route.admin_error_detail.fullname": "Admin Error {{id}}",
+  "app_route.admin_error_detail.shortname": "{{id}}",
+  "app_route.admin_error_viewer.fullname": "Admin Error Viewer",
+  "app_route.admin_error_viewer.shortname": "Error Viewer",
   "debug_info": "Debug Information:",
   "detail": "File analysis details",
   "download": "Download file",
