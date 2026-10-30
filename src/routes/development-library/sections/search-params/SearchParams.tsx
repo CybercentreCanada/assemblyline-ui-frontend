@@ -6,7 +6,7 @@ import { useLocation } from 'react-router';
 import { DemoContainer } from 'routes/development-library/components/DemoContainer';
 import { DemoSection } from 'routes/development-library/components/DemoSection';
 import { useForm } from 'routes/development-library/contexts/form';
-import type { SearchParamsKindDemo } from 'routes/development-library/development-library.models';
+import type { SearchParamsKindDemo } from 'routes/development-library/sections/search-params/search-params.models';
 import {
   KIND_DEMOS,
   LIVE_PARAMS,
@@ -17,7 +17,7 @@ import {
   SEARCH_PARAMS_CHECKS,
   SORT_OPTIONS,
   stringifyResult
-} from 'routes/development-library/utils/search-params.utils';
+} from 'routes/development-library/sections/search-params/search-params.utils';
 import { NumberInput } from 'ui/inputs/NumberInput';
 import { SelectInput } from 'ui/inputs/SelectInput';
 import { SwitchInput } from 'ui/inputs/SwitchInput';

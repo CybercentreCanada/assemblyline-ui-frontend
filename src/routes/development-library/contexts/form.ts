@@ -8,7 +8,7 @@ import { LIST_INPUTS_LIBRARY_STATE, type ListInputsLibraryState } from 'routes/d
 import {
   SEARCH_PARAMS_LIBRARY_STATE,
   type SearchParamsLibraryState
-} from 'routes/development-library/sections/SearchParams';
+} from 'routes/development-library/sections/search-params/SearchParams';
 
 type LibraryComponents = DateTimeLibraryState &
   InputsLibraryState &

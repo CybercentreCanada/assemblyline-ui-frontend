@@ -7,7 +7,7 @@ import {
   runSearchParamsCheck,
   SEARCH_PARAMS_CHECKS,
   stringifyResult
-} from 'routes/development-library/utils/search-params.utils';
+} from 'routes/development-library/sections/search-params/search-params.utils';
 import { describe, expect, it } from 'vitest';
 
 //*****************************************************************************************
