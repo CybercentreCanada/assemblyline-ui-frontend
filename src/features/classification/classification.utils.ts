@@ -649,6 +649,15 @@ export const applyClassificationRules = (
   };
 };
 
+/**
+ * Combines groups to find the maximum
+ *
+ * @param grps1 - First groups
+ * @param grps2 - Second groups
+ *
+ * @returns The a combination of the given groups
+ *
+ */
 const getMaxGroups = (grps1: string[], grps2: string[]): string[] => {
   let groups = new Set<string>();
   if (grps1.length > 0 && grps2.length > 0) {
