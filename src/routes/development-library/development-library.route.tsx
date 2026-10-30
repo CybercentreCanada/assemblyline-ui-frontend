@@ -9,7 +9,7 @@ import { InputsSection } from 'routes/development-library/sections/Inputs';
 import { LayoutSection } from 'routes/development-library/sections/Layout';
 import { ListSection } from 'routes/development-library/sections/List';
 import { ListInputsSection } from 'routes/development-library/sections/ListInputs';
-import { SearchParamsSection } from 'routes/development-library/sections/SearchParams';
+import { SearchParamsSection } from 'routes/development-library/sections/search-params/SearchParams';
 import { PageHeader } from 'ui/layouts/PageHeader';
 import { PageLayout } from 'ui/layouts/PageLayout';
 import type { PageNavigationItemProp } from 'ui/layouts/PageNavigation';

@@ -4,7 +4,7 @@ import type {
   SearchParamsCheck,
   SearchParamsCheckResult,
   SearchParamsKindDemo
-} from 'routes/development-library/development-library.models';
+} from 'routes/development-library/sections/search-params/search-params.models';
 
 //*****************************************************************************************
 // Formatting
