@@ -8,10 +8,10 @@ import { Autocomplete, Grid, IconButton, MenuItem, Select, TextField, Tooltip, u
 import FormControl from '@mui/material/FormControl';
 import type { ServiceParameter } from 'models/base/service';
 import { DEFAULT_SERVICE_PARAMETER } from 'models/base/service';
-import CustomChip from 'ui/CustomChip';
-import { CheckboxInput } from 'ui/inputs/CheckboxInput';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import CustomChip from 'ui/CustomChip';
+import { CheckboxInput } from 'ui/inputs/CheckboxInput';
 
 type MultiTypeParamProps<T extends 'bool' | 'int' | 'str' | 'list'> = {
   param?: ServiceParameter;

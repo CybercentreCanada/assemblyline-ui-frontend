@@ -1,4 +1,5 @@
 import { Button, Grid, Typography, useTheme } from '@mui/material';
+import React from 'react';
 import { DemoContainer } from 'routes/development-library/components/DemoContainer';
 import { DemoSection } from 'routes/development-library/components/DemoSection';
 import { useForm } from 'routes/development-library/contexts/form';
@@ -20,7 +21,6 @@ import { TextInput } from 'ui/inputs/TextInput';
 import type { CoercersSchema, ValidationSchema } from 'ui/inputs/utils/inputs.util.validation.tsx';
 import { PageSection } from 'ui/layouts/PageSection';
 import MonacoEditor from 'ui/MonacoEditor';
-import React from 'react';
 
 export const LONG_STRING =
   'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce iaculis consectetur elit. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Aenean nec ante nec sapien vulputate rhoncus ac quis leo. Aenean erat erat, lacinia nec nulla sit amet, egestas rutrum neque. Quisque et eleifend lorem, id vehicula lectus. Integer rhoncus rutrum ante id tempus. Donec non libero non justo vehicula finibus. Maecenas scelerisque lectus euismod neque aliquam, eget dictum mauris aliquet. Fusce at massa quis felis pulvinar egestas. Donec in libero sed sem scelerisque iaculis. Fusce placerat, eros eu gravida sollicitudin, massa sapien luctus massa, id ullamcorper tellus risus eget lorem. Praesent a nisi massa. Nulla mollis dictum sagittis. Donec vestibulum nulla magna, vitae volutpat dui blandit et.';

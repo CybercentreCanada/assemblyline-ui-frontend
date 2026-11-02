@@ -1,5 +1,5 @@
-import { CoercersResolver, ValidationResolver } from 'ui/inputs/utils/inputs.util.validation.tsx';
 import type { TFunction } from 'i18next';
+import { CoercersResolver, ValidationResolver } from 'ui/inputs/utils/inputs.util.validation.tsx';
 import { describe, expect, it } from 'vitest';
 
 const tMock = ((key: unknown): unknown => {

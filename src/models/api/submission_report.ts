@@ -1,10 +1,10 @@
+import type { Tags } from 'models/api/file';
+import type { SubmissionSummary } from 'models/api/submission';
 import type { Verdict } from 'models/base/alert';
 import type { File } from 'models/base/file';
 import type { PromoteTo } from 'models/base/result';
 import type { SectionBody } from 'models/base/result_body';
 import type { Submission } from 'models/base/submission';
-import type { Tags } from 'models/api/file';
-import type { SubmissionSummary } from 'models/api/submission';
 
 /** */
 export type TPromotedSection = SectionBody & {
