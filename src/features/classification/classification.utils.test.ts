@@ -827,7 +827,7 @@ describe('`getMaxClassification` correctly identifies the maximum', () => {
 //*****************************************************************************************
 describe('`applyClassificationRules` should correctly identify incorrect combinations', () => {
   it('leaves empty component lists empty without auto-selecting groups', () => {
-    const definition = JSON.parse(JSON.stringify(MOCK_CLASSIFICATION_DEFINITION)) as ClassificationDefinition;
+    const definition = structuredClone(MOCK_CLASSIFICATION_DEFINITION);
     const parts: ClassificationParts = { lvlIdx: 1, lvl: 'L0', req: [], groups: [], subgroups: [] };
 
     expect(applyClassificationRules(parts, definition, 'short', false)).toEqual({
@@ -837,7 +837,7 @@ describe('`applyClassificationRules` should correctly identify incorrect combina
   });
 
   it.each(['req', 'groups', 'subgroups'] as const)('enforces minimum levels from the %s field', field => {
-    const definition = JSON.parse(JSON.stringify(MOCK_CLASSIFICATION_DEFINITION)) as ClassificationDefinition;
+    const definition = structuredClone(MOCK_CLASSIFICATION_DEFINITION);
     definition.params_map.LE.require_lvl = 5;
     const parts: ClassificationParts = { lvlIdx: 1, lvl: 'L0', req: [], groups: [], subgroups: [] };
     parts[field].push('LE');
@@ -850,7 +850,7 @@ describe('`applyClassificationRules` should correctly identify incorrect combina
   });
 
   it('does not raise the level when it already equals the required minimum', () => {
-    const definition = JSON.parse(JSON.stringify(MOCK_CLASSIFICATION_DEFINITION)) as ClassificationDefinition;
+    const definition = structuredClone(MOCK_CLASSIFICATION_DEFINITION);
     definition.params_map.LE.require_lvl = 5;
     const parts: ClassificationParts = { lvlIdx: 5, lvl: 'L1', req: ['LE'], groups: [], subgroups: [] };
 
@@ -866,7 +866,7 @@ describe('`applyClassificationRules` should correctly identify incorrect combina
   ])(
     'auto-selects groups only for non-user classifications: $userClassification',
     ({ userClassification, expected }) => {
-      const definition = JSON.parse(JSON.stringify(MOCK_CLASSIFICATION_DEFINITION)) as ClassificationDefinition;
+      const definition = structuredClone(MOCK_CLASSIFICATION_DEFINITION);
       const parts: ClassificationParts = { lvlIdx: 1, lvl: 'L0', req: [], groups: ['B'], subgroups: [] };
 
       const result = applyClassificationRules(parts, definition, 'short', false, userClassification);
@@ -877,7 +877,7 @@ describe('`applyClassificationRules` should correctly identify incorrect combina
   );
 
   it.each(['req', 'subgroups'] as const)('does not trigger group auto-selection from the %s field', field => {
-    const definition = JSON.parse(JSON.stringify(MOCK_CLASSIFICATION_DEFINITION)) as ClassificationDefinition;
+    const definition = structuredClone(MOCK_CLASSIFICATION_DEFINITION);
     const parts: ClassificationParts = { lvlIdx: 1, lvl: 'L0', req: [], groups: [], subgroups: [] };
     parts[field].push(field === 'req' ? 'LE' : 'R1');
 
@@ -885,14 +885,14 @@ describe('`applyClassificationRules` should correctly identify incorrect combina
   });
 
   it('ignores empty group values when deciding whether to auto-select', () => {
-    const definition = JSON.parse(JSON.stringify(MOCK_CLASSIFICATION_DEFINITION)) as ClassificationDefinition;
+    const definition = structuredClone(MOCK_CLASSIFICATION_DEFINITION);
     const parts: ClassificationParts = { lvlIdx: 1, lvl: 'L0', req: [], groups: [''], subgroups: [] };
 
     expect(applyClassificationRules(parts, definition, 'short', false).parts.groups).toEqual(['']);
   });
 
   it('does not duplicate an auto-selected group already present in long format', () => {
-    const definition = JSON.parse(JSON.stringify(MOCK_CLASSIFICATION_DEFINITION)) as ClassificationDefinition;
+    const definition = structuredClone(MOCK_CLASSIFICATION_DEFINITION);
     const parts: ClassificationParts = {
       lvlIdx: 1,
       lvl: 'LEVEL 0',
@@ -905,7 +905,7 @@ describe('`applyClassificationRules` should correctly identify incorrect combina
   });
 
   it('adds a subgroup-required group without relying on the parser to add it first', () => {
-    const definition = JSON.parse(JSON.stringify(MOCK_CLASSIFICATION_DEFINITION)) as ClassificationDefinition;
+    const definition = structuredClone(MOCK_CLASSIFICATION_DEFINITION);
     const parts: ClassificationParts = { lvlIdx: 1, lvl: 'L0', req: [], groups: [], subgroups: ['R2'] };
 
     const result = applyClassificationRules(parts, definition, 'short', false);
@@ -918,7 +918,7 @@ describe('`applyClassificationRules` should correctly identify incorrect combina
     ['A', 'B', 'X'],
     ['GROUP A', 'GROUP B', 'GROUP X']
   ])('removes groups forbidden by a subgroup from input %j', (...groups) => {
-    const definition = JSON.parse(JSON.stringify(MOCK_CLASSIFICATION_DEFINITION)) as ClassificationDefinition;
+    const definition = structuredClone(MOCK_CLASSIFICATION_DEFINITION);
     const parts: ClassificationParts = { lvlIdx: 1, lvl: 'L0', req: [], groups, subgroups: ['R3'] };
 
     const result = applyClassificationRules(parts, definition, 'short', false, true);
@@ -928,7 +928,7 @@ describe('`applyClassificationRules` should correctly identify incorrect combina
   });
 
   it('uses short names on mobile even when long format is requested', () => {
-    const definition = JSON.parse(JSON.stringify(MOCK_CLASSIFICATION_DEFINITION)) as ClassificationDefinition;
+    const definition = structuredClone(MOCK_CLASSIFICATION_DEFINITION);
     const parts: ClassificationParts = {
       lvlIdx: 1,
       lvl: 'LEVEL 0',
