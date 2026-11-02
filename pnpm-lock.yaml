@@ -76,10 +76,10 @@ importers:
         version: 3.13.12(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       '@vitejs/plugin-react':
         specifier: ^4.3.4
-        version: 4.3.4(vite@6.4.3(@types/node@22.14.1)(jiti@2.4.2))
+        version: 4.3.4(vite@6.4.5(@types/node@22.14.1)(jiti@2.4.2))
       '@vitejs/plugin-react-swc':
         specifier: ^3.8.1
-        version: 3.8.1(vite@6.4.3(@types/node@22.14.1)(jiti@2.4.2))
+        version: 3.8.1(vite@6.4.5(@types/node@22.14.1)(jiti@2.4.2))
       autosuggest-highlight:
         specifier: ^3.3.4
         version: 3.3.4
@@ -114,8 +114,8 @@ importers:
         specifier: ^1.11.13
         version: 1.11.13
       dompurify:
-        specifier: ^3.4.16
-        version: 3.4.16
+        specifier: ^3.4.17
+        version: 3.4.17
       eslint-plugin-vitest:
         specifier: ^0.5.4
         version: 0.5.4(@typescript-eslint/eslint-plugin@8.30.0(@typescript-eslint/parser@8.30.0(eslint@9.24.0(jiti@2.4.2))(typescript@5.8.3))(eslint@9.24.0(jiti@2.4.2))(typescript@5.8.3))(eslint@9.24.0(jiti@2.4.2))(typescript@5.8.3)(vitest@4.1.11)
@@ -210,14 +210,14 @@ importers:
         specifier: ^6.1.17
         version: 6.1.17(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       vite:
-        specifier: ^6.4.3
-        version: 6.4.3(@types/node@22.14.1)(jiti@2.4.2)
+        specifier: ^6.4.4
+        version: 6.4.5(@types/node@22.14.1)(jiti@2.4.2)
       vite-plugin-mkcert:
         specifier: ^1.17.9
-        version: 1.17.9(vite@6.4.3(@types/node@22.14.1)(jiti@2.4.2))
+        version: 1.17.9(vite@6.4.5(@types/node@22.14.1)(jiti@2.4.2))
       vite-tsconfig-paths:
         specifier: ^5.1.4
-        version: 5.1.4(typescript@5.8.3)(vite@6.4.3(@types/node@22.14.1)(jiti@2.4.2))
+        version: 5.1.4(typescript@5.8.3)(vite@6.4.5(@types/node@22.14.1)(jiti@2.4.2))
       web-vitals:
         specifier: ^3.1.1
         version: 3.5.2
@@ -398,7 +398,7 @@ importers:
         version: 8.30.0(eslint@9.24.0(jiti@2.4.2))(typescript@5.8.3)
       vitest:
         specifier: ^4.1.11
-        version: 4.1.11(@types/node@22.14.1)(@vitest/coverage-v8@4.1.11)(@vitest/ui@4.1.11)(jsdom@26.1.0)(vite@6.4.3(@types/node@22.14.1)(jiti@2.4.2))
+        version: 4.1.11(@types/node@22.14.1)(@vitest/coverage-v8@4.1.11)(@vitest/ui@4.1.11)(jsdom@26.1.0)(vite@6.4.5(@types/node@22.14.1)(jiti@2.4.2))
       vitest-fetch-mock:
         specifier: ^0.4.5
         version: 0.4.5(vitest@4.1.11)
@@ -3163,8 +3163,8 @@ packages:
   dom-helpers@5.2.1:
     resolution: {integrity: sha512-nRCa7CK3VTrM2NmGkIy4cbK7IZlgBE/PYMn55rrXefr5xXDP0LdtfPnblFDoVdcAfslJ7or6iqAUnx0CCGIWQA==}
 
-  dompurify@3.4.16:
-    resolution: {integrity: sha512-sqo+pNp3qRhCIpbgRi1y8Tgk27Bo2Ry7w0dC1NBeNTdZChWjz9Xb/KOoZbRP/R6pQZ80Qw8YhXw13hWWBbMRnQ==}
+  dompurify@3.4.17:
+    resolution: {integrity: sha512-B/pSlYVHQ58kqISD/yDjuJ1yfzI34m1gF4lAod2bwSRhiN4K5Cl3H8Af7hqB2PmTL911tdEudnnXn5FnhRoz0w==}
 
   dotenv@17.2.1:
     resolution: {integrity: sha512-kQhDYKZecqnM0fCnzI5eIv5L4cAe/iRI+HqMbO/hbRdTAeXDG+M9FjipUxNfbARuEg4iHIbhnhs78BCHNbSxEQ==}
@@ -4496,11 +4496,6 @@ packages:
   ms@2.1.3:
     resolution: {integrity: sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==}
 
-  nanoid@3.3.11:
-    resolution: {integrity: sha512-N8SpfPUnUp1bK+PMYW8qSWdl9U+wwNWI4QKxOYDy9JAro3WMX7p2OeVRF9v+347pnakNevPmiHhNmZ2HbFA76w==}
-    engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
-    hasBin: true
-
   nanoid@3.3.15:
     resolution: {integrity: sha512-y7Wygv/7mEOvxTuEQDB8StXdMRBWf1kR/tlhAzBRUFkB2jfcLOAxO/SHmOO2zgz1pVgK29/kyupn059/bCHdjA==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
@@ -5512,8 +5507,8 @@ packages:
       vite:
         optional: true
 
-  vite@6.4.3:
-    resolution: {integrity: sha512-NTKlcQjlAK7MlQoyb6LgaqHc8sso/pVyUJYWMws3jg21uTJw/LddqIFPcPqP6PzpgbIcZyKI85sFE4HBrQDA8A==}
+  vite@6.4.5:
+    resolution: {integrity: sha512-4enwjFfi4IwtEh0w+jPzpLVOFQiPHmmzPxcHXQOyEur47o6u0jE573DmGpjA+7irXoMLYRZD5ZaFUEneS3abPg==}
     engines: {node: ^18.0.0 || ^20.0.0 || >=22.0.0}
     hasBin: true
     peerDependencies:
@@ -7595,7 +7590,7 @@ snapshots:
 
   '@types/dompurify@3.2.0':
     dependencies:
-      dompurify: 3.4.16
+      dompurify: 3.4.17
 
   '@types/estree-jsx@1.0.5':
     dependencies:
@@ -7944,21 +7939,21 @@ snapshots:
   '@unrs/resolver-binding-win32-x64-msvc@1.5.0':
     optional: true
 
-  '@vitejs/plugin-react-swc@3.8.1(vite@6.4.3(@types/node@22.14.1)(jiti@2.4.2))':
+  '@vitejs/plugin-react-swc@3.8.1(vite@6.4.5(@types/node@22.14.1)(jiti@2.4.2))':
     dependencies:
       '@swc/core': 1.11.21
-      vite: 6.4.3(@types/node@22.14.1)(jiti@2.4.2)
+      vite: 6.4.5(@types/node@22.14.1)(jiti@2.4.2)
     transitivePeerDependencies:
       - '@swc/helpers'
 
-  '@vitejs/plugin-react@4.3.4(vite@6.4.3(@types/node@22.14.1)(jiti@2.4.2))':
+  '@vitejs/plugin-react@4.3.4(vite@6.4.5(@types/node@22.14.1)(jiti@2.4.2))':
     dependencies:
       '@babel/core': 7.26.10
       '@babel/plugin-transform-react-jsx-self': 7.25.9(@babel/core@7.26.10)
       '@babel/plugin-transform-react-jsx-source': 7.25.9(@babel/core@7.26.10)
       '@types/babel__core': 7.20.5
       react-refresh: 0.14.2
-      vite: 6.4.3(@types/node@22.14.1)(jiti@2.4.2)
+      vite: 6.4.5(@types/node@22.14.1)(jiti@2.4.2)
     transitivePeerDependencies:
       - supports-color
 
@@ -7974,7 +7969,7 @@ snapshots:
       obug: 2.2.1
       std-env: 4.3.0
       tinyrainbow: 3.2.0
-      vitest: 4.1.11(@types/node@22.14.1)(@vitest/coverage-v8@4.1.11)(@vitest/ui@4.1.11)(jsdom@26.1.0)(vite@6.4.3(@types/node@22.14.1)(jiti@2.4.2))
+      vitest: 4.1.11(@types/node@22.14.1)(@vitest/coverage-v8@4.1.11)(@vitest/ui@4.1.11)(jsdom@26.1.0)(vite@6.4.5(@types/node@22.14.1)(jiti@2.4.2))
 
   '@vitest/expect@4.1.11':
     dependencies:
@@ -7985,13 +7980,13 @@ snapshots:
       chai: 6.3.0
       tinyrainbow: 3.2.0
 
-  '@vitest/mocker@4.1.11(vite@6.4.3(@types/node@22.14.1)(jiti@2.4.2))':
+  '@vitest/mocker@4.1.11(vite@6.4.5(@types/node@22.14.1)(jiti@2.4.2))':
     dependencies:
       '@vitest/spy': 4.1.11
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
-      vite: 6.4.3(@types/node@22.14.1)(jiti@2.4.2)
+      vite: 6.4.5(@types/node@22.14.1)(jiti@2.4.2)
 
   '@vitest/pretty-format@4.1.11':
     dependencies:
@@ -8020,7 +8015,7 @@ snapshots:
       sirv: 3.0.2
       tinyglobby: 0.2.17
       tinyrainbow: 3.2.0
-      vitest: 4.1.11(@types/node@22.14.1)(@vitest/coverage-v8@4.1.11)(@vitest/ui@4.1.11)(jsdom@26.1.0)(vite@6.4.3(@types/node@22.14.1)(jiti@2.4.2))
+      vitest: 4.1.11(@types/node@22.14.1)(@vitest/coverage-v8@4.1.11)(@vitest/ui@4.1.11)(jsdom@26.1.0)(vite@6.4.5(@types/node@22.14.1)(jiti@2.4.2))
 
   '@vitest/utils@4.1.11':
     dependencies:
@@ -8031,7 +8026,7 @@ snapshots:
   '@vitest/web-worker@4.1.11(vitest@4.1.11)':
     dependencies:
       obug: 2.2.1
-      vitest: 4.1.11(@types/node@22.14.1)(@vitest/coverage-v8@4.1.11)(@vitest/ui@4.1.11)(jsdom@26.1.0)(vite@6.4.3(@types/node@22.14.1)(jiti@2.4.2))
+      vitest: 4.1.11(@types/node@22.14.1)(@vitest/coverage-v8@4.1.11)(@vitest/ui@4.1.11)(jsdom@26.1.0)(vite@6.4.5(@types/node@22.14.1)(jiti@2.4.2))
 
   acorn-jsx@5.3.2(acorn@8.14.1):
     dependencies:
@@ -8732,7 +8727,7 @@ snapshots:
       '@babel/runtime': 7.27.0
       csstype: 3.1.3
 
-  dompurify@3.4.16:
+  dompurify@3.4.17:
     optionalDependencies:
       '@types/trusted-types': 2.0.7
 
@@ -9061,7 +9056,7 @@ snapshots:
       eslint: 9.24.0(jiti@2.4.2)
     optionalDependencies:
       '@typescript-eslint/eslint-plugin': 8.30.0(@typescript-eslint/parser@8.30.0(eslint@9.24.0(jiti@2.4.2))(typescript@5.8.3))(eslint@9.24.0(jiti@2.4.2))(typescript@5.8.3)
-      vitest: 4.1.11(@types/node@22.14.1)(@vitest/coverage-v8@4.1.11)(@vitest/ui@4.1.11)(jsdom@26.1.0)(vite@6.4.3(@types/node@22.14.1)(jiti@2.4.2))
+      vitest: 4.1.11(@types/node@22.14.1)(@vitest/coverage-v8@4.1.11)(@vitest/ui@4.1.11)(jsdom@26.1.0)(vite@6.4.5(@types/node@22.14.1)(jiti@2.4.2))
     transitivePeerDependencies:
       - supports-color
       - typescript
@@ -9487,7 +9482,7 @@ snapshots:
 
   hast-util-to-jsx-runtime@2.3.6:
     dependencies:
-      '@types/estree': 1.0.7
+      '@types/estree': 1.0.9
       '@types/hast': 3.0.4
       '@types/unist': 3.0.3
       comma-separated-tokens: 2.0.3
@@ -10555,8 +10550,6 @@ snapshots:
 
   ms@2.1.3: {}
 
-  nanoid@3.3.11: {}
-
   nanoid@3.3.15: {}
 
   nats@2.29.3:
@@ -10760,7 +10753,7 @@ snapshots:
 
   postcss@8.4.49:
     dependencies:
-      nanoid: 3.3.11
+      nanoid: 3.3.15
       picocolors: 1.1.1
       source-map-js: 1.2.1
 
@@ -11748,27 +11741,27 @@ snapshots:
       '@types/unist': 3.0.3
       vfile-message: 4.0.2
 
-  vite-plugin-mkcert@1.17.9(vite@6.4.3(@types/node@22.14.1)(jiti@2.4.2)):
+  vite-plugin-mkcert@1.17.9(vite@6.4.5(@types/node@22.14.1)(jiti@2.4.2)):
     dependencies:
       axios: 1.16.1(debug@4.4.3)
       debug: 4.4.3
       picocolors: 1.1.1
-      vite: 6.4.3(@types/node@22.14.1)(jiti@2.4.2)
+      vite: 6.4.5(@types/node@22.14.1)(jiti@2.4.2)
     transitivePeerDependencies:
       - supports-color
 
-  vite-tsconfig-paths@5.1.4(typescript@5.8.3)(vite@6.4.3(@types/node@22.14.1)(jiti@2.4.2)):
+  vite-tsconfig-paths@5.1.4(typescript@5.8.3)(vite@6.4.5(@types/node@22.14.1)(jiti@2.4.2)):
     dependencies:
       debug: 4.4.0
       globrex: 0.1.2
       tsconfck: 3.1.5(typescript@5.8.3)
     optionalDependencies:
-      vite: 6.4.3(@types/node@22.14.1)(jiti@2.4.2)
+      vite: 6.4.5(@types/node@22.14.1)(jiti@2.4.2)
     transitivePeerDependencies:
       - supports-color
       - typescript
 
-  vite@6.4.3(@types/node@22.14.1)(jiti@2.4.2):
+  vite@6.4.5(@types/node@22.14.1)(jiti@2.4.2):
     dependencies:
       esbuild: 0.25.12
       fdir: 6.5.0(picomatch@4.0.4)
@@ -11783,12 +11776,12 @@ snapshots:
 
   vitest-fetch-mock@0.4.5(vitest@4.1.11):
     dependencies:
-      vitest: 4.1.11(@types/node@22.14.1)(@vitest/coverage-v8@4.1.11)(@vitest/ui@4.1.11)(jsdom@26.1.0)(vite@6.4.3(@types/node@22.14.1)(jiti@2.4.2))
+      vitest: 4.1.11(@types/node@22.14.1)(@vitest/coverage-v8@4.1.11)(@vitest/ui@4.1.11)(jsdom@26.1.0)(vite@6.4.5(@types/node@22.14.1)(jiti@2.4.2))
 
-  vitest@4.1.11(@types/node@22.14.1)(@vitest/coverage-v8@4.1.11)(@vitest/ui@4.1.11)(jsdom@26.1.0)(vite@6.4.3(@types/node@22.14.1)(jiti@2.4.2)):
+  vitest@4.1.11(@types/node@22.14.1)(@vitest/coverage-v8@4.1.11)(@vitest/ui@4.1.11)(jsdom@26.1.0)(vite@6.4.5(@types/node@22.14.1)(jiti@2.4.2)):
     dependencies:
       '@vitest/expect': 4.1.11
-      '@vitest/mocker': 4.1.11(vite@6.4.3(@types/node@22.14.1)(jiti@2.4.2))
+      '@vitest/mocker': 4.1.11(vite@6.4.5(@types/node@22.14.1)(jiti@2.4.2))
       '@vitest/pretty-format': 4.1.11
       '@vitest/runner': 4.1.11
       '@vitest/snapshot': 4.1.11
@@ -11805,7 +11798,7 @@ snapshots:
       tinyexec: 1.3.1
       tinyglobby: 0.2.17
       tinyrainbow: 3.2.0
-      vite: 6.4.3(@types/node@22.14.1)(jiti@2.4.2)
+      vite: 6.4.5(@types/node@22.14.1)(jiti@2.4.2)
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@types/node': 22.14.1
