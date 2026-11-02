@@ -1,5 +1,5 @@
 import type { AppUserService, AppUserValidatedProp } from 'core/template/components/app/AppUserService';
-import type { ClassificationDefinition } from 'features/classification/classification.utils';
+import type { ClassificationDefinition } from 'features/classification';
 import type { CustomUser, Indexes, SystemMessage } from 'models/api/user';
 import type { Configuration } from 'models/base/config';
 import type { UserSettings } from 'models/base/user_settings';
