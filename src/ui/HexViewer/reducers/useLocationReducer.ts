@@ -32,7 +32,7 @@ export const useLocationReducer: UseReducer = () => {
       query.current.deleteAll();
       LOCATION_PARAMS.forEach(param => handleLocationShare(store, param));
       handleScrollLocationShare(store);
-      copy(`${window.location.origin}${window.location.pathname}?${query.current.toString()}${window.location.hash}`);
+      void copy(`${window.location.origin}${window.location.pathname}?${query.current.toString()}${window.location.hash}`);
       return store;
     },
     [copy, handleLocationShare, handleScrollLocationShare]
@@ -58,8 +58,8 @@ export const useLocationReducer: UseReducer = () => {
 
       let newStore = { ...store };
       Object.keys(params).forEach(key => {
-        for (let i = 0; i < LOCATION_PARAMS.length; i++) {
-          if (key === LOCATION_PARAMS[i].key) newStore = handleLocationLoad(newStore, LOCATION_PARAMS[i], params[key]);
+        for (const locationParam of LOCATION_PARAMS) {
+          if (key === locationParam.key) newStore = handleLocationLoad(newStore, locationParam, params[key]);
           else if (key === 'z')
             newStore = handleLocationLoad(
               newStore,

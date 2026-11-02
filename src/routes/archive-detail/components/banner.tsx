@@ -195,15 +195,17 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
   }, [file, scoreToVerdict]);
 
   const labels = useMemo<{ category: string; label: string }[]>(
-    () =>
-      file?.file_info?.label_categories &&
-      ['attribution', 'technique', 'info'].flatMap(
-        category =>
-          category in file?.file_info?.label_categories &&
-          file?.file_info?.label_categories[category]
-            .sort((a: string, b: string) => a.valueOf().localeCompare(b.valueOf()))
-            .map(label => ({ category, label }))
-      ),
+    () => {
+      const categories = file?.file_info?.label_categories;
+      return categories &&
+        ['attribution', 'technique', 'info'].flatMap(
+          category =>
+            category in categories &&
+            categories[category]
+              .sort((a: string, b: string) => a.valueOf().localeCompare(b.valueOf()))
+              .map(label => ({ category, label }))
+        );
+    },
     [file?.file_info?.label_categories]
   );
 
