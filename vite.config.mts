@@ -35,6 +35,10 @@ export default defineConfig(({ mode }) => {
       host: '0.0.0.0',
       port: 3000,
       strictPort: true,
+      watch: {
+        usePolling: true,
+        interval: 1000
+      },
       hmr: {
         overlay: false,
         path: '/ws',
