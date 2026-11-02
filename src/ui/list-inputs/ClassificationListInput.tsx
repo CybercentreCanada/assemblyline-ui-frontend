@@ -1,4 +1,5 @@
-import { PropProvider, usePropStore } from 'features/prop-provider/prop-provider.providers';
+import { PropProvider, usePropStore } from 'features/prop-provider';
+import React from 'react';
 import type { ClassificationProps } from 'ui/Classification';
 import Classification from 'ui/Classification';
 import {
@@ -20,7 +21,6 @@ import {
 } from 'ui/list-inputs/lib/listinputs.components.tsx';
 import type { ListInputOptions, ListInputSlotProps } from 'ui/list-inputs/lib/listinputs.model.ts';
 import { DEFAULT_LIST_INPUT_CONTROLLER_PROPS } from 'ui/list-inputs/lib/listinputs.model.ts';
-import React from 'react';
 
 export type ClassificationListInputProps = InputValueModel<ClassificationProps['c12n']> &
   ListInputOptions &

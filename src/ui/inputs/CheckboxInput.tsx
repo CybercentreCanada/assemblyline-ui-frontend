@@ -1,6 +1,7 @@
 import type { CheckboxProps } from '@mui/material';
 import { Checkbox } from '@mui/material';
-import { PropProvider, usePropStore } from 'features/prop-provider/prop-provider.providers';
+import { PropProvider, usePropStore } from 'features/prop-provider';
+import React from 'react';
 import {
   ExpandInputAdornment,
   HelpInputAdornment,
@@ -26,7 +27,6 @@ import type {
   InputValueModel
 } from 'ui/inputs/models/inputs.model.ts';
 import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'ui/inputs/models/inputs.model.ts';
-import React from 'react';
 
 export type CheckboxInputProps = InputValueModel<boolean, React.MouseEvent<HTMLButtonElement, MouseEvent>> &
   InputOptions &
