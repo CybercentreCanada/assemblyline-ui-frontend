@@ -10,16 +10,16 @@ import {
   PasswordInputAdornment,
   ProgressInputAdornment,
   ResetInputAdornment
-} from 'ui/inputs/components/inputs.component.adornment.tsx';
+} from 'ui/inputs/components/inputs.component.adornment';
 import {
   InputFormControl,
   InputFormLabel,
   InputHelperText,
   InputRoot,
   InputSkeleton
-} from 'ui/inputs/components/inputs.component.form.tsx';
-import { useInputChange } from 'ui/inputs/hooks/inputs.hook.event_handlers.tsx';
-import { useInputValidation } from 'ui/inputs/hooks/inputs.hook.validation.tsx';
+} from 'ui/inputs/components/inputs.component.form';
+import { useInputChange } from 'ui/inputs/hooks/inputs.hook.event_handlers';
+import { useInputValidation } from 'ui/inputs/hooks/inputs.hook.validation';
 import type {
   InputOptions,
   InputRuntimeState,

@@ -10,8 +10,8 @@ import type {
   ValidationSchema,
   ValidationStatus,
   Validator
-} from 'ui/inputs/utils/inputs.util.validation.tsx';
-import { CoercersResolver, ValidationResolver } from 'ui/inputs/utils/inputs.util.validation.tsx';
+} from 'ui/inputs/utils/inputs.util.validation';
+import { CoercersResolver, ValidationResolver } from 'ui/inputs/utils/inputs.util.validation';
 
 /**********************************************************************************************************************
  * Validation Hooks

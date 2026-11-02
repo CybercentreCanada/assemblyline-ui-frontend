@@ -1,7 +1,7 @@
 import { Box, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, styled, useTheme } from '@mui/material';
 import { memo, Profiler, useEffect } from 'react';
-import type { CustomizeMethod } from 'routes/development-customize/development-customize.form.tsx';
-import { CUSTOMIZE_METHODS, useForm } from 'routes/development-customize/development-customize.form.tsx';
+import type { CustomizeMethod } from 'routes/development-customize/development-customize.form';
+import { CUSTOMIZE_METHODS, useForm } from 'routes/development-customize/development-customize.form';
 import 'routes/development-customize/development-customize.styles.css';
 import { PageHeader } from 'ui/layouts/PageHeader';
 import { PageLayout } from 'ui/layouts/PageLayout';

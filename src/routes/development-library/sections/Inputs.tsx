@@ -18,7 +18,7 @@ import { SliderInput } from 'ui/inputs/SliderInput';
 import { SwitchInput } from 'ui/inputs/SwitchInput';
 import { TextAreaInput } from 'ui/inputs/TextAreaInput';
 import { TextInput } from 'ui/inputs/TextInput';
-import type { CoercersSchema, ValidationSchema } from 'ui/inputs/utils/inputs.util.validation.tsx';
+import type { CoercersSchema, ValidationSchema } from 'ui/inputs/utils/inputs.util.validation';
 import { PageSection } from 'ui/layouts/PageSection';
 import MonacoEditor from 'ui/MonacoEditor';
 
