@@ -137,7 +137,7 @@ function WrappedSubmissionDetail() {
   const [configuration, setConfiguration] = useState<Configuration>(null);
   const [liveErrors, setLiveErrors] = useState<string[]>(null);
   const [liveTagMap, setLiveTagMap] = useState<SubmissionTags>(null);
-  const [outstanding, setOutstanding] = useState<OutstandingServices>({ test: 2 });
+  const [outstanding, setOutstanding] = useState<OutstandingServices>(null);
   const [liveStatus, setLiveStatus] = useState<LiveStatus>('queued');
   const [socket, setSocket] = useState<Socket>(null);
   const [loadInterval, setLoadInterval] = useState<NodeJS.Timeout>(null);
@@ -1125,7 +1125,7 @@ function WrappedSubmissionDetail() {
         <Popper
           anchorEl={anchorRef.current}
           placement="bottom-end"
-          open={outstanding !== null}
+          open={true}
           disablePortal
           style={{ zIndex: 100 }}
           modifiers={[
