@@ -1,6 +1,6 @@
+import type { UserSettings } from 'models/base/user_settings';
 import { MOCK_CONFIGURATION } from 'models/mocks/configuration';
 import { MOCK_SETTINGS } from 'models/mocks/setting';
-import type { UserSettings } from 'models/base/user_settings';
 import { initializeSettings } from 'routes/settings/settings.utils.ts';
 import type { SubmitStore } from 'routes/submit/submit.form.ts';
 import {

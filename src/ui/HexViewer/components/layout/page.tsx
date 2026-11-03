@@ -1,6 +1,6 @@
+import React, { useRef } from 'react';
 import type { StoreProps } from 'ui/HexViewer';
 import { HexBody, HexHeader, HexSettings, useDispatch, useEventListener } from 'ui/HexViewer';
-import React, { useRef } from 'react';
 
 export const WrappedHexPageLayout = ({ store }: StoreProps) => {
   const ref = useRef(null);

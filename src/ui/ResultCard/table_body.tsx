@@ -1,9 +1,9 @@
 import { styled, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, useTheme } from '@mui/material';
 import type { TableBody as TableData } from 'models/base/result_body';
+import { memo, default as React } from 'react';
 import { KVBody } from 'ui/ResultCard/kv_body';
 import { TextBody } from 'ui/ResultCard/text_body';
 import TitleKey from 'ui/TitleKey';
-import { memo, default as React } from 'react';
 
 const StyledTableCell = memo(
   styled(TableCell)(({ theme }) => ({

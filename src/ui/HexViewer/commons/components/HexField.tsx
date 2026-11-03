@@ -2,8 +2,7 @@ import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import type { SxProps } from '@mui/material/styles';
-import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useState } from 'react';
 
 export type HexFieldProps = {
   id?: string;

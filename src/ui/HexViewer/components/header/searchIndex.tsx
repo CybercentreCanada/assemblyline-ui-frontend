@@ -1,9 +1,9 @@
 import { Tooltip, useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
-import type { StoreProps } from 'ui/HexViewer';
-import { FieldPopper, NumericField, useDispatch } from 'ui/HexViewer';
 import React, { useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import type { StoreProps } from 'ui/HexViewer';
+import { FieldPopper, NumericField, useDispatch } from 'ui/HexViewer';
 
 export const WrappedHexSearchIndex = ({ store }: StoreProps) => {
   const { t } = useTranslation(['hexViewer']);

@@ -1,6 +1,6 @@
 import { Grid, useTheme } from '@mui/material';
-import { PageSection } from 'ui/layouts/PageSection';
 import React from 'react';
+import { PageSection } from 'ui/layouts/PageSection';
 
 type DemoSectionProps = {
   id?: string;

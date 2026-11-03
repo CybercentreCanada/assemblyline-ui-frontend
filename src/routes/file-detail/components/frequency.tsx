@@ -1,9 +1,9 @@
 import { Grid, Skeleton, Typography } from '@mui/material';
 import type { Seen } from 'models/base/file';
-import Moment from 'ui/Moment';
-import SectionContainer from 'ui/SectionContainer';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import Moment from 'ui/Moment';
+import SectionContainer from 'ui/SectionContainer';
 
 type Props = {
   seen: Seen;

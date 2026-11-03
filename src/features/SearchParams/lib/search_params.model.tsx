@@ -5,8 +5,8 @@ import type {
   FiltersBlueprint,
   NumberBlueprint,
   StringBlueprint
-} from 'features/search-params/search-params.blueprints.tsx';
-import type { PARAM_RUNTIMES } from 'features/search-params/search-params.runtimes.tsx';
+} from 'features/search-params/search-params.blueprints';
+import type { PARAM_RUNTIMES } from 'features/search-params/search-params.runtimes';
 
 export type ParamValues = null | boolean | number | string | string[];
 

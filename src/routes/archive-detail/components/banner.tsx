@@ -194,20 +194,19 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
     return values;
   }, [file, scoreToVerdict]);
 
-  const labels = useMemo<{ category: string; label: string }[]>(
-    () => {
-      const categories = file?.file_info?.label_categories;
-      return categories &&
-        ['attribution', 'technique', 'info'].flatMap(
-          category =>
-            category in categories &&
-            categories[category]
-              .sort((a: string, b: string) => a.valueOf().localeCompare(b.valueOf()))
-              .map(label => ({ category, label }))
-        );
-    },
-    [file?.file_info?.label_categories]
-  );
+  const labels = useMemo<{ category: string; label: string }[]>(() => {
+    const categories = file?.file_info?.label_categories;
+    return (
+      categories &&
+      ['attribution', 'technique', 'info'].flatMap(
+        category =>
+          category in categories &&
+          categories[category]
+            .sort((a: string, b: string) => a.valueOf().localeCompare(b.valueOf()))
+            .map(label => ({ category, label }))
+      )
+    );
+  }, [file?.file_info?.label_categories]);
 
   const resubmit = useCallback(() => {
     apiCall({

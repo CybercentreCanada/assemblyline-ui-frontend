@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { BaseBlueprint } from 'features/search-params/search-params.blueprints.tsx';
+import type { BaseBlueprint } from 'features/search-params/search-params.blueprints';
 import {
   BooleanBlueprint,
   EnumBlueprint,
   FiltersBlueprint,
   NumberBlueprint,
   StringBlueprint
-} from 'features/search-params/search-params.blueprints.tsx';
+} from 'features/search-params/search-params.blueprints';
 import type { ParamValues } from 'features/SearchParams/lib/search_params.model';
 
 /**

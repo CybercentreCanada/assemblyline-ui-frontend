@@ -6,6 +6,9 @@ import SourceIcon from '@mui/icons-material/Source';
 import StarIcon from '@mui/icons-material/Star';
 import type { ChipProps, MenuItemProps } from '@mui/material';
 import { ListItemIcon, ListItemText, Menu, MenuItem, useTheme } from '@mui/material';
+import type { ReactNode } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { AlertSearchParams } from 'routes/alerts/alerts.route';
 import type { Favorite } from 'routes/alerts/components/Favorites';
 import type { Option } from 'routes/alerts/components/Filters';
@@ -13,9 +16,6 @@ import { GROUPBY_OPTIONS, SORT_OPTIONS, TC_OPTIONS } from 'routes/alerts/compone
 import { useAlerts } from 'routes/alerts/contexts/AlertsContext';
 import CustomChip from 'ui/CustomChip';
 import Moment from 'ui/Moment';
-import type { ReactNode } from 'react';
-import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 
 type Filter = {
   value: string;

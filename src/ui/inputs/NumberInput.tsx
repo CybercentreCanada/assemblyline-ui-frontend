@@ -7,10 +7,10 @@ import {
   InputHelperText,
   InputRoot,
   InputSkeleton
-} from 'ui/inputs/components/inputs.component.form.tsx';
-import { InputTextField } from 'ui/inputs/components/inputs.component.textfield.tsx';
-import { useInputBlur, useInputChange, useInputFocus } from 'ui/inputs/hooks/inputs.hook.event_handlers.tsx';
-import { useInputValidation } from 'ui/inputs/hooks/inputs.hook.validation.tsx';
+} from 'ui/inputs/components/inputs.component.form';
+import { InputTextField } from 'ui/inputs/components/inputs.component.textfield';
+import { useInputBlur, useInputChange, useInputFocus } from 'ui/inputs/hooks/inputs.hook.event_handlers';
+import { useInputValidation } from 'ui/inputs/hooks/inputs.hook.validation';
 import type {
   InputOptions,
   InputRuntimeState,

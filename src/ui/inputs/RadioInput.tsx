@@ -8,20 +8,20 @@ import {
   PasswordInputAdornment,
   ProgressInputAdornment,
   ResetInputAdornment
-} from 'ui/inputs/components/inputs.component.adornment.tsx';
+} from 'ui/inputs/components/inputs.component.adornment';
 import {
   InputButtonFormControlLabel,
   InputButtonLabel,
   InputFormButton
-} from 'ui/inputs/components/inputs.component.buttons.tsx';
+} from 'ui/inputs/components/inputs.component.buttons';
 import {
   InputFormControl,
   InputFormLabel,
   InputHelperText,
   InputRoot
-} from 'ui/inputs/components/inputs.component.form.tsx';
-import { useInputChange, useInputClickBlur, useInputFocus } from 'ui/inputs/hooks/inputs.hook.event_handlers.tsx';
-import { useInputValidation } from 'ui/inputs/hooks/inputs.hook.validation.tsx';
+} from 'ui/inputs/components/inputs.component.form';
+import { useInputChange, useInputClickBlur, useInputFocus } from 'ui/inputs/hooks/inputs.hook.event_handlers';
+import { useInputValidation } from 'ui/inputs/hooks/inputs.hook.validation';
 import type {
   InputOptions,
   InputRuntimeState,

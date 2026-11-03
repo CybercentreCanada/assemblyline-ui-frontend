@@ -1,5 +1,7 @@
 import { Divider, useTheme } from '@mui/material';
 import type { MultiBody as MultiData } from 'models/base/result_body';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { GraphBody } from 'ui/ResultCard/graph_body';
 import { ImageBody } from 'ui/ResultCard/image_body';
 import { JSONBody } from 'ui/ResultCard/json_body';
@@ -10,8 +12,6 @@ import { ProcessTreeBody } from 'ui/ResultCard/process_tree_body';
 import { TblBody } from 'ui/ResultCard/table_body';
 import { TextBody } from 'ui/ResultCard/text_body';
 import { URLBody } from 'ui/ResultCard/url_body';
-import React from 'react';
-import { useTranslation } from 'react-i18next';
 
 type Props = {
   body: MultiData;

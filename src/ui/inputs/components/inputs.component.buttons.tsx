@@ -3,14 +3,14 @@ import type { ButtonProps, FormControlLabelProps, TypographyProps } from '@mui/m
 import { Button, FormControlLabel, Skeleton, Typography, useTheme } from '@mui/material';
 import { usePropStore } from 'features/prop-provider';
 import React, { useMemo } from 'react';
-import { InputRequiredBadge } from 'ui/inputs/components/inputs.component.form.tsx';
+import { InputRequiredBadge } from 'ui/inputs/components/inputs.component.form';
 import {
   useInputId,
   useShouldRenderExpand,
   useShouldRenderPassword,
   useShouldRenderProgress,
   useShouldRenderReset
-} from 'ui/inputs/hooks/inputs.hook.renderer.tsx';
+} from 'ui/inputs/hooks/inputs.hook.renderer';
 import type { InputControllerProps } from 'ui/inputs/models/inputs.model.ts';
 import type { TooltipProps } from 'ui/Tooltip';
 import { Tooltip } from 'ui/Tooltip';
