@@ -1,43 +1,47 @@
-import { useTableOfContent } from 'features/table-of-content/table-of-content.providers';
-import React, { useEffect, useId, useMemo } from 'react';
+import { useTableOfContent } from 'features/table-of-content';
+import type { DetailedHTMLProps, HTMLAttributes, ReactNode } from 'react';
+import { memo, useEffect, useId, useMemo } from 'react';
 
-export type AnchorProps = React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> & {
+//*****************************************************************************************
+// Anchor
+//*****************************************************************************************
+
+/** Props for an anchor registered with the table of contents. */
+export type AnchorProps = DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> & {
+  /** Optional explicit anchor identifier. */
   anchor?: string;
-  label?: React.ReactNode;
+  /** Label shown in the table of contents. */
+  label?: ReactNode;
+  /** Whether the anchor is a subsection. */
   subheader?: boolean;
+  /** Whether the anchor should be rendered without registration. */
   disabled?: boolean;
 };
 
-export const Anchor: React.FC<AnchorProps> = React.memo(
+export const Anchor = memo(
   ({ anchor = null, label = '', subheader = false, disabled = false, children = null, ...props }: AnchorProps) => {
     const autoID = useId();
     const actualID = useMemo(() => anchor || autoID, [anchor, autoID]);
-
-    const toc = useTableOfContent();
-    const loadAnchors = toc?.loadAnchors;
+    const tableOfContent = useTableOfContent();
+    const { loadAnchors } = tableOfContent;
 
     useEffect(() => {
-      if (!loadAnchors || disabled) return;
+      if (disabled) return;
 
       const labelText = typeof label === 'string' || typeof label === 'number' ? String(label) : '';
+      loadAnchors({ id: actualID, label: labelText, subheader });
 
-      loadAnchors({
-        id: actualID,
-        label: labelText,
-        subheader
-      });
-
-      return () => {
-        loadAnchors({});
-      };
+      return () => loadAnchors({});
     }, [actualID, disabled, label, subheader, loadAnchors]);
 
-    if (disabled) return <>{children}</>;
-
-    return (
+    return disabled ? (
+      <>{children}</>
+    ) : (
       <div data-anchor={actualID} {...props}>
         {children}
       </div>
     );
   }
 );
+
+Anchor.displayName = 'Anchor';

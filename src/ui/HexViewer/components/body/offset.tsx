@@ -1,8 +1,8 @@
 import { useTheme } from '@mui/material';
-import type { StoreProps } from 'ui/HexViewer';
-import { getAddressValue, useDispatch } from 'ui/HexViewer';
 import type { CSSProperties } from 'react';
 import React from 'react';
+import type { StoreProps } from 'ui/HexViewer';
+import { getAddressValue, useDispatch } from 'ui/HexViewer';
 
 export type HexOffsetProps = StoreProps & {
   index?: number;

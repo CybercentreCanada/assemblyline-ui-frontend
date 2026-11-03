@@ -10,7 +10,7 @@ import { Divider, ListSubheader, Link as MaterialLink, Menu, MenuItem, SvgIcon, 
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
-import { isAccessible } from 'features/classification/classification.utils';
+import { isAccessible } from 'features/classification';
 import useClipboard from 'layout/clipboard/clipboard.hooks';
 import useExternalLookup from 'layout/external-lookup/external-lookup.hooks';
 import type { ExternalEnrichmentResults } from 'layout/external-lookup/external-lookup.providers';

@@ -1,7 +1,7 @@
 import { useTheme } from '@mui/material';
-import { LAYOUT_SIZE, useDispatch } from 'ui/HexViewer';
 import type { CSSProperties } from 'react';
 import React from 'react';
+import { LAYOUT_SIZE, useDispatch } from 'ui/HexViewer';
 
 export type HexSpacerProps = {
   Tag?: 'div' | 'td';

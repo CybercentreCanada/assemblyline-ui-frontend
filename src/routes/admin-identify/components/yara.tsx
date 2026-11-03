@@ -99,7 +99,7 @@ function WrappedYara({ reload, yaraFile, originalYaraFile, setYaraFile }) {
       </Dialog>
 
       <PageHeader
-        primary={t('title.patterns')}
+        primary={t('title.yara')}
         slotProps={{
           root: { style: { marginBottom: theme.spacing(1) } },
           primary: { variant: 'h5' },

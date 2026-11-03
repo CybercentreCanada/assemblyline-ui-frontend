@@ -1,10 +1,4 @@
 import type { Browser, BrowserContext } from '@playwright/test';
-import { ForbiddenPage } from 'routes/forbidden/forbidden.pom.ts';
-import { NotFoundPage } from 'routes/not-found/not-found.pom.ts';
-import { CrashPage } from 'core/error/error.pom.ts';
-import { LoginPage } from 'layout/auth/log-in/log-in.pom.ts';
-import { SubmitPage } from 'routes/submit/submit.pom.ts';
-import { TermsOfServicePage } from 'layout/auth/terms-of-service/terms-of-service.pom.ts';
 import {
   RESULTS_DIR,
   TEST_ADMIN_PASSWORD,
@@ -13,8 +7,14 @@ import {
   TEST_USER_USERNAME
 } from 'app/spec.constant';
 import { test } from 'core/e2e/e2e.fixtures';
+import { CrashPage } from 'core/error/error.pom.ts';
 import fs from 'fs';
+import { LoginPage } from 'layout/auth/log-in/log-in.pom.ts';
+import { TermsOfServicePage } from 'layout/auth/terms-of-service/terms-of-service.pom.ts';
 import path from 'path';
+import { ForbiddenPage } from 'routes/forbidden/forbidden.pom.ts';
+import { NotFoundPage } from 'routes/not-found/not-found.pom.ts';
+import { SubmitPage } from 'routes/submit/submit.pom.ts';
 
 type LoginAndSaveProps = {
   browser: Browser;

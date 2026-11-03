@@ -1,8 +1,8 @@
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import { LinearProgress, Typography, useTheme } from '@mui/material';
-import type { StoreProps } from 'ui/HexViewer';
 import { default as React, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import type { StoreProps } from 'ui/HexViewer';
 
 export const WrappedHexLoading = ({ store }: StoreProps) => {
   const { t } = useTranslation(['hexViewer']);

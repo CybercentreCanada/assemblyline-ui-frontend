@@ -1,9 +1,9 @@
 import { Skeleton } from '@mui/material';
 import type { FileResult } from 'models/base/result';
-import ResultCard from 'ui/ResultCard';
-import SectionContainer from 'ui/SectionContainer';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import ResultCard from 'ui/ResultCard';
+import SectionContainer from 'ui/SectionContainer';
 
 type EmptySectionProps = {
   emptys: FileResult[];

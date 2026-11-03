@@ -6,8 +6,13 @@ import WarningAmberOutlinedIcon from '@mui/icons-material/WarningAmberOutlined';
 import { AlertTitle, Skeleton, Tooltip, useTheme } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
-import type { Error, ErrorType } from 'models/base/error';
 import type { SearchResult } from 'models/api/search';
+import type { Error, ErrorType } from 'models/base/error';
+import type { ReactElement } from 'react';
+import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
+import { bytesToSize } from 'shared/utils/utils';
 import {
   DivTable,
   DivTableBody,
@@ -19,11 +24,6 @@ import {
 } from 'ui/DivTable';
 import InformativeAlert from 'ui/InformativeAlert';
 import Moment from 'ui/Moment';
-import { bytesToSize } from 'shared/utils/utils';
-import type { ReactElement } from 'react';
-import React, { useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
 
 const MAX_MESSAGE_SIZE = 2500;
 
