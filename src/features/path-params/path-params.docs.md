@@ -148,8 +148,3 @@ The input boundary is a route `Location` and its pathname. The codec splits the 
 | Pattern       | `parsePathPattern`, `splitPathname`                                                    | Split the definition and the pathname into segments  |
 | Extraction    | `extractPathParams`                                                                    | Read the decoded value of each parameter by position |
 | Serialization | `stringifyPathPattern`, `serializePathSegments`, `serializePathParam`, `joinPathParts` | Encode values and build the pathname                 |
-
-## 7. Related Modules
-
-- `features/search-params/` - Provides the parallel typed codec system for query parameters
-- `features/hash-params/` - Provides typed codecs for a single URL hash value
