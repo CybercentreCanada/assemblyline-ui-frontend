@@ -5,10 +5,10 @@ import type { Configuration, Submission } from 'models/base/config';
 import type { ServiceSpecification } from 'models/base/service';
 import type { UserSettings } from 'models/base/user_settings';
 import { useCallback, useRef } from 'react';
-import type { InterfaceKey, ProfileKey, ProfileSettings } from 'routes/settings/settings.utils.ts';
-import { getValidValue, INTERFACE_KEYS, PROFILE_KEYS } from 'routes/settings/settings.utils.ts';
-import type { AutoURLServiceIndices, SubmitStore } from 'routes/submit/submit.form.ts';
-import { useForm } from 'routes/submit/submit.form.ts';
+import type { InterfaceKey, ProfileKey, ProfileSettings } from 'routes/settings/settings.utils';
+import { getValidValue, INTERFACE_KEYS, PROFILE_KEYS } from 'routes/settings/settings.utils';
+import type { AutoURLServiceIndices, SubmitStore } from 'routes/submit/submit.form';
+import { useForm } from 'routes/submit/submit.form';
 import { isURL } from 'shared/utils/utils';
 
 /**

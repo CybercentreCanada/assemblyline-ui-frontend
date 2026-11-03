@@ -1,7 +1,7 @@
 import type { UndefinedInitialDataOptions } from '@tanstack/react-query';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { DEFAULT_RETRY_MS } from 'app/core.preference';
-import type { APIQueryKey, APIResponse, BlobResponse } from 'core/api/api.models.ts';
+import type { APIQueryKey, APIResponse, BlobResponse } from 'core/api/api.models';
 import { getBlobResponse, isAPIData, stableStringify } from 'core/api/api.utils';
 import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';

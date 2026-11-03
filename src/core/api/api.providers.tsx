@@ -2,7 +2,7 @@ import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persist
 import { keepPreviousData, QueryClient } from '@tanstack/react-query';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { DEFAULT_GC_TIME, DEFAULT_STALE_TIME } from 'app/core.preference';
-import type { APIQueryKey } from 'core/api/api.models.ts';
+import type { APIQueryKey } from 'core/api/api.models';
 import { createStoreContext } from 'features/store/factories/createStoreContext';
 import { compress, decompress } from 'lz-string';
 import React from 'react';

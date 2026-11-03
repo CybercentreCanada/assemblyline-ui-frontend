@@ -16,7 +16,7 @@ import {
   resetDefaultSubmissionValues,
   resetPreviousSubmissionValues,
   updatePreviousSubmissionValues
-} from 'routes/settings/settings.utils.ts';
+} from 'routes/settings/settings.utils';
 
 import { describe, expect, it } from 'vitest';
 

@@ -15,7 +15,7 @@ import { RadioInput } from 'ui/inputs/RadioInput';
 import type { CoercersSchema, ValidationSchema } from 'ui/inputs/utils/inputs.util.validation';
 import { BooleanListInput } from 'ui/list-inputs/BooleanListInput';
 import { ClassificationListInput } from 'ui/list-inputs/ClassificationListInput';
-import type { ListInputOptions } from 'ui/list-inputs/lib/listinputs.model.ts';
+import type { ListInputOptions } from 'ui/list-inputs/lib/listinputs.model';
 import { NumberListInput } from 'ui/list-inputs/NumberListInput';
 import type { SelectListInputProps } from 'ui/list-inputs/SelectListInput';
 import { SelectListInput } from 'ui/list-inputs/SelectListInput';

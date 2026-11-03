@@ -8,7 +8,7 @@ import CustomChip from 'ui/CustomChip';
 import { ProcessChip } from 'ui/ResultCard/Sandbox/common/ProcessChip';
 import { TableContainer } from 'ui/ResultCard/Sandbox/common/TableContainer';
 import { DetailTableCellValue } from 'ui/ResultCard/Sandbox/common/Tables';
-import { getProcessMapByPid, type SandboxFilter } from 'ui/ResultCard/Sandbox/sandbox.utils.ts';
+import { getProcessMapByPid, type SandboxFilter } from 'ui/ResultCard/Sandbox/sandbox.utils';
 
 type ProcessTableProps = {
   body?: SandboxBody | null;

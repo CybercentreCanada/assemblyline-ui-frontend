@@ -14,7 +14,7 @@ import {
   ResetInputAdornment
 } from 'ui/inputs/components/inputs.component.adornment';
 import { useInputId, useInputLabel } from 'ui/inputs/hooks/inputs.hook.renderer';
-import type { InputControllerProps } from 'ui/inputs/models/inputs.model.ts';
+import type { InputControllerProps } from 'ui/inputs/models/inputs.model';
 
 export const useInputTextFieldSlots = (overrides?: Partial<TextFieldProps>) => {
   const theme = useTheme();

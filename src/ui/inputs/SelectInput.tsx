@@ -26,8 +26,8 @@ import type {
   InputSlotProps,
   InputValueModel,
   SelectInputOption
-} from 'ui/inputs/models/inputs.model.ts';
-import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'ui/inputs/models/inputs.model.ts';
+} from 'ui/inputs/models/inputs.model';
+import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'ui/inputs/models/inputs.model';
 
 export type SelectInputProps<O extends readonly SelectInputOption[]> = InputValueModel<O[number]['value']> &
   InputOptions &

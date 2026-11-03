@@ -5,7 +5,7 @@ import type { Service, ServiceConstants } from 'models/base/service';
 import type { Dispatch, SetStateAction } from 'react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { showReset } from 'routes/admin-service-detail/components/service.utils.ts';
+import { showReset } from 'routes/admin-service-detail/components/service.utils';
 import { CheckboxInput } from 'ui/inputs/CheckboxInput';
 import { ChipsInput } from 'ui/inputs/ChipsInput';
 import { ClassificationInput } from 'ui/inputs/ClassificationInput';
