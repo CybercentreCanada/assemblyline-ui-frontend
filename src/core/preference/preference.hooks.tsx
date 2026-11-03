@@ -40,7 +40,7 @@ export const useAppLoadPreference = () => {
         loadPreferenceFromLocalStorage(APP_PREFERENCE_SCHEMA, store, APP_PREFERENCE_STORAGE_KEY)
       );
     } catch (err) {
-      console.warn('Failed to load preferences from localStorage', err);
+      console.error('Failed to load preferences from localStorage', err);
     }
   }, [setPreferenceStore]);
 };

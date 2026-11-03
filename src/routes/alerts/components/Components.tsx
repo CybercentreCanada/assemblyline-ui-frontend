@@ -22,7 +22,13 @@ import {
   useTheme
 } from '@mui/material';
 import type { AlertItem, DetailedItem } from 'models/base/alert';
+import type { ReactNode } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { BiNetworkChart } from 'react-icons/bi';
+import { HiOutlineExternalLink } from 'react-icons/hi';
 import { detailedItemCompare } from 'routes/alerts/utils/alertUtils';
+import { verdictToColor } from 'shared/utils/utils';
 import { ActionableChipList } from 'ui/ActionableChipList';
 import type { ActionableCustomChipProps } from 'ui/ActionableCustomChip';
 import type { CustomChipProps } from 'ui/CustomChip';
@@ -30,12 +36,6 @@ import CustomChip from 'ui/CustomChip';
 import type { GridLinkRowProps } from 'ui/GridTable';
 import { GridLinkRow, GridTable, GridTableBody, GridTableCell, GridTableHead, GridTableRow } from 'ui/GridTable';
 import Moment from 'ui/Moment';
-import { verdictToColor } from 'shared/utils/utils';
-import type { ReactNode } from 'react';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { BiNetworkChart } from 'react-icons/bi';
-import { HiOutlineExternalLink } from 'react-icons/hi';
 
 type PossibleColors = 'info' | 'default' | 'error' | 'success' | 'primary' | 'secondary' | 'warning';
 

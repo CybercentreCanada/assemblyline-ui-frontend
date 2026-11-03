@@ -1,8 +1,8 @@
 import { Divider, Skeleton, styled, Typography, useTheme } from '@mui/material';
 import type { SubmissionReport, TAttackMatrix } from 'models/api/submission_report';
-import TextVerdict from 'ui/TextVerdict';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import TextVerdict from 'ui/TextVerdict';
 
 const AttackBloc = styled('div')(({ theme }) => ({
   height: '100%',

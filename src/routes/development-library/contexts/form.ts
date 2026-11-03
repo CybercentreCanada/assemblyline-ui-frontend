@@ -1,4 +1,4 @@
-import { createFormContext } from 'features/form/form.factories';
+import { createFormContext } from 'features/form';
 import type { DateTimeLibraryState } from 'routes/development-library/sections/DateTime';
 import { DATETIME_LIBRARY_STATE } from 'routes/development-library/sections/DateTime';
 import { INPUTS_LIBRARY_STATE, type InputsLibraryState } from 'routes/development-library/sections/Inputs';

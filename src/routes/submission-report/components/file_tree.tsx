@@ -1,9 +1,9 @@
 import { Box, Divider, Skeleton, Typography, useTheme } from '@mui/material';
 import type { SubmissionReport } from 'models/api/submission_report';
-import Verdict from 'ui/Verdict';
-import { bytesToSize } from 'shared/utils/utils';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { bytesToSize } from 'shared/utils/utils';
+import Verdict from 'ui/Verdict';
 
 type Props = {
   tree: SubmissionReport['file_tree'];

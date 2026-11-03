@@ -1,6 +1,6 @@
-import type { WhoAmIProps } from 'models/api/user';
 import { MEDIUM_TIMEOUT } from 'app/spec.constant';
 import { test } from 'core/e2e/e2e.fixtures';
+import type { WhoAmIProps } from 'models/api/user';
 
 test.describe('Account page', () => {
   test('should detect the account page', async ({ userSession }) => {

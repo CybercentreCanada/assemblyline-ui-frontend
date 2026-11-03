@@ -3,7 +3,7 @@ version: '2.4'
 services:
   # Dependencies
   minio:
-    image: cccs/minio
+    image: cgr.dev/chainguard/minio
     environment:
       MINIO_ACCESS_KEY: al_storage_key
       MINIO_SECRET_KEY: Ch@ngeTh!sPa33w0rd

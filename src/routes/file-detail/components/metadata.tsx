@@ -1,9 +1,9 @@
 import { Grid, Skeleton } from '@mui/material';
 import type { Metadata } from 'models/api/file';
-import CustomChip from 'ui/CustomChip';
-import SectionContainer from 'ui/SectionContainer';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import CustomChip from 'ui/CustomChip';
+import SectionContainer from 'ui/SectionContainer';
 
 type MetadataSectionProps = {
   metadata: Metadata;

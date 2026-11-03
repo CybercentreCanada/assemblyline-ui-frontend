@@ -1,7 +1,7 @@
 import type { Configuration, FileSource, HashPatternMap } from 'models/base/config';
+import React from 'react';
 import type { PossibleColor } from 'shared/utils/colors';
 import { LOWERCASE_HASH, URL_REGEX } from 'shared/utils/constants';
-import React from 'react';
 
 /**
  *
