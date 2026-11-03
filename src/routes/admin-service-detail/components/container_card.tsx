@@ -1,9 +1,9 @@
 import { Card, Grid, Tooltip, useTheme } from '@mui/material';
 import type { DockerConfig, PersistentVolume } from 'models/base/service';
-import ContainerDialog from 'routes/admin-service-detail/components/container_dialog';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CgSmartphoneChip, CgSmartphoneRam } from 'react-icons/cg';
+import ContainerDialog from 'routes/admin-service-detail/components/container_dialog';
 
 type ContainerCardProps = {
   container: DockerConfig;

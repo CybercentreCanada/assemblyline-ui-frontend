@@ -2,8 +2,11 @@ import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
 import { AlertTitle, IconButton, Skeleton } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
-import type { ApiKey, Role } from 'models/base/user';
 import type { SearchResult } from 'models/api/search';
+import type { ApiKey, Role } from 'models/base/user';
+import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import CustomChip from 'ui/CustomChip';
 import {
   DivTable,
@@ -16,9 +19,6 @@ import {
 } from 'ui/DivTable';
 import InformativeAlert from 'ui/InformativeAlert';
 import Moment from 'ui/Moment';
-import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
 
 const MAX_DISPLAY_ROLES = 5;
 

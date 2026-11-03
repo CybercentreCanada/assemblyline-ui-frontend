@@ -1,5 +1,5 @@
 import Flow from '@flowjs/flow.js';
-import { createFormContext } from 'features/form/form.factories';
+import { createFormContext } from 'features/form';
 import type { HashPatternMap } from 'models/base/config';
 import type { Metadata } from 'models/base/submission';
 import type { ProfileSettings } from 'routes/settings/settings.utils.ts';

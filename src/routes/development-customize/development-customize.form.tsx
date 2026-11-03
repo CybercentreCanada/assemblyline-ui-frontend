@@ -1,4 +1,4 @@
-import { createFormContext } from 'features/form/form.factories';
+import { createFormContext } from 'features/form';
 
 export const CUSTOMIZE_METHODS = [
   'Pure <div /> using className',

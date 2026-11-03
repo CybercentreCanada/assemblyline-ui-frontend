@@ -12,15 +12,15 @@ export type UseInfiniteAPIQueryProps<Response = unknown, Request extends APIRequ
   getParams: (offset: number) => UseAPICallFnProps<APIResponse<Response>, Request, APIResponse<Error>>;
   getPreviousOffset?: (
     firstPage: APIResponse<Response>,
-    allPages: Array<APIResponse<Response>>,
+    allPages: APIResponse<Response>[],
     firstPageParam: number,
-    allPageParams: Array<number>
+    allPageParams: number[]
   ) => number | undefined;
   getNextOffset?: (
     lastPage: APIResponse<Response>,
-    allPages: Array<APIResponse<Response>>,
+    allPages: APIResponse<Response>[],
     lastPageParam: number,
-    allPageParams: Array<number>
+    allPageParams: number[]
   ) => number | undefined;
   allowCache?: boolean;
   retryAfter?: number;
@@ -52,7 +52,7 @@ export const useInfiniteAPIQuery = <
   >(
     {
       queryKey: [base?.url, base?.method ?? 'GET', stableStringify(base?.body ?? null), allowCache],
-      queryFn: async ({ signal, pageParam }) => apiCallFn({ ...getParams(pageParam as number), signal }),
+      queryFn: async ({ signal, pageParam }) => apiCallFn({ ...getParams(pageParam), signal }),
       initialPageParam: initialOffset,
       getPreviousPageParam: (firstPage, allPages, firstPageParam, allPageParams) =>
         getPreviousOffset(firstPage, allPages, firstPageParam, allPageParams),

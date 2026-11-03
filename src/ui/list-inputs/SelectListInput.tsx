@@ -1,16 +1,17 @@
 import type { MenuItemProps, SelectProps } from '@mui/material';
 import { ListItemText, MenuItem, Select, useTheme } from '@mui/material';
-import { PropProvider, usePropStore } from 'features/prop-provider/prop-provider.providers';
+import { PropProvider, usePropStore } from 'features/prop-provider';
+import React from 'react';
 import {
   HelpInputAdornment,
   PasswordInputAdornment,
   ProgressInputAdornment,
   ResetInputAdornment
-} from 'ui/inputs/components/inputs.component.adornment.tsx';
-import { InputHelperText } from 'ui/inputs/components/inputs.component.form.tsx';
-import { useInputBlur, useInputChange, useInputFocus } from 'ui/inputs/hooks/inputs.hook.event_handlers.tsx';
-import { useInputId } from 'ui/inputs/hooks/inputs.hook.renderer.tsx';
-import { useInputValidation } from 'ui/inputs/hooks/inputs.hook.validation.tsx';
+} from 'ui/inputs/components/inputs.component.adornment';
+import { InputHelperText } from 'ui/inputs/components/inputs.component.form';
+import { useInputBlur, useInputChange, useInputFocus } from 'ui/inputs/hooks/inputs.hook.event_handlers';
+import { useInputId } from 'ui/inputs/hooks/inputs.hook.renderer';
+import { useInputValidation } from 'ui/inputs/hooks/inputs.hook.validation';
 import type { InputRuntimeState, InputValueModel, SelectInputOption } from 'ui/inputs/models/inputs.model.ts';
 import {
   ListInputInner,
@@ -19,10 +20,9 @@ import {
   ListInputText,
   ListInputWrapper,
   SelectListInputOptionMenuItem
-} from 'ui/list-inputs/lib/listinputs.components.tsx';
+} from 'ui/list-inputs/lib/listinputs.components';
 import type { ListInputOptions, ListInputSlotProps } from 'ui/list-inputs/lib/listinputs.model.ts';
 import { DEFAULT_LIST_INPUT_CONTROLLER_PROPS } from 'ui/list-inputs/lib/listinputs.model.ts';
-import React from 'react';
 
 export type SelectListInputProps<O extends readonly SelectInputOption[]> = InputValueModel<O[number]['value']> &
   ListInputOptions &

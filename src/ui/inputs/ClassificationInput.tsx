@@ -13,17 +13,17 @@ import {
   useTheme
 } from '@mui/material';
 import useALContext from 'core/config/useALContext';
-import type { ClassificationParts, ClassificationValidator } from 'features/classification/classification.utils';
+import type { ClassificationParts, ClassificationValidator } from 'features/classification';
 import {
   applyAliases,
   applyClassificationRules,
-  defaultClassificationValidator,
-  defaultParts,
+  DEFAULT_CLASSIFICATION_PARTS,
+  DEFAULT_CLASSIFICATION_VALIDATOR,
   getLevelText,
   getParts,
   normalizedClassification
-} from 'features/classification/classification.utils';
-import { PropProvider, usePropStore } from 'features/prop-provider/prop-provider.providers';
+} from 'features/classification';
+import { PropProvider, usePropStore } from 'features/prop-provider';
 import type { WhoAmI } from 'models/api/user';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -36,16 +36,16 @@ import {
   PasswordInputAdornment,
   ProgressInputAdornment,
   ResetInputAdornment
-} from 'ui/inputs/components/inputs.component.adornment.tsx';
+} from 'ui/inputs/components/inputs.component.adornment';
 import {
   InputFormControl,
   InputFormLabel,
   InputHelperText,
   InputRoot,
   InputSkeleton
-} from 'ui/inputs/components/inputs.component.form.tsx';
-import { useInputBlur } from 'ui/inputs/hooks/inputs.hook.event_handlers.tsx';
-import { useInputValidation } from 'ui/inputs/hooks/inputs.hook.validation.tsx';
+} from 'ui/inputs/components/inputs.component.form';
+import { useInputBlur } from 'ui/inputs/hooks/inputs.hook.event_handlers';
+import { useInputValidation } from 'ui/inputs/hooks/inputs.hook.validation';
 import type {
   InputOptions,
   InputRuntimeState,
@@ -97,8 +97,8 @@ const WrappedClassificationInput = () => {
 
   const dynGroup = get('dynGroup');
   const showPicker = get('showPicker') ?? false;
-  const uParts = get('uParts') ?? defaultParts;
-  const validated = get('validated') ?? defaultClassificationValidator;
+  const uParts = get('uParts') ?? DEFAULT_CLASSIFICATION_PARTS;
+  const validated = get('validated') ?? DEFAULT_CLASSIFICATION_VALIDATOR;
 
   const handleBlur = useInputBlur<ClassificationProps['c12n']>();
 

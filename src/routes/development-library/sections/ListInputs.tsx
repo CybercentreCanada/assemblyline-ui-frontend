@@ -12,7 +12,7 @@ import {
 import { Button } from 'ui/buttons/Button';
 import { CheckboxInput } from 'ui/inputs/CheckboxInput';
 import { RadioInput } from 'ui/inputs/RadioInput';
-import type { CoercersSchema, ValidationSchema } from 'ui/inputs/utils/inputs.util.validation.tsx';
+import type { CoercersSchema, ValidationSchema } from 'ui/inputs/utils/inputs.util.validation';
 import { BooleanListInput } from 'ui/list-inputs/BooleanListInput';
 import { ClassificationListInput } from 'ui/list-inputs/ClassificationListInput';
 import type { ListInputOptions } from 'ui/list-inputs/lib/listinputs.model.ts';
