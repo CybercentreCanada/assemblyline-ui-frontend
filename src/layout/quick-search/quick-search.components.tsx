@@ -146,7 +146,7 @@ export default function AppSearch() {
         setTimeout(() => menuRef.current.querySelector('input')?.blur(), 50);
         state.set({ ...state, menu: false });
       } else if (isArrowDown) {
-        const result = document.querySelector('[data-tui-id="tui-app-search-result"]') as HTMLElement;
+        const result = document.querySelector<HTMLElement>('[data-tui-id="tui-app-search-result"]');
         if (result) {
           // Prevent scolling before menu list gets focus.
           // Doing this prevents the menu list from scrolling down

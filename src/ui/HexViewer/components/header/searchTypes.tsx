@@ -6,11 +6,11 @@ import List from '@mui/material/List';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import { isEscape } from 'deprecated/utils/keyboard';
+import React, { useCallback, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { SearchType, StoreProps } from 'ui/HexViewer';
 import { useDispatch, useEventListener } from 'ui/HexViewer';
 import { TooltipIconButton } from 'ui/HexViewer/commons/components';
-import React, { useCallback, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 
 export const WrappedHexSearchTypes = ({ store }: StoreProps) => {
   const theme = useTheme();

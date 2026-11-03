@@ -1,13 +1,13 @@
 import { Divider, Grid, Skeleton, Typography, useMediaQuery, useTheme } from '@mui/material';
-import type { BodyFormat, SectionBody } from 'models/base/result_body';
 import type { SubmissionReport } from 'models/api/submission_report';
-import Moment from 'ui/Moment';
-import { GraphBody } from 'ui/ResultCard/graph_body';
-import { ImageInlineBody } from 'ui/image_inline';
-import { bytesToSize } from 'shared/utils/utils';
+import type { BodyFormat, SectionBody } from 'models/base/result_body';
 import type { ReactNode } from 'react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { bytesToSize } from 'shared/utils/utils';
+import Moment from 'ui/Moment';
+import { GraphBody } from 'ui/ResultCard/graph_body';
+import { ImageInlineBody } from 'ui/image_inline';
 
 const parseValue = (value: any): ReactNode => {
   if (value instanceof Array) {
@@ -142,8 +142,8 @@ function WrappedGeneralInformation({ report }: Props) {
             {report ? (
               report?.params?.services?.rescan ? (
                 [
-                  ...report?.params?.services?.selected,
-                  ...report?.params?.services?.rescan?.filter(
+                  ...(report?.params?.services?.selected ?? []),
+                  ...(report?.params?.services?.rescan ?? []).filter(
                     word => report?.params?.services?.selected?.indexOf(word) === -1
                   )
                 ]

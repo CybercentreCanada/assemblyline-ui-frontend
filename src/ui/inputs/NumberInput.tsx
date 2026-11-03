@@ -1,15 +1,16 @@
 import type { TextFieldProps } from '@mui/material';
-import { PropProvider, usePropStore } from 'features/prop-provider/prop-provider.providers';
+import { PropProvider, usePropStore } from 'features/prop-provider';
+import React, { useCallback, useEffect, useRef } from 'react';
 import {
   InputFormControl,
   InputFormLabel,
   InputHelperText,
   InputRoot,
   InputSkeleton
-} from 'ui/inputs/components/inputs.component.form.tsx';
-import { InputTextField } from 'ui/inputs/components/inputs.component.textfield.tsx';
-import { useInputBlur, useInputChange, useInputFocus } from 'ui/inputs/hooks/inputs.hook.event_handlers.tsx';
-import { useInputValidation } from 'ui/inputs/hooks/inputs.hook.validation.tsx';
+} from 'ui/inputs/components/inputs.component.form';
+import { InputTextField } from 'ui/inputs/components/inputs.component.textfield';
+import { useInputBlur, useInputChange, useInputFocus } from 'ui/inputs/hooks/inputs.hook.event_handlers';
+import { useInputValidation } from 'ui/inputs/hooks/inputs.hook.validation';
 import type {
   InputOptions,
   InputRuntimeState,
@@ -17,7 +18,6 @@ import type {
   InputValueModel
 } from 'ui/inputs/models/inputs.model.ts';
 import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'ui/inputs/models/inputs.model.ts';
-import React, { useCallback, useEffect, useRef } from 'react';
 
 export type NumberInputProps = InputValueModel<number, React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>> &
   InputOptions &

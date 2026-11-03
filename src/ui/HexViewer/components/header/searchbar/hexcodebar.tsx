@@ -1,5 +1,7 @@
 import ClearIcon from '@mui/icons-material/Clear';
 import { Typography, useTheme } from '@mui/material';
+import React, { useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { StoreProps } from 'ui/HexViewer';
 import {
   DelayedTextField,
@@ -9,8 +11,6 @@ import {
   useDispatch,
   useEventListener
 } from 'ui/HexViewer';
-import React, { useRef } from 'react';
-import { useTranslation } from 'react-i18next';
 
 export const WrappedHexcodeBar = ({ store }: StoreProps) => {
   const { t } = useTranslation(['hexViewer']);

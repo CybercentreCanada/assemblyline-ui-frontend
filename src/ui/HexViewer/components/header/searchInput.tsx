@@ -1,11 +1,11 @@
 import { useMediaQuery, useTheme } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
-import type { StoreProps } from 'ui/HexViewer';
-import { useDispatch } from 'ui/HexViewer';
 import type { SyntheticEvent } from 'react';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import type { StoreProps } from 'ui/HexViewer';
+import { useDispatch } from 'ui/HexViewer';
 
 export const WrappedHexSearchbar = ({ store }: StoreProps) => {
   const { t } = useTranslation(['hexViewer']);

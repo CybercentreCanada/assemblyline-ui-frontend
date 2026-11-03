@@ -27,7 +27,7 @@ import type { SwitchInputProps } from 'ui/inputs/SwitchInput';
 import { SwitchInput } from 'ui/inputs/SwitchInput';
 import type { TextInputProps } from 'ui/inputs/TextInput';
 import { TextInput } from 'ui/inputs/TextInput';
-import type { Validator } from 'ui/inputs/utils/inputs.util.validation.tsx';
+import type { Validator } from 'ui/inputs/utils/inputs.util.validation';
 import MonacoEditor from 'ui/MonacoEditor';
 
 const STATIC_VALIDATOR_TYPES_SET = new Set<MetadataFieldTypeMap>(['enum', 'boolean', 'integer', 'date']);

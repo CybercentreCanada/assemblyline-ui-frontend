@@ -36,7 +36,7 @@ import { MemDumpBody } from 'ui/ResultCard/memdump_body';
 import { MultiBody } from 'ui/ResultCard/multi_body';
 import { OrderedKVBody } from 'ui/ResultCard/ordered_kv_body';
 import { ProcessTreeBody } from 'ui/ResultCard/process_tree_body';
-import { SandboxBody } from 'ui/ResultCard/Sandbox/sandbox.body.tsx';
+import { SandboxBody } from 'ui/ResultCard/Sandbox/sandbox.body';
 import { TblBody } from 'ui/ResultCard/table_body';
 import { TextBody } from 'ui/ResultCard/text_body';
 import { TimelineBody } from 'ui/ResultCard/timeline_body';
@@ -183,7 +183,7 @@ const WrappedResultSection: React.FC<Props> = ({
   }, [showHeur, handleClose]);
 
   const handleMenuCopy = useCallback(() => {
-    copy(typeof section.body === 'string' ? section.body : JSON.stringify(section.body, undefined, 2));
+    void copy(typeof section.body === 'string' ? section.body : JSON.stringify(section.body, undefined, 2));
     handleClose();
   }, [copy, handleClose, section.body]);
 
