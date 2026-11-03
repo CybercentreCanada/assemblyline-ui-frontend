@@ -13,7 +13,6 @@ import MonacoEditor from 'ui/MonacoEditor';
 const TAB_VALUES = ['ascii', 'code', 'hex'] as const;
 
 const TAB_OPTIONS = [
-  { primary: 'None', value: null },
   { primary: 'ASCII', value: 'ascii' },
   { primary: 'Code', value: 'code' },
   { primary: 'Hex', value: 'hex' }
@@ -25,7 +24,7 @@ export type PathParamsLibraryState = {
     values: {
       sectionOpen: boolean;
       id: string;
-      tab: (typeof TAB_VALUES)[number] | null;
+      tab: (typeof TAB_VALUES)[number];
       pathname: string;
       itemsPathname: string;
     };
@@ -45,26 +44,16 @@ export const PATH_PARAMS_LIBRARY_STATE: PathParamsLibraryState = {
   }
 } as const;
 
-const FILE_VIEWER_CODEC = createPathParamsCodec('/file/viewer/:id/:tab?')(b => ({
+const FILE_VIEWER_CODEC = createPathParamsCodec('/file/viewer/:id/:tab')(b => ({
   id: b.string(),
   tab: b.enum(TAB_VALUES, 'ascii')
 }));
 
-const ITEMS_CODEC = createPathParamsCodec('/items/:page/:sort?/:descending?')(b => ({
+const ITEMS_CODEC = createPathParamsCodec('/items/:page/:sort/:descending')(b => ({
   page: b.number(1),
   sort: b.enum(['name', 'date'] as const, 'name'),
   descending: b.boolean(false)
 }));
-
-const PATTERNS = [
-  '/path/:param',
-  '/path/:param?',
-  '/path/:param?/:other?',
-  '/path/:param?/:other',
-  '/path/:param?/:other/:next?',
-  '/item/:id/:id',
-  '/files/:id/*'
-] as const;
 
 const makeLocation = (pathname: string): Location => ({ pathname, search: '', hash: '', state: null, key: 'demo' });
 
@@ -102,9 +91,7 @@ export const PathParamsSection = React.memo(() => {
         secondary={
           <>
             <span>{'Build a pathname from typed values. '}</span>
-            <span>
-              {'Values are URL-encoded, and an omitted optional param is dropped from the end of the pathname.'}
-            </span>
+            <span>{'Values are URL-encoded and written as they are, without validation.'}</span>
           </>
         }
         left={
@@ -127,7 +114,6 @@ export const PathParamsSection = React.memo(() => {
                   label="tab"
                   value={value}
                   options={TAB_OPTIONS}
-                  displayEmpty
                   onChange={(event, next) => form.setFieldValue('components.path_params.values.tab', next)}
                 />
               )}
@@ -148,10 +134,11 @@ export const PathParamsSection = React.memo(() => {
         right={
           <MonacoEditor
             language="typescript"
+            validation={false}
             value={`
 import { createPathParamsCodec } from 'features/path-params';
 
-const codec = createPathParamsCodec('/file/viewer/:id/:tab?')(b => ({
+const codec = createPathParamsCodec('/file/viewer/:id/:tab')(b => ({
   id: b.string(),
   tab: b.enum(['ascii', 'code', 'hex'] as const, 'ascii')
 }));
@@ -159,15 +146,12 @@ const codec = createPathParamsCodec('/file/viewer/:id/:tab?')(b => ({
 codec.stringify({ id: 'abc123', tab: 'hex' });
 // '/file/viewer/abc123/hex'
 
-codec.stringify({ id: 'abc123' });
-// '/file/viewer/abc123'
+codec.stringify({ id: 'a b/c', tab: 'hex' });
+// '/file/viewer/a%20b%2Fc/hex'
 
-codec.stringify({ id: 'a b/c' });
-// '/file/viewer/a%20b%2Fc'
-
-// Empty, '.' and '..' values are rejected
-codec.stringify({ id: '' });
-// TypeError`}
+// Values are not validated
+codec.stringify({ id: '', tab: 'hex' });
+// '/file/viewer//hex'`}
           />
         }
       />
@@ -177,8 +161,12 @@ codec.stringify({ id: '' });
         primary="Parse"
         secondary={
           <>
-            <span>{'Read typed values from a Location pathname. '}</span>
-            <span>{'Missing params and values the blueprint does not recognize resolve to its default.'}</span>
+            <span>{'Read typed values from a Location pathname, by position. '}</span>
+            <span>
+              {
+                'Static segments are not compared. A missing or empty segment and a value the blueprint does not recognize resolve to its default.'
+              }
+            </span>
           </>
         }
         left={
@@ -189,7 +177,7 @@ codec.stringify({ id: '' });
                 <TextInput
                   label="pathname"
                   value={value}
-                  helperText="Pattern: /file/viewer/:id/:tab?"
+                  helperText="Definition: /file/viewer/:id/:tab"
                   onChange={(event, next) => form.setFieldValue('components.path_params.values.pathname', next)}
                 />
               )}
@@ -208,21 +196,25 @@ codec.stringify({ id: '' });
         right={
           <MonacoEditor
             language="typescript"
+            validation={false}
             value={`
 codec.parse(location); // location.pathname = '/file/viewer/abc123/hex'
 // { id: 'abc123', tab: 'hex' }
 
 codec.parse(location); // '/file/viewer/abc123'
-// { id: 'abc123', tab: 'ascii' }   <- default of the omitted tab
+// { id: 'abc123', tab: 'ascii' }   <- default of the missing tab
 
 codec.parse(location); // '/file/viewer/abc123/unknown'
 // { id: 'abc123', tab: 'ascii' }   <- unrecognized value
 
-codec.parse(location); // '/file/viewer/a%20b'
-// { id: 'a b', tab: 'ascii' }      <- decoded
+codec.parse(location); // '/file/viewer/a%20b/hex'
+// { id: 'a b', tab: 'hex' }        <- decoded
+
+codec.parse(location); // '/other/path/hex'
+// { id: 'path', tab: 'hex' }       <- static segments are not compared
 
 codec.parse(location); // '/file/viewer/'
-// TypeError                        <- empty value`}
+// { id: '', tab: 'ascii' }         <- empty segment, defaults`}
           />
         }
       />
@@ -244,7 +236,7 @@ codec.parse(location); // '/file/viewer/'
                 <TextInput
                   label="pathname"
                   value={value}
-                  helperText="Pattern: /items/:page/:sort?/:descending?"
+                  helperText="Definition: /items/:page/:sort/:descending"
                   onChange={(event, next) => form.setFieldValue('components.path_params.values.itemsPathname', next)}
                 />
               )}
@@ -263,8 +255,9 @@ codec.parse(location); // '/file/viewer/'
         right={
           <MonacoEditor
             language="typescript"
+            validation={false}
             value={`
-const codec = createPathParamsCodec('/items/:page/:sort?/:descending?')(b => ({
+const codec = createPathParamsCodec('/items/:page/:sort/:descending')(b => ({
   page: b.number(1),                           // 'abc' -> 1
   sort: b.enum(['name', 'date'] as const, 'name'), // 'other' -> 'name'
   descending: b.boolean(false)                 // 'true' or '1' -> true
@@ -275,57 +268,6 @@ codec.parse(location); // '/items/2/date/true'
 
 codec.parse(location); // '/items/abc'
 // { page: 1, sort: 'name', descending: false }`}
-          />
-        }
-      />
-
-      <DemoSection
-        id="Path Params: Optional params"
-        primary="Optional params"
-        secondary={
-          <>
-            <span>{'Optional params are only supported at the end of the path. '}</span>
-            <span>{'Repeated param names and wildcards are rejected when the codec is created.'}</span>
-          </>
-        }
-        left={
-          <div style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(2) }}>
-            {PATTERNS.map(pattern => (
-              <ResultBlock key={pattern} label={pattern}>
-                {run(() => {
-                  createPathParamsCodec(pattern as string);
-                  return 'Supported';
-                })}
-              </ResultBlock>
-            ))}
-          </div>
-        }
-        right={
-          <MonacoEditor
-            language="typescript"
-            value={`
-// Supported
-createPathParamsCodec('/path/:param');
-createPathParamsCodec('/path/:param?');
-createPathParamsCodec('/path/:param?/:other?');
-
-// Rejected: an optional param is followed by a required segment
-createPathParamsCodec('/path/:param?/:other');
-createPathParamsCodec('/path/:param?/:other/:next?');
-
-// Rejected: param names must be unique and alphanumeric
-createPathParamsCodec('/item/:id/:id');
-createPathParamsCodec('/files/:id/*');
-
-// An omitted optional before a supplied one is written with its default
-const codec = createPathParamsCodec('/path/:param?/:other?')(b => ({
-  param: b.string('default'),
-  other: b.string('default')
-}));
-
-codec.stringify({});                  // '/path'
-codec.stringify({ param: 'x' });      // '/path/x'
-codec.stringify({ other: 'y' });      // '/path/default/y'`}
           />
         }
       />
