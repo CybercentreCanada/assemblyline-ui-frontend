@@ -4,10 +4,10 @@ import {
   FiltersBlueprint,
   NumberBlueprint,
   StringBlueprint
-} from 'features/search-params/search-params.blueprints.tsx';
-import type { ParamRuntime } from 'features/search-params/search-params.runtimes.tsx';
-import { PARAM_RUNTIMES } from 'features/search-params/search-params.runtimes.tsx';
-import { SearchParamSnapshot } from 'features/search-params/search-params.snapshots.tsx';
+} from 'features/search-params/search-params.blueprints';
+import type { ParamRuntime } from 'features/search-params/search-params.runtimes';
+import { PARAM_RUNTIMES } from 'features/search-params/search-params.runtimes';
+import { SearchParamSnapshot } from 'features/search-params/search-params.snapshots';
 import type {
   ParamBlueprints,
   SearchParamRuntimes,

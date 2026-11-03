@@ -1,8 +1,8 @@
 import { Typography, useTheme } from '@mui/material';
-import { useForm } from 'routes/submit/submit.form.ts';
-import { ChipsInput } from 'ui/inputs/ChipsInput';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { useForm } from 'routes/submit/submit.form.ts';
+import { ChipsInput } from 'ui/inputs/ChipsInput';
 
 export const PasswordInput = React.memo(() => {
   const { t } = useTranslation(['submit']);

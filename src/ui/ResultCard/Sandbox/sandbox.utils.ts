@@ -33,8 +33,8 @@ export const getSafelistedProcessIds = (processes: readonly SandboxProcessItem[]
   new Set(processes.filter(process => process.safelisted).map(process => process.pid));
 
 export const filterNetflowsBySafelistedProcesses = (
-  netflows: readonly SandboxNetflowItem[] = [],
   safelistedProcessIds: ReadonlySet<number>,
+  netflows: readonly SandboxNetflowItem[] = [],
   showSafeResults = true
 ): SandboxNetflowItem[] =>
   showSafeResults

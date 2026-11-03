@@ -1,5 +1,5 @@
-import { getASCIICharacter, getHexValue } from 'ui/HexViewer/handlers/HexHandler';
 import { useCallback } from 'react';
+import { getASCIICharacter, getHexValue } from 'ui/HexViewer/handlers/HexHandler';
 import type { ReducerHandler, Reducers, RenderHandler, Store, UseReducer } from '..';
 import {
   DEFAULT_STORE,

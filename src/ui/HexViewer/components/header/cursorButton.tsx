@@ -1,8 +1,8 @@
 import NavigationIcon from '@mui/icons-material/Navigation';
-import type { StoreProps } from 'ui/HexViewer';
-import { NumericField, PopperIconButton, useDispatch } from 'ui/HexViewer';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import type { StoreProps } from 'ui/HexViewer';
+import { NumericField, PopperIconButton, useDispatch } from 'ui/HexViewer';
 
 export const WrappedHexCursorButton = ({ store }: StoreProps) => {
   const { t } = useTranslation(['hexViewer']);

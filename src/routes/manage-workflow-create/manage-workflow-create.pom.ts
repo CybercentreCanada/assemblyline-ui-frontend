@@ -1,9 +1,9 @@
 import type { Locator, Page } from '@playwright/test';
-import type { Priority, Status } from 'models/base/workflow';
 import { SHORT_TIMEOUT } from 'app/spec.constant';
 import { expect, test } from 'core/e2e/e2e.fixtures';
 import type { WaitForOptions } from 'core/e2e/e2e.models';
 import { PageObjectModel } from 'core/e2e/utils/PageObjectModel';
+import type { Priority, Status } from 'models/base/workflow';
 import { CheckboxInput } from 'ui/inputs/pom/CheckboxInput.pom.ts';
 import { ChipsInput } from 'ui/inputs/pom/ChipsInput.pom.ts';
 import { SelectInput } from 'ui/inputs/pom/SelectInput.pom.ts';

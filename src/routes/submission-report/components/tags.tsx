@@ -1,8 +1,8 @@
 import { Divider, Grid, Typography, useTheme } from '@mui/material';
 import type { SubmissionReport } from 'models/api/submission_report';
-import TextVerdict from 'ui/TextVerdict';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import TextVerdict from 'ui/TextVerdict';
 
 type TagTableProps = {
   group: string;

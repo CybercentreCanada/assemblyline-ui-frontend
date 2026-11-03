@@ -1,5 +1,5 @@
 import useALContext from 'core/config/useALContext';
-import { TableOfContentProvider, useTableOfContent } from 'features/table-of-content/table-of-content.providers';
+import { TableOfContentLayout, useTableOfContent } from 'features/table-of-content/table-of-content.providers';
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router';
 import type { LibraryFormStore } from 'routes/development-library/contexts/form';
@@ -132,11 +132,11 @@ const LibraryContent: React.FC = () => {
 };
 
 const WrappedLibraryPage: React.FC = () => (
-  <TableOfContentProvider>
+  <TableOfContentLayout>
     <FormProvider>
       <LibraryContent />
     </FormProvider>
-  </TableOfContentProvider>
+  </TableOfContentLayout>
 );
 
 export const LibraryPage = React.memo(WrappedLibraryPage);
