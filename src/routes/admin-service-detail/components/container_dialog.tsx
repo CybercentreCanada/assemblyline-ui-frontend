@@ -21,7 +21,7 @@ import { DEFAULT_DOCKER_CONFIG, DEFAULT_ENVIRONMENT_VARIABLE, DEFAULT_PERSISTENT
 import type { Dispatch, SetStateAction } from 'react';
 import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { showReset } from 'routes/admin-service-detail/components/service.utils.ts';
+import { showReset } from 'routes/admin-service-detail/components/service.utils';
 import { NumberInput } from 'ui/inputs/NumberInput';
 import { RadioInput } from 'ui/inputs/RadioInput';
 import { SelectInput } from 'ui/inputs/SelectInput';

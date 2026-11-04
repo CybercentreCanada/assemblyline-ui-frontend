@@ -11,7 +11,7 @@ import {
   useShouldRenderProgress,
   useShouldRenderReset
 } from 'ui/inputs/hooks/inputs.hook.renderer';
-import type { InputControllerProps } from 'ui/inputs/models/inputs.model.ts';
+import type { InputControllerProps } from 'ui/inputs/models/inputs.model';
 import type { TooltipProps } from 'ui/Tooltip';
 import { Tooltip } from 'ui/Tooltip';
 

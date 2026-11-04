@@ -1,8 +1,8 @@
 import type { UserSettings } from 'models/base/user_settings';
 import { MOCK_CONFIGURATION } from 'models/mocks/configuration';
 import { MOCK_SETTINGS } from 'models/mocks/setting';
-import { initializeSettings } from 'routes/settings/settings.utils.ts';
-import type { SubmitStore } from 'routes/submit/submit.form.ts';
+import { initializeSettings } from 'routes/settings/settings.utils';
+import type { SubmitStore } from 'routes/submit/submit.form';
 import {
   calculateFileHash,
   getDefaultExternalSources,
@@ -13,7 +13,7 @@ import {
   isValidJSON,
   isValidMetadata,
   parseSubmitProfile
-} from 'routes/submit/submit.utils.ts';
+} from 'routes/submit/submit.utils';
 import generateUUID from 'shared/utils/uuid';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 

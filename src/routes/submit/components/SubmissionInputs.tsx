@@ -24,10 +24,10 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { Link } from 'react-router-dom';
-import { getProfileNames } from 'routes/settings/settings.utils.ts';
+import { getProfileNames } from 'routes/settings/settings.utils';
 import FileDropper from 'routes/submit/components/FileDropper';
-import type { SubmitStore } from 'routes/submit/submit.form.ts';
-import { FLOW, useForm } from 'routes/submit/submit.form.ts';
+import type { SubmitStore } from 'routes/submit/submit.form';
+import { FLOW, useForm } from 'routes/submit/submit.form';
 import {
   calculateFileHash,
   getHashQuery,
@@ -35,7 +35,7 @@ import {
   parseSubmitProfile,
   switchProfile,
   useAutoURLServicesSelection
-} from 'routes/submit/submit.utils.ts';
+} from 'routes/submit/submit.utils';
 import { getSubmitType } from 'shared/utils/utils';
 import generateUUID from 'shared/utils/uuid';
 import type { ButtonProps } from 'ui/buttons/Button';
@@ -43,7 +43,7 @@ import { Button } from 'ui/buttons/Button';
 import { IconButton } from 'ui/buttons/IconButton';
 import Classification from 'ui/Classification';
 import { CheckboxInput } from 'ui/inputs/CheckboxInput';
-import type { SelectInputOption } from 'ui/inputs/models/inputs.model.ts';
+import type { SelectInputOption } from 'ui/inputs/models/inputs.model';
 import { SelectInput } from 'ui/inputs/SelectInput';
 import { SwitchInput } from 'ui/inputs/SwitchInput';
 import { TextAreaInput } from 'ui/inputs/TextAreaInput';

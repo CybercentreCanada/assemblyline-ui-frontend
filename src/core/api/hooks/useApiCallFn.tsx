@@ -1,5 +1,5 @@
 import { DEFAULT_RETRY_MS } from 'app/core.preference';
-import type { APIRequest, APIResponse } from 'core/api/api.models.ts';
+import type { APIRequest, APIResponse } from 'core/api/api.models';
 import { isAPIData } from 'core/api/api.utils';
 import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';

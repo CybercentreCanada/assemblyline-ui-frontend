@@ -1,5 +1,5 @@
 import { DEFAULT_INVALIDATE_DELAY } from 'app/core.preference';
-import type { APIQueryKey, APIRequest } from 'core/api/api.models.ts';
+import type { APIQueryKey, APIRequest } from 'core/api/api.models';
 import { queryClient } from 'core/api/api.providers';
 
 export const invalidateAPIQuery = (filter: (key: APIRequest) => boolean, delay: number = DEFAULT_INVALIDATE_DELAY) =>

@@ -10,12 +10,7 @@ import { KVBody } from 'ui/ResultCard/kv_body';
 import { ProcessChip } from 'ui/ResultCard/Sandbox/common/ProcessChip';
 import { TableContainer } from 'ui/ResultCard/Sandbox/common/TableContainer';
 import { DetailTableCellValue, DetailTableRow } from 'ui/ResultCard/Sandbox/common/Tables';
-import {
-  compareIPs,
-  getProcessMapByPid,
-  hasObjectData,
-  type SandboxFilter
-} from 'ui/ResultCard/Sandbox/sandbox.utils.ts';
+import { compareIPs, getProcessMapByPid, hasObjectData, type SandboxFilter } from 'ui/ResultCard/Sandbox/sandbox.utils';
 
 type NetflowTableProps = {
   body?: SandboxBody | null;

@@ -5,7 +5,7 @@ import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useForm } from 'routes/settings/settings.form.ts';
+import { useForm } from 'routes/settings/settings.form';
 import {
   hasDifferentDefaultSubmissionValues,
   hasDifferentPreviousSubmissionValues,

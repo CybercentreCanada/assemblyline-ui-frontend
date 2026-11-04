@@ -14,7 +14,7 @@ import {
   getProcessMapByPid,
   getSafelistedProcessIds,
   type SandboxFilter
-} from 'ui/ResultCard/Sandbox/sandbox.utils.ts';
+} from 'ui/ResultCard/Sandbox/sandbox.utils';
 import { TabContainer } from 'ui/TabContainer';
 
 type LabelProps = {
