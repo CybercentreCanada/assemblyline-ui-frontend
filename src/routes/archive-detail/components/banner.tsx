@@ -183,7 +183,7 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
       currentVerdict: 'info' as keyof typeof VERDICTS
     };
     if (!file) return values;
-    results = file?.results?.map(result => scoreToVerdict(result?.result?.score) as keyof typeof VERDICTS);
+    results = file?.results?.map(result => scoreToVerdict(result?.result?.score));
     results.forEach(item => {
       if (Object.keys(VERDICTS).includes(item)) values.verdicts[item] += 1;
     });

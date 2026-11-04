@@ -193,7 +193,7 @@ export default tseslint.config(
             },
             {
               from: { element: { type: 'core' } },
-              allow: { to: { element: { type: ['app', 'layout', 'features'] } } }
+              allow: { to: { element: { type: ['app', 'layout', 'features', 'pages'] } } }
             },
             {
               from: { element: { type: 'models' } },

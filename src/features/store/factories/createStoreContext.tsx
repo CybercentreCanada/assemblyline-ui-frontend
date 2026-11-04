@@ -6,8 +6,8 @@ export const createStoreContext = <Store extends object>(initialState: Store) =>
 
   const shallowEqual = <T extends object>(a: T, b: T): boolean => {
     if (Object.is(a, b)) return true;
-    const aKeys = Object.keys(a) as Array<keyof T>;
-    const bKeys = Object.keys(b) as Array<keyof T>;
+    const aKeys = Object.keys(a) as (keyof T)[];
+    const bKeys = Object.keys(b) as (keyof T)[];
     if (aKeys.length !== bKeys.length) return false;
     return aKeys.every(key => Object.is(a[key], b[key]));
   };

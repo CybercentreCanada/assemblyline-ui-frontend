@@ -270,28 +270,28 @@ describe('setPanel', () => {
 describe('insertLeftPanel', () => {
   it('inserts a panel at the given index', () => {
     const store = { ...getDefaultRouterStore(), panels: [{ pageKey: 'r1' }] };
-    const [next, index] = insertLeftPanel(store, 0, { pageKey: 'r0' }, makePreferences({ maxPanels: 3 }));
+    const [next, index] = insertLeftPanel(store, makePreferences({ maxPanels: 3 }), 0, { pageKey: 'r0' });
     expect(index).toBe(0);
     expect(next.panels[0].pageKey).toBe('r0');
   });
 
   it('returns index 0 when inserting into an empty panel list', () => {
     const store = { ...getDefaultRouterStore(), panels: [] };
-    const [next, index] = insertLeftPanel(store, 0, { pageKey: 'r0' }, makePreferences({ maxPanels: 3 }));
+    const [next, index] = insertLeftPanel(store, makePreferences({ maxPanels: 3 }), 0, { pageKey: 'r0' });
     expect(index).toBe(0);
     expect(next.panels[0].pageKey).toBe('r0');
   });
 
   it('trims overflow from the end when exceeding maxPanels', () => {
     const store = { ...getDefaultRouterStore(), panels: [{ pageKey: 'r1' }, { pageKey: 'r2' }] };
-    const [next] = insertLeftPanel(store, 0, { pageKey: 'r0' }, makePreferences({ maxPanels: 2 }));
+    const [next] = insertLeftPanel(store, makePreferences({ maxPanels: 2 }), 0, { pageKey: 'r0' });
     expect(next.panels).toHaveLength(2);
     expect(next.panels.map(p => p.pageKey)).toEqual(['r0', 'r1']);
   });
 
   it('returns null index when maxPanels is 0', () => {
     const store = { ...getDefaultRouterStore(), panels: [{ pageKey: 'r1' }] };
-    const [, index] = insertLeftPanel(store, 0, { pageKey: 'r0' }, makePreferences({ maxPanels: 0 }));
+    const [, index] = insertLeftPanel(store, makePreferences({ maxPanels: 0 }), 0, { pageKey: 'r0' });
     expect(index).toBeNull();
   });
 });
@@ -299,21 +299,21 @@ describe('insertLeftPanel', () => {
 describe('insertRightPanel', () => {
   it('inserts a panel to the right of the source index', () => {
     const store = { ...getDefaultRouterStore(), panels: [{ pageKey: 'r1' }] };
-    const [next, index] = insertRightPanel(store, 0, { pageKey: 'r2' }, makePreferences({ maxPanels: 3 }));
+    const [next, index] = insertRightPanel(store, makePreferences({ maxPanels: 3 }), 0, { pageKey: 'r2' });
     expect(index).toBe(1);
     expect(next.panels[1].pageKey).toBe('r2');
   });
 
   it('trims overflow from the start when exceeding maxPanels', () => {
     const store = { ...getDefaultRouterStore(), panels: [{ pageKey: 'r1' }, { pageKey: 'r2' }] };
-    const [next, index] = insertRightPanel(store, 1, { pageKey: 'r3' }, makePreferences({ maxPanels: 2 }));
+    const [next, index] = insertRightPanel(store, makePreferences({ maxPanels: 2 }), 1, { pageKey: 'r3' });
     expect(next.panels.map(p => p.pageKey)).toEqual(['r2', 'r3']);
     expect(index).toBe(1);
   });
 
   it('returns null index when maxPanels is 0', () => {
     const store = { ...getDefaultRouterStore(), panels: [{ pageKey: 'r1' }] };
-    const [, index] = insertRightPanel(store, 0, { pageKey: 'r2' }, makePreferences({ maxPanels: 0 }));
+    const [, index] = insertRightPanel(store, makePreferences({ maxPanels: 0 }), 0, { pageKey: 'r2' });
     expect(index).toBeNull();
   });
 });
@@ -321,14 +321,14 @@ describe('insertRightPanel', () => {
 describe('upsertPanel', () => {
   it('updates an existing panel when the index is in range', () => {
     const store = { ...getDefaultRouterStore(), panels: [{ pageKey: 'r1' }] };
-    const [next, index] = upsertPanel(store, 0, { pageKey: 'r2' }, makePreferences());
+    const [next, index] = upsertPanel(store, makePreferences(), 0, { pageKey: 'r2' });
     expect(index).toBe(0);
     expect(next.panels[0].pageKey).toBe('r2');
   });
 
   it('inserts a new panel when the index is out of range', () => {
     const store = { ...getDefaultRouterStore(), panels: [{ pageKey: 'r1' }] };
-    const [next, index] = upsertPanel(store, 5, { pageKey: 'r2' }, makePreferences({ maxPanels: 3 }));
+    const [next, index] = upsertPanel(store, makePreferences({ maxPanels: 3 }), 5, { pageKey: 'r2' });
     expect(index).toBe(1);
     expect(next.panels[1].pageKey).toBe('r2');
   });

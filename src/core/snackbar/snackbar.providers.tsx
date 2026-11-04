@@ -42,7 +42,7 @@ const CopyableSnackbarContent = memo((props: CustomContentProps) => {
     [message]
   );
 
-  const existingAction: ReactNode = typeof action === 'function' ? action(props.id) : (action as ReactNode);
+  const existingAction: ReactNode = typeof action === 'function' ? action(props.id) : action;
 
   return (
     <MaterialDesignContent
