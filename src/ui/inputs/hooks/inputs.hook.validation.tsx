@@ -3,7 +3,7 @@ import { usePropStore } from 'features/prop-provider';
 import type { SyntheticEvent } from 'react';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { InputControllerProps, InputOptions, InputValueModel } from 'ui/inputs/models/inputs.model.ts';
+import type { InputControllerProps, InputOptions, InputValueModel } from 'ui/inputs/models/inputs.model';
 import type {
   Coercer,
   CoercersSchema,

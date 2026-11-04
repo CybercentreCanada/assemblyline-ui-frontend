@@ -8,7 +8,7 @@ import { ChipsInput } from 'ui/inputs/ChipsInput';
 import { ClassificationInput } from 'ui/inputs/ClassificationInput';
 import { DateInput } from 'ui/inputs/DateInput';
 import { JSONInput } from 'ui/inputs/JSONInput';
-import type { InputOptions } from 'ui/inputs/models/inputs.model.ts';
+import type { InputOptions } from 'ui/inputs/models/inputs.model';
 import { NumberInput } from 'ui/inputs/NumberInput';
 import type { RadioInputProps } from 'ui/inputs/RadioInput';
 import { RadioInput } from 'ui/inputs/RadioInput';

@@ -1,7 +1,7 @@
 import type { UndefinedInitialDataOptions } from '@tanstack/react-query';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { DEFAULT_RETRY_MS } from 'app/core.preference';
-import type { APIQueryKey, APIRequest, APIResponse } from 'core/api/api.models.ts';
+import type { APIQueryKey, APIRequest, APIResponse } from 'core/api/api.models';
 import { getAPIResponse, stableStringify } from 'core/api/api.utils';
 import type { UseAPICallFnProps } from 'core/api/hooks/useApiCallFn';
 import { useAPICallFn } from 'core/api/hooks/useApiCallFn';

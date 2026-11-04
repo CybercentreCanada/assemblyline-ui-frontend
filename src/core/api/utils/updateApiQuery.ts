@@ -1,4 +1,4 @@
-import type { APIQueryKey, APIRequest, APIResponse } from 'core/api/api.models.ts';
+import type { APIQueryKey, APIRequest, APIResponse } from 'core/api/api.models';
 import { queryClient } from 'core/api/api.providers';
 
 // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-constraint

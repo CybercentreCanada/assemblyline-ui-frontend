@@ -2,7 +2,7 @@ import { List, useTheme } from '@mui/material';
 import useALContext from 'core/config/useALContext';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useForm } from 'routes/settings/settings.form.ts';
+import { useForm } from 'routes/settings/settings.form';
 import { PageSection } from 'ui/layouts/PageSection';
 import { BooleanListInput } from 'ui/list-inputs/BooleanListInput';
 

@@ -6,7 +6,7 @@ import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ContainerCard from 'routes/admin-service-detail/components/container_card';
 import ContainerDialog from 'routes/admin-service-detail/components/container_dialog';
-import { showReset } from 'routes/admin-service-detail/components/service.utils.ts';
+import { showReset } from 'routes/admin-service-detail/components/service.utils';
 import { SelectInput } from 'ui/inputs/SelectInput';
 
 type ServiceContainerProps = {

@@ -10,11 +10,7 @@ import CustomChip from 'ui/CustomChip';
 import { ProcessChip } from 'ui/ResultCard/Sandbox/common/ProcessChip';
 import { TableContainer } from 'ui/ResultCard/Sandbox/common/TableContainer';
 import { DetailTableCellValue, DetailTableRow } from 'ui/ResultCard/Sandbox/common/Tables';
-import {
-  getProcessMapByPid,
-  getVisibleProcessesByPids,
-  type SandboxFilter
-} from 'ui/ResultCard/Sandbox/sandbox.utils.ts';
+import { getProcessMapByPid, getVisibleProcessesByPids, type SandboxFilter } from 'ui/ResultCard/Sandbox/sandbox.utils';
 import Verdict from 'ui/Verdict';
 
 type FlatSignatures = SandboxSignatureItem & {
