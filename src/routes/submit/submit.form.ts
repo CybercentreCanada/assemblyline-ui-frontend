@@ -2,7 +2,7 @@ import Flow from '@flowjs/flow.js';
 import { createFormContext } from 'features/form';
 import type { HashPatternMap } from 'models/base/config';
 import type { Metadata } from 'models/base/submission';
-import type { ProfileSettings } from 'routes/settings/settings.utils.ts';
+import type { ProfileSettings } from 'routes/settings/settings.utils';
 import generateUUID from 'shared/utils/uuid';
 
 /**

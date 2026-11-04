@@ -1,8 +1,8 @@
 import useALContext from 'core/config/useALContext';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useForm } from 'routes/settings/settings.form.ts';
-import { getProfileNames } from 'routes/settings/settings.utils.ts';
+import { useForm } from 'routes/settings/settings.form';
+import { getProfileNames } from 'routes/settings/settings.utils';
 import { PageNavigation } from 'ui/layouts/PageNavigation';
 
 export const LeftNav = React.memo(() => {

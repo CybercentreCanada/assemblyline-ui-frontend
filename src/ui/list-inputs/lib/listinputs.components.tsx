@@ -20,8 +20,8 @@ import { IconButton } from 'ui/buttons/IconButton';
 import { InputListItemText, SelectInputOptionMenuItem } from 'ui/inputs/components/inputs.component.form';
 import { useInputTextFieldSlots } from 'ui/inputs/components/inputs.component.textfield';
 import { useInputId } from 'ui/inputs/hooks/inputs.hook.renderer';
-import type { SelectInputOption } from 'ui/inputs/models/inputs.model.ts';
-import type { ListInputControllerProps } from 'ui/list-inputs/lib/listinputs.model.ts';
+import type { SelectInputOption } from 'ui/inputs/models/inputs.model';
+import type { ListInputControllerProps } from 'ui/list-inputs/lib/listinputs.model';
 
 /**********************************************************************************************************************
  * Skeletons

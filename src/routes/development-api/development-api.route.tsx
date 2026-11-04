@@ -13,14 +13,14 @@ import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } f
 import { useTranslation } from 'react-i18next';
 import { Navigate } from 'react-router';
 import AutoSizer from 'react-virtualized-auto-sizer';
-import type { Request, Response } from 'routes/development-api/development-api.models.ts';
+import type { Request, Response } from 'routes/development-api/development-api.models';
 import {
   formatMilliseconds,
   METHOD_COLOR_MAP,
   parseRequest,
   STATUS_CODES,
   stringifyRequest
-} from 'routes/development-api/development-api.utils.ts';
+} from 'routes/development-api/development-api.utils';
 import CustomChip from 'ui/CustomChip';
 import { PageHeader } from 'ui/layouts/PageHeader';
 

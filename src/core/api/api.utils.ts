@@ -1,4 +1,4 @@
-import type { APIResponse, BlobResponse } from 'core/api/api.models.ts';
+import type { APIResponse, BlobResponse } from 'core/api/api.models';
 
 export const isAPIData = (value: object): value is APIResponse =>
   value !== undefined &&

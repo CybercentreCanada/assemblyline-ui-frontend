@@ -1,6 +1,6 @@
 import type { UndefinedInitialDataOptions } from '@tanstack/react-query';
 import type { ALRequests, ALResponses } from 'app/core.api';
-import type { APIQueryKey, APIResponse } from 'core/api/api.models.ts';
+import type { APIQueryKey, APIResponse } from 'core/api/api.models';
 import type { UseAPICallFnProps } from 'core/api/hooks/useApiCallFn';
 import type { UseAPIQueryProps } from 'core/api/hooks/useApiQuery';
 import { useAPIQuery } from 'core/api/hooks/useApiQuery';

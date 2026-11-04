@@ -4,18 +4,18 @@ import type { WaitForOptions } from 'core/e2e/e2e.models';
 import { PageObjectModel } from 'core/e2e/utils/PageObjectModel';
 
 // Input POMs
-import { CheckboxInput } from 'ui/inputs/pom/CheckboxInput.pom.ts';
-import { ChipsInput } from 'ui/inputs/pom/ChipsInput.pom.ts';
-import { ClassificationInput } from 'ui/inputs/pom/ClassificationInput.pom.ts';
-import { DateInput } from 'ui/inputs/pom/DateInput.pom.ts';
-import { JSONInput } from 'ui/inputs/pom/JSONInput.pom.ts';
-import { NumberInput } from 'ui/inputs/pom/NumberInput.pom.ts';
-import { RadioInput } from 'ui/inputs/pom/RadioInput.pom.ts';
-import { SelectInput } from 'ui/inputs/pom/SelectInput.pom.ts';
-import { SliderInput } from 'ui/inputs/pom/SliderInput.pom.ts';
-import { SwitchInput } from 'ui/inputs/pom/SwitchInput.pom.ts';
-import { TextAreaInput } from 'ui/inputs/pom/TextAreaInput.pom.ts';
-import { TextInput } from 'ui/inputs/pom/TextInput.pom.ts';
+import { CheckboxInput } from 'ui/inputs/pom/CheckboxInput.pom';
+import { ChipsInput } from 'ui/inputs/pom/ChipsInput.pom';
+import { ClassificationInput } from 'ui/inputs/pom/ClassificationInput.pom';
+import { DateInput } from 'ui/inputs/pom/DateInput.pom';
+import { JSONInput } from 'ui/inputs/pom/JSONInput.pom';
+import { NumberInput } from 'ui/inputs/pom/NumberInput.pom';
+import { RadioInput } from 'ui/inputs/pom/RadioInput.pom';
+import { SelectInput } from 'ui/inputs/pom/SelectInput.pom';
+import { SliderInput } from 'ui/inputs/pom/SliderInput.pom';
+import { SwitchInput } from 'ui/inputs/pom/SwitchInput.pom';
+import { TextAreaInput } from 'ui/inputs/pom/TextAreaInput.pom';
+import { TextInput } from 'ui/inputs/pom/TextInput.pom';
 
 export class DevelopmentLibraryInputsPage extends PageObjectModel {
   readonly title: Locator;

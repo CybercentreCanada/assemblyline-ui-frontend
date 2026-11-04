@@ -1,8 +1,8 @@
 import { useTheme } from '@mui/material';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { SettingsStore } from 'routes/settings/settings.form.ts';
-import { useForm } from 'routes/settings/settings.form.ts';
+import type { SettingsStore } from 'routes/settings/settings.form';
+import { useForm } from 'routes/settings/settings.form';
 import { PageSection } from 'ui/layouts/PageSection';
 import { BooleanListInput } from 'ui/list-inputs/BooleanListInput';
 import { NumberListInput } from 'ui/list-inputs/NumberListInput';

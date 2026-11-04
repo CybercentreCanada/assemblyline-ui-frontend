@@ -11,7 +11,7 @@ import {
 import { InputHelperText } from 'ui/inputs/components/inputs.component.form';
 import { useInputChange } from 'ui/inputs/hooks/inputs.hook.event_handlers';
 import { useInputValidation } from 'ui/inputs/hooks/inputs.hook.validation';
-import type { InputRuntimeState, InputValueModel } from 'ui/inputs/models/inputs.model.ts';
+import type { InputRuntimeState, InputValueModel } from 'ui/inputs/models/inputs.model';
 import {
   ListInputInner,
   ListInputLoading,
@@ -19,8 +19,8 @@ import {
   ListInputText,
   ListInputWrapper
 } from 'ui/list-inputs/lib/listinputs.components';
-import type { ListInputOptions, ListInputSlotProps } from 'ui/list-inputs/lib/listinputs.model.ts';
-import { DEFAULT_LIST_INPUT_CONTROLLER_PROPS } from 'ui/list-inputs/lib/listinputs.model.ts';
+import type { ListInputOptions, ListInputSlotProps } from 'ui/list-inputs/lib/listinputs.model';
+import { DEFAULT_LIST_INPUT_CONTROLLER_PROPS } from 'ui/list-inputs/lib/listinputs.model';
 
 export type ClassificationListInputProps = InputValueModel<ClassificationProps['c12n']> &
   ListInputOptions &

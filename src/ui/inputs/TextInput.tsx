@@ -13,13 +13,8 @@ import { InputTextField } from 'ui/inputs/components/inputs.component.textfield'
 import { useInputBlur, useInputChange, useInputFocus } from 'ui/inputs/hooks/inputs.hook.event_handlers';
 import { useInputId } from 'ui/inputs/hooks/inputs.hook.renderer';
 import { useInputValidation } from 'ui/inputs/hooks/inputs.hook.validation';
-import type {
-  InputOptions,
-  InputRuntimeState,
-  InputSlotProps,
-  InputValueModel
-} from 'ui/inputs/models/inputs.model.ts';
-import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'ui/inputs/models/inputs.model.ts';
+import type { InputOptions, InputRuntimeState, InputSlotProps, InputValueModel } from 'ui/inputs/models/inputs.model';
+import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'ui/inputs/models/inputs.model';
 
 export type TextInputProps = InputValueModel<string, React.SyntheticEvent<Element, Event>> &
   InputOptions &
