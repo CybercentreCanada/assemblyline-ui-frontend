@@ -1,8 +1,8 @@
 import { useTheme } from '@mui/material';
-import type { StoreProps } from 'ui/HexViewer';
-import { FoldingType, HexCell, HexOffset, HexSpacer, LAYOUT_SIZE, useStore } from 'ui/HexViewer';
 import type { CSSProperties } from 'react';
 import React, { useMemo } from 'react';
+import type { StoreProps } from 'ui/HexViewer';
+import { FoldingType, HexCell, HexOffset, HexSpacer, LAYOUT_SIZE, useStore } from 'ui/HexViewer';
 
 export type HexRowProps = StoreProps & {
   rowIndex?: number;

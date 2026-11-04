@@ -1,5 +1,6 @@
 import eslint from '@eslint/js';
 import eslintConfigPrettier from 'eslint-config-prettier/flat';
+import boundariesPlugin from 'eslint-plugin-boundaries';
 import importPlugin from 'eslint-plugin-import';
 import jsoncPlugin from 'eslint-plugin-jsonc';
 import jsxA11yPlugin from 'eslint-plugin-jsx-a11y';
@@ -17,13 +18,12 @@ const defaultConfig = {
 };
 
 const typescriptRules = {
-  '@typescript-eslint/array-type': 'error',
-  '@typescript-eslint/array-type': 'warn',
-  '@typescript-eslint/consistent-generic-constructors': 'warn',
-  '@typescript-eslint/consistent-indexed-object-style': 'warn',
+  '@typescript-eslint/array-type': ['error', { default: 'array' }],
+  '@typescript-eslint/consistent-generic-constructors': ['error', 'constructor'],
+  '@typescript-eslint/consistent-indexed-object-style': ['error', 'record'],
   '@typescript-eslint/consistent-type-definitions': 'off',
-  '@typescript-eslint/consistent-type-imports': 'warn',
-  '@typescript-eslint/default-param-last': 'off',
+  '@typescript-eslint/consistent-type-imports': 'error',
+  '@typescript-eslint/default-param-last': 'error',
   '@typescript-eslint/explicit-function-return-type': 'off',
   '@typescript-eslint/indent': 'off',
   '@typescript-eslint/no-base-to-string': 'warn',
@@ -32,14 +32,13 @@ const typescriptRules = {
   '@typescript-eslint/no-empty-function': 'warn',
   '@typescript-eslint/no-empty-object-type': 'warn',
   '@typescript-eslint/no-explicit-any': 'warn',
-  '@typescript-eslint/no-explicit-any': 'warn',
-  '@typescript-eslint/no-floating-promises': 'warn',
-  '@typescript-eslint/no-for-in-array': 'warn',
+  '@typescript-eslint/no-floating-promises': 'error',
+  '@typescript-eslint/no-for-in-array': 'error',
   '@typescript-eslint/no-inferrable-types': 'off',
-  '@typescript-eslint/no-invalid-void-type': 'warn',
+  '@typescript-eslint/no-invalid-void-type': 'error',
   '@typescript-eslint/no-misused-promises': 'off',
   '@typescript-eslint/no-redundant-type-constituents': 'warn',
-  '@typescript-eslint/no-unnecessary-type-assertion': 'warn',
+  '@typescript-eslint/no-unnecessary-type-assertion': 'error',
   '@typescript-eslint/no-unnecessary-type-constraint': 'warn',
   '@typescript-eslint/no-unsafe-argument': 'warn',
   '@typescript-eslint/no-unsafe-assignment': 'warn',
@@ -50,11 +49,10 @@ const typescriptRules = {
   '@typescript-eslint/no-unsafe-return': 'warn',
   '@typescript-eslint/no-unused-expressions': 'off',
   '@typescript-eslint/no-unused-vars': 'warn',
-  '@typescript-eslint/no-unused-vars': 'warn',
   '@typescript-eslint/no-use-before-define': 'warn',
-  '@typescript-eslint/no-wrapper-object-types': 'warn',
-  '@typescript-eslint/prefer-as-const': 'warn',
-  '@typescript-eslint/prefer-for-of': 'warn',
+  '@typescript-eslint/no-wrapper-object-types': 'error',
+  '@typescript-eslint/prefer-as-const': 'error',
+  '@typescript-eslint/prefer-for-of': 'error',
   '@typescript-eslint/space-before-function-paren': 'off',
 
   '@typescript-eslint/naming-convention': [
@@ -128,6 +126,89 @@ export default tseslint.config(
     }
   },
 
+  // Import boundaries: app is the composition root.
+  {
+    ...defaultConfig,
+    plugins: { boundaries: boundariesPlugin },
+    settings: {
+      'boundaries/root-path': import.meta.dirname,
+      'boundaries/elements': [
+        { type: 'app', pattern: 'src/app', partialMatch: false },
+        { type: 'pages', pattern: 'src/routes', partialMatch: false },
+        { type: 'layout', pattern: 'src/layout', partialMatch: false },
+        { type: 'features', pattern: 'src/features', partialMatch: false },
+        { type: 'core', pattern: 'src/core', partialMatch: false },
+        { type: 'models', pattern: 'src/models', partialMatch: false },
+        { type: 'shared', pattern: 'src/shared', partialMatch: false },
+        { type: 'ui', pattern: 'src/ui', partialMatch: false }
+      ],
+      // Legacy code and test infrastructure do not follow production layering yet.
+      'boundaries/ignore': ['src/deprecated/**', 'src/**/*.{spec,test,pom}.{ts,tsx}', 'src/core/{e2e,test}/**']
+    },
+    rules: {
+      // Enforce intended layering plus explicit legacy allowances during adoption.
+      // Same-folder imports and external packages remain allowed.
+      // Root-level bootstrap files are intentionally outside these folder boundaries.
+      'boundaries/dependencies': [
+        'error',
+        {
+          default: 'disallow',
+          policies: [
+            {
+              from: { element: { type: 'app' } },
+              allow: { to: { element: { type: '*' } } }
+            },
+            {
+              from: { element: { type: 'pages' } },
+              allow: { to: { element: { type: ['app', 'layout', 'features', 'core', 'models', 'shared', 'ui'] } } }
+            },
+            {
+              from: { element: { type: 'layout' } },
+              allow: { to: { element: { type: ['features', 'core', 'models', 'shared', 'ui'] } } }
+            },
+            {
+              from: { element: { type: 'features' } },
+              allow: { to: { element: { type: ['core', 'models', 'shared'] } } }
+            },
+            {
+              from: { element: { type: 'core' } },
+              allow: { to: { element: { type: ['models', 'shared', 'ui'] } } }
+            },
+            {
+              from: { element: { type: 'shared' } },
+              allow: { to: { element: { type: 'models' } } }
+            },
+            // models and ui are leaf layers: no dependencies on other source folders.
+
+            // Legacy dependencies: remove these allowances as imports are migrated.
+            // The policies above describe the intended architecture; models and ui
+            // should eventually be leaf layers with no cross-layer dependencies.
+            {
+              from: { element: { type: 'layout' } },
+              allow: { to: { element: { type: 'pages' } } }
+            },
+            {
+              from: { element: { type: 'features' } },
+              allow: { to: { element: { type: 'layout' } } }
+            },
+            {
+              from: { element: { type: 'core' } },
+              allow: { to: { element: { type: ['app', 'layout', 'features'] } } }
+            },
+            {
+              from: { element: { type: 'models' } },
+              allow: { to: { element: { type: ['features', 'core', 'shared'] } } }
+            },
+            {
+              from: { element: { type: 'ui' } },
+              allow: { to: { element: { type: ['pages', 'layout', 'features', 'core', 'models', 'shared'] } } }
+            }
+          ]
+        }
+      ]
+    }
+  },
+
   // Prettier
   eslintConfigPrettier,
 
@@ -152,7 +233,7 @@ export default tseslint.config(
     plugins: { 'no-relative-import-paths': noRelativeImportPathsPlugin },
     rules: {
       'no-relative-import-paths/no-relative-import-paths': [
-        'warn',
+        'error',
         { allowSameFolder: false, prefix: '', rootDir: 'src' }
       ]
     }
@@ -217,7 +298,7 @@ export default tseslint.config(
       ...reactPlugin.configs.recommended.rules,
       'react/display-name': 'off',
       'react/jsx-curly-newline': 'off',
-      'react/jsx-filename-extension': ['warn', { extensions: ['.js', '.jsx', '.ts', '.tsx'] }],
+      'react/jsx-filename-extension': ['error', { extensions: ['.js', '.jsx', '.ts', '.tsx'] }],
       'react/jsx-no-literals': [
         'off',
         {
@@ -252,14 +333,14 @@ export default tseslint.config(
     rules: {
       'no-async-promise-executor': 'off',
       'no-case-declarations': 'off',
-      'no-console': 'warn',
+      'no-console': ['error', { allow: ['error'] }],
       'no-extra-boolean-cast': 'off',
       'no-param-reassign': 'off',
       'no-prototype-builtins': 'warn',
-      'no-unsafe-optional-chaining': 'warn',
+      'no-unsafe-optional-chaining': 'error',
       'no-unused-vars': 'warn',
-      'no-var': 'warn',
-      'prefer-const': 'warn'
+      'no-var': 'error',
+      'prefer-const': 'error'
     }
   }
 );

@@ -3,6 +3,8 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
 import type { StoreProps } from 'ui/HexViewer';
 import {
   CopyTypeSetting,
@@ -14,8 +16,6 @@ import {
   RowFoldingSetting,
   useDispatch
 } from 'ui/HexViewer';
-import { default as React } from 'react';
-import { useTranslation } from 'react-i18next';
 
 export * from './bodyType';
 export * from './column';

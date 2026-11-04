@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 
 type DisableOTPProps = {
   isUnsetOTP: boolean;
-  username?: String;
+  username?: string;
   setDrawerOpen: (value: boolean) => void;
   set2FAEnabled: (value: boolean) => void;
 };

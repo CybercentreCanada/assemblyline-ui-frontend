@@ -10,6 +10,7 @@ import {
 } from 'routes/development-customize/development-customize.components';
 import type { CustomizeMethod } from 'routes/development-customize/development-customize.form';
 import { CUSTOMIZE_METHODS, FormProvider, useForm } from 'routes/development-customize/development-customize.form';
+import 'routes/development-customize/development-customize.styles.css';
 import { PageHeader } from 'ui/layouts/PageHeader';
 import { PageLayout } from 'ui/layouts/PageLayout';
 

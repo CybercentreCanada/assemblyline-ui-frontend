@@ -1,4 +1,7 @@
 import type { SelectChangeEvent } from '@mui/material';
+import type { ChangeEvent } from 'react';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
 import type { StoreProps } from 'ui/HexViewer';
 import {
   getItems,
@@ -10,9 +13,6 @@ import {
   singleCharacterString,
   useStore
 } from 'ui/HexViewer';
-import type { ChangeEvent } from 'react';
-import { default as React } from 'react';
-import { useTranslation } from 'react-i18next';
 
 export const WrappedHexSetSetting = ({ store }: StoreProps) => {
   const { t } = useTranslation(['hexViewer']);

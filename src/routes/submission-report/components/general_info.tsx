@@ -142,8 +142,8 @@ function WrappedGeneralInformation({ report }: Props) {
             {report ? (
               report?.params?.services?.rescan ? (
                 [
-                  ...report?.params?.services?.selected,
-                  ...report?.params?.services?.rescan?.filter(
+                  ...(report?.params?.services?.selected ?? []),
+                  ...(report?.params?.services?.rescan ?? []).filter(
                     word => report?.params?.services?.selected?.indexOf(word) === -1
                   )
                 ]

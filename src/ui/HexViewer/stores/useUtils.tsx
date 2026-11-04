@@ -87,9 +87,9 @@ export const STORE_TYPES: TypesConfig<Omit<Store, 'setting'>, HexViewerTypes> = 
 const getValueFromPath = (obj: object, path: string[]): number | string | object => {
   let current = obj;
   if (obj === undefined || obj === null) return null;
-  for (let i = 0; i < path.length; ++i) {
-    if (current[path[i]] === undefined) return undefined;
-    current = current[path[i]];
+  for (const pathSegment of path) {
+    if (current[pathSegment] === undefined) return undefined;
+    current = current[pathSegment];
   }
   return current;
 };

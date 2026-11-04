@@ -139,7 +139,7 @@ const HexWindowBody = memo(({ store }: StoreProps) => {
 
   React.useEffect(() => {
     if (store.loading.conditions.hasResized)
-      scrollToWindowIndexAsync(store, listRef, store.scroll.index, store.scroll.type).then(
+      void scrollToWindowIndexAsync(store, listRef, store.scroll.index, store.scroll.type).then(
         () => !store.loading.conditions.hasScrolled && onBodyScrollInit()
       );
     // eslint-disable-next-line react-hooks/exhaustive-deps
