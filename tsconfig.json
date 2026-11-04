@@ -4,12 +4,13 @@
     "useDefineForClassFields": true,
     "lib": ["ES2023", "DOM", "DOM.Iterable"],
     "types": ["vite/client", "vitest/globals", "node"],
-    "typeRoots": ["./node_modules/@types/", "./types", "./node_modules"],
+    // "typeRoots": ["./node_modules/@types/", "./types", "./node_modules"],
     "module": "ESNext",
     "skipLibCheck": true,
 
     /* Bundler mode */
     "moduleResolution": "bundler",
+    "moduleDetection": "force",
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
@@ -17,14 +18,20 @@
     "jsx": "react-jsx",
 
     /* Linting */
-    "strict": false,
-    "noUnusedLocals": null,
-    "noUnusedParameters": null,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true,
+    "strict": true,
+    "strictNullChecks": false,
+    "noImplicitAny": false,
+    "strictFunctionTypes": false,
+    "strictPropertyInitialization": false,
+    "strictBindCallApply": false,
+    "noImplicitThis": false,
+    "useUnknownInCatchVariables": false,
 
     /* Previous definition */
     "allowJs": true,
-    "allowSyntheticDefaultImports": true,
     "baseUrl": "src",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true
