@@ -1,5 +1,5 @@
 import { Grid, Skeleton, useMediaQuery, useTheme } from '@mui/material';
-import useALContext from 'core/config/useALContext';
+import useALContext from 'deprecated/hooks/useALContext';
 import type { File as FileInfo } from 'models/base/file';
 import type { Section } from 'models/base/result';
 import type { KeyValueBody, OrderedKeyValueBody } from 'models/base/result_body';

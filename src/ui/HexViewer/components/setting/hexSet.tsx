@@ -1,6 +1,6 @@
 import type { SelectChangeEvent } from '@mui/material';
 import type { ChangeEvent } from 'react';
-import { default as React } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import type { StoreProps } from 'ui/HexViewer';
 import {

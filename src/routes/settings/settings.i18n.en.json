@@ -1,4 +1,8 @@
 {
+  "app_route.settings_root.fullname": "Settings",
+  "app_route.settings_root.shortname": "Settings",
+  "app_route.settings_tab.fullname": "Settings {{tab}}",
+  "app_route.settings_tab.shortname": "{{tab}}",
   "button.cancel.label": "Cancel",
   "button.cancel.tooltip": "Revert this setting's parameters to their current values.",
   "button.reset.label": "Reset",

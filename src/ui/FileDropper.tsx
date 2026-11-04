@@ -1,7 +1,7 @@
 import BlockIcon from '@mui/icons-material/Block';
 import { styled } from '@mui/material';
 import Typography from '@mui/material/Typography';
-import useALContext from 'core/config/useALContext';
+import useALContext from 'deprecated/hooks/useALContext';
 import React, { memo, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useTranslation } from 'react-i18next';

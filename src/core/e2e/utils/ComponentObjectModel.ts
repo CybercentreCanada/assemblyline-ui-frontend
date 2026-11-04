@@ -1,6 +1,6 @@
 import type { Page } from '@playwright/test';
-import { test } from 'core/e2e/e2e.fixtures';
 import type { PlaywrightArgs, WaitForOptions } from 'core/e2e/e2e.models';
+import { test } from 'core/e2e/e2e.fixtures';
 
 export abstract class ComponentObjectModel {
   constructor(

@@ -1,23 +1,24 @@
-import { Grid, Typography, useTheme } from '@mui/material';
-import Skeleton from '@mui/material/Skeleton';
-import useMyAPI from 'core/api/hooks/useMyAPI';
-import useALContext from 'core/config/useALContext';
-import PageFullWidth from 'core/template/components/pages/PageFullWidth';
-import { useEffect, useState } from 'react';
+import SettingsApplicationsOutlinedIcon from '@mui/icons-material/SettingsApplicationsOutlined';
+import { Grid, Skeleton, Typography, useTheme } from '@mui/material';
+import { useAppConfigStore } from 'core/config';
+import { createAppRoute } from 'core/router';
+import { AppPageFullWidth } from 'core/template';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
+import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import CustomChip from 'ui/CustomChip';
+import { CustomChip } from 'ui/CustomChip';
 import { PageHeader } from 'ui/layouts/PageHeader';
 
-export default function Configuration() {
+export const HelpConfigurationPage = memo(() => {
   const { apiCall } = useMyAPI();
   const [configuration, setConfiguration] = useState(null);
   const [constants, setConstants] = useState(null);
-  const { configuration: systemConfiguration } = useALContext();
   const { t } = useTranslation(['helpConfiguration']);
   const theme = useTheme();
   const sp1 = theme.spacing(1);
   const sp2 = theme.spacing(2);
-  const coreVersion = systemConfiguration.system.version;
+
+  const coreVersion = useAppConfigStore(s => s?.configuration.system.version);
 
   function isArrayOfArray(val) {
     if (Array.isArray(val)) {
@@ -46,7 +47,7 @@ export default function Configuration() {
   }, []);
 
   return (
-    <PageFullWidth margin={4}>
+    <AppPageFullWidth>
       <div style={{ textAlign: 'left' }}>
         <PageHeader
           primary={t('title')}
@@ -239,6 +240,21 @@ export default function Configuration() {
           </div>
         </div>
       </div>
-    </PageFullWidth>
+    </AppPageFullWidth>
   );
-}
+});
+
+export const HelpConfigurationRoute = createAppRoute({
+  component: HelpConfigurationPage,
+
+  path: '/help/configuration',
+
+  ancestor: '/help',
+  shortname: () => ['app_route.help_configuration.shortname', { ns: 'helpConfiguration' }],
+  fullname: () => ['app_route.help_configuration.fullname', { ns: 'helpConfiguration' }],
+  shorticon: () => <SettingsApplicationsOutlinedIcon />,
+  fullicon: () => <SettingsApplicationsOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
+});

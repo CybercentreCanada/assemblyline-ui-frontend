@@ -2,14 +2,13 @@ import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
 import { AlertTitle, Skeleton, Tooltip } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
-import useALContext from 'core/config/useALContext';
-import { useSearchParams } from 'features/SearchParams/createSearchParams';
+import { useAppConfigStore } from 'core/config';
+import { useAppNavigate } from 'core/router';
+import useALContext from 'deprecated/hooks/useALContext';
 import type { SearchResult } from 'models/api/search';
 import type { SubmissionIndexed } from 'models/base/submission';
-import React from 'react';
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
-import type { SubmissionParams } from 'routes/submissions/submissions.route';
 import { maxLenStr } from 'shared/utils/utils';
 import Classification from 'ui/Classification';
 import CustomChip from 'ui/CustomChip';
@@ -27,18 +26,31 @@ import Moment from 'ui/Moment';
 import SubmissionState from 'ui/SubmissionState';
 import Verdict from 'ui/Verdict';
 
-type Props = {
+export type SubmissionsTableProps = {
   submissionResults: SearchResult<SubmissionIndexed>;
   allowSort?: boolean;
+  ignoreFilters?: boolean;
+  onRowClick?: (event: React.MouseEvent<HTMLElement>, submission: SubmissionIndexed) => void;
 };
 
-const WrappedSubmissionsTable: React.FC<Props> = ({ submissionResults, allowSort = true }) => {
-  const { t } = useTranslation(['search']);
-  const { c12nDef } = useALContext();
-  const { search, setSearchObject } = useSearchParams<SubmissionParams>();
+export const SubmissionsTable = memo(
+  ({ submissionResults, allowSort = true, ignoreFilters = false, onRowClick = () => null }: SubmissionsTableProps) => {
+    const { t } = useTranslation(['search']);
+    const { c12nDef } = useALContext();
 
-  return submissionResults ? (
-    !!submissionResults?.total ? (
+    const navigate = useAppNavigate<'/submissions'>();
+    const submissionView = useAppConfigStore(s => s.settings.submission_view);
+
+    return !submissionResults ? (
+      <Skeleton variant="rectangular" sx={{ height: '6rem', borderRadius: '4px' }} />
+    ) : !submissionResults?.total ? (
+      <div style={{ width: '100%' }}>
+        <InformativeAlert>
+          <AlertTitle>{t('no_submissions_title')}</AlertTitle>
+          {t('no_results_desc')}
+        </InformativeAlert>
+      </div>
+    ) : (
       <TableContainer component={Paper}>
         <DivTable>
           <DivTableHead>
@@ -71,12 +83,22 @@ const WrappedSubmissionsTable: React.FC<Props> = ({ submissionResults, allowSort
             {submissionResults.items.map((submission, id) => (
               <LinkRow
                 key={`${submission.id}-${id}`}
-                component={Link}
-                to={
-                  submission.state === 'completed'
-                    ? `/submission/${submission.id}`
-                    : `/submission/detail/${submission.id}`
+                nav={nav =>
+                  nav.to().create(s => {
+                    const route =
+                      submission.state !== 'completed'
+                        ? '/submission/detail/:id'
+                        : s?.route === '/submission/detail/:id' || s?.route === '/submission/report/:id'
+                          ? s.route
+                          : submissionView === 'report'
+                            ? '/submission/report/:id'
+                            : '/submission/detail/:id';
+
+                    return { route, path: { id: submission.id } };
+                  })
                 }
+                navDeps={[submission.state, submissionView, submission.id]}
+                onClick={event => onRowClick(event, submission)}
                 hover
                 style={{ textDecoration: 'none' }}
               >
@@ -92,7 +114,7 @@ const WrappedSubmissionsTable: React.FC<Props> = ({ submissionResults, allowSort
                 </DivTableCell>
                 <DivTableCell breakable>{maxLenStr(submission.params.description, 150)}</DivTableCell>
                 <DivTableCell style={{ whiteSpace: 'nowrap' }}>
-                  {!search ? (
+                  {ignoreFilters ? (
                     submission.params.submitter
                   ) : (
                     <CustomChip
@@ -103,10 +125,13 @@ const WrappedSubmissionsTable: React.FC<Props> = ({ submissionResults, allowSort
                       onClick={event => {
                         event.preventDefault();
                         event.stopPropagation();
-                        setSearchObject(o => ({
-                          ...o,
-                          offset: 0,
-                          filters: [...o.filters, `params.submitter:"${submission.params.submitter}"`]
+                        navigate.here().update(s => ({
+                          ...s,
+                          search: {
+                            ...s.search,
+                            offset: 0,
+                            filters: [...s.search.filters, `params.submitter:"${submission.params.submitter}"`]
+                          }
                         }));
                       }}
                     />
@@ -133,18 +158,6 @@ const WrappedSubmissionsTable: React.FC<Props> = ({ submissionResults, allowSort
           </DivTableBody>
         </DivTable>
       </TableContainer>
-    ) : (
-      <div style={{ width: '100%' }}>
-        <InformativeAlert>
-          <AlertTitle>{t('no_submissions_title')}</AlertTitle>
-          {t('no_results_desc')}
-        </InformativeAlert>
-      </div>
-    )
-  ) : (
-    <Skeleton variant="rectangular" style={{ height: '6rem', borderRadius: '4px' }} />
-  );
-};
-
-const SubmissionsTable = React.memo(WrappedSubmissionsTable);
-export default SubmissionsTable;
+    );
+  }
+);

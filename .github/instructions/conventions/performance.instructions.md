@@ -44,13 +44,43 @@ const activeItems = useMemo(() => items.filter(i => i.active), [items]);
 // ✅ Module-level — same reference every render
 const EMPTY_SERVICES: MinimalService[] = [];
 
-export const MyComponent = memo(({ services = EMPTY_SERVICES }: MyComponentProps) => {
-  // ...
+export const MyComponent = memo(() => {
+  const services = useAppConfigStore(s => s?.services ?? EMPTY_SERVICES);
 });
 
 // ❌ Inline default — new array every render
-export const MyComponent = memo(({ services = [] }: MyComponentProps) => {
-  // ...
+const services = useAppConfigStore(s => s?.services ?? []);
+```
+
+## Store Selectors — Access Leaf Values
+
+Zustand (and similar stores) only trigger re-renders when the selected value's reference changes. Selecting a parent object and then reading its fields in JSX will **not** react to field-level mutations (since the parent reference is preserved).
+
+```typescript
+// ❌ Selecting the parent object — won't re-render when `href` or `state` changes
+const route = useStore(s => s.routes[routeKey]);
+return <AppRoutes href={route.href} state={route.state} />;
+
+// ✅ Selecting each leaf field — re-renders only when that field changes
+const href = useStore(s => s?.routes?.[routeKey]?.href || undefined);
+const state = useStore(s => s?.routes?.[routeKey]?.state || undefined);
+return <AppRoutes href={href} state={state} />;
+```
+
+**Rule:** Always select the most deeply nested primitive or leaf value you actually need. One selector per field.
+
+## Store Mutations — Mutate In Place
+
+Never spread/replace a parent object in the store. Mutate the individual fields to preserve reference identity for unchanged siblings:
+
+```typescript
+// ❌ Spreading creates a new object — causes re-renders for ALL selectors on that subtree
+setStore(s => ({ ...s, routes: { ...s.routes, [key]: { ...s.routes[key], href: newHref } } }));
+
+// ✅ Mutate in place — only selectors for `href` will re-render
+setStore(s => {
+  s.routes[key].href = newHref;
+  return s;
 });
 ```
 

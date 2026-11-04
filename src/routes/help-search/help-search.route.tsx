@@ -1,3 +1,4 @@
+import SearchIcon from '@mui/icons-material/Search';
 import type { CardProps } from '@mui/material';
 import {
   Box,
@@ -11,11 +12,12 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
-import useALContext from 'core/config/useALContext';
-import { useAppBar, useAppLayout } from 'core/template/components/app/hooks';
-import PageCenter from 'core/template/components/pages/PageCenter';
+import { useAppPreferenceStore } from 'core/preference';
+import { createAppRoute } from 'core/router';
+import { AppPageCenter } from 'core/template';
 import type { ContentWithTOCItemDef } from 'deprecated/components/toc/Toc';
 import ContentWithTOC from 'deprecated/components/toc/Toc';
+import { useALContext } from 'deprecated/hooks/useALContext';
 import { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import CustomChip from 'ui/CustomChip';
@@ -84,8 +86,8 @@ const StyledTableCell = memo(
 function Paragraph({ id, children }) {
   const theme = useTheme();
 
-  const { autoHide: autoHideAppbar } = useAppBar();
-  const { current: currentLayout } = useAppLayout();
+  const autoHideAppbar = useAppPreferenceStore(s => s?.template?.autoHideAppbar);
+  const currentLayout = useAppPreferenceStore(s => s?.template?.layout);
 
   return (
     <Box
@@ -127,13 +129,13 @@ const StyledCard = memo(
   }))
 );
 
-export default function Search() {
+export const HelpSearchPage = memo(() => {
   const { t } = useTranslation(['helpSearch']);
   const theme = useTheme();
   const { indexes } = useALContext();
 
   return (
-    <PageCenter margin={4} width="100%" textAlign="left">
+    <AppPageCenter style={{ textAlign: 'left' }}>
       <ContentWithTOC translation="helpSearch" items={Toc}>
         <PageHeader primary={t('title')} secondary={t('subtitle')} />
 
@@ -509,6 +511,22 @@ export default function Search() {
           </Padded>
         </Paragraph>
       </ContentWithTOC>
-    </PageCenter>
+    </AppPageCenter>
   );
-}
+});
+
+export const HelpSearchRoute = createAppRoute({
+  component: HelpSearchPage,
+
+  path: '/help/search',
+  hash: s => s.string(null),
+
+  ancestor: '/help',
+  shortname: () => ['app_route.help_search.shortname', { ns: 'helpSearch' }],
+  fullname: () => ['app_route.help_search.fullname', { ns: 'helpSearch' }],
+  shorticon: () => <SearchIcon />,
+  fullicon: () => <SearchIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
+});

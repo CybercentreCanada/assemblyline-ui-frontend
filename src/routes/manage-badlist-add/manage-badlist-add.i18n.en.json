@@ -1,5 +1,7 @@
 {
   "add.success": "The badlist item was successfully added to the system.",
+  "app_route.manage_badlist_add.fullname": "Manage Add Badlist",
+  "app_route.manage_badlist_add.shortname": "Add",
   "attribution": "Attributions (Optional)",
   "attribution.actor.title": "Actors",
   "attribution.campaign.title": "Campaigns",

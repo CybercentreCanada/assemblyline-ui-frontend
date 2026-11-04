@@ -1,12 +1,11 @@
 import { Alert, LinearProgress } from '@mui/material';
-import useMyAPI from 'core/api/hooks/useMyAPI';
-import useMySnackbar from 'core/snackbar/snackbar.hooks';
-import { useAppUser } from 'core/template/components/app/hooks';
-import type { CustomUser } from 'models/api/user';
+import useALContext from 'deprecated/hooks/useALContext';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useMySnackbar from 'deprecated/hooks/useMySnackbar';
 import type { editor } from 'monaco-editor';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import ForbiddenPage from 'routes/forbidden/forbidden.route';
+import { ForbiddenPage } from 'routes/forbidden/forbidden';
 import MonacoEditor, { LANGUAGE_SELECTOR } from 'ui/MonacoEditor';
 
 type Props = {
@@ -25,7 +24,7 @@ const WrappedStringsSection: React.FC<Props> = ({
   const { t } = useTranslation(['fileViewer']);
   const { apiCall } = useMyAPI();
   const { showErrorMessage, closeSnackbar } = useMySnackbar();
-  const { user: currentUser } = useAppUser<CustomUser>();
+  const { user: currentUser } = useALContext();
 
   const [data, setData] = useState<string>(null);
   const [error, setError] = useState<string>(null);

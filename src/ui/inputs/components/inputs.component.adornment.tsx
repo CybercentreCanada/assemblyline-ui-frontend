@@ -202,7 +202,7 @@ export const HelpInputAdornment = React.memo(({ variant = 'icon' }: InputButtonA
         color="secondary"
         disabled={disabled}
         tabIndex={-1}
-        to={helpLink}
+        {...(helpLink && { nav: nav => nav.to().create(helpLink), navDeps: [helpLink] })}
         tooltip={
           <>
             <span style={{ color: theme.palette.text.secondary }}>{t('adornment.help.tooltip')}</span>
@@ -233,7 +233,7 @@ export const HelpInputAdornment = React.memo(({ variant = 'icon' }: InputButtonA
         disableElevation
         size="small"
         tabIndex={-1}
-        to={helpLink}
+        {...(helpLink && { nav: nav => nav.to().create(helpLink), navDeps: [helpLink] })}
         tooltip={
           <>
             <span style={{ color: theme.palette.text.secondary }}>{t('adornment.help.tooltip')}</span>

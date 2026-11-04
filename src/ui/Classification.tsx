@@ -1,5 +1,4 @@
 import {
-  alpha,
   Card,
   Dialog,
   DialogActions,
@@ -14,7 +13,7 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import useALContext from 'core/config/useALContext';
+import useALContext from 'deprecated/hooks/useALContext';
 import type {
   ClassificationGroup,
   ClassificationLevel,
@@ -37,9 +36,9 @@ import {
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { PossibleColor } from 'shared/utils/colors';
-import { Button } from 'ui/buttons/Button';
-import CustomChip, { COLOR_MAP } from 'ui/CustomChip';
+import { COLOR_MAP, CustomChip } from 'ui/CustomChip';
 import { Tooltip } from 'ui/Tooltip';
+import { Button } from 'ui/buttons/Button';
 
 export interface ClassificationProps {
   c12n: string;
@@ -307,7 +306,7 @@ export const Classification = React.memo(
                               placement="bottom"
                               slotProps={{
                                 popper: { modifiers: [{ name: 'offset', options: { offset: [0, -8] } }] },
-                                tooltip: { sx: { backgroundColor: alpha(theme.palette.Tooltip.bg, 1) } }
+                                tooltip: { sx: { backgroundColor: theme.palette.grey[700] } }
                               }}
                             >
                               <ListItemButton
@@ -343,7 +342,7 @@ export const Classification = React.memo(
                                 placement="bottom"
                                 slotProps={{
                                   popper: { modifiers: [{ name: 'offset', options: { offset: [0, -8] } }] },
-                                  tooltip: { sx: { backgroundColor: alpha(theme.palette.Tooltip.bg, 1) } }
+                                  tooltip: { sx: { backgroundColor: theme.palette.grey[700] } }
                                 }}
                               >
                                 <ListItemButton
@@ -387,7 +386,7 @@ export const Classification = React.memo(
                                   placement="bottom"
                                   slotProps={{
                                     popper: { modifiers: [{ name: 'offset', options: { offset: [0, -8] } }] },
-                                    tooltip: { sx: { backgroundColor: alpha(theme.palette.Tooltip.bg, 1) } }
+                                    tooltip: { sx: { backgroundColor: theme.palette.grey[700] } }
                                   }}
                                 >
                                   <ListItemButton
@@ -451,7 +450,7 @@ export const Classification = React.memo(
                                     placement="bottom"
                                     slotProps={{
                                       popper: { modifiers: [{ name: 'offset', options: { offset: [0, -8] } }] },
-                                      tooltip: { sx: { backgroundColor: alpha(theme.palette.Tooltip.bg, 1) } }
+                                      tooltip: { sx: { backgroundColor: theme.palette.grey[700] } }
                                     }}
                                   >
                                     <ListItemButton
@@ -492,7 +491,7 @@ export const Classification = React.memo(
                                   placement="bottom"
                                   slotProps={{
                                     popper: { modifiers: [{ name: 'offset', options: { offset: [0, -8] } }] },
-                                    tooltip: { sx: { backgroundColor: alpha(theme.palette.Tooltip.bg, 1) } }
+                                    tooltip: { sx: { backgroundColor: theme.palette.grey[700] } }
                                   }}
                                 >
                                   <ListItemButton
@@ -517,7 +516,7 @@ export const Classification = React.memo(
               <DialogActions>
                 <Button
                   color="secondary"
-                  to="/help/classification"
+                  nav={nav => nav.to().create({ route: '/help/classification' })}
                   variant="outlined"
                   onClick={() => setShowPicker(false)}
                 >

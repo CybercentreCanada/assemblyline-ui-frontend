@@ -2,6 +2,8 @@
   "E": "Élargie",
   "R": "Lecture",
   "W": "Écriture",
+  "app_route.admin_sitemap.fullname": "Administration Plan du site",
+  "app_route.admin_sitemap.shortname": "Plan du site",
   "caption": "chemins disponibles",
   "header.function": "Fonction",
   "header.methods": "Méthodes",

@@ -1,15 +1,14 @@
+import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined';
 import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import PauseCircleOutlineIcon from '@mui/icons-material/PauseCircleOutline';
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 import SpeedOutlinedIcon from '@mui/icons-material/SpeedOutlined';
 import type { CardProps, SwitchProps, TooltipProps } from '@mui/material';
 import { Card, Grid, Skeleton, styled, Switch, Tooltip, Typography, useTheme } from '@mui/material';
-import useMyAPI from 'core/api/hooks/useMyAPI';
-import useALContext from 'core/config/useALContext';
-import { useAppUser } from 'core/template/components/app/hooks';
-import PageFullWidth from 'core/template/components/pages/PageFullWidth';
-import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
-import type { CustomUser } from 'models/api/user';
+import { createAppRoute } from 'core/router';
+import { AppPageFullWidth } from 'core/template';
+import useALContext from 'deprecated/hooks/useALContext';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
 import type { AlerterMessage } from 'models/messages/alerter_heartbeat';
 import type { ArchiveMessage } from 'models/messages/archive_heartbeat';
 import type { DispatcherMessage } from 'models/messages/dispatcher_heartbeat';
@@ -21,13 +20,13 @@ import type { ScalerMessage } from 'models/messages/scaler_heartbeat';
 import type { ScalerStatusMessage } from 'models/messages/scaler_status_heartbeat';
 import type { ServiceMessage } from 'models/messages/service_heartbeat';
 import type { AnyActionArg, CSSProperties, ReactNode } from 'react';
-import React, { useEffect, useMemo, useReducer, useState } from 'react';
+import React, { memo, useEffect, useMemo, useReducer, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { bytesToSize, humanSeconds, sumValues } from 'shared/utils/utils';
 import io from 'socket.io-client';
 import ArcGauge from 'ui/ArcGauge';
 import type { CustomChipProps } from 'ui/CustomChip';
-import CustomChip from 'ui/CustomChip';
+import { CustomChip } from 'ui/CustomChip';
 
 const NAMESPACE = '/status';
 
@@ -115,7 +114,7 @@ type IngestCardProps = {
 const WrappedIngestCard = ({ ingester, status, handleStatusChange }: IngestCardProps) => {
   const { t } = useTranslation(['dashboard']);
   const theme = useTheme();
-  const { user: currentUser } = useAppUser<CustomUser>();
+  const { user: currentUser } = useALContext();
 
   const [timer, setTimer] = useState<NodeJS.Timeout>(null);
   const [error, setError] = useState<string>(null);
@@ -369,7 +368,7 @@ const WrappedDispatcherCard = ({ dispatcher, up, down, status, handleStatusChang
   const startQueue = dispatcher.queues.start.reduce((x, y) => x + y, 0);
   const resultQueue = dispatcher.queues.result.reduce((x, y) => x + y, 0);
   const commandQueue = dispatcher.queues.command.reduce((x, y) => x + y, 0);
-  const { user: currentUser } = useAppUser<CustomUser>();
+  const { user: currentUser } = useALContext();
 
   useEffect(() => {
     if (dispatcher.initialized && dispatcher.queues.ingest >= dispatcher.inflight.max / 10) {
@@ -1510,7 +1509,7 @@ const DEFAULT_RETROHUNT = {
   initialized: false
 } as RetrohuntMessage['msg'];
 
-const Dashboard = () => {
+export const DashboardPage = memo(() => {
   const { t } = useTranslation(['dashboard']);
   const { apiCall } = useMyAPI();
   const { configuration } = useALContext();
@@ -1569,14 +1568,14 @@ const Dashboard = () => {
     });
   }
 
-  useEffectOnce(() => {
+  useEffect(() => {
     reloadStatuses();
     const intervalID = setInterval(reloadStatuses, 30000);
 
     return () => {
       clearInterval(intervalID);
     };
-  });
+  }, []);
 
   const handleAlerterHeartbeat = (hb: AlerterMessage['msg']) => {
     // eslint-disable-next-line no-console
@@ -1639,7 +1638,7 @@ const Dashboard = () => {
     setServices({ type: 'scaler', hb });
   };
 
-  useEffectOnce(() => {
+  useEffect(() => {
     const socket = io(NAMESPACE);
 
     socket.on('connect', () => {
@@ -1669,10 +1668,10 @@ const Dashboard = () => {
     return () => {
       socket.disconnect();
     };
-  });
+  }, []);
 
   return (
-    <PageFullWidth margin={4}>
+    <AppPageFullWidth>
       <Typography gutterBottom color="primary" variant="h2" align="center">
         {t('title')}
       </Typography>
@@ -1757,8 +1756,21 @@ const Dashboard = () => {
             </Grid>
           ))}
       </Grid>
-    </PageFullWidth>
+    </AppPageFullWidth>
   );
-};
+});
 
-export default Dashboard;
+export const DashboardRoute = createAppRoute({
+  component: DashboardPage,
+
+  path: '/dashboard',
+
+  ancestor: null,
+  shortname: () => ['app_route.dashboard.shortname', { ns: 'dashboard' }],
+  fullname: () => ['app_route.dashboard.fullname', { ns: 'dashboard' }],
+  shorticon: () => <DashboardOutlinedIcon />,
+  fullicon: () => <DashboardOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
+});

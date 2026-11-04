@@ -1,13 +1,13 @@
 import ArchiveIcon from '@mui/icons-material/Archive';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
-import { AlertTitle, Box, IconButton, Skeleton, TableContainer, Tooltip, Typography, useTheme } from '@mui/material';
-import useMyAPI from 'core/api/hooks/useMyAPI';
-import useMySnackbar from 'core/snackbar/snackbar.hooks';
+import { AlertTitle, Box, Skeleton, TableContainer, Tooltip, Typography, useTheme } from '@mui/material';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useMySnackbar from 'deprecated/hooks/useMySnackbar';
 import type { File, SimilarResult, SimilarResults, SimilarType } from 'models/api/file';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
-import { safeFieldValueURI } from 'shared/utils/utils';
+import { safeFieldValue } from 'shared/utils/utils';
+import { IconButton } from 'ui/buttons/IconButton';
 import {
   GridLinkRow,
   GridTable,
@@ -74,11 +74,16 @@ const SimilarItem: React.FC<SimilarItemProps> = ({ data, drawer }) => {
         <div style={{ gridRow: 'span 2' }}>
           <Tooltip title={t('search.tooltip')} placement="left">
             <IconButton
-              component={Link}
               size="small"
-              to={`${DEFAULT_SIMILAR[data.type].prefix}${safeFieldValueURI(data.value)}${
-                DEFAULT_SIMILAR[data.type].suffix
-              }`}
+              nav={nav =>
+                nav
+                  .to()
+                  .create(
+                    `${DEFAULT_SIMILAR[data.type].prefix}${safeFieldValue(data.value)}${
+                      DEFAULT_SIMILAR[data.type].suffix
+                    }`
+                  )
+              }
               onClick={e => e.stopPropagation()}
               style={{ margin: `0 ${theme.spacing(0.5)}` }}
             >
@@ -122,7 +127,13 @@ const SimilarItem: React.FC<SimilarItemProps> = ({ data, drawer }) => {
               <GridLinkRow
                 key={`${data.type}-${data.value}-${j}`}
                 hover
-                to={item?.from_archive ? `/archive/${item?.sha256}` : `/file/detail/${item?.sha256}`}
+                nav={nav =>
+                  nav.to().create({
+                    route: item?.from_archive ? '/archive/:id' : '/file/detail/:id',
+                    path: { id: item?.sha256 }
+                  })
+                }
+                navDeps={[item?.from_archive, item?.sha256]}
               >
                 {hasArchived && (
                   <GridTableCell sx={{ '&.MuiTableCell-root>div': { justifyItems: 'flex-start' } }}>

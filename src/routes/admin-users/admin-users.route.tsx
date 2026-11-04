@@ -1,41 +1,29 @@
 import BlockIcon from '@mui/icons-material/Block';
 import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount';
+import SupervisorAccountOutlinedIcon from '@mui/icons-material/SupervisorAccountOutlined';
 import { useTheme } from '@mui/material';
-import useMyAPI from 'core/api/hooks/useMyAPI';
-import useALContext from 'core/config/useALContext';
-import PageContainer from 'core/template/branding/AppPageContainer';
-import PageFullWidth from 'core/template/components/pages/PageFullWidth';
-import { createSearchParams, SearchParamsProvider, useSearchParams } from 'features/SearchParams/createSearchParams';
+import { createAppRoute, useAppNavigate, useAppSearchSnapshot } from 'core/router';
+import { AppPageContainer, AppPageFullWidth } from 'core/template';
+import useALContext from 'deprecated/hooks/useALContext';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
 import type { SearchResult } from 'models/api/search';
 import type { IndexDefinition } from 'models/api/user';
 import type { UserIndexed } from 'models/base/user';
-import React, { useCallback, useEffect, useState } from 'react';
+import { memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate } from 'react-router';
-import { AddUserPage } from 'routes/admin-users/components/users_add';
-import UsersTable from 'routes/search/components/users';
+import AddUserPage from 'routes/admin-users/components/users_add';
+import { UsersTable } from 'routes/search/components/users';
 import { PageHeader } from 'ui/layouts/PageHeader';
 import { DEFAULT_SUGGESTION } from 'ui/SearchBar/search-textfield';
-import { SearchHeader } from 'ui/SearchBar/SearchHeader';
+import SearchHeader from 'ui/SearchBar/SearchHeader';
 
-const USERS_PARAMS = createSearchParams(p => ({
-  query: p.string(''),
-  offset: p.number(0).min(0).origin('snapshot').ephemeral(),
-  rows: p.number(25).locked().origin('snapshot').ephemeral(),
-  sort: p.string(null).nullable().ephemeral(),
-  filters: p.filters([]),
-  track_total_hits: p.number(10000).nullable().ephemeral(),
-  refresh: p.boolean(false).origin('snapshot').ephemeral()
-}));
-
-type UsersParams = typeof USERS_PARAMS;
-
-const UsersSearch = () => {
+export const AdminUsersPage = memo(() => {
   const { t } = useTranslation(['adminUsers']);
   const theme = useTheme();
   const { apiCall } = useMyAPI();
   const { user: currentUser } = useALContext();
-  const { search, setSearchParams, setSearchObject } = useSearchParams<UsersParams>();
+  const navigate = useAppNavigate<'/admin/users'>();
+  const search = useAppSearchSnapshot<'/admin/users'>();
 
   const [userResults, setUserResults] = useState<SearchResult<UserIndexed>>(null);
   const [searching, setSearching] = useState<boolean>(false);
@@ -43,12 +31,15 @@ const UsersSearch = () => {
 
   const handleToggleFilter = useCallback(
     (filter: string) => {
-      setSearchObject(o => {
-        const filters = o.filters.includes(filter) ? o.filters.filter(f => f !== filter) : [...o.filters, filter];
-        return { ...o, offset: 0, filters };
-      });
+      navigate.here().search(s =>
+        s.set(o => ({
+          ...o,
+          offset: 0,
+          filters: o.filters.includes(filter) ? o.filters.filter(f => f !== filter) : [...o.filters, filter]
+        }))
+      );
     },
-    [setSearchObject]
+    [navigate]
   );
 
   const handleReload = useCallback(
@@ -87,19 +78,17 @@ const UsersSearch = () => {
 
   useEffect(() => {
     function reload() {
-      setSearchObject(o => ({ ...o, offset: 0, refresh: !o.refresh }));
+      navigate.here().search(s => s.set(o => ({ ...o, offset: 0, refresh: !o.refresh })));
     }
 
     window.addEventListener('reloadUsers', reload);
     return () => {
       window.removeEventListener('reloadUsers', reload);
     };
-  }, [setSearchObject]);
+  }, [navigate]);
 
-  return !currentUser.is_admin ? (
-    <Navigate to="/forbidden" replace />
-  ) : (
-    <PageFullWidth margin={4}>
+  return (
+    <AppPageFullWidth>
       <PageHeader
         primary={t('title')}
         slotProps={{
@@ -109,7 +98,7 @@ const UsersSearch = () => {
         actions={<AddUserPage />}
       />
 
-      <PageContainer isSticky>
+      <AppPageContainer isSticky>
         <div style={{ paddingTop: theme.spacing(1) }}>
           <SearchHeader
             params={search.toParams()}
@@ -120,7 +109,11 @@ const UsersSearch = () => {
                 ? t(`filtered${userResults?.total === 1 ? '' : 's'}`)
                 : t(`total${userResults?.total === 1 ? '' : 's'}`)
             }
-            onChange={v => setSearchParams(v)}
+            onChange={v =>
+              navigate
+                .here()
+                .update(s => ({ ...s, search: { ...s.search, ...AdminUsersRoute.search.full(v).toObject() } }))
+            }
             paramDefaults={search.defaults().toObject()}
             searchInputProps={{ placeholder: t('filter'), options: suggestions }}
             actionProps={[
@@ -149,20 +142,35 @@ const UsersSearch = () => {
             ]}
           />
         </div>
-      </PageContainer>
+      </AppPageContainer>
 
       <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
         <UsersTable userResults={userResults} />
       </div>
-    </PageFullWidth>
+    </AppPageFullWidth>
   );
-};
+});
 
-const WrappedUsersPage = () => (
-  <SearchParamsProvider params={USERS_PARAMS}>
-    <UsersSearch />
-  </SearchParamsProvider>
-);
+export const AdminUsersRoute = createAppRoute({
+  component: AdminUsersPage,
 
-export const Users = React.memo(WrappedUsersPage);
-export default Users;
+  path: '/admin/users',
+  search: s => ({
+    query: s.string(''),
+    offset: s.number(0).min(0).source('transient').ephemeral(),
+    rows: s.number(25).locked().source('transient').ephemeral(),
+    sort: s.string(null).nullable().ephemeral(),
+    filters: s.filters([]),
+    track_total_hits: s.number(10000).nullable().ephemeral(),
+    refresh: s.boolean(false).source('transient').ephemeral()
+  }),
+
+  ancestor: '/admin',
+  shortname: () => ['app_route.admin_users.shortname', { ns: 'adminUsers' }],
+  fullname: () => ['app_route.admin_users.fullname', { ns: 'adminUsers' }],
+  shorticon: () => <SupervisorAccountOutlinedIcon />,
+  fullicon: () => <SupervisorAccountOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.is_admin
+});

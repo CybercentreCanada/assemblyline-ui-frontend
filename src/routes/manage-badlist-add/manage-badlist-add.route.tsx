@@ -1,3 +1,4 @@
+import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
 import {
   Button,
   Chip,
@@ -13,11 +14,11 @@ import {
   useTheme
 } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
-import useMyAPI from 'core/api/hooks/useMyAPI';
-import useALContext from 'core/config/useALContext';
-import useMySnackbar from 'core/snackbar/snackbar.hooks';
-import PageFullWidth from 'core/template/components/pages/PageFullWidth';
-import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
+import { createAppRoute, useAppBlocker, useAppNavigate } from 'core/router';
+import { AppPageFullWidth } from 'core/template';
+import useALContext from 'deprecated/hooks/useALContext';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useMySnackbar from 'deprecated/hooks/useMySnackbar';
 import type { Badlist } from 'models/base/badlist';
 import {
   ATTRIBUTION_TYPES,
@@ -26,28 +27,14 @@ import {
   DEFAULT_BADLIST_TAG,
   HASHES
 } from 'models/base/badlist';
-import { useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router';
-import ForbiddenPage from 'routes/forbidden/forbidden.route';
 import { HASH_MAP, MD5_REGEX, SHA1_REGEX, SHA256_REGEX, SSDEEP_REGEX, TLSH_REGEX } from 'shared/utils/constants';
 import Classification from 'ui/Classification';
 import DatePicker from 'ui/DatePicker';
-import { RouterPrompt } from 'ui/RouterPrompt';
 
-type ParamProps = {
-  id: string;
-};
-
-type Props = {
-  badlist_id?: string;
-  close?: () => void;
-};
-
-// eslint-disable-next-line no-empty-pattern
-const BadlistNew = ({}: Props) => {
+export const ManageBadlistAddPage = memo(() => {
   const { t } = useTranslation(['manageBadlistAdd']);
-  const { id } = useParams<ParamProps>();
   const theme = useTheme();
   const [badlist, setBadlist] = useState<Badlist>(DEFAULT_BADLIST);
   const [waiting, setWaiting] = useState<boolean>(false);
@@ -59,9 +46,11 @@ const BadlistNew = ({}: Props) => {
   const { user: currentUser, c12nDef, indexes } = useALContext();
   const { showSuccessMessage } = useMySnackbar();
   const { apiCall } = useMyAPI();
-  const navigate = useNavigate();
+  const navigate = useAppNavigate();
 
-  useEffectOnce(() => {
+  useAppBlocker(() => (modified ? 'unsaved_changes' : null), [modified]);
+
+  useEffect(() => {
     const tempTags = Object.keys(indexes.result)
       .filter(k => k.indexOf('result.sections.tags') !== -1)
       .map(k => k.slice(21));
@@ -78,7 +67,7 @@ const BadlistNew = ({}: Props) => {
       onEnter: () => setWaiting(true),
       onExit: () => setWaiting(false)
     });
-  });
+  }, []);
 
   useEffect(() => {
     // If there are no type selected
@@ -184,7 +173,7 @@ const BadlistNew = ({}: Props) => {
         setModified(false);
         showSuccessMessage(t('add.success'));
         setTimeout(() => {
-          navigate(`/manage/badlist#${resp.api_response.hash}`);
+          navigate.here().create({ route: '/manage/badlist/detail/:id', path: { id: resp.api_response.hash } });
           window.dispatchEvent(new CustomEvent('reloadBadlist'));
         }, 1000);
       },
@@ -198,31 +187,19 @@ const BadlistNew = ({}: Props) => {
     setBadlist({ ...badlist, ...extras, type: event.target.value });
   };
 
-  return currentUser.roles.includes('badlist_view') ? (
-    <PageFullWidth margin={!id ? 2 : 4}>
-      <RouterPrompt when={modified} />
-      <div
-        style={{
-          alignItems: 'start',
-          display: 'flex',
-          float: 'right',
-          marginTop: theme.spacing(-8),
-          marginRight: theme.spacing(-1),
-          position: 'sticky',
-          top: theme.spacing(2),
-          zIndex: 10
-        }}
-      >
-        <Button variant="contained" onClick={saveBadlist} disabled={!ready || waiting}>
-          {t('save')}
-          {waiting && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
-        </Button>
-      </div>
+  return (
+    <AppPageFullWidth>
       <Grid container spacing={2}>
         <Grid size={{ xs: 'grow' }}>
           <Typography variant="h4">{t('title')}</Typography>
         </Grid>
-        <Grid size={{ xs: 12, md: 'auto' }} alignSelf="end">
+        <Grid size={{ xs: 'auto' }}>
+          <Button variant="contained" onClick={saveBadlist} disabled={!ready || waiting}>
+            {t('save')}
+            {waiting && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
+          </Button>
+        </Grid>
+        <Grid size={{ xs: 12 }} alignSelf="end" sx={{ display: 'flex', justifyContent: 'end' }}>
           <FormControl required>
             <FormLabel id="type-radio-buttons-group-label">{t('type.title')}</FormLabel>
             <RadioGroup
@@ -432,10 +409,21 @@ const BadlistNew = ({}: Props) => {
           </>
         )}
       </Grid>
-    </PageFullWidth>
-  ) : (
-    <ForbiddenPage />
+    </AppPageFullWidth>
   );
-};
+});
 
-export default BadlistNew;
+export const ManageBadlistAddRoute = createAppRoute({
+  component: ManageBadlistAddPage,
+
+  path: '/manage/badlist/add',
+
+  ancestor: '/manage/badlists',
+  shortname: () => ['app_route.manage_badlist_add.shortname', { ns: 'manageBadlistAdd' }],
+  fullname: () => ['app_route.manage_badlist_add.fullname', { ns: 'manageBadlistAdd' }],
+  shorticon: () => <BugReportOutlinedIcon />,
+  fullicon: () => <BugReportOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.roles.includes('badlist_view')
+});

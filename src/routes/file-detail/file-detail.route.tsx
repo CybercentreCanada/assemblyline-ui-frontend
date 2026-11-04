@@ -1,4 +1,5 @@
 import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
+import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import OndemandVideoOutlinedIcon from '@mui/icons-material/OndemandVideoOutlined';
@@ -8,20 +9,17 @@ import TuneOutlinedIcon from '@mui/icons-material/TuneOutlined';
 import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
 import { List, ListItemButton, ListItemIcon, ListItemText, Popover, useTheme } from '@mui/material';
-import useMyAPI from 'core/api/hooks/useMyAPI';
-import useALContext from 'core/config/useALContext';
-import useMySnackbar from 'core/snackbar/snackbar.hooks';
-import { useAppUser } from 'core/template/components/app/hooks';
-import useAssistant from 'layout/assistant/assistant.hooks';
-import useDrawer from 'layout/drawer/drawer.hooks';
+import { AppLink, createAppRoute, useAppNavigate, useAppPathParams, useAppSearchSnapshot } from 'core/router';
+import { AppPageCenter } from 'core/template';
+import useALContext from 'deprecated/hooks/useALContext';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useMySnackbar from 'deprecated/hooks/useMySnackbar';
+import { useAssistant } from 'layout/assistant';
 import type { File } from 'models/api/file';
-import type { CustomUser } from 'models/api/user';
 import type { Error } from 'models/base/error';
 import type { Submission } from 'models/base/submission';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router';
-import { Link } from 'react-router-dom';
 import AttackSection from 'routes/file-detail/components/attacks';
 import ChildrenSection from 'routes/file-detail/components/childrens';
 import Detection from 'routes/file-detail/components/detection';
@@ -29,15 +27,12 @@ import EmptySection from 'routes/file-detail/components/emptys';
 import ErrorSection from 'routes/file-detail/components/errors';
 import FrequencySection from 'routes/file-detail/components/frequency';
 import IdentificationSection from 'routes/file-detail/components/ident';
-import MetadataSection from 'routes/file-detail/components/metadata';
+import { default as MetadataSection } from 'routes/file-detail/components/metadata';
 import ParentSection from 'routes/file-detail/components/parents';
 import ResultSection from 'routes/file-detail/components/results';
 import TagSection from 'routes/file-detail/components/tags';
 import URIIdentificationSection from 'routes/file-detail/components/uriIdent';
-import { DEFAULT_TAB, TAB_OPTIONS } from 'routes/file-viewer/file-viewer.route';
-import ForbiddenPage from 'routes/forbidden/forbidden.route';
-import HeuristicDetail from 'routes/manage-heuristic-detail/manage-heuristic-detail.route';
-import SignatureDetail from 'routes/manage-signature-detail/manage-signature-detail.route';
+import { ForbiddenPage } from 'routes/forbidden/forbidden';
 import AISummarySection from 'routes/submission-detail/components/ai_summary';
 import { FileDownloader } from 'ui/buttons/FileDownloader';
 import { IconButton } from 'ui/buttons/IconButton';
@@ -46,35 +41,16 @@ import InputDialog from 'ui/InputDialog';
 import { PageHeader } from 'ui/layouts/PageHeader';
 import { emptyResult } from 'ui/ResultCard';
 
-type Props = {
-  sha256: string;
-  sid?: string;
-  metadata?: Record<string, string>;
-  liveResultKeys?: string[];
-  liveErrors?: Error[];
-  force?: boolean;
-  filetype_override?: string;
-};
-
-const WrappedFileDetail: React.FC<Props> = ({
-  sha256,
-  sid = null,
-  metadata = null,
-  liveResultKeys = null,
-  liveErrors = null,
-  force = false,
-  filetype_override = null
-}) => {
+const FileDetailPage = memo(() => {
   const { t } = useTranslation(['fileDetail']);
   const theme = useTheme();
-  const location = useLocation();
-  const navigate = useNavigate();
+  const { id: sha256 } = useAppPathParams<'/file/detail/:id'>();
+  const search = useAppSearchSnapshot<'/file/detail/:id'>();
+  const navigate = useAppNavigate();
   const { apiCall } = useMyAPI();
-  const { c12nDef, configuration, settings } = useALContext();
-  const { user: currentUser } = useAppUser<CustomUser>();
+  const { user: currentUser, configuration, settings } = useALContext();
   const { showSuccessMessage } = useMySnackbar();
   const { addInsight, removeInsight } = useAssistant();
-  const { setGlobalDrawer, globalDrawerOpened } = useDrawer();
 
   const [file, setFile] = useState<File | null>(null);
   const [safelistDialog, setSafelistDialog] = useState<boolean>(false);
@@ -84,14 +60,26 @@ const WrappedFileDetail: React.FC<Props> = ({
   const [waitingDialog, setWaitingDialog] = useState<boolean>(false);
   const [resubmitAnchor, setResubmitAnchor] = useState(null);
   const [promotedSections, setPromotedSections] = useState([]);
-  const [insideDrawer, setInsideDrawer] = useState<boolean>(null);
-  const [loaded, setLoaded] = useState<boolean>(false);
-  const [heuristics, setHeuristics] = useState<string[]>([]);
+
+  const fileName = useMemo(() => (file ? search.get('name') || sha256 : null), [file, search?.toString(), sha256]);
+
+  const filetypeOverride = useMemo(
+    () => search?.get('filetypeOverride'),
+    [search?.get('filetypeOverride')?.toString()]
+  );
+  const force = useMemo(() => search?.get('force'), [search?.get('force')?.toString()]);
+
+  const liveErrors = useMemo(() => search?.get('liveErrors'), [search?.get('liveErrors')?.toString()]);
+
+  const liveResultKeys = useMemo(() => search?.get('liveResultKeys'), [search?.get('liveResultKeys')?.toString()]);
+
+  const metadata = useMemo(() => search?.get('metadata'), [search?.get('metadata')?.toString()]);
+
+  const sid = useMemo(() => search?.get('sid'), [search?.get('sid')?.toString()]);
 
   const ref = useRef(null);
 
   const sp2 = useMemo(() => theme.spacing(2), [theme]);
-  const sp4 = useMemo(() => theme.spacing(4), [theme]);
 
   const popoverOpen = Boolean(resubmitAnchor);
 
@@ -103,31 +91,12 @@ const WrappedFileDetail: React.FC<Props> = ({
     return profileMap;
   }, [configuration]);
 
-  const params = useMemo(() => new URLSearchParams(location.search), [location.search]);
-  const fileName = useMemo(() => (file ? params.get('name') || sha256 : null), [file, params, sha256]);
-
-  const fileViewerPath = useMemo<string>(() => {
-    const tab = TAB_OPTIONS.find(option => location.pathname.indexOf(option) >= 0);
-    if (!location.pathname.startsWith('/file/viewer') || !tab)
-      return `/file/viewer/${file?.file_info?.sha256}/${DEFAULT_TAB}/${location.search}${location.hash}`;
-    else return `/file/viewer/${file?.file_info?.sha256}/${tab}/${location.search}${location.hash}`;
-  }, [file?.file_info?.sha256, location.hash, location.pathname, location.search]);
-
   const patchFileDetails = (data: File) => {
     const newData = { ...data };
     newData.results.sort((a, b) => (a.response.service_name > b.response.service_name ? 1 : -1));
     newData.emptys = data.results.filter(result => emptyResult(result));
     newData.results = data.results.filter(result => !emptyResult(result));
     newData.errors = liveErrors ? [...data.errors, ...liveErrors] : data.errors;
-
-    // Compile a simplified list of heuristics for later reference
-    const heurs = [];
-    Object.values(newData?.heuristics || {}).map(hs => {
-      hs.map(h => {
-        heurs.push(h[0]);
-      });
-    });
-    setHeuristics(heurs);
     return newData;
   };
 
@@ -139,7 +108,7 @@ const WrappedFileDetail: React.FC<Props> = ({
         onSuccess: api_data => {
           showSuccessMessage(t('resubmit.success'));
           setTimeout(() => {
-            navigate(`/submission/detail/${api_data.api_response.sid}`);
+            navigate.to().create({ route: '/submission/detail/:id', path: { id: api_data.api_response.sid } });
           }, 500);
         }
       });
@@ -316,247 +285,263 @@ const WrappedFileDetail: React.FC<Props> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [file]);
 
-  useEffect(() => {
-    setInsideDrawer(document.getElementById('drawerContent')?.contains(ref.current) || false);
-  }, [file]);
-
-  useEffect(() => {
-    if (insideDrawer === false) {
-      setLoaded(true);
-      if (!location.hash) {
-        setGlobalDrawer(null);
-      } else if (file) {
-        // Set the drawer content based on the hash
-        const id = location.hash.slice(1);
-        if (heuristics.includes(id)) {
-          setGlobalDrawer(<HeuristicDetail heur_id={id} />);
-        } else {
-          setGlobalDrawer(<SignatureDetail signature_id={id} />);
-        }
-      }
-    }
-  }, [insideDrawer, location.hash, setGlobalDrawer, file]);
-
-  useEffect(() => {
-    if (loaded && insideDrawer === false && !globalDrawerOpened && location.hash) {
-      navigate(`${location.pathname}${location.search ? location.search : ''}`);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [insideDrawer, globalDrawerOpened]);
-
   return currentUser.roles.includes('submission_view') ? (
-    <div id="fileDetailTop" ref={ref} style={{ textAlign: 'left' }}>
-      <InputDialog
-        open={safelistDialog}
-        handleClose={() => setSafelistDialog(false)}
-        handleAccept={addToSafelist}
-        handleInputChange={event => setSafelistReason(event.target.value)}
-        inputValue={safelistReason}
-        title={t('safelist.title')}
-        cancelText={t('safelist.cancelText')}
-        acceptText={t('safelist.acceptText')}
-        inputLabel={t('safelist.input')}
-        text={t('safelist.text')}
-        waiting={waitingDialog}
-        extra={
-          <Classification
-            size="tiny"
-            type="outlined"
-            c12n={file?.file_info?.classification ? file.file_info.classification : null}
-          />
-        }
-      />
-      <InputDialog
-        open={badlistDialog}
-        handleClose={() => setBadlistDialog(false)}
-        handleAccept={addToBadlist}
-        handleInputChange={event => setBadlistReason(event.target.value)}
-        inputValue={badlistReason}
-        title={t('badlist.title')}
-        cancelText={t('badlist.cancelText')}
-        acceptText={t('badlist.acceptText')}
-        inputLabel={t('badlist.input')}
-        text={t('badlist.text')}
-        waiting={waitingDialog}
-        extra={
-          <Classification
-            size="tiny"
-            type="outlined"
-            c12n={file?.file_info?.classification ? file.file_info.classification : null}
-          />
-        }
-      />
-
-      <PageHeader
-        classification={() => file.classification}
-        primary={file?.file_info?.type.startsWith('uri/') ? t('uri_title') : t('title')}
-        secondary={() =>
-          file?.file_info?.type.startsWith('uri/') && file?.file_info?.uri_info?.uri
-            ? file?.file_info?.uri_info?.uri
-            : fileName
-        }
-        secondaryLoading={!file}
-        slotProps={{ root: { style: { marginBottom: theme.spacing(2) } } }}
-        actions={
-          <>
-            <IconButton
-              component={Link}
-              loading={!file}
-              size="large"
-              to={
-                !file
-                  ? null
-                  : `/search/submission?query=files.sha256:${file.file_info.sha256} OR results:${file.file_info.sha256}* OR errors:${file.file_info.sha256}*`
-              }
-              tooltip={t('related')}
-            >
-              <ViewCarouselOutlinedIcon />
-            </IconButton>
-            <FileDownloader
-              link={() =>
-                `/api/v4/file/download/${file.file_info.sha256}/?${
-                  fileName && file.file_info.sha256 !== fileName ? `name=${encodeURIComponent(fileName)}&` : ''
-                }${sid ? `sid=${sid}&` : ''}`
-              }
-              loading={!file}
-              preventRender={!currentUser.roles.includes('file_download')}
-              tooltip={t('download')}
+    <AppPageCenter>
+      <div id="fileDetailTop" ref={ref} style={{ textAlign: 'left' }}>
+        <InputDialog
+          open={safelistDialog}
+          handleClose={() => setSafelistDialog(false)}
+          handleAccept={addToSafelist}
+          handleInputChange={event => setSafelistReason(event.target.value)}
+          inputValue={safelistReason}
+          title={t('safelist.title')}
+          cancelText={t('safelist.cancelText')}
+          acceptText={t('safelist.acceptText')}
+          inputLabel={t('safelist.input')}
+          text={t('safelist.text')}
+          waiting={waitingDialog}
+          extra={
+            <Classification
+              size="tiny"
+              type="outlined"
+              c12n={file?.file_info?.classification ? file.file_info.classification : null}
             />
-            <IconButton
-              component={Link}
-              loading={!file}
-              size="large"
-              to={fileViewerPath}
-              tooltip={t('file_viewer')}
-              preventRender={
-                !currentUser.roles.includes('file_detail') ||
-                (file?.file_info?.type.startsWith('uri/') && !currentUser.is_admin)
-              }
-            >
-              <PageviewOutlinedIcon />
-            </IconButton>
-            <IconButton
-              loading={!file}
-              size="large"
-              tooltip={t('resubmit')}
-              preventRender={!currentUser.roles.includes('submission_create')}
-              onClick={event => setResubmitAnchor(event.currentTarget)}
-            >
-              <ReplayOutlinedIcon />
-              {popoverOpen ? (
-                <ExpandLessIcon style={{ position: 'absolute', right: 0, bottom: 10, fontSize: 'medium' }} />
-              ) : (
-                <ExpandMoreIcon style={{ position: 'absolute', right: 0, bottom: 10, fontSize: 'medium' }} />
-              )}
-            </IconButton>
-            {!file || !currentUser.roles.includes('submission_create') ? null : (
-              <Popover
-                open={popoverOpen}
-                anchorEl={resubmitAnchor}
-                onClose={() => setResubmitAnchor(null)}
-                anchorOrigin={{
-                  vertical: 'bottom',
-                  horizontal: 'right'
-                }}
-                transformOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right'
-                }}
-              >
-                <List disablePadding>
-                  <ListItemButton
-                    component={Link}
-                    to={`/submit?hash=${file.file_info.sha256}`}
-                    state={{
-                      c12n: file.file_info.classification,
-                      metadata: metadata,
-                      params: {
-                        filetype_override: filetype_override
-                      }
-                    }}
-                    dense
-                    onClick={() => setResubmitAnchor(null)}
-                  >
-                    <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
-                      <TuneOutlinedIcon />
-                    </ListItemIcon>
-                    <ListItemText primary={t('resubmit.modify')} />
-                  </ListItemButton>
-                  <ListItemButton dense onClick={() => resubmit('dynamic', false)}>
-                    <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
-                      <OndemandVideoOutlinedIcon />
-                    </ListItemIcon>
-                    <ListItemText primary={t('resubmit.dynamic')} />
-                  </ListItemButton>
-                  {submissionProfiles &&
-                    Object.entries(submissionProfiles).map(([name, display]) => (
-                      <ListItemButton key={name} dense onClick={() => resubmit(name, true)}>
-                        <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
-                          <OndemandVideoOutlinedIcon />
-                        </ListItemIcon>
-                        <ListItemText primary={`${t('resubmit.with')} "${display}"`} />
-                      </ListItemButton>
-                    ))}
-                </List>
-              </Popover>
-            )}
-            <IconButton
-              loading={!file}
-              size="large"
-              tooltip={t('safelist')}
-              preventRender={!currentUser.roles.includes('safelist_manage')}
-              onClick={prepareSafelist}
-            >
-              <VerifiedUserOutlinedIcon />
-            </IconButton>
-            <IconButton
-              loading={!file}
-              size="large"
-              tooltip={t('badlist')}
-              preventRender={!currentUser.roles.includes('badlist_manage')}
-              onClick={prepareBadlist}
-            >
-              <BugReportOutlinedIcon />
-            </IconButton>
-          </>
-        }
-      />
-
-      <div style={{ paddingBottom: sp2 }}>
-        {file?.file_info?.type.startsWith('uri/') ? (
-          <URIIdentificationSection fileinfo={file ? file.file_info : null} promotedSections={promotedSections} />
-        ) : (
-          <IdentificationSection
-            fileinfo={file ? file.file_info : null}
-            promotedSections={promotedSections}
-            filetype_override={filetype_override}
-          />
-        )}
-        <FrequencySection seen={file ? file.file_info?.seen : null} />
-        <MetadataSection metadata={file ? file.metadata : null} />
-        {configuration.ui.ai.enabled && settings.executive_summary && !liveErrors && !liveResultKeys && (
-          <AISummarySection type="file" id={file ? file.file_info.sha256 : null} />
-        )}
-        <ChildrenSection childrens={file ? file.childrens : null} />
-        <ParentSection parents={file ? file.parents : null} />
-        <Detection results={file ? file.results : null} heuristics={file ? file.heuristics : null} force={force} />
-        <AttackSection attacks={file ? file.attack_matrix : null} force={force} />
-        <TagSection signatures={file ? file.signatures : null} tags={file ? file.tags : null} force={force} />
-        <ResultSection
-          results={file ? file.results : null}
-          sid={sid}
-          alternates={file ? file.alternates : null}
-          force={force}
+          }
         />
-        <EmptySection emptys={file ? file.emptys : null} sid={sid} />
-        <ErrorSection errors={file ? file.errors : null} />
+        <InputDialog
+          open={badlistDialog}
+          handleClose={() => setBadlistDialog(false)}
+          handleAccept={addToBadlist}
+          handleInputChange={event => setBadlistReason(event.target.value)}
+          inputValue={badlistReason}
+          title={t('badlist.title')}
+          cancelText={t('badlist.cancelText')}
+          acceptText={t('badlist.acceptText')}
+          inputLabel={t('badlist.input')}
+          text={t('badlist.text')}
+          waiting={waitingDialog}
+          extra={
+            <Classification
+              size="tiny"
+              type="outlined"
+              c12n={file?.file_info?.classification ? file.file_info.classification : null}
+            />
+          }
+        />
+
+        <PageHeader
+          classification={() => file.classification}
+          primary={file?.file_info?.type.startsWith('uri/') ? t('uri_title') : t('title')}
+          secondary={() =>
+            file?.file_info?.type.startsWith('uri/') && file?.file_info?.uri_info?.uri
+              ? file?.file_info?.uri_info?.uri
+              : fileName
+          }
+          secondaryLoading={!file}
+          slotProps={{ root: { style: { marginBottom: theme.spacing(2) } } }}
+          actions={
+            <>
+              <IconButton
+                loading={!file}
+                size="large"
+                nav={
+                  !file
+                    ? null
+                    : nav =>
+                        nav.to().create({
+                          route: '/search/:index',
+                          path: { index: 'submission' },
+                          search: {
+                            query: `files.sha256:${file.file_info.sha256} OR results:${file.file_info.sha256}* OR errors:${file.file_info.sha256}*`
+                          }
+                        })
+                }
+                navDeps={[file?.file_info?.sha256]}
+                tooltip={t('related')}
+              >
+                <ViewCarouselOutlinedIcon />
+              </IconButton>
+              <FileDownloader
+                link={() =>
+                  `/api/v4/file/download/${file.file_info.sha256}/?${
+                    fileName && file.file_info.sha256 !== fileName ? `name=${encodeURIComponent(fileName)}&` : ''
+                  }${sid ? `sid=${sid}&` : ''}`
+                }
+                loading={!file}
+                preventRender={!currentUser.roles.includes('file_download')}
+                tooltip={t('download')}
+              />
+              <IconButton
+                loading={!file}
+                size="large"
+                nav={nav =>
+                  nav.to().create(prev => ({
+                    route: '/file/viewer/:id/:tab',
+                    path: {
+                      id: file?.file_info?.sha256,
+                      tab: prev.route === '/file/viewer/:id/:tab' ? prev.path.tab : null
+                    }
+                  }))
+                }
+                navDeps={[file?.file_info?.sha256]}
+                tooltip={t('file_viewer')}
+                preventRender={
+                  !currentUser.roles.includes('file_detail') ||
+                  (file?.file_info?.type.startsWith('uri/') && !currentUser.is_admin)
+                }
+              >
+                <PageviewOutlinedIcon />
+              </IconButton>
+              <IconButton
+                loading={!file}
+                size="large"
+                tooltip={t('resubmit')}
+                preventRender={!currentUser.roles.includes('submission_create')}
+                onClick={event => setResubmitAnchor(event.currentTarget)}
+              >
+                <ReplayOutlinedIcon />
+                {popoverOpen ? (
+                  <ExpandLessIcon style={{ position: 'absolute', right: 0, bottom: 10, fontSize: 'medium' }} />
+                ) : (
+                  <ExpandMoreIcon style={{ position: 'absolute', right: 0, bottom: 10, fontSize: 'medium' }} />
+                )}
+              </IconButton>
+              {!file || !currentUser.roles.includes('submission_create') ? null : (
+                <Popover
+                  open={popoverOpen}
+                  anchorEl={resubmitAnchor}
+                  onClose={() => setResubmitAnchor(null)}
+                  anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'right'
+                  }}
+                  transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right'
+                  }}
+                >
+                  <List disablePadding>
+                    <ListItemButton
+                      component={AppLink}
+                      nav={nav =>
+                        nav.to().create({
+                          route: '/submit',
+                          search: {
+                            classification: file.file_info.classification,
+                            filetypeOverride: filetypeOverride,
+                            hash: file.file_info.sha256,
+                            metadata: metadata
+                          }
+                        })
+                      }
+                      navDeps={[file.file_info.sha256, file.file_info.classification, metadata]}
+                      dense
+                      onClick={() => setResubmitAnchor(null)}
+                    >
+                      <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
+                        <TuneOutlinedIcon />
+                      </ListItemIcon>
+                      <ListItemText primary={t('resubmit.modify')} />
+                    </ListItemButton>
+                    <ListItemButton dense onClick={() => resubmit('dynamic', false)}>
+                      <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
+                        <OndemandVideoOutlinedIcon />
+                      </ListItemIcon>
+                      <ListItemText primary={t('resubmit.dynamic')} />
+                    </ListItemButton>
+                    {submissionProfiles &&
+                      Object.entries(submissionProfiles).map(([name, display]) => (
+                        <ListItemButton key={name} dense onClick={() => resubmit(name, true)}>
+                          <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
+                            <OndemandVideoOutlinedIcon />
+                          </ListItemIcon>
+                          <ListItemText primary={`${t('resubmit.with')} "${display}"`} />
+                        </ListItemButton>
+                      ))}
+                  </List>
+                </Popover>
+              )}
+              <IconButton
+                loading={!file}
+                size="large"
+                tooltip={t('safelist')}
+                preventRender={!currentUser.roles.includes('safelist_manage')}
+                onClick={prepareSafelist}
+              >
+                <VerifiedUserOutlinedIcon />
+              </IconButton>
+              <IconButton
+                loading={!file}
+                size="large"
+                tooltip={t('badlist')}
+                preventRender={!currentUser.roles.includes('badlist_manage')}
+                onClick={prepareBadlist}
+              >
+                <BugReportOutlinedIcon />
+              </IconButton>
+            </>
+          }
+        />
+
+        <div style={{ paddingBottom: sp2 }}>
+          {file?.file_info?.type.startsWith('uri/') ? (
+            <URIIdentificationSection fileinfo={file ? file.file_info : null} promotedSections={promotedSections} />
+          ) : (
+            <IdentificationSection
+              fileinfo={file ? file.file_info : null}
+              promotedSections={promotedSections}
+              filetypeOverride={filetypeOverride}
+            />
+          )}
+          <FrequencySection seen={file ? file.file_info?.seen : null} />
+          <MetadataSection metadata={file ? file.metadata : null} />
+          {configuration.ui.ai.enabled && settings.executive_summary && !liveErrors && !liveResultKeys && (
+            <AISummarySection type="file" id={file ? file.file_info.sha256 : null} />
+          )}
+          <ChildrenSection childrens={file ? file.childrens : null} />
+          <ParentSection parents={file ? file.parents : null} />
+          <Detection results={file ? file.results : null} heuristics={file ? file.heuristics : null} force={force} />
+          <AttackSection attacks={file ? file.attack_matrix : null} force={force} />
+          <TagSection signatures={file ? file.signatures : null} tags={file ? file.tags : null} force={force} />
+          <ResultSection
+            results={file ? file.results : null}
+            sid={sid}
+            alternates={file ? file.alternates : null}
+            force={force}
+          />
+          <EmptySection emptys={file ? file.emptys : null} sid={sid} />
+          <ErrorSection errors={file ? file.errors : null} />
+        </div>
       </div>
-    </div>
+    </AppPageCenter>
   ) : (
     <ForbiddenPage />
   );
-};
+});
 
-const FileDetail = React.memo(WrappedFileDetail);
+export const FileDetailRoute = createAppRoute({
+  component: FileDetailPage,
 
-export default FileDetail;
+  path: '/file/detail/:id',
+  params: s => ({
+    id: s.string()
+  }),
+  search: s => ({
+    filetypeOverride: s.string(null).source('transient'),
+    force: s.boolean(false).source('transient'),
+    liveErrors: s.object(null as Error[]).source('transient'),
+    liveResultKeys: s.object(null as string[]).source('transient'),
+    metadata: s.object(null as Record<string, string>).source('transient'),
+    name: s.string(null),
+    sid: s.string(null).source('transient')
+  }),
+
+  ancestor: null,
+  shortname: location => ['app_route.file_detail.shortname', { ns: 'fileDetail', id: location.path.id }],
+  fullname: location => ['app_route.file_detail.fullname', { ns: 'fileDetail', id: location.path.id }],
+  shorticon: () => <DescriptionOutlinedIcon />,
+  fullicon: () => <DescriptionOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.roles.includes('submission_view')
+});

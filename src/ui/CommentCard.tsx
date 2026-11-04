@@ -15,8 +15,8 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
-import useALContext from 'core/config/useALContext';
-import { AppUserAvatar } from 'core/template/components/topnav/UserProfile';
+import { AppUserAvatar } from '@tui/core';
+import useALContext from 'deprecated/hooks/useALContext';
 import type { Author, Comment, ReactionType } from 'models/base/file';
 import { REACTIONS_TYPES } from 'models/base/file';
 import React, { useCallback, useMemo } from 'react';
@@ -223,7 +223,7 @@ const WrappedCommentCard: React.FC<Props> = ({
                       slotProps={{
                         tooltip: {
                           sx: {
-                            backgroundColor: theme.palette.grey[theme.palette.mode === 'dark' ? 700 : 500],
+                            backgroundColor: theme.palette.background.paper,
                             margin: `${theme.spacing(0.5)} !important`
                           }
                         }
@@ -236,7 +236,7 @@ const WrappedCommentCard: React.FC<Props> = ({
                         sx={{
                           display: 'flex',
                           alignItems: 'center',
-                          backgroundColor: theme.palette.background.default,
+                          backgroundColor: theme.palette.background.paper,
                           borderRadius: '4px',
                           boxShadow: theme.shadows[4]
                           // border: '1px solid black'
@@ -351,7 +351,7 @@ const WrappedCommentCard: React.FC<Props> = ({
             padding: `0px ${theme.spacing(1)}`,
             justifyContent: 'flex-start',
             ...(isCurrentUser && { justifyContent: 'flex-end' }),
-            ...(hasReactions && { margin: `-${theme.spacing(1)} 0px`, transform: `translateY(${theme.spacing(2)})` })
+            ...(hasReactions && { transform: `translateY(${theme.spacing(-1)})` })
           }}
         >
           {Object.entries(reactions).map(
@@ -364,7 +364,7 @@ const WrappedCommentCard: React.FC<Props> = ({
                     <List
                       sx={{
                         borderRadius: '4px',
-                        backgroundColor: theme.palette.background.default,
+                        backgroundColor: theme.palette.background.paper,
                         boxShadow: theme.shadows[4]
                       }}
                       dense={true}
@@ -372,7 +372,7 @@ const WrappedCommentCard: React.FC<Props> = ({
                         <ListSubheader
                           sx={{
                             borderRadius: '4px',
-                            backgroundColor: theme.palette.background.default,
+                            backgroundColor: theme.palette.background.paper,
                             lineHeight: '36px'
                           }}
                         >

@@ -1,8 +1,8 @@
 import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
 import { AlertTitle, Box, IconButton, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
+import { AppLink } from 'core/router';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
 import InformativeAlert from 'ui/InformativeAlert';
 import SectionContainer from 'ui/SectionContainer';
 
@@ -61,8 +61,9 @@ const WrappedParentSection: React.FC<ParentSectionProps> = ({
             return (
               <Box
                 key={i}
-                component={Link}
-                to={`/file/detail/${parentSHA256}`}
+                component={AppLink}
+                nav={nav => nav.to().create({ route: '/file/detail/:id', path: { id: parentSHA256 } })}
+                navDeps={[parentSHA256]}
                 style={{ wordBreak: 'break-word' }}
                 sx={{
                   wordBreak: 'break-word',

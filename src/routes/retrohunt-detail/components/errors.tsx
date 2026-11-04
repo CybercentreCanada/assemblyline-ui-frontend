@@ -3,11 +3,9 @@ import WarningAmberOutlinedIcon from '@mui/icons-material/WarningAmberOutlined';
 import { AlertTitle, Divider, Grid, Pagination, Paper, Skeleton, Typography, useTheme } from '@mui/material';
 import LinearProgress from '@mui/material/LinearProgress';
 import TableContainer from '@mui/material/TableContainer';
-import useMyAPI from 'core/api/hooks/useMyAPI';
-import useALContext from 'core/config/useALContext';
-import { useAppUser } from 'core/template/components/app/hooks';
+import useALContext from 'deprecated/hooks/useALContext';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
 import type { SearchResult } from 'models/api/search';
-import type { CustomUser } from 'models/api/user';
 import type { Retrohunt } from 'models/base/retrohunt';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -43,8 +41,7 @@ const WrappedRetrohuntErrors = ({ retrohunt = null, isDrawer = false }: Props) =
   const { t } = useTranslation(['retrohunt']);
   const theme = useTheme();
   const { apiCall } = useMyAPI();
-  const { configuration } = useALContext();
-  const { user: currentUser } = useAppUser<CustomUser>();
+  const { configuration, user: currentUser } = useALContext();
 
   const [errorResults, setErrorResults] = useState<SearchResult<Error>>(null);
   const [query, setQuery] = useState<SimpleSearchQuery>(new SimpleSearchQuery(DEFAULT_QUERY));

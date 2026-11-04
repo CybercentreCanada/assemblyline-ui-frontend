@@ -4,31 +4,23 @@ import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { Box, Button, Collapse, Divider, IconButton, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
-import useHighlighter from 'layout/highlighter/highlighter.hooks';
-import useSafeResults from 'layout/safe-results/safe-results.hooks';
+import { AppLink } from 'core/router';
+import useSafeResults from 'deprecated/hooks/useSafeResults';
+import { useAppAreKeysHighlighted } from 'layout/highlighter';
 import type { SubmissionTree, Tree } from 'models/api/submission';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
-import { Link } from 'react-router-dom';
+import { getFileTreeKeys, isFileTreeItemVisible } from 'routes/submission-detail/submission-detail.utils';
 import Verdict from 'ui/Verdict';
 
 const MAX_FILE_COUNT = 500;
-
-const isVisible = (curItem, forcedShown, isHighlighted, showSafeResults) =>
-  (curItem.score < 0 && !showSafeResults) ||
-  curItem.score > 0 ||
-  forcedShown.includes(curItem.sha256) ||
-  isHighlighted(curItem.sha256) ||
-  (curItem.children &&
-    Object.values(curItem.children).some(c => isVisible(c, forcedShown, isHighlighted, showSafeResults)));
 
 type FileTreeSectionProps = {
   tree: SubmissionTree['tree'];
   sid: string;
   baseFiles: string[];
   force?: boolean;
-  filetype_override?: string;
+  filetypeOverride?: string;
 };
 
 const WrappedFileTreeSection: React.FC<FileTreeSectionProps> = ({
@@ -36,7 +28,7 @@ const WrappedFileTreeSection: React.FC<FileTreeSectionProps> = ({
   sid,
   baseFiles,
   force = false,
-  filetype_override = null
+  filetypeOverride = null
 }) => {
   const { t } = useTranslation(['submissionDetail']);
   const [open, setOpen] = useState(true);
@@ -79,7 +71,7 @@ const WrappedFileTreeSection: React.FC<FileTreeSectionProps> = ({
               tree={tree}
               sid={sid}
               force={force}
-              filetype_override={filetype_override}
+              filetypeOverride={filetypeOverride}
               defaultForceShown={forcedShown}
             />
           ) : (
@@ -101,7 +93,7 @@ type FileTreeProps = {
   sid: string;
   force: boolean;
   defaultForceShown: string[];
-  filetype_override?: string;
+  filetypeOverride?: string;
 };
 
 const WrappedFileTree: React.FC<FileTreeProps> = ({
@@ -109,16 +101,24 @@ const WrappedFileTree: React.FC<FileTreeProps> = ({
   sid,
   defaultForceShown,
   force = false,
-  filetype_override = null
+  filetypeOverride = null
 }) => {
   const { t } = useTranslation(['submissionDetail']);
   const theme = useTheme();
-  const navigate = useNavigate();
-  const { isHighlighted } = useHighlighter();
   const { showSafeResults } = useSafeResults();
 
   const [forcedShown, setForcedShown] = useState<string[]>([...defaultForceShown]);
   const [maxChildCount, setMaxChildCount] = useState<number>(MAX_FILE_COUNT);
+
+  const fileKeys = useMemo<string[]>(() => getFileTreeKeys(tree), [tree]);
+
+  const highlighted = useAppAreKeysHighlighted(fileKeys);
+
+  const highlightedKeys = useMemo<Set<string>>(
+    () => new Set(fileKeys.filter((_key, index) => highlighted[index])),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [...(fileKeys || []), ...(highlighted || [])]
+  );
 
   const files = useMemo<[string, Tree][]>(
     () =>
@@ -126,14 +126,14 @@ const WrappedFileTree: React.FC<FileTreeProps> = ({
         .sort((a: [string, Tree], b: [string, Tree]) => (a[1].name.join() > b[1].name.join() ? 1 : -1))
         .reduce(
           (prev, [sha256, item]: [string, Tree]) =>
-            !isVisible(tree[sha256], defaultForceShown, isHighlighted, showSafeResults) ||
+            !isFileTreeItemVisible(tree[sha256], defaultForceShown, highlightedKeys, showSafeResults) ||
             (item.score < 0 && !showSafeResults && !force) ||
             prev.length > maxChildCount
               ? [...prev]
               : [...prev, [sha256, item]],
           [] as [string, Tree][]
         ),
-    [defaultForceShown, force, isHighlighted, maxChildCount, showSafeResults, tree]
+    [defaultForceShown, force, highlightedKeys, maxChildCount, showSafeResults, tree]
   );
 
   return (
@@ -142,7 +142,9 @@ const WrappedFileTree: React.FC<FileTreeProps> = ({
         <div key={i}>
           <div style={{ display: 'flex', width: '100%', alignItems: 'flex-start' }}>
             {item.children &&
-            Object.values(item.children).some(c => !isVisible(c, forcedShown, isHighlighted, showSafeResults)) ? (
+            Object.values(item.children).some(
+              c => !isFileTreeItemVisible(c, forcedShown, highlightedKeys, showSafeResults)
+            ) ? (
               <Tooltip title={t('tree_more')}>
                 <IconButton
                   size="small"
@@ -171,13 +173,17 @@ const WrappedFileTree: React.FC<FileTreeProps> = ({
               <span style={{ marginLeft: theme.spacing(3) }} />
             )}
             <Box
-              component={item.sha256 ? Link : 'span'}
-              to={`/file/detail/${item.sha256}`}
-              onClick={e => {
-                e.preventDefault();
-                if (item.sha256)
-                  navigate(`/submission/detail/${sid}/${item.sha256}?name=${encodeURIComponent(item.name[0])}`);
-              }}
+              {...(!item?.sha256
+                ? { component: 'span' }
+                : {
+                    component: AppLink,
+                    nav: nav =>
+                      nav.to().create({
+                        route: '/file/detail/:id',
+                        path: { id: item.sha256 },
+                        search: { name: item.name[0] }
+                      })
+                  })}
               sx={{
                 cursor: 'pointer',
                 flexGrow: 1,
@@ -185,7 +191,11 @@ const WrappedFileTree: React.FC<FileTreeProps> = ({
                 color: 'inherit',
                 textDecoration: 'none',
                 wordBreak: 'break-word',
-                backgroundColor: isHighlighted(sha256) ? (theme.palette.mode === 'dark' ? '#343a44' : '#d8e3ea') : null,
+                backgroundColor: highlightedKeys.has(sha256)
+                  ? theme.palette.mode === 'dark'
+                    ? '#343a44'
+                    : '#d8e3ea'
+                  : null,
                 '&:hover, &:focus': {
                   backgroundColor: theme.palette.action.hover
                 }
@@ -200,7 +210,7 @@ const WrappedFileTree: React.FC<FileTreeProps> = ({
                   <span style={{ paddingRight: '4px', unicodeBidi: 'isolate-override' }}>
                     {item.name.sort().join(' | ')}
                   </span>
-                  {filetype_override ? (
+                  {filetypeOverride ? (
                     <>
                       <span
                         style={{
@@ -208,7 +218,7 @@ const WrappedFileTree: React.FC<FileTreeProps> = ({
                           color: theme.palette.text.secondary,
                           paddingRight: theme.spacing(0.5)
                         }}
-                      >{`[${filetype_override}]`}</span>
+                      >{`[${filetypeOverride}]`}</span>
                       <span
                         style={{
                           fontSize: '80%',

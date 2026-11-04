@@ -1,5 +1,7 @@
 {
   "add_badlist": "Ajouter un item à la liste mauvaise",
+  "app_route.manage_badlists.fullname": "Gestion de la Liste mauvaise",
+  "app_route.manage_badlists.shortname": "Liste mauvaise",
   "filter": "Filtrer les hachages de la liste mauvaise...",
   "filter.disabled.add": "Ajouter un filtre pour afficher les hachages désactivés",
   "filter.disabled.remove": "Supprimer le filtre pour afficher les hachages désactivés",

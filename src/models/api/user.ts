@@ -1,4 +1,4 @@
-import type { AppUser } from 'core/template/components/app/AppUserService';
+import type { AppUser } from '@tui/core';
 import type { ClassificationDefinition } from 'features/classification';
 import type { Configuration } from 'models/base/config';
 import type { Role, Type, User } from 'models/base/user';

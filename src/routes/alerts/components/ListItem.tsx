@@ -3,7 +3,7 @@ import GroupOutlinedIcon from '@mui/icons-material/GroupOutlined';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
 import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import { Grid, Tooltip, useTheme } from '@mui/material';
-import useALContext from 'core/config/useALContext';
+import useALContext from 'deprecated/hooks/useALContext';
 import type { Alert, DetailedItem } from 'models/base/alert';
 import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';

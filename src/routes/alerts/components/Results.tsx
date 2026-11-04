@@ -1,11 +1,11 @@
 import { Button, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
+import { useAppNavigate, useAppSearchSnapshot } from 'core/router';
 import type { FC, ReactNode } from 'react';
 import React, { memo, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FiFilter } from 'react-icons/fi';
-import { ALERT_DEFAULT_PARAMS, type AlertSearchParams } from 'routes/alerts/alerts.route';
+import type { AlertSearchParams } from 'routes/alerts/alerts.route';
 import AlertsFiltersSelected from 'routes/alerts/components/FiltersSelected';
-import { useSearchParams } from 'routes/alerts/contexts/SearchParamsContext';
 
 type SearchCountProps = {
   children?: ReactNode;
@@ -70,13 +70,14 @@ type Props = {
 const WrappedAlertSearchResults: React.FC<Props> = ({ loading = false, total = 0 }: Props) => {
   const { t } = useTranslation(['alerts']);
   const theme = useTheme();
-  const { search, setSearchObject } = useSearchParams<AlertSearchParams>();
+  const navigate = useAppNavigate<'/alerts'>();
+  const search = useAppSearchSnapshot<'/alerts'>();
 
   const isMDUp = useMediaQuery(theme.breakpoints.up('md'));
 
   const handleChange = useCallback(
-    (value: AlertSearchParams) => setSearchObject({ ...value, offset: 0 }),
-    [setSearchObject]
+    (value: AlertSearchParams) => navigate.here<'/alerts'>().update(s => ({ ...s, search: { ...value, offset: 0 } })),
+    [navigate]
   );
 
   if (isMDUp)
@@ -103,13 +104,13 @@ const WrappedAlertSearchResults: React.FC<Props> = ({ loading = false, total = 0
           max={search.get('track_total_hits')}
           suffix={total > 1 ? t('results') : t('result')}
           onClick={() =>
-            setSearchObject(v => ({
-              ...v,
-              offset: 0,
-              track_total_hits:
-                v.track_total_hits === ALERT_DEFAULT_PARAMS.track_total_hits
-                  ? 10000000
-                  : ALERT_DEFAULT_PARAMS.track_total_hits
+            navigate.here<'/alerts'>().update(s => ({
+              ...s,
+              search: {
+                ...s.search,
+                offset: 0,
+                track_total_hits: s.search.track_total_hits === null ? 10000000 : null
+              }
             }))
           }
         />
@@ -133,13 +134,13 @@ const WrappedAlertSearchResults: React.FC<Props> = ({ loading = false, total = 0
           max={search.get('track_total_hits')}
           suffix={total > 1 ? t('results') : t('result')}
           onClick={() =>
-            setSearchObject(v => ({
-              ...v,
-              offset: 0,
-              track_total_hits:
-                v.track_total_hits === ALERT_DEFAULT_PARAMS.track_total_hits
-                  ? 10000000
-                  : ALERT_DEFAULT_PARAMS.track_total_hits
+            navigate.here<'/alerts'>().update(s => ({
+              ...s,
+              search: {
+                ...s.search,
+                offset: 0,
+                track_total_hits: s.search.track_total_hits === null ? 10000000 : null
+              }
             }))
           }
         >

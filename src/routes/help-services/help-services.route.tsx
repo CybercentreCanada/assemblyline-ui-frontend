@@ -1,9 +1,10 @@
+import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined';
 import { Card, CardHeader, Grid, Typography, useTheme } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
-import useMyAPI from 'core/api/hooks/useMyAPI';
-import PageFullWidth from 'core/template/components/pages/PageFullWidth';
-import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
-import { useState } from 'react';
+import { createAppRoute } from 'core/router';
+import { AppPageFullWidth } from 'core/template';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
+import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Classification from 'ui/Classification';
 import CustomChip from 'ui/CustomChip';
@@ -77,14 +78,14 @@ function ServiceCard({ service }) {
   );
 }
 
-export default function Services() {
+export const HelpServicesPage = memo(() => {
   const { apiCall } = useMyAPI();
   const { t } = useTranslation(['helpServices']);
   const theme = useTheme();
   const [services, setServices] = useState(null);
   const minCardHeight = '240px';
 
-  useEffectOnce(() => {
+  useEffect(() => {
     // Load all services on start
     apiCall({
       url: '/api/v4/service/all/',
@@ -92,9 +93,11 @@ export default function Services() {
         setServices(api_data.api_response);
       }
     });
-  });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
-    <PageFullWidth margin={4}>
+    <AppPageFullWidth>
       <PageHeader
         primary={t('title')}
         secondary={() => `${services.length} ${t('count')}`}
@@ -121,6 +124,21 @@ export default function Services() {
           ))}
         </Grid>
       )}
-    </PageFullWidth>
+    </AppPageFullWidth>
   );
-}
+});
+
+export const HelpServicesRoute = createAppRoute({
+  component: HelpServicesPage,
+
+  path: '/help/services',
+
+  ancestor: '/help',
+  shortname: () => ['app_route.help_services.shortname', { ns: 'helpServices' }],
+  fullname: () => ['app_route.help_services.fullname', { ns: 'helpServices' }],
+  shorticon: () => <AccountTreeOutlinedIcon />,
+  fullicon: () => <AccountTreeOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
+});

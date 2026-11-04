@@ -1,65 +1,50 @@
+import KeyOutlinedIcon from '@mui/icons-material/KeyOutlined';
 import PersonIcon from '@mui/icons-material/Person';
-import { Grid, useTheme } from '@mui/material';
-import Typography from '@mui/material/Typography';
-import useMyAPI from 'core/api/hooks/useMyAPI';
-import useALContext from 'core/config/useALContext';
-import PageContainer from 'core/template/branding/AppPageContainer';
-import PageFullWidth from 'core/template/components/pages/PageFullWidth';
-import { createSearchParams, SearchParamsProvider, useSearchParams } from 'features/SearchParams/createSearchParams';
-import useDrawer from 'layout/drawer/drawer.hooks';
+import { Grid, Typography, useTheme } from '@mui/material';
+import { createAppRoute, useAppNavigate, useAppSearchSnapshot } from 'core/router';
+import { AppPageContainer, AppPageFullWidth } from 'core/template';
+import useALContext from 'deprecated/hooks/useALContext';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
 import type { SearchResult } from 'models/api/search';
 import type { IndexDefinition } from 'models/api/user';
 import type { ApiKey } from 'models/base/user';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate, useLocation, useNavigate } from 'react-router';
-import ApikeyDetail from 'routes/admin-api-key-detail/admin-api-key-detail.route';
-import ApikeysTable from 'routes/search/components/apikeys';
+import { ApikeysTable } from 'routes/search/components/apikeys';
 import { safeFieldValue } from 'shared/utils/utils';
-import SearchHeader from 'ui/SearchBar/SearchHeader';
 import { DEFAULT_SUGGESTION } from 'ui/SearchBar/search-textfield';
+import SearchHeader from 'ui/SearchBar/SearchHeader';
 
-const API_KEYS_PARAMS = createSearchParams(p => ({
-  query: p.string(''),
-  offset: p.number(0).min(0).origin('snapshot').ephemeral(),
-  rows: p.number(25).locked().origin('snapshot').ephemeral(),
-  sort: p.string(null).ephemeral(),
-  filters: p.filters([]),
-  track_total_hits: p.number(10000).nullable().ephemeral(),
-  refresh: p.boolean(false).origin('snapshot').ephemeral()
-}));
+//*****************************************************************************************
+// AdminAPIKeys Page
+//*****************************************************************************************
 
-export type APIKeysParams = typeof API_KEYS_PARAMS;
-
-const APIKeysSearch = () => {
+export const AdminAPIKeysPage = React.memo(() => {
   const { t } = useTranslation(['adminAPIkeys']);
-  const location = useLocation();
-  const navigate = useNavigate();
+  const navigate = useAppNavigate<'/admin/apikeys'>();
+  const search = useAppSearchSnapshot<'/admin/apikeys'>();
   const theme = useTheme();
   const { apiCall } = useMyAPI();
-  const { globalDrawerOpened, setGlobalDrawer, closeGlobalDrawer } = useDrawer();
   const { user: currentUser } = useALContext();
-  const { search, setSearchParams, setSearchObject } = useSearchParams<APIKeysParams>();
 
   const [apikeySearchResults, setApikeySearchResults] = useState<SearchResult<ApiKey>>(null);
   const [searching, setSearching] = useState<boolean>(false);
   const [suggestions, setSuggestions] = useState<IndexDefinition>(DEFAULT_SUGGESTION);
 
-  const setApikeyID = useCallback(
-    (key_id: string) => {
-      navigate(`${location.pathname}${location.search || ''}#${key_id}`);
-    },
-    [location.pathname, location.search, navigate]
-  );
-
   const handleToggleFilter = useCallback(
     (filter: string) => {
-      setSearchObject(o => {
-        const filters = o.filters.includes(filter) ? o.filters.filter(f => f !== filter) : [...o.filters, filter];
-        return { ...o, offset: 0, filters };
-      });
+      navigate.here().update(s => ({
+        ...s,
+        search: {
+          ...s,
+          offset: 0,
+          filters: s.search.filters.includes(filter)
+            ? s.search.filters.filter(f => f !== filter)
+            : [...s.search.filters, filter]
+        }
+      }));
     },
-    [setSearchObject]
+    [navigate]
   );
 
   const handleReload = useCallback(
@@ -90,25 +75,6 @@ const APIKeysSearch = () => {
   }, [handleReload, search.toString()]);
 
   useEffect(() => {
-    if (!location.hash || globalDrawerOpened || !apikeySearchResults) return;
-    navigate(`${location.pathname}${location.search || ''}`);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [globalDrawerOpened]);
-
-  useEffect(() => {
-    if (!location.hash) closeGlobalDrawer();
-    else {
-      setGlobalDrawer(
-        <ApikeyDetail
-          key_id={location.hash.slice(1)}
-          onClose={() => navigate(`${location.pathname}${location.search}`)}
-        />
-      );
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location.hash]);
-
-  useEffect(() => {
     if (!currentUser.is_admin) return;
     apiCall<IndexDefinition>({
       url: '/api/v4/search/fields/apikey/',
@@ -119,17 +85,17 @@ const APIKeysSearch = () => {
 
   useEffect(() => {
     function reload() {
-      setSearchObject(o => ({ ...o, offset: 0, refresh: !o.refresh }));
+      navigate.here().update(s => ({ ...s, search: { ...s.search, offset: 0, refresh: !s.search.refresh } }));
     }
 
-    window.addEventListener('reloadAPIKeys', reload);
+    window.addEventListener('reloadAdminAPIKeys', reload);
     return () => {
-      window.removeEventListener('reloadAPIKeys', reload);
+      window.removeEventListener('reloadAdminAPIKeys', reload);
     };
-  }, [setSearchObject]);
+  }, [navigate]);
 
-  return currentUser.is_admin ? (
-    <PageFullWidth margin={4}>
+  return (
+    <AppPageFullWidth>
       <div style={{ paddingBottom: theme.spacing(2) }}>
         <Grid container alignItems="center">
           <Grid flexGrow={1}>
@@ -138,7 +104,7 @@ const APIKeysSearch = () => {
         </Grid>
       </div>
 
-      <PageContainer isSticky>
+      <AppPageContainer isSticky>
         <div style={{ paddingTop: theme.spacing(1) }}>
           <SearchHeader
             params={search.toParams()}
@@ -149,7 +115,11 @@ const APIKeysSearch = () => {
                 ? t(`filtered${apikeySearchResults?.total === 1 ? '' : 's'}`)
                 : t(`total${apikeySearchResults?.total === 1 ? '' : 's'}`)
             }
-            onChange={v => setSearchParams(v)}
+            onChange={v =>
+              navigate
+                .here()
+                .update(s => ({ ...s, search: { ...s.search, ...AdminAPIKeysRoute.search.full(v).toObject() } }))
+            }
             paramDefaults={search.defaults().toObject()}
             searchInputProps={{ placeholder: t('filter'), options: suggestions }}
             actionProps={[
@@ -168,22 +138,41 @@ const APIKeysSearch = () => {
             ]}
           />
         </div>
-      </PageContainer>
+      </AppPageContainer>
 
       <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
-        <ApikeysTable apikeySearchResults={apikeySearchResults} setApikeyID={setApikeyID} />
+        <ApikeysTable apikeySearchResults={apikeySearchResults} />
       </div>
-    </PageFullWidth>
-  ) : (
-    <Navigate to="/forbidden" replace />
+    </AppPageFullWidth>
   );
-};
+});
 
-const WrappedAPIKeysPage = () => (
-  <SearchParamsProvider params={API_KEYS_PARAMS}>
-    <APIKeysSearch />
-  </SearchParamsProvider>
-);
+AdminAPIKeysPage.displayName = 'AdminAPIKeysPage';
 
-export const APIKeysPage = React.memo(WrappedAPIKeysPage);
-export default APIKeysPage;
+//*****************************************************************************************
+// AdminAPIKeys Route
+//*****************************************************************************************
+
+export const AdminAPIKeysRoute = createAppRoute({
+  component: AdminAPIKeysPage,
+
+  path: '/admin/apikeys',
+  search: s => ({
+    query: s.string(''),
+    offset: s.number(0).min(0).ephemeral(),
+    rows: s.number(25).locked().ephemeral(),
+    sort: s.string(null).ephemeral(),
+    filters: s.filters([]),
+    track_total_hits: s.number(10000).nullable().ephemeral(),
+    refresh: s.boolean(false).ephemeral()
+  }),
+
+  ancestor: '/admin',
+  shortname: () => ['app_route.admin_api_keys.shortname', { ns: 'adminAPIkeys' }],
+  fullname: () => ['app_route.admin_api_keys.fullname', { ns: 'adminAPIkeys' }],
+  shorticon: () => <KeyOutlinedIcon />,
+  fullicon: () => <KeyOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.is_admin
+});

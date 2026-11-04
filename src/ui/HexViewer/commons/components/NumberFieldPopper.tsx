@@ -1,6 +1,6 @@
 import { ClickAwayListener, Fade, Paper, Popper, useTheme } from '@mui/material';
 import { isEnter, isEscape } from 'deprecated/utils/keyboard';
-import { default as React, forwardRef, useCallback, useImperativeHandle, useState } from 'react';
+import React, { forwardRef, useCallback, useImperativeHandle, useState } from 'react';
 import { NumericField } from 'ui/HexViewer';
 
 export type NumberFieldPopperProps = {

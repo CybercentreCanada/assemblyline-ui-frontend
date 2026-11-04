@@ -1,4 +1,4 @@
-import getXSRFCookie from 'shared/utils/xsrf';
+import { getXSRFCookie } from 'shared/utils/xsrf.utils';
 import { expect, vi } from 'vitest';
 
 describe('Test `getXSRFCookie`', () => {

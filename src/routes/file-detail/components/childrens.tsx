@@ -1,9 +1,9 @@
 import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
 import { AlertTitle, Box, IconButton, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
+import { AppLink } from 'core/router';
 import type { Childrens } from 'models/api/file';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
 import InformativeAlert from 'ui/InformativeAlert';
 import SectionContainer from 'ui/SectionContainer';
 
@@ -60,8 +60,15 @@ const WrappedChildrenSection: React.FC<ChildrenSectionProps> = ({
           {filteredChildren?.map((fileItem, i) => (
             <Box
               key={i}
-              component={Link}
-              to={`/file/detail/${fileItem.sha256}?name=${encodeURIComponent(fileItem.name)}`}
+              component={AppLink}
+              nav={nav =>
+                nav.to().create({
+                  route: '/file/detail/:id',
+                  path: { id: fileItem.sha256 },
+                  search: { name: fileItem.name }
+                })
+              }
+              navDeps={[fileItem.sha256, fileItem.name]}
               sx={{
                 wordBreak: 'break-word',
                 color: 'inherit',

@@ -12,9 +12,9 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import useMyAPI from 'core/api/hooks/useMyAPI';
-import useALContext from 'core/config/useALContext';
-import useMySnackbar from 'core/snackbar/snackbar.hooks';
+import useALContext from 'deprecated/hooks/useALContext';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useMySnackbar from 'deprecated/hooks/useMySnackbar';
 import type { Apps as AppData, User } from 'models/base/user';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';

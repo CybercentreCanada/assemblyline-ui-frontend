@@ -1,5 +1,5 @@
 import { Skeleton } from '@mui/material';
-import useSafeResults from 'layout/safe-results/safe-results.hooks';
+import useSafeResults from 'deprecated/hooks/useSafeResults';
 import type { Alternates } from 'models/api/file';
 import type { FileResult } from 'models/base/result';
 import React from 'react';

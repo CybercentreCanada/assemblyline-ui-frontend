@@ -7,6 +7,8 @@
   "add.attribution.success": "L'attribution a été ajoutée avec succès à l'élément de la liste mauvaise",
   "add.attribution.text": "Quelle étiquette d'attribution souhaitez-vous ajouter à cet article et dans quelle catégorie ?",
   "add.attribution.title": "Ajout d'attribution",
+  "app_route.manage_badlist_detail.fullname": "Gestion du Détails de la Liste mauvaise {{id}}",
+  "app_route.manage_badlist_detail.shortname": "{{id}}",
   "attribution.actor": "Acteurs",
   "attribution.campaign": "Campagnes",
   "attribution.category": "Catégories",

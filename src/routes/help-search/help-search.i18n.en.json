@@ -1,4 +1,6 @@
 {
+  "app_route.help_search.fullname": "Search Help",
+  "app_route.help_search.shortname": "Search Help",
   "basic": "Basic Search",
   "basic.ex1": "\"quick brown fox\"",
   "basic.ex2": "quick OR brown OR fox",

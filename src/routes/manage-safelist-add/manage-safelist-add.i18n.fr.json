@@ -1,5 +1,7 @@
 {
   "add.success": "L'élément de la liste sûre a été ajouté avec succès au système.",
+  "app_route.manage_safelist_add.fullname": "Gestion à l'Ajout à la Liste sûre",
+  "app_route.manage_safelist_add.shortname": "Ajouter",
   "details": "Détails de l'élément",
   "expiry.title": "Date d'expiration",
   "file": "Fichier",

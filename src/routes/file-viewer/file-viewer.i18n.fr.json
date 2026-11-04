@@ -1,5 +1,9 @@
 {
   "analysing_code": "Demander aux robots de donner un sens à ce code...",
+  "app_route.file_viewer_id.fullname": "Visualisateur du fichier {{id}}",
+  "app_route.file_viewer_id.shortname": "{{id}}",
+  "app_route.file_viewer_id_tab.fullname": "Visualisateur du fichier {{id}} {{tab}}",
+  "app_route.file_viewer_id_tab.shortname": "{{id}}",
   "code_summary": "Résumé du code",
   "detail": "Détails de l'analyse du fichier",
   "download": "Télécharger le fichier",

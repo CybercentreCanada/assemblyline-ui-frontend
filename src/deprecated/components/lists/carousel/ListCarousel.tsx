@@ -1,4 +1,4 @@
-import Carousel from 'deprecated/components/Carousel';
+import Carousel from 'deprecated/components/carousel/Carousel';
 import useListNavigator from 'deprecated/components/lists/hooks/useListNavigator';
 import React from 'react';
 
