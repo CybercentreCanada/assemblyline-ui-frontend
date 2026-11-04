@@ -2,9 +2,9 @@ import { List, useTheme } from '@mui/material';
 import { useAppConfigStore } from 'core/config';
 import { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useForm } from 'routes/settings/settings.form';
 import { PageSection } from 'ui/layouts/PageSection';
 import { BooleanListInput } from 'ui/list-inputs/BooleanListInput';
-import { useForm } from '../settings.form';
 
 export const ExternalSourcesSection = memo(() => {
   const { t } = useTranslation(['settings']);

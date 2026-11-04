@@ -67,7 +67,7 @@ export function useAppNavigate<const Origin extends AppRoute['path']>() {
         store = getNavigationStoreFromRouter(store, routerState);
         store = setPageScrollPositions(store);
         const [nextStore, nextPageKey] = addPage(store, nextPage);
-        [store] = upsertPanel(nextStore, destinationPanelKey, { pageKey: nextPageKey }, preferenceState);
+        [store] = upsertPanel(nextStore, preferenceState, destinationPanelKey, { pageKey: nextPageKey });
         store = updatePage(store, pageKey, { age: 0 });
         store = sanitizeRouterStore(store, preferenceState);
         store.id = generateRandomUUID();
@@ -171,7 +171,7 @@ export function useAppNavigate<const Origin extends AppRoute['path']>() {
         store = getNavigationStoreFromRouter(store, routerState);
         store = setPageScrollPositions(store);
         const [nextStore, nextPageKey] = addPage(store, nextPage);
-        [store] = upsertPanel(nextStore, 0, { pageKey: nextPageKey }, preferenceState);
+        [store] = upsertPanel(nextStore, preferenceState, 0, { pageKey: nextPageKey });
 
         for (let panelKey = store.panels.length - 1; panelKey > 0; panelKey--) {
           store = removePanel(store, panelKey);
@@ -215,7 +215,7 @@ export function useAppNavigate<const Origin extends AppRoute['path']>() {
         const firstPage = firstPanel?.pageKey ? store.pages[firstPanel.pageKey] : null;
         if (store.panels.length === 0 || !firstPage?.href) {
           const [nextStore, nextPageKey] = addPage(store, nextPage);
-          [store] = upsertPanel(nextStore, 0, { pageKey: nextPageKey }, preferenceState);
+          [store] = upsertPanel(nextStore, preferenceState, 0, { pageKey: nextPageKey });
         }
 
         store = updatePage(store, pageKey, { age: 0 });

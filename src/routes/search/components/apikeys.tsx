@@ -4,7 +4,7 @@ import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
 import type { SearchResult } from 'models/api/search';
 import type { ApiKey, Role } from 'models/base/user';
-import { memo, useState } from 'react';
+import React, { memo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import CustomChip from 'ui/CustomChip';
 import {

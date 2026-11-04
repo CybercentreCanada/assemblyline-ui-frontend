@@ -2,11 +2,11 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import ShareIcon from '@mui/icons-material/Share';
 import { Paper, useTheme } from '@mui/material';
 import Divider from '@mui/material/Divider';
-import type { StoreProps } from 'ui/HexViewer';
-import { HexSearchBar, HexSearchTypes, TooltipIconButton, useDispatch } from 'ui/HexViewer';
 import type { PropsWithChildren } from 'react';
 import React, { memo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import type { StoreProps } from 'ui/HexViewer';
+import { HexSearchBar, HexSearchTypes, TooltipIconButton, useDispatch } from 'ui/HexViewer';
 
 export * from './cursorButton';
 export * from './searchbar';

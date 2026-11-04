@@ -9,7 +9,7 @@ import TableContainer from '@mui/material/TableContainer';
 import type { SearchResult } from 'models/api/search';
 import type { Error, ErrorType } from 'models/base/error';
 import type { ReactElement } from 'react';
-import { memo, useMemo } from 'react';
+import React, { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { bytesToSize } from 'shared/utils/utils';
 import {

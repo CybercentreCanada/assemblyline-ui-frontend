@@ -130,7 +130,7 @@ export const ArchivesPage = memo(() => {
   const buildFacetParams = useCallback((body: InferSearchParamValueMapFromEngine<typeof ArchivesRoute.search>) => {
     const params = new URLSearchParams();
     params.set('query', body.query);
-    for (const filter of (body.filters as string[]) ?? []) {
+    for (const filter of body.filters ?? []) {
       params.append('filters', filter);
     }
 

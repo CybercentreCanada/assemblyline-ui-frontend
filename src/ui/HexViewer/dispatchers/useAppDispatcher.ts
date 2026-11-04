@@ -15,8 +15,8 @@ import { ACTIONS } from '..';
 export type AppAction =
   | { type: 'storeDefault'; payload: any; tracked: boolean; repeat: boolean }
   | { type: 'appLoad'; payload: { data: string }; guard: { store: Store }; tracked: false; repeat: true }
-  | { type: 'appSave'; payload: void }
-  | { type: 'appInit'; payload: null }
+  | { type: 'appSave'; payload: undefined }
+  | { type: 'appInit'; payload: undefined }
   | { type: 'appDataChange'; payload: { data: string } }
   | { type: 'appModeThemeChange'; payload: { theme: ModeTheme } }
   | { type: 'appModeLanguageChange'; payload: { language: ModeLanguage } }
@@ -24,11 +24,11 @@ export type AppAction =
   | { type: 'appModeLayoutChange'; payload: { layout: ModeLayout } }
   | { type: 'appModeToolbarChange'; payload: { toolbar: ModeToolbar } }
   | { type: 'appModeBodyChange'; payload: { body: ModeBody } }
-  | { type: 'appHistoryLoad'; payload: null }
-  | { type: 'appHistorySave'; payload: null }
-  | { type: 'locationFetch'; payload: void }
-  | { type: 'locationLoad'; payload: void }
-  | { type: 'appClickAway'; payload: void; tracked: true; repeat: true };
+  | { type: 'appHistoryLoad'; payload: undefined }
+  | { type: 'appHistorySave'; payload: undefined }
+  | { type: 'locationFetch'; payload: undefined }
+  | { type: 'locationLoad'; payload: undefined }
+  | { type: 'appClickAway'; payload: undefined; tracked: true; repeat: true };
 
 export type AppActionTypes = ActionTypesConfig<AppAction>;
 export type AppDispatchers = DispatchersConfig<AppAction>;

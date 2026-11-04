@@ -1,8 +1,8 @@
 import type { SelectChangeEvent } from '@mui/material';
-import type { StoreProps } from 'ui/HexViewer';
-import { getItems, getType, getValue, SelectField, useStore } from 'ui/HexViewer';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import type { StoreProps } from 'ui/HexViewer';
+import { getItems, getType, getValue, SelectField, useStore } from 'ui/HexViewer';
 
 export const WrappedHexSearchModeEncodingSetting = ({ store }: StoreProps) => {
   const { t } = useTranslation(['hexViewer']);
