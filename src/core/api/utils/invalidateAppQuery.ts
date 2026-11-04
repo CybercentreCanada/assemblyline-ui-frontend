@@ -1,6 +1,6 @@
 import type { ALRequests } from 'app/core.api';
 import { DEFAULT_INVALIDATE_DELAY } from 'app/core.preference';
-import type { APIQueryKey, APIRequest } from 'core/api/api.models.ts';
+import type { APIQueryKey, APIRequest } from 'core/api/api.models';
 import { queryClient } from 'core/api/api.providers';
 
 function isObject(variable) {

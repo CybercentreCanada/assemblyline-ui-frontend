@@ -22,7 +22,7 @@ import {
   getSafelistedProcessIds,
   getVisibleProcessesByPids,
   hasObjectData
-} from 'ui/ResultCard/Sandbox/sandbox.utils.ts';
+} from 'ui/ResultCard/Sandbox/sandbox.utils';
 import { describe, expect, it } from 'vitest';
 
 const mockTheme: Theme = {

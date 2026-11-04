@@ -3,7 +3,7 @@ import { usePropStore } from 'features/prop-provider';
 import type { SyntheticEvent } from 'react';
 import { useCallback, useRef, useTransition } from 'react';
 import { useInputCoercingResolver, useInputValidationResolver } from 'ui/inputs/hooks/inputs.hook.validation';
-import type { InputControllerProps } from 'ui/inputs/models/inputs.model.ts';
+import type { InputControllerProps } from 'ui/inputs/models/inputs.model';
 
 /**
  * Handles input click with validation and optional enforcement

@@ -1,5 +1,5 @@
 import type { Page } from '@playwright/test';
-import type { APIResponse } from 'core/api/api.models.ts';
+import type { APIResponse } from 'core/api/api.models';
 import { test } from 'core/e2e/e2e.fixtures';
 
 type Response<T> = {

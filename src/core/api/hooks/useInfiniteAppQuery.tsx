@@ -1,5 +1,5 @@
 import type { ALRequests, ALResponses } from 'app/core.api';
-import type { APIResponse } from 'core/api/api.models.ts';
+import type { APIResponse } from 'core/api/api.models';
 import type { UseAPICallFnProps } from 'core/api/hooks/useApiCallFn';
 import { useInfiniteAPIQuery } from 'core/api/hooks/useInfiniteApiQuery';
 

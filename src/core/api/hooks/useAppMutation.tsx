@@ -1,6 +1,6 @@
 import type { UseMutationOptions } from '@tanstack/react-query';
 import type { ALRequests, ALResponses } from 'app/core.api';
-import type { APIResponse } from 'core/api/api.models.ts';
+import type { APIResponse } from 'core/api/api.models';
 import type { UseAPICallFnProps } from 'core/api/hooks/useApiCallFn';
 import { useAPIMutation } from 'core/api/hooks/useApiMutation';
 
