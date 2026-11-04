@@ -345,7 +345,7 @@ export const parseRequest = (input: string): Request => {
       response: parsedData.response || null,
       error: null // Ensure error is cleared in case of successful parsing
     };
-  } catch (error: unknown) {
+  } catch (error) {
     // Capture any parsing errors and store them in the result
     result.error = error instanceof Error ? error : new Error('Unknown parsing error');
   }

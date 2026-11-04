@@ -26,9 +26,9 @@
     "noImplicitAny": false,
     "strictFunctionTypes": false,
     "strictPropertyInitialization": false,
-    "strictBindCallApply": false,
-    "noImplicitThis": false,
-    "useUnknownInCatchVariables": false,
+    "strictBindCallApply": true,
+    "noImplicitThis": true,
+    "useUnknownInCatchVariables": true,
 
     /* Previous definition */
     "allowJs": true,
