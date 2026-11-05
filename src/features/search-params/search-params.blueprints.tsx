@@ -3,7 +3,6 @@ import type {
   InferSearchParamValueMapFromBlueprintMap,
   ObjectParamShape,
   ObjectParamValue,
-  SearchParamBlueprintDescriptor,
   SearchParamBlueprintKind,
   SearchParamBlueprintMap,
   SearchParamSnapshot,
@@ -182,20 +181,6 @@ export abstract class BaseSearchParamBlueprint<T extends SearchParamValue> {
     throw new Error('getKind() must be implemented by a concrete blueprint subclass.');
   }
 
-  /** Plain-object description of this blueprint's configuration, for tooling/introspection. */
-  public describe(): SearchParamBlueprintDescriptor {
-    return {
-      key: this._key,
-      kind: this.getKind(),
-      defaultValue: this._defaultValue,
-      source: this._source,
-      ephemeral: this._ephemeral,
-      ignored: this._ignored,
-      locked: this._locked,
-      nullable: this._nullable
-    };
-  }
-
   // -------------------------
   // Parsers
   // -------------------------
@@ -361,10 +346,6 @@ export class NumberSearchParamBlueprint extends BaseSearchParamBlueprint<number>
     return 'number';
   }
 
-  public override describe(): SearchParamBlueprintDescriptor {
-    return { ...super.describe(), min: this._min, max: this._max };
-  }
-
   private clamp(value: number): number {
     let num = value;
     if (this._min !== null) num = Math.max(num, this._min);
@@ -446,10 +427,6 @@ export class EnumSearchParamBlueprint<
     return 'enum';
   }
 
-  public override describe(): SearchParamBlueprintDescriptor {
-    return { ...super.describe(), options: this._options };
-  }
-
   private check(value: unknown): value is O[number] {
     return Array.isArray(this._options) && this._options.includes(value as O[number]);
   }
@@ -499,10 +476,6 @@ export class FiltersSearchParamBlueprint extends BaseSearchParamBlueprint<string
 
   public override getKind(): SearchParamBlueprintKind {
     return 'filters';
-  }
-
-  public override describe(): SearchParamBlueprintDescriptor {
-    return { ...super.describe(), not: this._not, omit: this._omit };
   }
 
   // -------------------------
