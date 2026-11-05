@@ -177,7 +177,9 @@ export abstract class BaseSearchParamBlueprint<T extends SearchParamValue> {
   // -------------------------
 
   /** Identifies which blueprint variant this instance is, for tooling/introspection. Overridden by each subclass. */
-  public abstract getKind(): SearchParamBlueprintKind;
+  public getKind(): SearchParamBlueprintKind {
+    throw new Error('getKind() must be implemented by a concrete blueprint subclass.');
+  }
 
   // -------------------------
   // Parsers
