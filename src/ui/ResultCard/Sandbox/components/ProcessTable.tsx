@@ -2,13 +2,13 @@ import { useTheme } from '@mui/material';
 import type { ColumnDef } from '@tanstack/react-table';
 import { createColumnHelper } from '@tanstack/react-table';
 import type { SandboxBody, SandboxProcessItem } from 'models/base/result_body';
+import React, { useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import CustomChip from 'ui/CustomChip';
 import { ProcessChip } from 'ui/ResultCard/Sandbox/common/ProcessChip';
 import { TableContainer } from 'ui/ResultCard/Sandbox/common/TableContainer';
 import { DetailTableCellValue } from 'ui/ResultCard/Sandbox/common/Tables';
-import { getProcessMapByPid, type SandboxFilter } from 'ui/ResultCard/Sandbox/sandbox.utils.ts';
-import React, { useCallback, useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
+import { getProcessMapByPid, type SandboxFilter } from 'ui/ResultCard/Sandbox/sandbox.utils';
 
 type ProcessTableProps = {
   body?: SandboxBody | null;

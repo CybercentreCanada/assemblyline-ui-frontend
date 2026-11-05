@@ -1,8 +1,8 @@
 import useALContext from 'core/config/useALContext';
 import React from 'react';
 import { Navigate } from 'react-router';
-import { FormProvider } from 'routes/development-customize/development-customize.form.tsx';
-import { CustomizeRoute } from 'routes/development-customize/development-customize.route.tsx';
+import { FormProvider } from 'routes/development-customize/development-customize.form';
+import { CustomizeRoute } from 'routes/development-customize/development-customize.route';
 
 const WrappedCustomizePage = () => {
   const { user: currentUser, configuration } = useALContext();

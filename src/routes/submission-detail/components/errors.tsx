@@ -14,10 +14,10 @@ import {
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import type { Submission } from 'models/base/submission';
-import { getErrorIDFromKey, getErrorTypeFromKey, getHashFromKey, getServiceFromKey } from 'shared/utils/errors';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+import { getErrorIDFromKey, getErrorTypeFromKey, getHashFromKey, getServiceFromKey } from 'shared/utils/errors';
 
 const MAX_ERROR_COUNT = 500;
 

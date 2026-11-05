@@ -1,16 +1,16 @@
 import OpenInNewOutlinedIcon from '@mui/icons-material/OpenInNewOutlined';
 import { Typography, useTheme } from '@mui/material';
-import type { ProfileSettings } from 'routes/settings/settings.utils.ts';
-import { useForm } from 'routes/submit/submit.form.ts';
+import React, { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
+import type { ProfileSettings } from 'routes/settings/settings.utils';
+import { useForm } from 'routes/submit/submit.form';
 import { CheckboxInput } from 'ui/inputs/CheckboxInput';
-import type { InputOptions, InputSlotProps, InputValueModel } from 'ui/inputs/models/inputs.model.ts';
+import type { InputOptions, InputSlotProps, InputValueModel } from 'ui/inputs/models/inputs.model';
 import { NumberInput } from 'ui/inputs/NumberInput';
 import { SelectInput } from 'ui/inputs/SelectInput';
 import { TextInput } from 'ui/inputs/TextInput';
 import { CollapseSection } from 'ui/layouts/CollapseSection';
 import { ShowMore } from 'ui/ShowMore';
-import React, { useCallback } from 'react';
-import { useTranslation } from 'react-i18next';
 
 type SpecParamList = {
   show: number[];

@@ -11,9 +11,9 @@ import { LeftNav } from 'routes/settings/components/LeftNav';
 import { RightNav } from 'routes/settings/components/RightNav';
 import { ServicesSection } from 'routes/settings/components/Services';
 import { SubmissionOptionsSection, SubmissionProfileDescription } from 'routes/settings/components/Submission';
-import type { SettingsStore } from 'routes/settings/settings.form.ts';
-import { useForm } from 'routes/settings/settings.form.ts';
-import { initializeSettings, loadDefaultProfile, loadSubmissionProfile } from 'routes/settings/settings.utils.ts';
+import type { SettingsStore } from 'routes/settings/settings.form';
+import { useForm } from 'routes/settings/settings.form';
+import { initializeSettings, loadDefaultProfile, loadSubmissionProfile } from 'routes/settings/settings.utils';
 import { PageLayout } from 'ui/layouts/PageLayout';
 
 type Params = {

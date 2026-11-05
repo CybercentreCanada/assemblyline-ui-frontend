@@ -1,6 +1,6 @@
-import { shallowEqual } from 'features/prop-provider/prop-provider.utils.ts';
-import { SearchParamEngine } from 'features/search-params/search-params.engines.tsx';
-import { SearchParamSnapshot } from 'features/search-params/search-params.snapshots.tsx';
+import { shallowEqual } from 'features/prop-provider/prop-provider.utils';
+import { SearchParamEngine } from 'features/search-params/search-params.engines';
+import { SearchParamSnapshot } from 'features/search-params/search-params.snapshots';
 import type { SearchParamBlueprints, SearchParamValues } from 'features/SearchParams/lib/search_params.model';
 import React, {
   createContext,

@@ -1,13 +1,13 @@
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
 import { Button, Grid, IconButton, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
 import type { DockerConfig, PersistentVolume, Service } from 'models/base/service';
-import ContainerCard from 'routes/admin-service-detail/components/container_card';
-import ContainerDialog from 'routes/admin-service-detail/components/container_dialog';
-import { showReset } from 'routes/admin-service-detail/components/service.utils.ts';
-import { SelectInput } from 'ui/inputs/SelectInput';
 import type { Dispatch, SetStateAction } from 'react';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import ContainerCard from 'routes/admin-service-detail/components/container_card';
+import ContainerDialog from 'routes/admin-service-detail/components/container_dialog';
+import { showReset } from 'routes/admin-service-detail/components/service.utils';
+import { SelectInput } from 'ui/inputs/SelectInput';
 
 type ServiceContainerProps = {
   service: Service;

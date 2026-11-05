@@ -1,15 +1,15 @@
 import { useTheme } from '@mui/material';
-import type { SettingsStore } from 'routes/settings/settings.form.ts';
-import { useForm } from 'routes/settings/settings.form.ts';
+import React, { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
+import type { SettingsStore } from 'routes/settings/settings.form';
+import { useForm } from 'routes/settings/settings.form';
 import { PageSection } from 'ui/layouts/PageSection';
-import { List } from 'ui/list/List';
-import { ListHeader } from 'ui/list/ListHeader';
 import { BooleanListInput } from 'ui/list-inputs/BooleanListInput';
 import { NumberListInput } from 'ui/list-inputs/NumberListInput';
 import { SelectListInput } from 'ui/list-inputs/SelectListInput';
 import { TextListInput } from 'ui/list-inputs/TextListInput';
-import React, { useCallback } from 'react';
-import { useTranslation } from 'react-i18next';
+import { List } from 'ui/list/List';
+import { ListHeader } from 'ui/list/ListHeader';
 
 type ParameterProps = {
   customize: boolean;

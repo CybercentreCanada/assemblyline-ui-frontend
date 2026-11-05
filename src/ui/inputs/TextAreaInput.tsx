@@ -7,19 +7,14 @@ import {
   InputFormLabel,
   InputHelperText,
   InputRoot
-} from 'ui/inputs/components/inputs.component.form.tsx';
-import type { InputTextFieldProps } from 'ui/inputs/components/inputs.component.textfield.tsx';
-import { InputTextField } from 'ui/inputs/components/inputs.component.textfield.tsx';
-import { useInputBlur, useInputChange, useInputFocus } from 'ui/inputs/hooks/inputs.hook.event_handlers.tsx';
-import { useInputId } from 'ui/inputs/hooks/inputs.hook.renderer.tsx';
-import { useInputValidation } from 'ui/inputs/hooks/inputs.hook.validation.tsx';
-import type {
-  InputOptions,
-  InputRuntimeState,
-  InputSlotProps,
-  InputValueModel
-} from 'ui/inputs/models/inputs.model.ts';
-import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'ui/inputs/models/inputs.model.ts';
+} from 'ui/inputs/components/inputs.component.form';
+import type { InputTextFieldProps } from 'ui/inputs/components/inputs.component.textfield';
+import { InputTextField } from 'ui/inputs/components/inputs.component.textfield';
+import { useInputBlur, useInputChange, useInputFocus } from 'ui/inputs/hooks/inputs.hook.event_handlers';
+import { useInputId } from 'ui/inputs/hooks/inputs.hook.renderer';
+import { useInputValidation } from 'ui/inputs/hooks/inputs.hook.validation';
+import type { InputOptions, InputRuntimeState, InputSlotProps, InputValueModel } from 'ui/inputs/models/inputs.model';
+import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'ui/inputs/models/inputs.model';
 
 export type TextAreaInputProps = InputValueModel<string, React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>> &
   InputOptions &

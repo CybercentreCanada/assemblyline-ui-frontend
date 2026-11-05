@@ -1,24 +1,24 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import type { Browser, BrowserContext, Page } from '@playwright/test';
 import { test as base } from '@playwright/test';
-import { SnackbarContext } from 'core/snackbar/snackbar.pom.ts';
-import { ForbiddenPage } from 'routes/forbidden/forbidden.pom.ts';
-import { NotFoundPage } from 'routes/not-found/not-found.pom.ts';
-import { AccountPage } from 'routes/user/user.pom.ts';
-import { CrashPage } from 'core/error/error.pom.ts';
-import { DevelopmentLibraryInputsPage } from 'routes/development-library/development-library.pom.ts';
-import { LoginPage } from 'layout/auth/log-in/log-in.pom.ts';
-import { WorkflowCreatePage } from 'routes/manage-workflow-create/manage-workflow-create.pom.ts';
-import { WorkflowDetailPage } from 'routes/manage-workflow-detail/manage-workflow-detail.pom.ts';
-import { WorkflowsPage } from 'routes/manage-workflows/manage-workflows.pom.ts';
-import { SubmissionDetailPage } from 'routes/submission-detail/submission-detail.pom.ts';
-import { SubmissionReportPage } from 'routes/submission-report/submission-report.pom.ts';
-import { SubmitPage } from 'routes/submit/submit.pom.ts';
-import { TermsOfServicePage } from 'layout/auth/terms-of-service/terms-of-service.pom.ts';
 import { RESULTS_DIR } from 'app/spec.constant';
 import type { PlaywrightArgs } from 'core/e2e/e2e.models';
 import { APIFixture } from 'core/e2e/utils/APIFixture';
+import { CrashPage } from 'core/error/error.pom';
+import { SnackbarContext } from 'core/snackbar/snackbar.pom';
+import { LoginPage } from 'layout/auth/log-in/log-in.pom';
+import { TermsOfServicePage } from 'layout/auth/terms-of-service/terms-of-service.pom';
 import path from 'path';
+import { DevelopmentLibraryInputsPage } from 'routes/development-library/development-library.pom';
+import { ForbiddenPage } from 'routes/forbidden/forbidden.pom';
+import { WorkflowCreatePage } from 'routes/manage-workflow-create/manage-workflow-create.pom';
+import { WorkflowDetailPage } from 'routes/manage-workflow-detail/manage-workflow-detail.pom';
+import { WorkflowsPage } from 'routes/manage-workflows/manage-workflows.pom';
+import { NotFoundPage } from 'routes/not-found/not-found.pom';
+import { SubmissionDetailPage } from 'routes/submission-detail/submission-detail.pom';
+import { SubmissionReportPage } from 'routes/submission-report/submission-report.pom';
+import { SubmitPage } from 'routes/submit/submit.pom';
+import { AccountPage } from 'routes/user/user.pom';
 
 type UserSession = {
   // Fixture

@@ -7,7 +7,7 @@ import type { Metadata } from 'models/base/submission';
 import React, { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router';
-import { initializeSettings, loadDefaultProfile, loadSubmissionProfile } from 'routes/settings/settings.utils.ts';
+import { initializeSettings, loadDefaultProfile, loadSubmissionProfile } from 'routes/settings/settings.utils';
 import { ServiceParameters } from 'routes/submit/components/ServiceParameters';
 import { SubmissionData } from 'routes/submit/components/SubmissionData';
 import {
@@ -28,8 +28,8 @@ import {
 } from 'routes/submit/components/SubmissionInputs';
 import { SubmissionMetadata } from 'routes/submit/components/SubmissionMetadata';
 import { SubmissionOptions } from 'routes/submit/components/SubmissionOptions';
-import type { SubmitState, SubmitStore } from 'routes/submit/submit.form.ts';
-import { FLOW, useForm } from 'routes/submit/submit.form.ts';
+import type { SubmitState, SubmitStore } from 'routes/submit/submit.form';
+import { FLOW, useForm } from 'routes/submit/submit.form';
 import {
   calculateFileHash,
   getDefaultExternalSources,
@@ -37,7 +37,7 @@ import {
   isValidJSON,
   switchProfile,
   useAutoURLServicesSelection
-} from 'routes/submit/submit.utils.ts';
+} from 'routes/submit/submit.utils';
 import { getSubmitType } from 'shared/utils/utils';
 import generateUUID from 'shared/utils/uuid';
 import { TabContainer } from 'ui/TabContainer';

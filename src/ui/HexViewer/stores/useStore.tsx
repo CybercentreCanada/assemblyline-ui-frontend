@@ -1,6 +1,6 @@
+import React, { useLayoutEffect } from 'react';
 import type { UpdateMemo } from 'ui/HexViewer/commons/hooks/useAdvanceReducer';
 import useAdvanceReducer from 'ui/HexViewer/commons/hooks/useAdvanceReducer';
-import React, { useLayoutEffect } from 'react';
 import type {
   ActionProps,
   ACTIONS,

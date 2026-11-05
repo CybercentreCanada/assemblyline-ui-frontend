@@ -2,24 +2,19 @@ import type { SliderProps } from '@mui/material';
 import { Slider } from '@mui/material';
 import { PropProvider, usePropStore } from 'features/prop-provider';
 import React from 'react';
-import { ResetInputAdornment } from 'ui/inputs/components/inputs.component.adornment.tsx';
+import { ResetInputAdornment } from 'ui/inputs/components/inputs.component.adornment';
 import {
   InputFormControl,
   InputFormLabel,
   InputHelperText,
   InputRoot,
   InputSkeleton
-} from 'ui/inputs/components/inputs.component.form.tsx';
-import { useInputBlur, useInputChange, useInputFocus } from 'ui/inputs/hooks/inputs.hook.event_handlers.tsx';
-import { useInputId } from 'ui/inputs/hooks/inputs.hook.renderer.tsx';
-import { useInputValidation } from 'ui/inputs/hooks/inputs.hook.validation.tsx';
-import type {
-  InputOptions,
-  InputRuntimeState,
-  InputSlotProps,
-  InputValueModel
-} from 'ui/inputs/models/inputs.model.ts';
-import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'ui/inputs/models/inputs.model.ts';
+} from 'ui/inputs/components/inputs.component.form';
+import { useInputBlur, useInputChange, useInputFocus } from 'ui/inputs/hooks/inputs.hook.event_handlers';
+import { useInputId } from 'ui/inputs/hooks/inputs.hook.renderer';
+import { useInputValidation } from 'ui/inputs/hooks/inputs.hook.validation';
+import type { InputOptions, InputRuntimeState, InputSlotProps, InputValueModel } from 'ui/inputs/models/inputs.model';
+import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'ui/inputs/models/inputs.model';
 
 export type SliderInputProps = InputValueModel<number> &
   InputOptions &

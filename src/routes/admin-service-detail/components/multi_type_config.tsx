@@ -4,9 +4,9 @@ import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import { Autocomplete, Grid, IconButton, MenuItem, Select, TextField, Tooltip, useTheme } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
 import type { Service } from 'models/base/service';
-import JSONEditor from 'ui/JSONEditor';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import JSONEditor from 'ui/JSONEditor';
 
 type ServiceConfig = {
   name: keyof Service['config'];

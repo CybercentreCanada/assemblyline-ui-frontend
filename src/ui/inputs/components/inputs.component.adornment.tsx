@@ -12,7 +12,7 @@ import { useTranslation } from 'react-i18next';
 import type { ButtonProps } from 'ui/buttons/Button';
 import { Button } from 'ui/buttons/Button';
 import { IconButton } from 'ui/buttons/IconButton';
-import { useInputBlur, useInputChange } from 'ui/inputs/hooks/inputs.hook.event_handlers.tsx';
+import { useInputBlur, useInputChange } from 'ui/inputs/hooks/inputs.hook.event_handlers';
 import {
   useInputId,
   useShouldRenderAdornments,
@@ -24,8 +24,8 @@ import {
   useShouldRenderPassword,
   useShouldRenderProgress,
   useShouldRenderReset
-} from 'ui/inputs/hooks/inputs.hook.renderer.tsx';
-import type { InputControllerProps } from 'ui/inputs/models/inputs.model.ts';
+} from 'ui/inputs/hooks/inputs.hook.renderer';
+import type { InputControllerProps } from 'ui/inputs/models/inputs.model';
 
 export type InputButtonAdornmentProps = {
   variant?: 'icon' | 'text';

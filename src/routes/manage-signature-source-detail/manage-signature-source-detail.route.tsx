@@ -7,7 +7,7 @@ import type { EnvironmentVariable, UpdateSource, UpdateSourceCommon } from 'mode
 import { FETCH_METHODS } from 'models/base/service';
 import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { showReset } from 'routes/admin-service-detail/components/service.utils.ts';
+import { showReset } from 'routes/admin-service-detail/components/service.utils';
 import { CheckboxInput } from 'ui/inputs/CheckboxInput';
 import { ClassificationInput } from 'ui/inputs/ClassificationInput';
 import { JSONInput } from 'ui/inputs/JSONInput';

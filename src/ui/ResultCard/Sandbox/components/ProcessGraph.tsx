@@ -22,7 +22,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { humanReadableNumber } from 'shared/utils/utils';
 import { CustomChip } from 'ui/CustomChip';
-import type { ProcessItem, SandboxFilter } from 'ui/ResultCard/Sandbox/sandbox.utils.ts';
+import type { ProcessItem, SandboxFilter } from 'ui/ResultCard/Sandbox/sandbox.utils';
 import {
   buildProcessTree,
   filterSafelistedProcesses,
@@ -30,7 +30,7 @@ import {
   getBorderColor,
   getDescendantPids,
   getProcessScore
-} from 'ui/ResultCard/Sandbox/sandbox.utils.ts';
+} from 'ui/ResultCard/Sandbox/sandbox.utils';
 
 /* ----------------------------------------------------------------------------
  * ProcessStats

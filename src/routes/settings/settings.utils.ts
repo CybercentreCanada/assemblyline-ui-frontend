@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/prefer-for-of */
+import _ from 'lodash';
+import type { CustomUser } from 'models/api/user';
 import type { Submission, SubmissionProfileParams } from 'models/base/config';
 import type { UserSettings } from 'models/base/user_settings';
-import type { CustomUser } from 'models/api/user';
-import _ from 'lodash';
 
 /**
  * Keys that belong to the "interface" part of user settings.

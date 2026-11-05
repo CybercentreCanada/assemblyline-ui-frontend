@@ -1,5 +1,5 @@
-import { FormProvider } from 'routes/submit/submit.form.ts';
-import { SubmitRoute } from 'routes/submit/submit.route.tsx';
+import { FormProvider } from 'routes/submit/submit.form';
+import { SubmitRoute } from 'routes/submit/submit.route';
 
 const SubmitPage = () => (
   <FormProvider>

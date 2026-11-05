@@ -1,9 +1,9 @@
 import ClearIcon from '@mui/icons-material/Clear';
 import { useTheme } from '@mui/material';
-import type { StoreProps } from 'ui/HexViewer';
-import { NumericField, TooltipIconButton, useDispatch, useEventListener } from 'ui/HexViewer';
 import React, { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import type { StoreProps } from 'ui/HexViewer';
+import { NumericField, TooltipIconButton, useDispatch, useEventListener } from 'ui/HexViewer';
 
 export const WrappedHexCursorBar = ({ store }: StoreProps) => {
   const { t } = useTranslation(['hexViewer']);

@@ -12,9 +12,9 @@ import {
   PasswordInputAdornment,
   ProgressInputAdornment,
   ResetInputAdornment
-} from 'ui/inputs/components/inputs.component.adornment.tsx';
-import { useInputId, useInputLabel } from 'ui/inputs/hooks/inputs.hook.renderer.tsx';
-import type { InputControllerProps } from 'ui/inputs/models/inputs.model.ts';
+} from 'ui/inputs/components/inputs.component.adornment';
+import { useInputId, useInputLabel } from 'ui/inputs/hooks/inputs.hook.renderer';
+import type { InputControllerProps } from 'ui/inputs/models/inputs.model';
 
 export const useInputTextFieldSlots = (overrides?: Partial<TextFieldProps>) => {
   const theme = useTheme();
