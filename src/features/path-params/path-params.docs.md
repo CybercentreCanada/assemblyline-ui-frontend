@@ -101,6 +101,13 @@ codec.parse({ ...location, pathname: '/alerts/123' });
 // { id: '123', tab: 'overview' }
 ```
 
+When no default is provided, a missing or empty segment resolves to `null`:
+
+```typescript
+codec.parse({ ...location, pathname: '/alerts/' });
+// { id: null, tab: 'overview' }
+```
+
 Route components can parse the current React Router location directly with the codec defined above:
 
 ```typescript

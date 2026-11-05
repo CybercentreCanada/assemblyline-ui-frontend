@@ -145,7 +145,7 @@ codec.parse(location); // '/other/path/hex'
 // { id: 'path', tab: 'hex' }       <- static segments are not compared
 
 codec.parse(location); // '/file/viewer/'
-// { id: '', tab: 'ascii' }         <- empty segment, defaults`;
+// { id: null, tab: 'ascii' }       <- empty id uses its null default`;
 
 const BLUEPRINTS_SNIPPET = `
 const codec = createPathParamsCodec('/items/:page/:sort/:descending')(b => ({
