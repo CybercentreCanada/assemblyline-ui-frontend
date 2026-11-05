@@ -9,8 +9,9 @@ Type-safe reading and writing of URL path parameters for one path definition. Th
 - **Typed parameter keys** - Derives keys from the `:param` segments of a path literal
 - **Blueprint-based parsing** - Supports string, number, boolean, and enum parameter values
 - **Positional extraction** - Reads each parameter from the pathname segment at the same position as in the definition; static segments are not compared
-- **Default values** - Resolves a missing or empty segment, and a value a blueprint does not recognize, to the configured default
+- **Default values** - Resolves a missing or empty segment, and a value a blueprint does not recognize, to the configured default; defaults to `null` when omitted
 - **URL encoding** - Decodes segments during parsing, keeping malformed escapes as literal text, and encodes values during serialization
+- **Nullish serialization** - `null` and `undefined` serialize as empty path segments; values such as `0` and `false` retain their string representations
 - **No value validation** - Values are written as the blueprint serializes them, including empty, `.` and `..` values; the only error is a `URIError` for text that cannot be encoded
 
 ## 3. Concepts
@@ -48,14 +49,15 @@ The module does not validate the definition: repeated parameter names, wildcards
 
 ### Available Blueprint Types
 
-| Blueprint                     | Default     | Behavior                                                                  |
-| ----------------------------- | ----------- | ------------------------------------------------------------------------- |
-| `string(defaultValue?)`       | `''`        | Returns the decoded segment or the default when it is missing             |
-| `number(defaultValue?)`       | `0`         | Converts the segment with `Number`, using the default for invalid numbers |
-| `boolean(defaultValue?)`      | `false`     | Converts `true`/`1` to `true` and `false`/`0` to `false`                  |
-| `enum(values, defaultValue?)` | `values[0]` | Returns a matching value or the default                                   |
+| Blueprint                     | Default | Behavior                                                                |
+| ----------------------------- | ------- | ----------------------------------------------------------------------- |
+| `string(defaultValue?)`       | `null`  | Returns the decoded segment or the default when it is missing or empty  |
+| `number(defaultValue?)`       | `null`  | Converts the segment with `Number`, using the default for invalid input |
+| `boolean(defaultValue?)`      | `null`  | Converts `true`/`1` to `true` and `false`/`0` to `false`                |
+| `enum(values, defaultValue?)` | `null`  | Returns a matching value or the default                                 |
 
 Distinct enum options must not share a string representation, so `[1, '1']` is rejected when the blueprint is created.
+Providing an explicit default preserves that value's narrower type and uses it when parsing missing, empty, or unrecognized segments. Stringifying `null` or `undefined` writes an empty segment, while `0` and `false` write `0` and `false`.
 
 ### Creating A Codec
 

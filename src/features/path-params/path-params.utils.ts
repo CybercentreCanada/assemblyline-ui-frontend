@@ -39,37 +39,46 @@ export const getOwnValue = <Value>(record: Record<string, Value>, key: string): 
 // Path Param Blueprints
 //*****************************************************************************************
 export const PATH_PARAM_BLUEPRINTS_MAP = {
-  string: (defaultValue = ''): InferPathParamBlueprintFromValue<string> => ({
+  string: <const DefaultValue extends string | null = null>(
+    defaultValue: DefaultValue = null as DefaultValue
+  ): InferPathParamBlueprintFromValue<string | Extract<DefaultValue, null>> => ({
     type: '',
     kind: 'string',
-    parse: value => (value == null ? defaultValue : value),
-    stringify: value => String(value)
+    parse: value => (value == null || value === '' ? defaultValue : value),
+    stringify: value => (value == null ? '' : String(value))
   }),
-  number: (defaultValue = 0): InferPathParamBlueprintFromValue<number> => ({
+  number: <const DefaultValue extends number | null = null>(
+    defaultValue: DefaultValue = null as DefaultValue
+  ): InferPathParamBlueprintFromValue<number | Extract<DefaultValue, null>> => ({
     type: 0,
     kind: 'number',
     parse: value => {
-      if (value == null) return defaultValue;
+      if (value == null || value === '') return defaultValue;
       const parsed = Number(value);
       return Number.isNaN(parsed) ? defaultValue : parsed;
     },
-    stringify: value => String(value)
+    stringify: value => (value == null ? '' : String(value))
   }),
-  boolean: (defaultValue = false): InferPathParamBlueprintFromValue<boolean> => ({
+  boolean: <const DefaultValue extends boolean | null = null>(
+    defaultValue: DefaultValue = null as DefaultValue
+  ): InferPathParamBlueprintFromValue<boolean | Extract<DefaultValue, null>> => ({
     type: false,
     kind: 'boolean',
     parse: value => {
-      if (value == null) return defaultValue;
+      if (value == null || value === '') return defaultValue;
       if (value === 'true' || value === '1') return true;
       if (value === 'false' || value === '0') return false;
       return defaultValue;
     },
-    stringify: value => String(value)
+    stringify: value => (value == null ? '' : String(value))
   }),
-  enum: <const Values extends readonly [string | boolean | number, ...(string | boolean | number)[]]>(
+  enum: <
+    const Values extends readonly [string | boolean | number, ...(string | boolean | number)[]],
+    const DefaultValue extends Values[number] | null = null
+  >(
     values: Values,
-    defaultValue: Values[number] = values[0]
-  ): InferPathParamBlueprintFromValue<Values[number]> => {
+    defaultValue: DefaultValue = null as DefaultValue
+  ): InferPathParamBlueprintFromValue<Values[number] | Extract<DefaultValue, null>> => {
     const optionByString = new Map<string, Values[number]>();
 
     for (const option of values) {
@@ -84,12 +93,13 @@ export const PATH_PARAM_BLUEPRINTS_MAP = {
       type: defaultValue,
       kind: 'enum',
       options: values,
-      parse: value => (value == null ? defaultValue : (optionByString.get(value) ?? defaultValue)),
+      parse: value => (value == null || value === '' ? defaultValue : (optionByString.get(value) ?? defaultValue)),
       stringify: value => {
+        if (value == null) return '';
         for (const candidate of values) {
           if (Object.is(candidate, value)) return String(candidate);
         }
-        return String(defaultValue);
+        return defaultValue == null ? '' : String(defaultValue);
       }
     };
   }

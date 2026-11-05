@@ -19,9 +19,18 @@ import { describe, expect, expectTypeOf, it } from 'vitest';
 //*****************************************************************************************
 
 describe('PATH_PARAM_BLUEPRINTS_MAP.string', () => {
+  it('uses null as the default for missing or empty values', () => {
+    const blueprint = PATH_PARAM_BLUEPRINTS_MAP.string();
+
+    expect(blueprint.parse(undefined)).toBeNull();
+    expect(blueprint.parse('')).toBeNull();
+    expectTypeOf(blueprint.parse(undefined)).toEqualTypeOf<string | null>();
+  });
+
   it('returns the default value when parsing a missing value', () => {
     const blueprint = PATH_PARAM_BLUEPRINTS_MAP.string('fallback');
     expect(blueprint.parse(undefined)).toBe('fallback');
+    expectTypeOf(blueprint.parse(undefined)).toEqualTypeOf<string>();
   });
 
   it('returns the given value as-is when present', () => {
@@ -32,13 +41,24 @@ describe('PATH_PARAM_BLUEPRINTS_MAP.string', () => {
   it('stringifies values to strings', () => {
     const blueprint = PATH_PARAM_BLUEPRINTS_MAP.string();
     expect(blueprint.stringify('abc')).toBe('abc');
+    expect(blueprint.stringify(null)).toBe('');
+    expect(blueprint.stringify(undefined)).toBe('');
   });
 });
 
 describe('PATH_PARAM_BLUEPRINTS_MAP.number', () => {
+  it('uses null as the default for missing or empty values', () => {
+    const blueprint = PATH_PARAM_BLUEPRINTS_MAP.number();
+
+    expect(blueprint.parse(undefined)).toBeNull();
+    expect(blueprint.parse('')).toBeNull();
+    expectTypeOf(blueprint.parse(undefined)).toEqualTypeOf<number | null>();
+  });
+
   it('returns the default value when parsing a missing value', () => {
     const blueprint = PATH_PARAM_BLUEPRINTS_MAP.number(7);
     expect(blueprint.parse(undefined)).toBe(7);
+    expectTypeOf(blueprint.parse(undefined)).toEqualTypeOf<number>();
   });
 
   it('parses numeric strings', () => {
@@ -54,13 +74,25 @@ describe('PATH_PARAM_BLUEPRINTS_MAP.number', () => {
   it('stringifies numbers to strings', () => {
     const blueprint = PATH_PARAM_BLUEPRINTS_MAP.number();
     expect(blueprint.stringify(42)).toBe('42');
+    expect(blueprint.stringify(0)).toBe('0');
+    expect(blueprint.stringify(null)).toBe('');
+    expect(blueprint.stringify(undefined)).toBe('');
   });
 });
 
 describe('PATH_PARAM_BLUEPRINTS_MAP.boolean', () => {
+  it('uses null as the default for missing or empty values', () => {
+    const blueprint = PATH_PARAM_BLUEPRINTS_MAP.boolean();
+
+    expect(blueprint.parse(undefined)).toBeNull();
+    expect(blueprint.parse('')).toBeNull();
+    expectTypeOf(blueprint.parse(undefined)).toEqualTypeOf<boolean | null>();
+  });
+
   it('returns the default value when parsing a missing value', () => {
     const blueprint = PATH_PARAM_BLUEPRINTS_MAP.boolean(true);
     expect(blueprint.parse(undefined)).toBe(true);
+    expectTypeOf(blueprint.parse(undefined)).toEqualTypeOf<boolean>();
   });
 
   it('parses truthy string representations', () => {
@@ -83,13 +115,25 @@ describe('PATH_PARAM_BLUEPRINTS_MAP.boolean', () => {
   it('stringifies booleans to strings', () => {
     const blueprint = PATH_PARAM_BLUEPRINTS_MAP.boolean();
     expect(blueprint.stringify(true)).toBe('true');
+    expect(blueprint.stringify(false)).toBe('false');
+    expect(blueprint.stringify(null)).toBe('');
+    expect(blueprint.stringify(undefined)).toBe('');
   });
 });
 
 describe('PATH_PARAM_BLUEPRINTS_MAP.enum', () => {
+  it('uses null as the default for missing or empty values', () => {
+    const blueprint = PATH_PARAM_BLUEPRINTS_MAP.enum(['a', 'b', 'c'] as const);
+
+    expect(blueprint.parse(undefined)).toBeNull();
+    expect(blueprint.parse('')).toBeNull();
+    expectTypeOf(blueprint.parse(undefined)).toEqualTypeOf<'a' | 'b' | 'c' | null>();
+  });
+
   it('returns the default value when parsing a missing value', () => {
     const blueprint = PATH_PARAM_BLUEPRINTS_MAP.enum(['a', 'b', 'c'] as const, 'b');
     expect(blueprint.parse(undefined)).toBe('b');
+    expectTypeOf(blueprint.parse(undefined)).toEqualTypeOf<'a' | 'b' | 'c'>();
   });
 
   it('parses a matching candidate value', () => {
@@ -102,9 +146,9 @@ describe('PATH_PARAM_BLUEPRINTS_MAP.enum', () => {
     expect(blueprint.parse('zzz')).toBe('a');
   });
 
-  it('defaults to the first value when no default is given', () => {
+  it('defaults to null when no default is given', () => {
     const blueprint = PATH_PARAM_BLUEPRINTS_MAP.enum(['x', 'y'] as const);
-    expect(blueprint.type).toBe('x');
+    expect(blueprint.type).toBeNull();
   });
 
   it('rejects distinct options with the same string representation', () => {
@@ -123,7 +167,8 @@ describe('PATH_PARAM_BLUEPRINTS_MAP.enum', () => {
 
   it('stringifies invalid values to the configured default', () => {
     const blueprint = PATH_PARAM_BLUEPRINTS_MAP.enum(['ascii', 'code'] as const, 'ascii');
-    expect(blueprint.stringify(null as never)).toBe('ascii');
+    expect(blueprint.stringify(null)).toBe('');
+    expect(blueprint.stringify(undefined)).toBe('');
     expect(blueprint.stringify('invalid' as never)).toBe('ascii');
   });
 
@@ -131,8 +176,8 @@ describe('PATH_PARAM_BLUEPRINTS_MAP.enum', () => {
     const nullBlueprint = PATH_PARAM_BLUEPRINTS_MAP.enum(['ascii', 'null'] as const, 'ascii');
     const undefinedBlueprint = PATH_PARAM_BLUEPRINTS_MAP.enum(['ascii', 'undefined'] as const, 'ascii');
 
-    expect(nullBlueprint.stringify(null as never)).toBe('ascii');
-    expect(undefinedBlueprint.stringify(undefined as never)).toBe('ascii');
+    expect(nullBlueprint.stringify(null)).toBe('');
+    expect(undefinedBlueprint.stringify(undefined)).toBe('');
   });
 });
 
@@ -194,6 +239,17 @@ describe('createPathParamsCodec', () => {
     expect(codec.parse(makeLocation('/item/'))).toEqual({ itemID: 'none', pageNumber: 1 });
     expect(codec.parse(makeLocation('/item//page/3'))).toEqual({ itemID: 'none', pageNumber: 3 });
     expect(codec.parse(makeLocation(''))).toEqual({ itemID: 'none', pageNumber: 1 });
+  });
+
+  it('uses null defaults for missing or empty segments when no default is configured', () => {
+    const codec = createPathParamsCodec('/item/:itemID/page/:pageNumber/:enabled')(b => ({
+      itemID: b.string(),
+      pageNumber: b.number(),
+      enabled: b.boolean()
+    }));
+
+    expect(codec.parse(makeLocation('/item'))).toEqual({ itemID: null, pageNumber: null, enabled: null });
+    expect(codec.parse(makeLocation('/item//page//'))).toEqual({ itemID: null, pageNumber: null, enabled: null });
   });
 
   it('uses the default for a value the blueprint does not recognize', () => {
@@ -294,13 +350,24 @@ describe('createPathParamsCodec', () => {
     expect(() => codec.stringify({ itemID })).toThrow(URIError);
   });
 
-  it('stringifies null enum values to the configured default', () => {
+  it('stringifies null enum values as empty segments', () => {
     const codec = createPathParamsCodec('/file/viewer/:id/:tab')(b => ({
       id: b.string(),
       tab: b.enum(['ascii', 'code', 'strings', 'hex', 'image'] as const, 'ascii')
     }));
 
-    expect(codec.stringify({ id: 'abc', tab: null as never })).toBe('/file/viewer/abc/ascii');
+    expect(codec.stringify({ id: 'abc', tab: null as never })).toBe('/file/viewer/abc/');
+  });
+
+  it('stringifies nullish values as empty strings while preserving zero and false', () => {
+    const codec = createPathParamsCodec('/item/:name/:count/:enabled')(b => ({
+      name: b.string(),
+      count: b.number(),
+      enabled: b.boolean()
+    }));
+
+    expect(codec.stringify({ name: null, count: 0, enabled: false })).toBe('/item//0/false');
+    expect(codec.stringify({ name: undefined, count: null, enabled: null } as never)).toBe('/item///');
   });
 
   it('handles a path with no dynamic segments', () => {

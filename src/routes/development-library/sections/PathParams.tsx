@@ -291,7 +291,7 @@ export const PathParamsSection = memo(() => (
     <DemoSection
       id="Path Params: Stringify"
       primary="Stringify"
-      secondary="Build a pathname from typed values. Values are URL-encoded and written as they are, without validation."
+      secondary="Build a pathname from typed values. Values are URL-encoded and written as they are"
       left={
         <Column>
           <PathParamsTextField field="id" label="id" />

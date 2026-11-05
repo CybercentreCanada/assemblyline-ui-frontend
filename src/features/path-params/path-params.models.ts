@@ -34,7 +34,7 @@ export type PathParamBlueprintKind = 'string' | 'number' | 'boolean' | 'enum';
  * Defines how a single path parameter is parsed from and serialized to the URL.
  * The generic `Value` determines the runtime type of the resolved parameter.
  */
-export type InferPathParamBlueprintFromValue<Value extends PathParamValue = PathParamValue> = {
+export type InferPathParamBlueprintFromValue<Value extends PathParamValue | null = PathParamValue | null> = {
   /** Representative value used for type inference at compile time. */
   type: Value;
   /** Identifies the blueprint variant (e.g. distinguishes `enum` from a plain `string`). */
@@ -44,7 +44,7 @@ export type InferPathParamBlueprintFromValue<Value extends PathParamValue = Path
   /** Deserializes a raw URL segment into the typed value; `undefined` means the segment is missing or empty. */
   parse: (value: string | undefined) => Value;
   /** Serializes the typed value back into a URL-safe string. */
-  stringify: (value: Value) => string;
+  stringify: (value: Value | undefined) => string;
 };
 
 /**
