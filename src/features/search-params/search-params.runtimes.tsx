@@ -28,6 +28,7 @@ export function SearchParamRuntimeFactory<
 
     // Introspection
     public override getKind = super.getKind;
+    public override describe = super.describe;
 
     // Setters
     public override setDefaultValue = super.setDefaultValue;
