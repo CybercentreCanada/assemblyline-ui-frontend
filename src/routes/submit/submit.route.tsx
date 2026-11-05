@@ -1,7 +1,7 @@
 import { Alert, Collapse, styled, useMediaQuery, useTheme } from '@mui/material';
 import { BAR_FLAG, FOO_FLAG } from 'app/core.feature-flags';
 import useALContext from 'core/config/useALContext';
-import { useIsFeatureEnabled2, useToggleFeatureFlag } from 'core/feature-flags';
+import { useIsFeatureEnabled, useToggleFeatureFlag } from 'core/feature-flags';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import { useAppBanner } from 'core/template/components/app/hooks';
 import PageCenter from 'core/template/components/pages/PageCenter';
@@ -122,8 +122,8 @@ const WrappedSubmitRoute = () => {
   const { user: currentUser, configuration, settings } = useALContext();
   const form = useForm();
 
-  const isBarEnabled: boolean = useIsFeatureEnabled2(BAR_FLAG);
-  const isFooEnabled: boolean = useIsFeatureEnabled2(FOO_FLAG);
+  const isBarEnabled: boolean = useIsFeatureEnabled(BAR_FLAG);
+  const isFooEnabled: boolean = useIsFeatureEnabled(FOO_FLAG);
   const toggleFlag = useToggleFeatureFlag();
 
   const applyAutoURLServicesSelection = useAutoURLServicesSelection();

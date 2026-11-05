@@ -10,6 +10,7 @@ import { useBootstrapQuery } from 'core/api/hooks/useBootstrapQuery';
 import type { LoginParamsProps } from 'core/api/hooks/useMyAPI';
 import { AppConfigStoreProvider } from 'core/config';
 import useALContext from 'core/config/useALContext';
+import { EMPTY_FEATURE_FLAG_STATE } from 'core/feature-flags';
 import { AppFeatureFlagProvider, AppFeatureFlagStoreProvider } from 'core/feature-flags/feature-flags.providers';
 import { AppInterfaceStoreProvider } from 'core/interface';
 import { AppPreferenceProvider, AppPreferenceStoreProvider } from 'core/preference';
@@ -120,17 +121,20 @@ export const MyApp: React.FC = () => {
         <APIProvider>
           <SafeResultsProvider>
             <QuotaProvider>
-              <AppFeatureFlagProvider storageKey={FEATURE_FLAGS_STORAGE_KEY} defaultState={DEFAULT_FEATURE_FLAG_STATE}>
-                <AppProvider
-                  preferences={myPreferences}
-                  themes={myThemes}
-                  sitemap={mySitemap}
-                  user={myUser}
-                  // search={mySearch}
+              <AppProvider
+                preferences={myPreferences}
+                themes={myThemes}
+                sitemap={mySitemap}
+                user={myUser}
+                // search={mySearch}
+              >
+                <AppFeatureFlagProvider
+                  storageKey={FEATURE_FLAGS_STORAGE_KEY}
+                  defaultState={DEFAULT_FEATURE_FLAG_STATE}
                 >
                   <MyAppMain />
-                </AppProvider>
-              </AppFeatureFlagProvider>
+                </AppFeatureFlagProvider>
+              </AppProvider>
             </QuotaProvider>
           </SafeResultsProvider>
         </APIProvider>
@@ -147,7 +151,7 @@ const AppStores = memo(({ children }: PropsWithChildren) => (
   <AppConfigStoreProvider data={DEFAULT_APP_CONFIG_STORE}>
     <AppInterfaceStoreProvider data={DEFAULT_APP_INTERFACE_STORE}>
       <AppPreferenceStoreProvider data={DEFAULT_APP_PREFERENCE_STORE}>
-        <AppFeatureFlagStoreProvider>{children}</AppFeatureFlagStoreProvider>
+        <AppFeatureFlagStoreProvider data={EMPTY_FEATURE_FLAG_STATE}>{children}</AppFeatureFlagStoreProvider>
       </AppPreferenceStoreProvider>
     </AppInterfaceStoreProvider>
   </AppConfigStoreProvider>
