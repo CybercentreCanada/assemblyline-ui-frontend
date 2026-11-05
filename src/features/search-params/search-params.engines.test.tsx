@@ -94,9 +94,10 @@ describe('SearchParamEngine.getEphemeralKeys', () => {
   it('returns keys marked as ephemeral', () => {
     const engine = new SearchParamEngine({
       page: SEARCH_PARAM_BLUEPRINTS_MAP.number(1).ephemeral(),
-      query: SEARCH_PARAM_BLUEPRINTS_MAP.string('')
+      query: SEARCH_PARAM_BLUEPRINTS_MAP.string(''),
+      sort: SEARCH_PARAM_BLUEPRINTS_MAP.string('').ephemeral()
     });
-    expect(engine.getEphemeralKeys()).toEqual(['page']);
+    expect(engine.getEphemeralKeys()).toEqual(['page', 'sort']);
   });
 });
 
@@ -104,9 +105,10 @@ describe('SearchParamEngine.getIgnoredKeys', () => {
   it('returns keys marked as ignored', () => {
     const engine = new SearchParamEngine({
       page: SEARCH_PARAM_BLUEPRINTS_MAP.number(1).ignored(),
-      query: SEARCH_PARAM_BLUEPRINTS_MAP.string('')
+      query: SEARCH_PARAM_BLUEPRINTS_MAP.string(''),
+      sort: SEARCH_PARAM_BLUEPRINTS_MAP.string('').ignored()
     });
-    expect(engine.getIgnoredKeys()).toEqual(['page']);
+    expect(engine.getIgnoredKeys()).toEqual(['page', 'sort']);
   });
 });
 
@@ -114,9 +116,20 @@ describe('SearchParamEngine.getLockedKeys', () => {
   it('returns keys marked as locked', () => {
     const engine = new SearchParamEngine({
       page: SEARCH_PARAM_BLUEPRINTS_MAP.number(1).locked(),
-      query: SEARCH_PARAM_BLUEPRINTS_MAP.string('')
+      query: SEARCH_PARAM_BLUEPRINTS_MAP.string(''),
+      sort: SEARCH_PARAM_BLUEPRINTS_MAP.string('').locked()
     });
-    expect(engine.getLockedKeys()).toEqual(['page']);
+    expect(engine.getLockedKeys()).toEqual(['page', 'sort']);
+  });
+});
+
+describe('SearchParamEngine key introspection', () => {
+  it('returns empty arrays when there are no runtimes', () => {
+    const engine = new SearchParamEngine({});
+
+    expect(engine.getEphemeralKeys()).toEqual([]);
+    expect(engine.getIgnoredKeys()).toEqual([]);
+    expect(engine.getLockedKeys()).toEqual([]);
   });
 });
 
