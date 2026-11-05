@@ -1,6 +1,6 @@
-import { useAppFeatureFlagStore } from 'core/feature-flags';
-import type { FeatureFlagType } from 'core/feature-flags/feature-flags.models';
-import { useAppSetFeatureFlagStore } from 'core/feature-flags/feature-flags.providers';
+import { useAppFeatureFlagStore } from 'core/feature-flag';
+import type { FeatureFlagType } from 'core/feature-flag/feature-flag.models';
+import { useAppSetFeatureFlagStore } from 'core/feature-flag/feature-flag.providers';
 import { useCallback } from 'react';
 
 export const useIsFeatureEnabled = (flag: FeatureFlagType): boolean => {

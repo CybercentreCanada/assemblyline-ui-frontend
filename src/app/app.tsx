@@ -10,8 +10,8 @@ import { useBootstrapQuery } from 'core/api/hooks/useBootstrapQuery';
 import type { LoginParamsProps } from 'core/api/hooks/useMyAPI';
 import { AppConfigStoreProvider } from 'core/config';
 import useALContext from 'core/config/useALContext';
-import { EMPTY_FEATURE_FLAG_STATE } from 'core/feature-flags';
-import { AppFeatureFlagProvider, AppFeatureFlagStoreProvider } from 'core/feature-flags/feature-flags.providers';
+import { EMPTY_FEATURE_FLAG_STATE } from 'core/feature-flag';
+import { AppFeatureFlagProvider, AppFeatureFlagStoreProvider } from 'core/feature-flag/feature-flag.providers';
 import { AppInterfaceStoreProvider } from 'core/interface';
 import { AppPreferenceProvider, AppPreferenceStoreProvider } from 'core/preference';
 import QuotaExceeded from 'core/template/branding/AppVerticalBanner';
@@ -34,7 +34,7 @@ import React, { memo, useCallback, useEffect, useState } from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import setMomentFRLocale from 'shared/utils/moment-fr-locale';
 import { getProvider, getSAMLData } from 'shared/utils/utils';
-import { DEFAULT_FEATURE_FLAG_STATE, FEATURE_FLAGS_STORAGE_KEY } from './core.feature-flags';
+import { DEFAULT_FEATURE_FLAG_STATE, FEATURE_FLAGS_STORAGE_KEY } from './core.feature-flag';
 
 type PossibleApps = 'load' | 'locked' | 'login' | 'routes' | 'tos' | 'quota';
 

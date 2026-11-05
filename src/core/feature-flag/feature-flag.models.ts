@@ -15,4 +15,4 @@ export type FeatureFlagStore = {
   flags: FeatureFlag[];
 };
 
-export const EMPTY_FEATURE_FLAG_STATE = { flags: [] };
+export const EMPTY_FEATURE_FLAG_STATE: FeatureFlagStore = { flags: [] };

@@ -1,6 +1,6 @@
 import useALContext from 'core/config/useALContext';
-import { loadFeatureFlags, saveFeatureFlags } from 'core/feature-flags/feature-flag.persistence';
-import { EMPTY_FEATURE_FLAG_STATE, FeatureFlag, FeatureFlagStore } from 'core/feature-flags/feature-flags.models';
+import { EMPTY_FEATURE_FLAG_STATE, FeatureFlagStore } from 'core/feature-flag/feature-flag.models';
+import { loadFeatureFlags, saveFeatureFlags } from 'core/feature-flag/feature-flag.persistence';
 import { createAppStore } from 'features/store';
 import type { PropsWithChildren } from 'react';
 import { memo, useEffect } from 'react';
@@ -13,13 +13,13 @@ export const {
   useStore: useAppFeatureFlagStore,
   useSetStore: useAppSetFeatureFlagStore,
   useStoreApi: useAppFeatureFlagStoreApi
-} = createAppStore<FeatureFlagStore>(EMPTY_FEATURE_FLAG_STATE);
+} = createAppStore(EMPTY_FEATURE_FLAG_STATE);
 
 AppFeatureFlagStoreProvider.displayName = 'AppFeatureFlagStoreProvider';
 
 export type AppFeatureFlagProviderProps = PropsWithChildren<{
   storageKey: string;
-  defaultState: FeatureFlag[];
+  defaultState: FeatureFlagStore;
 }>;
 
 export const AppFeatureFlagProvider = memo(({ children, storageKey, defaultState }: AppFeatureFlagProviderProps) => {
@@ -30,7 +30,7 @@ export const AppFeatureFlagProvider = memo(({ children, storageKey, defaultState
   useEffect(() => {
     if (!isUserFeatureFlagAdmin(user)) return;
 
-    setFeatureFlagStore({ flags: loadFeatureFlags(storageKey, defaultState) });
+    setFeatureFlagStore(loadFeatureFlags(storageKey, defaultState));
   }, [setFeatureFlagStore, storageKey, user]);
 
   useEffect(() => {
@@ -38,8 +38,9 @@ export const AppFeatureFlagProvider = memo(({ children, storageKey, defaultState
 
     featureFlagStoreApi.subscribe(store => {
       if (!store) return;
+      console.warn('save flags', store.flags);
 
-      saveFeatureFlags(storageKey, store.flags);
+      saveFeatureFlags(storageKey, store);
     });
   }, [featureFlagStoreApi, storageKey, user]);
 

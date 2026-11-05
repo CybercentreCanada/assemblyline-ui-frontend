@@ -1,7 +1,7 @@
 import { Alert, Collapse, styled, useMediaQuery, useTheme } from '@mui/material';
-import { BAR_FLAG, FOO_FLAG } from 'app/core.feature-flags';
+import { BAR_FLAG, FOO_FLAG } from 'app/core.feature-flag';
 import useALContext from 'core/config/useALContext';
-import { useIsFeatureEnabled, useToggleFeatureFlag } from 'core/feature-flags';
+import { FeatureFlagged, useIsFeatureEnabled, useToggleFeatureFlag } from 'core/feature-flag';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import { useAppBanner } from 'core/template/components/app/hooks';
 import PageCenter from 'core/template/components/pages/PageCenter';
@@ -359,6 +359,8 @@ const WrappedSubmitRoute = () => {
                 <LeftPanelAction adjust={adjust}>
                   <CancelButton />
                   <div style={{ flex: 1 }} />
+
+                  <FeatureFlagged flag={FOO_FLAG}>test</FeatureFlagged>
 
                   {isFooEnabled && <FindButton />}
 

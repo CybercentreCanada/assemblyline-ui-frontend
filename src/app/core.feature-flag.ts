@@ -1,4 +1,5 @@
-import { FeatureFlag, FeatureFlagDefinition, FeatureFlagType } from 'core/feature-flags';
+import { FeatureFlagDefinition, FeatureFlagType } from 'core/feature-flag';
+import { FeatureFlagStore } from 'core/feature-flag/feature-flag.models';
 
 export const FEATURE_FLAGS_STORAGE_KEY = 'assemblyline.featureFlags';
 
@@ -20,7 +21,9 @@ export const BAR_FLAG_DEF: FeatureFlagDefinition = {
   state: 'alpha'
 };
 
-export const DEFAULT_FEATURE_FLAG_STATE: FeatureFlag[] = [
-  { flag: FOO_FLAG, enabled: false },
-  { flag: BAR_FLAG, enabled: false }
-];
+export const DEFAULT_FEATURE_FLAG_STATE: FeatureFlagStore = {
+  flags: [
+    { flag: FOO_FLAG, enabled: false },
+    { flag: BAR_FLAG, enabled: false }
+  ]
+};
