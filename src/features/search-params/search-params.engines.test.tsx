@@ -54,6 +54,70 @@ describe('SearchParamEngine.setDefaultValues', () => {
     });
   });
 
+  it('recursively merges restored records and replaces arrays', () => {
+    const engine = new SearchParamEngine({
+      config: SEARCH_PARAM_BLUEPRINTS_MAP.object({
+        panel: {
+          filters: { tags: ['a', 'b'], mode: 'any' },
+          tags: ['old'],
+          enabled: true
+        }
+      })
+    });
+    const values = new URLSearchParams({
+      config: JSON.stringify({
+        panel: {
+          filters: { mode: 'all' },
+          tags: ['new']
+        }
+      })
+    });
+
+    engine.setDefaultValues(values);
+
+    expect(engine.getDefaultValues().toObject()).toEqual({
+      config: {
+        panel: {
+          filters: { tags: ['a', 'b'], mode: 'all' },
+          tags: ['new'],
+          enabled: true
+        }
+      }
+    });
+  });
+
+  it('recursively merges restored nested records and replaces arrays', () => {
+    const engine = new SearchParamEngine({
+      config: SEARCH_PARAM_BLUEPRINTS_MAP.object({
+        panel: {
+          filters: { tags: ['a', 'b'], mode: 'any' },
+          tags: ['old'],
+          enabled: true
+        }
+      })
+    });
+    const values = new URLSearchParams({
+      config: JSON.stringify({
+        panel: {
+          filters: { mode: 'all' },
+          tags: ['new']
+        }
+      })
+    });
+
+    engine.setDefaultValues(values);
+
+    expect(engine.getDefaultValues().toObject()).toEqual({
+      config: {
+        panel: {
+          filters: { tags: ['a', 'b'], mode: 'all' },
+          tags: ['new'],
+          enabled: true
+        }
+      }
+    });
+  });
+
   it('returns itself unchanged when no values are provided', () => {
     const engine = new SearchParamEngine({ page: SEARCH_PARAM_BLUEPRINTS_MAP.number(1) });
     const result = engine.setDefaultValues(null);
@@ -182,6 +246,34 @@ describe('SearchParamEngine.full', () => {
     });
   });
 
+  it('rejects array elements that are missing fields from the default shape', () => {
+    const engine = new SearchParamEngine({
+      config: SEARCH_PARAM_BLUEPRINTS_MAP.object({ items: [{ id: 1, enabled: true }] })
+    });
+    const defaults = { config: { items: [{ id: 1, enabled: true }] } };
+
+    expect(engine.full(new URLSearchParams({ config: JSON.stringify({ items: [{ id: 2 }] }) })).toObject()).toEqual(
+      defaults
+    );
+    expect(
+      engine.full(new URLSearchParams({ config: JSON.stringify({ items: [{ id: 2, enabled: false }] }) })).toObject()
+    ).toEqual({ config: { items: [{ id: 2, enabled: false }] } });
+  });
+
+  it('rejects array elements that are missing fields from the default shape', () => {
+    const engine = new SearchParamEngine({
+      config: SEARCH_PARAM_BLUEPRINTS_MAP.object({ items: [{ id: 1, enabled: true }] })
+    });
+    const defaults = { config: { items: [{ id: 1, enabled: true }] } };
+
+    expect(engine.full(new URLSearchParams({ config: JSON.stringify({ items: [{ id: 2 }] }) })).toObject()).toEqual(
+      defaults
+    );
+    expect(
+      engine.full(new URLSearchParams({ config: JSON.stringify({ items: [{ id: 2, enabled: false }] }) })).toObject()
+    ).toEqual({ config: { items: [{ id: 2, enabled: false }] } });
+  });
+
   it('keeps a __proto__ object key as an own property without changing the prototype', () => {
     const engine = new SearchParamEngine({ config: SEARCH_PARAM_BLUEPRINTS_MAP.object({ a: 1 }) });
     const params = new URLSearchParams({ config: '{"__proto__":{"polluted":true}}' });
@@ -291,6 +383,26 @@ describe('SearchParamEngine.fromRoute', () => {
     });
 
     expect(engine.fromRoute('/list', { config: { a: 3 } }).toObject()).toEqual({ config: { a: 3, b: 2 } });
+  });
+
+  it('recursively merges partial nested records from route state', () => {
+    const engine = new SearchParamEngine({
+      config: SEARCH_PARAM_BLUEPRINTS_MAP.object({ panel: { tags: ['a'], enabled: true } }).source('state')
+    });
+
+    expect(engine.fromRoute('/list', { config: { panel: { enabled: false } } }).toObject()).toEqual({
+      config: { panel: { tags: ['a'], enabled: false } }
+    });
+  });
+
+  it('recursively merges partial nested records from route state', () => {
+    const engine = new SearchParamEngine({
+      config: SEARCH_PARAM_BLUEPRINTS_MAP.object({ panel: { tags: ['a'], enabled: true } }).source('state')
+    });
+
+    expect(engine.fromRoute('/list', { config: { panel: { enabled: false } } }).toObject()).toEqual({
+      config: { panel: { tags: ['a'], enabled: false } }
+    });
   });
 
   it('uses object defaults for unsupported state and transient values', () => {

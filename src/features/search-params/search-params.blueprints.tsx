@@ -715,6 +715,10 @@ export class ObjectSearchParamBlueprint<
     );
   }
 
+  private isRecord(value: unknown): value is Record<string, unknown> {
+    return typeof value === 'object' && value !== null && !Array.isArray(value);
+  }
+
   private getOwn(record: Record<string, unknown>, key: string): unknown {
     return Object.hasOwn(record, key) ? record[key] : undefined;
   }
@@ -723,23 +727,24 @@ export class ObjectSearchParamBlueprint<
     Object.defineProperty(record, key, { value, enumerable: true, writable: true, configurable: true });
   }
 
-  private matchesTemplate(value: unknown, template: unknown): boolean {
+  private matchesTemplate(value: unknown, template: unknown, allowPartialRecords = true): boolean {
     if (template === null || template === undefined) return this.isShape(value);
     if (this.isPrimitive(template)) return typeof value === typeof template;
 
     if (Array.isArray(template)) {
       if (!Array.isArray(value)) return false;
       if (template.length === 0) return this.isShape(value);
-      return value.every(item => template.some(entry => this.matchesTemplate(item, entry)));
+      return value.every(item => template.some(entry => this.matchesTemplate(item, entry, false)));
     }
 
-    if (typeof value !== 'object' || value === null || Array.isArray(value)) return false;
+    if (!this.isRecord(value) || !this.isRecord(template)) return false;
 
-    const record = template as Record<string, unknown>;
+    const record = template;
     if (Object.keys(record).length === 0) return this.isShape(value);
+    if (!allowPartialRecords && Object.keys(record).some(key => !Object.hasOwn(value, key))) return false;
 
     return Object.entries(value).every(([key, entry]) =>
-      Object.hasOwn(record, key) ? this.matchesTemplate(entry, record[key]) : this.isShape(entry)
+      Object.hasOwn(record, key) ? this.matchesTemplate(entry, record[key], allowPartialRecords) : this.isShape(entry)
     );
   }
 
@@ -755,26 +760,31 @@ export class ObjectSearchParamBlueprint<
     return structuredClone(value);
   }
 
+  private mergeRecords(base: Record<string, unknown>, next: Record<string, unknown>): Record<string, unknown> {
+    const merged = structuredClone(base);
+
+    for (const [key, nextValue] of Object.entries(next)) {
+      const baseValue = this.getOwn(merged, key);
+      const value =
+        this.isRecord(baseValue) && this.isRecord(nextValue)
+          ? this.mergeRecords(baseValue, nextValue)
+          : structuredClone(nextValue);
+
+      this.setOwn(merged, key, value);
+    }
+
+    return merged;
+  }
+
   private mergeValue(base: O, next: O): O {
     if (!this.isObjectValue(next)) {
       return this.clone(next);
     }
 
     if (Array.isArray(next) || Array.isArray(base)) return this.clone(next);
+    if (!this.isRecord(base) || !this.isRecord(next)) return this.clone(next);
 
-    const merged = this.clone(base) as unknown as Record<string, unknown>;
-
-    for (const [key, nextValue] of Object.entries(next as Record<string, unknown>)) {
-      const baseValue = this.getOwn(merged, key);
-
-      this.setOwn(
-        merged,
-        key,
-        this.isFlatObject(baseValue) && this.isFlatObject(nextValue) ? { ...baseValue, ...nextValue } : nextValue
-      );
-    }
-
-    return merged as O;
+    return this.mergeRecords(base, next) as O;
   }
 
   private isEqual(left: unknown, right: unknown): boolean {
