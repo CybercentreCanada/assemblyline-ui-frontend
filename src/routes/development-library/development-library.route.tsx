@@ -9,6 +9,7 @@ import { InputsSection } from 'routes/development-library/sections/Inputs';
 import { LayoutSection } from 'routes/development-library/sections/Layout';
 import { ListSection } from 'routes/development-library/sections/List';
 import { ListInputsSection } from 'routes/development-library/sections/ListInputs';
+import { PathParamsSection } from 'routes/development-library/sections/PathParams';
 import { PageHeader } from 'ui/layouts/PageHeader';
 import { PageLayout } from 'ui/layouts/PageLayout';
 import type { PageNavigationItemProp } from 'ui/layouts/PageNavigation';
@@ -39,7 +40,8 @@ const LibraryPageContentInnerComponent: React.FC<LibraryPageContentInnerProps> =
         inputs: <InputsSection />,
         layout: <LayoutSection />,
         list: <ListSection />,
-        list_inputs: <ListInputsSection />
+        list_inputs: <ListInputsSection />,
+        path_params: <PathParamsSection />
       }[tab] ?? null
     );
   }, [tab]);
