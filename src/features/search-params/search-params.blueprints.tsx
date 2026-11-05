@@ -54,9 +54,9 @@ export abstract class BaseSearchParamBlueprint<T extends SearchParamValue> {
 
   /**
    * Where this parameter should be resolved from:
-   * - "search" → URL query string
-   * - "state"  → location.state
-   * - "ref"    → a React.ref value
+   * - "search"     → URL query string
+   * - "state"      → location.state
+   * - "transient"  → memory value
    */
   protected _source: SearchParamSource = 'search';
 
@@ -177,9 +177,7 @@ export abstract class BaseSearchParamBlueprint<T extends SearchParamValue> {
   // -------------------------
 
   /** Identifies which blueprint variant this instance is, for tooling/introspection. Overridden by each subclass. */
-  public getKind(): SearchParamBlueprintKind {
-    throw new Error('getKind() must be implemented by a concrete blueprint subclass.');
-  }
+  public abstract getKind(): SearchParamBlueprintKind;
 
   // -------------------------
   // Parsers
