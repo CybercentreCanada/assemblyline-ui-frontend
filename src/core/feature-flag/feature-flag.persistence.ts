@@ -1,6 +1,11 @@
 import type { FeatureFlagStore } from 'core/feature-flag/feature-flag.models';
 import { z } from 'zod';
 
+/*
+ * Utility functions for loading and saving feature flags to localStorage.
+ */
+
+// Has the same structure as FeatureFlagStore
 const FEATURE_FLAG_STORE_SCHEMA = z.object({ flags: z.array(z.object({ flag: z.string(), enabled: z.boolean() })) });
 
 export const loadFeatureFlags = (storageKey: string, defaultState: FeatureFlagStore): FeatureFlagStore => {

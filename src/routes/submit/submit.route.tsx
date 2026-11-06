@@ -1,7 +1,5 @@
 import { Alert, Collapse, styled, useMediaQuery, useTheme } from '@mui/material';
-import { BAR_FLAG, FOO_FLAG } from 'app/core.feature-flag';
 import useALContext from 'core/config/useALContext';
-import { FeatureFlagged, useIsFeatureEnabled, useToggleFeatureFlag } from 'core/feature-flag';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import { useAppBanner } from 'core/template/components/app/hooks';
 import PageCenter from 'core/template/components/pages/PageCenter';
@@ -43,7 +41,6 @@ import {
 import { getSubmitType } from 'shared/utils/utils';
 import generateUUID from 'shared/utils/uuid';
 import { TabContainer } from 'ui/TabContainer';
-import { Button } from 'ui/buttons/Button';
 
 type AdjustProps = { adjust: boolean };
 
@@ -121,10 +118,6 @@ const WrappedSubmitRoute = () => {
   const { closeSnackbar } = useMySnackbar();
   const { user: currentUser, configuration, settings } = useALContext();
   const form = useForm();
-
-  const isBarEnabled: boolean = useIsFeatureEnabled(BAR_FLAG);
-  const isFooEnabled: boolean = useIsFeatureEnabled(FOO_FLAG);
-  const toggleFlag = useToggleFeatureFlag();
 
   const applyAutoURLServicesSelection = useAutoURLServicesSelection();
 
@@ -359,23 +352,10 @@ const WrappedSubmitRoute = () => {
                 <LeftPanelAction adjust={adjust}>
                   <CancelButton />
                   <div style={{ flex: 1 }} />
-
-                  <FeatureFlagged flag={FOO_FLAG}>test</FeatureFlagged>
-
-                  {isFooEnabled && <FindButton />}
-
-                  {isBarEnabled && <AdjustButton />}
-
+                  <FindButton />
+                  <AdjustButton />
                   <AnalyzeSubmission />
                 </LeftPanelAction>
-
-                {currentUser.is_admin && (
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '2rem' }}>
-                    <Button onClick={() => toggleFlag(FOO_FLAG)}>Toggle {FOO_FLAG}</Button>
-
-                    <Button onClick={() => toggleFlag(BAR_FLAG)}>Toggle {BAR_FLAG}</Button>
-                  </div>
-                )}
 
                 {!loading && (
                   <>

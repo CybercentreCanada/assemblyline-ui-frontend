@@ -8,6 +8,9 @@ export type FeatureFlaggedProps = PropsWithChildren<{
   flag: FeatureFlagType;
 }>;
 
+/**
+ * Renders children only if the specified feature flag is enabled.
+ */
 export const FeatureFlagged = memo(({ children, flag }: FeatureFlaggedProps) => {
   const enabled = useIsFeatureEnabled(flag);
 
