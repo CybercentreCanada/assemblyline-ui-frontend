@@ -1,6 +1,7 @@
 import useALContext from 'core/config/useALContext';
-import { EMPTY_FEATURE_FLAG_STATE, type FeatureFlagStore } from 'core/feature-flag';
 import { isUserFeatureFlagAdmin } from 'core/feature-flag/feature-flag.guard';
+import type { FeatureFlagStore } from 'core/feature-flag/feature-flag.models';
+import { EMPTY_FEATURE_FLAG_STATE } from 'core/feature-flag/feature-flag.models';
 import { loadFeatureFlags, saveFeatureFlags } from 'core/feature-flag/feature-flag.persistence';
 import { createAppStore } from 'features/store';
 import type { PropsWithChildren } from 'react';
