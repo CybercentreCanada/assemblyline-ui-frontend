@@ -16,6 +16,7 @@ import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import FindInPageOutlinedIcon from '@mui/icons-material/FindInPageOutlined';
 import FingerprintOutlinedIcon from '@mui/icons-material/FingerprintOutlined';
+import FlagIcon from '@mui/icons-material/Flag';
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import KeyOutlinedIcon from '@mui/icons-material/KeyOutlined';
 import LabelOutlinedIcon from '@mui/icons-material/LabelOutlined';
@@ -474,6 +475,18 @@ const useMyPreferences = () => {
               ],
               icon: <PaletteIcon />,
               route: '/development/customize',
+              nested: true
+            },
+            {
+              id: 'development.feature-flags',
+              i18nKey: 'drawer.development.feature-flags',
+              userPropValidators: [
+                { prop: 'user.is_admin', value: true, enforce: true },
+                { prop: 'configuration.system.type', value: 'development' },
+                { prop: 'configuration.system.type', value: 'staging' }
+              ],
+              icon: <FlagIcon />,
+              route: '/development/feature-flags',
               nested: true
             },
             {

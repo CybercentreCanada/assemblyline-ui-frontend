@@ -1,6 +1,6 @@
-// TODO: change syntax to "import type {theme}" to avoid potential problems like type-only imports being incorrectly bundled.
 import { useClue } from '@cccsaurora/clue-ui';
 import { DEFAULT_APP_CONFIG_STORE } from 'app/core.config';
+import { DEFAULT_FEATURE_FLAG_STATE, FEATURE_FLAGS_STORAGE_KEY } from 'app/core.feature-flag';
 import { DEFAULT_APP_INTERFACE_STORE } from 'app/core.interface';
 import { APP_PREFERENCE_SCHEMA, APP_PREFERENCE_STORAGE_KEY, DEFAULT_APP_PREFERENCE_STORE } from 'app/core.preference';
 import Routes from 'app/routes';
@@ -11,6 +11,8 @@ import { useBootstrapQuery } from 'core/api/hooks/useBootstrapQuery';
 import type { LoginParamsProps } from 'core/api/hooks/useMyAPI';
 import { AppConfigStoreProvider } from 'core/config';
 import useALContext from 'core/config/useALContext';
+import { EMPTY_FEATURE_FLAG_STATE } from 'core/feature-flag';
+import { AppFeatureFlagProvider, AppFeatureFlagStoreProvider } from 'core/feature-flag/feature-flag.providers';
 import { AppInterfaceStoreProvider } from 'core/interface';
 import { AppPreferenceProvider, AppPreferenceStoreProvider } from 'core/preference';
 import QuotaExceeded from 'core/template/branding/AppVerticalBanner';
@@ -126,7 +128,12 @@ export const MyApp: React.FC = () => {
                 user={myUser}
                 // search={mySearch}
               >
-                <MyAppMain />
+                <AppFeatureFlagProvider
+                  storageKey={FEATURE_FLAGS_STORAGE_KEY}
+                  defaultState={DEFAULT_FEATURE_FLAG_STATE}
+                >
+                  <MyAppMain />
+                </AppFeatureFlagProvider>
               </AppProvider>
             </QuotaProvider>
           </SafeResultsProvider>
@@ -144,7 +151,7 @@ const AppStores = memo(({ children }: PropsWithChildren) => (
   <AppConfigStoreProvider data={DEFAULT_APP_CONFIG_STORE}>
     <AppInterfaceStoreProvider data={DEFAULT_APP_INTERFACE_STORE}>
       <AppPreferenceStoreProvider data={DEFAULT_APP_PREFERENCE_STORE}>
-        <>{children}</>
+        <AppFeatureFlagStoreProvider data={EMPTY_FEATURE_FLAG_STATE}>{children}</AppFeatureFlagStoreProvider>
       </AppPreferenceStoreProvider>
     </AppInterfaceStoreProvider>
   </AppConfigStoreProvider>

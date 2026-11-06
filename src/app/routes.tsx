@@ -66,8 +66,10 @@ import Submit from 'routes/submit/submit';
 import User from 'routes/user/user.route';
 import { resetFavicon } from 'shared/utils/utils';
 
+const Development = lazy(() => import('routes/development/Development.route.tsx'));
 const DevelopmentAPI = lazy(() => import('routes/development-api/development-api.route.tsx'));
 const DevelopmentCustomize = lazy(() => import('routes/development-customize/customize'));
+const DevelopmentFeatureFlags = lazy(() => import('routes/development-feature-flags/development-feature-flags.route.tsx'));
 const DevelopmentLibrary = lazy(() => import('routes/development-library/development-library.route'));
 const DevelopmentTheme = lazy(() => import('routes/development-theme/development-theme.route'));
 
@@ -158,8 +160,10 @@ const WrappedRoutes = () => {
         <Route path="/authorize" element={<AppRegistration />} />
         <Route path="/crash" element={<CrashTest />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/development" element={<Development />} />
         <Route path="/development/api" element={<DevelopmentAPI />} />
         <Route path="/development/customize" element={<DevelopmentCustomize />} />
+        <Route path="/development/feature-flags" element={<DevelopmentFeatureFlags />} />
         <Route path="/development/library" element={<DevelopmentLibrary />} />
         <Route path="/development/theme" element={<DevelopmentTheme />} />
         <Route path="/file/detail/:id" element={<FileFullDetail />} />
