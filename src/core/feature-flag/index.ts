@@ -1,6 +1,6 @@
 export { useIsFeatureEnabled, useToggleFeatureFlag, useUpdateFeatureFlag } from './feature-flag.hooks';
 export { EMPTY_FEATURE_FLAG_STATE } from './feature-flag.models';
-export type { FeatureFlag, FeatureFlagDefinition, FeatureFlagType } from './feature-flag.models';
+export type { FeatureFlag, FeatureFlagDefinition, FeatureFlagStore, FeatureFlagType } from './feature-flag.models';
 export {
   AppFeatureFlagProvider,
   AppFeatureFlagStoreProvider,

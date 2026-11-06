@@ -1,12 +1,14 @@
 import useALContext from 'core/config/useALContext';
-import { EMPTY_FEATURE_FLAG_STATE, FeatureFlagStore } from 'core/feature-flag/feature-flag.models';
+import { EMPTY_FEATURE_FLAG_STATE, type FeatureFlagStore } from 'core/feature-flag';
+import { isUserFeatureFlagAdmin } from 'core/feature-flag/feature-flag.guard';
 import { loadFeatureFlags, saveFeatureFlags } from 'core/feature-flag/feature-flag.persistence';
 import { createAppStore } from 'features/store';
 import type { PropsWithChildren } from 'react';
 import { memo, useEffect } from 'react';
-import { isUserFeatureFlagAdmin } from './feature-flag.guard';
 
 // TODO CREATE DEV PAGAE/ROUTE
+// TODO CREATE UNIT TESTS
+// Add vision and milestones to Epic ticket
 
 export const {
   StoreProvider: AppFeatureFlagStoreProvider,
@@ -38,7 +40,6 @@ export const AppFeatureFlagProvider = memo(({ children, storageKey, defaultState
 
     featureFlagStoreApi.subscribe(store => {
       if (!store) return;
-      console.warn('save flags', store.flags);
 
       saveFeatureFlags(storageKey, store);
     });

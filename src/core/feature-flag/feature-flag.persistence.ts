@@ -8,7 +8,7 @@ export const loadFeatureFlags = (storageKey: string, defaultState: FeatureFlagSt
     const raw = localStorage.getItem(storageKey);
     return raw === null ? defaultState : FEATURE_FLAG_STORE_SCHEMA.parse(JSON.parse(raw));
   } catch (err) {
-    console.debug('Feature Flags could not be parsed from localStorage', err);
+    // Feature Flags could not be parsed from localStorage; use defaults
     return defaultState;
   }
 };
@@ -17,6 +17,6 @@ export const saveFeatureFlags = (storageKey: string, featureFlags: FeatureFlagSt
   try {
     localStorage.setItem(storageKey, JSON.stringify(featureFlags));
   } catch (err) {
-    console.debug('Failed to save Feature Flags to localStorage', err);
+    // Failed to save Feature Flags to localStorage; no-op
   }
 };

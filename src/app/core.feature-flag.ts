@@ -1,5 +1,4 @@
-import { FeatureFlagDefinition, FeatureFlagType } from 'core/feature-flag';
-import { FeatureFlagStore } from 'core/feature-flag/feature-flag.models';
+import type { FeatureFlagDefinition, FeatureFlagStore, FeatureFlagType } from 'core/feature-flag';
 
 export const FEATURE_FLAGS_STORAGE_KEY = 'assemblyline.featureFlags';
 
