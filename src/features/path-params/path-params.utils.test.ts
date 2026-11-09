@@ -167,8 +167,8 @@ describe('PATH_PARAM_BLUEPRINTS_MAP.enum', () => {
 
   it('stringifies invalid values to the configured default', () => {
     const blueprint = PATH_PARAM_BLUEPRINTS_MAP.enum(['ascii', 'code'] as const, 'ascii');
-    expect(blueprint.stringify(null)).toBe('');
-    expect(blueprint.stringify(undefined)).toBe('');
+    expect(blueprint.stringify(null)).toBe('ascii');
+    expect(blueprint.stringify(undefined)).toBe('ascii');
     expect(blueprint.stringify('invalid' as never)).toBe('ascii');
   });
 
@@ -176,8 +176,8 @@ describe('PATH_PARAM_BLUEPRINTS_MAP.enum', () => {
     const nullBlueprint = PATH_PARAM_BLUEPRINTS_MAP.enum(['ascii', 'null'] as const, 'ascii');
     const undefinedBlueprint = PATH_PARAM_BLUEPRINTS_MAP.enum(['ascii', 'undefined'] as const, 'ascii');
 
-    expect(nullBlueprint.stringify(null)).toBe('');
-    expect(undefinedBlueprint.stringify(undefined)).toBe('');
+    expect(nullBlueprint.stringify(null)).toBe('ascii');
+    expect(undefinedBlueprint.stringify(undefined)).toBe('ascii');
   });
 });
 
@@ -357,13 +357,13 @@ describe('createPathParamsCodec', () => {
     expect(() => codec.stringify({ itemID })).toThrow(URIError);
   });
 
-  it('stringifies null enum values as empty segments', () => {
+  it('stringifies null enum values using the configured default', () => {
     const codec = createPathParamsCodec('/file/viewer/:id/:tab')(b => ({
       id: b.string(),
       tab: b.enum(['ascii', 'code', 'strings', 'hex', 'image'] as const, 'ascii')
     }));
 
-    expect(codec.stringify({ id: 'abc', tab: null as never })).toBe('/file/viewer/abc/');
+    expect(codec.stringify({ id: 'abc', tab: null as never })).toBe('/file/viewer/abc/ascii');
   });
 
   it('stringifies nullish values as empty strings while preserving zero and false', () => {
