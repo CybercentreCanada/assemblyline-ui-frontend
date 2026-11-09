@@ -7,6 +7,7 @@ export type {
   PathParamBlueprintKind,
   PathParamValue,
   PathPattern,
-  PathPatternSegment
+  PathPatternSegment,
+  RoutePath
 } from './path-params.models';
 export { createPathParamsCodec, PATH_PARAM_BLUEPRINTS_MAP } from './path-params.utils';
