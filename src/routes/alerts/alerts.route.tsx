@@ -157,8 +157,8 @@ export const AlertsPage = memo(() => {
     else if (!alerts || alerts.length === 0)
       navigate.here<'/alerts'>({ replace: true }).update(s => ({ ...s, search: { ...s.search, tc_start: '' } }));
     else {
-      const dates = alerts.map(a => new Date(a.reporting_ts));
-      const min = Math.max.apply(null, dates) as string;
+      const dates = alerts.map(a => new Date(a.reporting_ts).getTime());
+      const min = Math.max(...dates);
       navigate
         .here<'/alerts'>({ replace: true })
         .update(s => ({ ...s, search: { ...s.search, tc_start: new Date(min).toISOString() } }));
