@@ -17,8 +17,11 @@ import { MonacoEditor } from 'ui/MonacoEditor';
 //*****************************************************************************************
 
 const TAB_VALUES = ['ascii', 'code', 'hex'] as const;
+const NULL_TAB_OPTION_VALUE = '__null_tab__';
+const UNDEFINED_TAB_OPTION_VALUE = '__undefined_tab__';
 
-type Tab = (typeof TAB_VALUES)[number];
+type Tab = (typeof TAB_VALUES)[number] | '' | null | undefined;
+type TabOptionValue = Tab | typeof NULL_TAB_OPTION_VALUE | typeof UNDEFINED_TAB_OPTION_VALUE;
 
 /** State of the Path Params section, stored in the library form. */
 export type PathParamsLibraryState = {
@@ -56,7 +59,7 @@ export const PATH_PARAMS_LIBRARY_STATE: PathParamsLibraryState = {
 //*****************************************************************************************
 
 const FILE_VIEWER_CODEC = createPathParamsCodec('/file/viewer/:id/:tab')(b => ({
-  id: b.string(),
+  id: b.string(''),
   tab: b.enum(TAB_VALUES, 'ascii')
 }));
 
@@ -105,7 +108,10 @@ const stringifyResult = (fn: () => unknown): string => {
 const TAB_OPTIONS = [
   { primary: 'ASCII', value: 'ascii' },
   { primary: 'Code', value: 'code' },
-  { primary: 'Hex', value: 'hex' }
+  { primary: 'Hex', value: 'hex' },
+  { primary: 'Empty string ("")', value: '' },
+  { primary: 'null', value: NULL_TAB_OPTION_VALUE },
+  { primary: 'undefined', value: UNDEFINED_TAB_OPTION_VALUE }
 ] as const;
 
 const RESULT_SX = { margin: 0, fontFamily: 'monospace', whiteSpace: 'pre-wrap' } as const;
@@ -124,7 +130,14 @@ codec.stringify({ id: 'abc123', tab: 'hex' });
 codec.stringify({ id: 'a b/c', tab: 'hex' });
 // '/file/viewer/a%20b%2Fc/hex'
 
-// Values are not validated
+codec.stringify({ id: 'abc123', tab: '' });
+// '/file/viewer/abc123/ascii' <- unrecognized enum value uses its default
+
+codec.stringify({ id: 'abc123', tab: null });
+codec.stringify({ id: 'abc123', tab: undefined });
+// '/file/viewer/abc123/ascii' <- nullish values use the blueprint default
+
+// String values are URL-encoded
 codec.stringify({ id: '', tab: 'hex' });
 // '/file/viewer//hex'`;
 
@@ -230,13 +243,18 @@ PathParamsTextField.displayName = 'PathParamsTextField';
 const PathParamsTabField = memo(() => {
   const form = useForm();
   const value = useStore(form.store, state => state.values.components.path_params.values.tab);
+  const selectValue: TabOptionValue =
+    value === null ? NULL_TAB_OPTION_VALUE : value === undefined ? UNDEFINED_TAB_OPTION_VALUE : value;
 
   const handleChange = useCallback(
-    (_event: unknown, next: Tab) => form.setFieldValue('components.path_params.values.tab', next),
+    (_event: unknown, next: TabOptionValue) => {
+      const nextValue = next === NULL_TAB_OPTION_VALUE ? null : next === UNDEFINED_TAB_OPTION_VALUE ? undefined : next;
+      form.setFieldValue('components.path_params.values.tab', nextValue);
+    },
     [form]
   );
 
-  return <SelectInput label="tab" value={value} options={TAB_OPTIONS} onChange={handleChange} />;
+  return <SelectInput label="tab" value={selectValue} options={TAB_OPTIONS} onChange={handleChange} />;
 });
 
 PathParamsTabField.displayName = 'PathParamsTabField';

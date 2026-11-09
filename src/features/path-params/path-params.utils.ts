@@ -95,7 +95,6 @@ export const PATH_PARAM_BLUEPRINTS_MAP = {
       options: values,
       parse: value => (value == null || value === '' ? defaultValue : (optionByString.get(value) ?? defaultValue)),
       stringify: value => {
-        if (value == null) return '';
         for (const candidate of values) {
           if (Object.is(candidate, value)) return String(candidate);
         }
