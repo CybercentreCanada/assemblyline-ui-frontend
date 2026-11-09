@@ -43,7 +43,8 @@ export const AppFeatureFlagProvider = memo(({ children, storageKey, defaultState
   useEffect(() => {
     if (!isUserFeatureFlagAdmin(user)) return;
 
-    featureFlagStoreApi.subscribe(store => {
+    // Return the function callback to unsubscribe from store changes on unmount
+    return featureFlagStoreApi.subscribe(store => {
       if (!store) return;
 
       saveFeatureFlags(storageKey, store);

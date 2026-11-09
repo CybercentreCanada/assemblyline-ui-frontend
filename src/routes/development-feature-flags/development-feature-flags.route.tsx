@@ -1,9 +1,9 @@
-import { RestartAlt } from '@mui/icons-material';
+import { Delete } from '@mui/icons-material';
 import { Button, FormControlLabel, Switch, Typography, useTheme, type Theme } from '@mui/material';
 import useALContext from 'core/config/useALContext';
 import { FeatureFlagged } from 'core/feature-flag/FeatureFlagged';
 import { useIsFeatureEnabled, useUpdateFeatureFlag } from 'core/feature-flag/feature-flag.hooks';
-import type { FeatureFlagStore } from 'core/feature-flag/feature-flag.models';
+import { EMPTY_FEATURE_FLAG_STATE, type FeatureFlagStore } from 'core/feature-flag/feature-flag.models';
 import {
   AppFeatureFlagProvider,
   AppFeatureFlagStoreProvider,
@@ -19,7 +19,7 @@ import { PageHeader } from 'ui/layouts/PageHeader';
 const DEMO_KEY = 'assemblyline.development.feature-flags.preview';
 const DEMO_FLAG = 'demo.flag';
 const DEMO_STATE: FeatureFlagStore = { flags: [{ flag: DEMO_FLAG, enabled: false }] };
-const RESET_ICON = <RestartAlt />;
+const DELETE_ICON = <Delete />;
 
 const DECLARE_EXAMPLE = `// app/core.feature-flag.ts
 export const PREVIEW_FLAG: FeatureFlagType = 'preview';
@@ -39,7 +39,7 @@ import { useIsFeatureEnabled } from 'core/feature-flag';
 
 const Preview = () => {
   const enabled = useIsFeatureEnabled(PREVIEW_FLAG);
-  return enabled ? <PreviewContent /> : null;
+  return <Typography color={enabled ? 'success' : 'error'}> Foo </Typography>;
 };`;
 
 const COMPONENT_EXAMPLE = `import { PREVIEW_FLAG } from 'app/core.feature-flag';
@@ -49,132 +49,170 @@ import { FeatureFlagged } from 'core/feature-flag';
   <PreviewContent />
 </FeatureFlagged>`;
 
-const codeStyle = (theme: Theme) =>
-  useMemo<CSSProperties>(
-    () => ({
-      margin: 0,
-      padding: theme.spacing(2),
-      background: theme.palette.action.hover,
-      borderRadius: theme.shape.borderRadius,
-      overflowX: 'auto',
-      maxWidth: '100%',
-      fontSize: theme.typography.body2.fontSize,
-      lineHeight: 1.6,
-      tabSize: 2
-    }),
-    [theme]
-  );
+const codeStyle = (theme: Theme): CSSProperties => ({
+  margin: 0,
+  padding: theme.spacing(2),
+  background: theme.palette.action.hover,
+  borderRadius: theme.shape.borderRadius,
+  overflowX: 'auto',
+  maxWidth: '100%',
+  fontSize: theme.typography.body2.fontSize,
+  lineHeight: 1.6,
+  tabSize: 2
+});
 
+const borderStyle = (theme: Theme): CSSProperties => ({
+  padding: theme.spacing(2),
+  border: `1px solid ${theme.palette.divider}`,
+  borderRadius: theme.shape.borderRadius,
+  minWidth: 0
+});
+
+/* Component Preview Content */
+const ComponentPreviewContent = memo(() => {
+  const { t } = useTranslation(['developmentFeatureFlags']);
+
+  // Log on mount + unmount to showcase feature flag's power
+  useEffect(() => {
+    /* eslint-disable no-console */
+    console.log('Preview content component mounted');
+    return () => console.log('Preview content component unmounted');
+    /* eslint-enable no-console */
+  }, []);
+
+  return <Typography>{t('demo.component.content')}</Typography>;
+});
+
+ComponentPreviewContent.displayName = 'ComponentPreviewContent';
+
+/* Feature Flag Example */
 const FeatureFlagExample = memo(() => {
   const { t } = useTranslation(['developmentFeatureFlags']);
   const theme = useTheme();
+  const codeStyles = useMemo(() => codeStyle(theme), [theme]);
+  const borderStyles = useMemo(() => borderStyle(theme), [theme]);
   const enabled = useIsFeatureEnabled(DEMO_FLAG);
   const updateFlag = useUpdateFeatureFlag();
   const setStore = useAppSetFeatureFlagStore();
+
+  // Remove local storage key on component unmount
+  useEffect(() => {
+    return () => {
+      localStorage.removeItem(DEMO_KEY);
+    };
+  }, []);
 
   const handleChange = useCallback(
     (_event: ChangeEvent<HTMLInputElement>, checked: boolean) => updateFlag(DEMO_FLAG, checked),
     [updateFlag]
   );
-  const handleReset = useCallback(() => setStore(DEMO_STATE), [setStore]);
-
-  const previewStyle = useMemo<CSSProperties>(
-    () => ({
-      padding: theme.spacing(2),
-      border: `1px solid ${theme.palette.divider}`,
-      borderRadius: theme.shape.borderRadius,
-      minWidth: 0
-    }),
-    [theme]
-  );
+  const handleClear = useCallback(() => setStore(EMPTY_FEATURE_FLAG_STATE), [setStore]);
 
   return (
     <section>
-      <Typography variant="h5" component="h2" gutterBottom>
+      <Typography variant="h5" component="h2">
         {t('demo.title')}
       </Typography>
-      <Typography>{t('demo.description')}</Typography>
+      <Typography gutterBottom>{t('demo.title.sub')}</Typography>
 
       <section>
-        <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: theme.spacing(2) }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: theme.spacing(2),
+            margin: theme.spacing(2)
+          }}
+        >
           <FormControlLabel control={<Switch checked={enabled} onChange={handleChange} />} label={t('demo.toggle')} />
 
-          <Button startIcon={RESET_ICON} onClick={handleReset} disabled={!enabled}>
-            {t('demo.reset')}
+          <Button startIcon={DELETE_ICON} onClick={handleClear}>
+            {t('demo.clear')}
           </Button>
         </div>
+
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 260px), 1fr))',
+            gap: theme.spacing(2)
+          }}
+        >
+          {/* useHook example */}
+          <div style={borderStyles}>
+            <Typography variant="h6" component="h3">
+              {t('demo.hook.title')}
+            </Typography>
+            <Typography gutterBottom>{t('demo.hook.description')}</Typography>
+
+            <section>
+              <pre style={codeStyles}>
+                <code>{HOOK_EXAMPLE}</code>
+              </pre>
+            </section>
+
+            <section>
+              <Typography sx={{ mt: 2 }}>{t('demo.value', { value: enabled.toString() })}</Typography>
+
+              <div style={borderStyles}>
+                <Typography color={enabled ? 'success' : 'error'}>{t('demo.hook.content')}</Typography>
+              </div>
+            </section>
+          </div>
+
+          {/* FeatureFlagged component example */}
+          <div style={borderStyles}>
+            <Typography variant="h6" component="h3">
+              {t('demo.component.title')}
+            </Typography>
+            <Typography gutterBottom>{t('demo.component.description')}</Typography>
+
+            <section>
+              <pre style={codeStyles}>
+                <code>{COMPONENT_EXAMPLE}</code>
+              </pre>
+            </section>
+
+            <section>
+              <Typography sx={{ mt: 2 }}>
+                {enabled ? t('demo.component.enabled') : t('demo.component.disabled')}
+              </Typography>
+              <Typography variant="subtitle2" gutterBottom>
+                {t('demo.component.consoleHint')}
+              </Typography>
+
+              <div style={borderStyles}>
+                <FeatureFlagged flag={DEMO_FLAG}>
+                  <ComponentPreviewContent />
+                </FeatureFlagged>
+              </div>
+            </section>
+          </div>
+        </div>
       </section>
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 260px), 1fr))',
-          gap: theme.spacing(2)
-        }}
-      >
-        {/* useHook example */}
-        <div style={previewStyle}>
-          <Typography variant="h6" component="h3">
-            {t('demo.hook.title')}
-          </Typography>
-
-          <section>
-            <Typography variant="h5" component="h2" gutterBottom>
-              {t('hook.title')}
-            </Typography>
-            <Typography>{t('hook.description')}</Typography>
-            <pre style={codeStyle(theme)}>
-              <code>{HOOK_EXAMPLE}</code>
-            </pre>
-            <Typography sx={{ mt: 2 }}>{t('hook.unknown')}</Typography>
-          </section>
-
-          <section>
-            <Typography>{enabled ? t('demo.enabled') : t('demo.disabled')}</Typography>
-            {enabled && <Typography>{t('demo.hook.content')}</Typography>}
-          </section>
-        </div>
-
-        {/* FeatureFlagged component example */}
-        <div style={previewStyle}>
-          <Typography variant="h6" component="h3">
-            {t('demo.component.title')}
-          </Typography>
-
-          <section>
-            <Typography variant="h5" component="h2" gutterBottom>
-              {t('component.title')}
-            </Typography>
-            <Typography>{t('component.description')}</Typography>
-            <pre style={codeStyle(theme)}>
-              <code>{COMPONENT_EXAMPLE}</code>
-            </pre>
-            <Typography sx={{ mt: 2 }}>{t('component.unknown')}</Typography>
-          </section>
-
-          <section>
-            <Typography>{enabled ? t('demo.enabled') : t('demo.disabled')}</Typography>
-
-            <FeatureFlagged flag={DEMO_FLAG}>
-              <Typography>{t('demo.component.content')}</Typography>
-            </FeatureFlagged>
-          </section>
-        </div>
-      </div>
     </section>
   );
 });
 
-FeatureFlagExample.displayName = 'FeatureFlagExamples';
+FeatureFlagExample.displayName = 'FeatureFlagExample';
 
 const DevelopmentFeatureFlags = memo(() => {
   const { t } = useTranslation(['developmentFeatureFlags']);
   const theme = useTheme();
+  const codeStyles = useMemo(() => codeStyle(theme), [theme]);
+  const borderStyles = useMemo(() => borderStyle(theme), [theme]);
   const { user: currentUser, configuration } = useALContext();
 
+  // Remove local storage key on tab close/refresh
   useEffect(() => {
-    return () => {
-      // Remove local storage key on component unmount
+    const handleTabClose = () => {
       localStorage.removeItem(DEMO_KEY);
+    };
+
+    window.addEventListener('beforeunload', handleTabClose);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleTabClose);
     };
   }, []);
 
@@ -204,28 +242,36 @@ const DevelopmentFeatureFlags = memo(() => {
             gap: theme.spacing(4)
           }}
         >
-          <section>
+          <div style={borderStyles}>
             <Typography variant="h6" component="h3">
               {t('start.declare.title')}
             </Typography>
             <Typography gutterBottom>{t('start.declare.subtitle')}</Typography>
 
-            <pre style={codeStyle(theme)}>
+            <pre style={codeStyles}>
               <code>{DECLARE_EXAMPLE}</code>
             </pre>
-          </section>
+          </div>
 
-          <section>
+          <div style={borderStyles}>
             <Typography variant="h6" component="h3">
               {t('start.register.title')}
             </Typography>
-            <Typography gutterBottom>{t('start.registration.subtitle')}</Typography>
+            <Typography gutterBottom>{t('start.register.subtitle')}</Typography>
 
-            <pre style={codeStyle(theme)}>
+            <pre style={codeStyles}>
               <code>{REGISTER_EXAMPLE}</code>
             </pre>
-          </section>
+          </div>
         </div>
+
+        <section>
+          <AppFeatureFlagStoreProvider data={DEMO_STATE}>
+            <AppFeatureFlagProvider storageKey={DEMO_KEY} defaultState={DEMO_STATE}>
+              <FeatureFlagExample />
+            </AppFeatureFlagProvider>
+          </AppFeatureFlagStoreProvider>
+        </section>
 
         <section>
           <Typography variant="h5" component="h2">
@@ -251,14 +297,6 @@ const DevelopmentFeatureFlags = memo(() => {
             {t('security.title')}
           </Typography>
           <Typography>{t('security.description')}</Typography>
-        </section>
-
-        <section>
-          <AppFeatureFlagStoreProvider data={DEMO_STATE}>
-            <AppFeatureFlagProvider storageKey={DEMO_KEY} defaultState={DEMO_STATE}>
-              <FeatureFlagExample />
-            </AppFeatureFlagProvider>
-          </AppFeatureFlagStoreProvider>
         </section>
       </div>
     </PageFullSize>
