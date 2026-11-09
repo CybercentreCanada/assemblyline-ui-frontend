@@ -268,7 +268,10 @@ const PathParamsStringifyResult = memo(() => {
   const id = useStore(form.store, state => state.values.components.path_params.values.id);
   const tab = useStore(form.store, state => state.values.components.path_params.values.tab);
 
-  const result = useMemo(() => stringifyResult(() => FILE_VIEWER_CODEC.stringify({ id, tab })), [id, tab]);
+  const result = useMemo(
+    () => stringifyResult(() => FILE_VIEWER_CODEC.stringify({ id, tab: tab as never })),
+    [id, tab]
+  );
 
   return <ResultBlock label="codec.stringify(params)">{result}</ResultBlock>;
 });
