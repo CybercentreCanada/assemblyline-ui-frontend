@@ -61,6 +61,17 @@ export class SearchParamEngine<Blueprints extends SearchParamBlueprintMap> {
     return Object.entries(this.runtimes) as [string, SearchParamRuntime][];
   }
 
+  private getKeysFor(fieldFilter: (runtime: SearchParamRuntime) => boolean): string[] {
+    const keys: string[] = [];
+    const runtimes = this.runtimes as Record<string, SearchParamRuntime>;
+
+    for (const key in runtimes) {
+      if (Object.hasOwn(runtimes, key) && fieldFilter(runtimes[key])) keys.push(key);
+    }
+
+    return keys;
+  }
+
   public getDefaultValues() {
     const values = {} as InferSearchParamValueMapFromBlueprintMap<Blueprints>;
     for (const [key, runtime] of this.runtimeEntries()) {
@@ -90,28 +101,16 @@ export class SearchParamEngine<Blueprints extends SearchParamBlueprintMap> {
     return this;
   }
 
-  public getEphemeralKeys() {
-    const keys: string[] = [];
-    for (const [key, runtime] of this.runtimeEntries()) {
-      if (runtime.isEphemeral()) keys.push(key);
-    }
-    return keys;
+  public getEphemeralKeys(): string[] {
+    return this.getKeysFor(runtime => runtime.isEphemeral());
   }
 
-  public getIgnoredKeys() {
-    const keys: string[] = [];
-    for (const [key, runtime] of this.runtimeEntries()) {
-      if (runtime.isIgnored()) keys.push(key);
-    }
-    return keys;
+  public getIgnoredKeys(): string[] {
+    return this.getKeysFor(runtime => runtime.isIgnored());
   }
 
-  public getLockedKeys() {
-    const keys: string[] = [];
-    for (const [key, runtime] of this.runtimeEntries()) {
-      if (runtime.isLocked()) keys.push(key);
-    }
-    return keys;
+  public getLockedKeys(): string[] {
+    return this.getKeysFor(runtime => runtime.isLocked());
   }
 
   public full(value: URLSearchParams | InferSearchParamValueMapFromBlueprintMap<Blueprints>) {
