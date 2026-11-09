@@ -4,12 +4,7 @@ import { DisabledBoundary } from 'core/router/components/DisabledBoundary';
 import { ForbiddenBoundary } from 'core/router/components/ForbiddenBoundary';
 import type { HASH_PARAM_BLUEPRINTS, HashParamValue, InferHashParamBlueprintFromValue } from 'features/hash-params';
 import { createHashParamCodec } from 'features/hash-params';
-import type {
-  InferPathParamBlueprintMapFromPath,
-  PATH_PARAM_BLUEPRINTS_MAP,
-  RoutePath,
-  ValidRoutePath
-} from 'features/path-params';
+import type { InferPathParamBlueprintMapFromPath, PATH_PARAM_BLUEPRINTS_MAP, RoutePath } from 'features/path-params';
 import { createPathParamsCodec } from 'features/path-params';
 import type { SearchParamBlueprintMap } from 'features/search-params';
 import { SEARCH_PARAM_BLUEPRINTS_MAP, SearchParamEngine } from 'features/search-params';
@@ -29,7 +24,7 @@ export type CreateAppRouteProps<
   component: ReactElement | MemoExoticComponent<ComponentType<unknown>>;
 
   // Parameters
-  path: ValidRoutePath<Path>;
+  path: Path;
   params?: (blueprints: typeof PATH_PARAM_BLUEPRINTS_MAP) => Params;
   search?: (blueprints: typeof SEARCH_PARAM_BLUEPRINTS_MAP) => Search;
   hash?: (blueprints: typeof HASH_PARAM_BLUEPRINTS) => InferHashParamBlueprintFromValue<Hash>;
