@@ -225,7 +225,7 @@ export const stringifyPathPattern = (
  * @returns A function that takes the blueprints of the parameters and returns the codec
  */
 export const createPathParamsCodec = <const Path extends string>(path: Path) => {
-  const pattern = parsePathPattern(path);
+  const pattern = parsePathPattern(path ?? '');
 
   return <
     const Blueprints extends InferPathParamBlueprintMapFromPath<Path> & Record<string, InferPathParamBlueprintFromValue>

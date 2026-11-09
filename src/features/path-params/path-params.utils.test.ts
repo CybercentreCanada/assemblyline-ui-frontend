@@ -188,6 +188,13 @@ describe('PATH_PARAM_BLUEPRINTS_MAP.enum', () => {
 const makeLocation = (pathname: string): Location => ({ pathname, search: '', hash: '', state: null, key: 'default' });
 
 describe('createPathParamsCodec', () => {
+  it('creates an empty codec for a null fallback route path', () => {
+    const codec = createPathParamsCodec(null as never)(() => null as never);
+
+    expect(codec.parse(makeLocation('/'))).toEqual({});
+    expect(codec.stringify({} as never)).toBe('');
+  });
+
   it('extracts keys only from colon-prefixed path segments', () => {
     expectTypeOf<InferPathParamKeyFromPath<'/items/:itemID/version:latest'>>().toEqualTypeOf<'itemID'>();
     expectTypeOf<InferPathParamKeyFromPath<'/items/version:latest'>>().toEqualTypeOf<never>();
