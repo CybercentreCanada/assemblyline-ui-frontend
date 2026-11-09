@@ -331,7 +331,7 @@ export const SubmissionReportRoute = createAppRoute({
 
   path: '/submission/report/:id',
   params: s => ({
-    id: s.string()
+    id: s.string('')
   }),
 
   ancestor: '/submissions',

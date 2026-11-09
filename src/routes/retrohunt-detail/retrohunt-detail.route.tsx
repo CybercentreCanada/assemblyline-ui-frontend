@@ -621,7 +621,7 @@ export const RetrohuntDetailRoute = createAppRoute({
 
   path: '/retrohunt/detail/:id',
   params: s => ({
-    id: s.string()
+    id: s.string('')
   }),
   search: s => ({
     query: s.string(''),

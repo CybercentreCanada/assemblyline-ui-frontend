@@ -296,7 +296,7 @@ export const ArchiveDetailRoute = createAppRoute({
 
   path: '/archive/:id/:tab',
   params: s => ({
-    id: s.string(),
+    id: s.string(''),
     tab: s.enum(TAB_OPTIONS, DEFAULT_TAB)
   }),
   search: s => ({
@@ -321,7 +321,7 @@ export const ArchiveDetailRootRoute = createAppRoute({
 
   path: '/archive/:id',
   params: s => ({
-    id: s.string()
+    id: s.string('')
   }),
   search: s => ({
     name: s.string(null).nullable()

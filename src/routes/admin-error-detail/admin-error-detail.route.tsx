@@ -228,7 +228,9 @@ export const AdminErrorDetailRoute = createAppRoute({
   component: AdminErrorDetailPage,
 
   path: '/admin/errors/:id',
-  params: s => ({ id: s.string() }),
+  params: s => ({
+    id: s.string('')
+  }),
 
   ancestor: '/admin/errors',
   shortname: location => ['app_route.admin_error_detail.shortname', { ns: 'adminErrorViewer', id: location.path.id }],

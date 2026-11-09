@@ -524,7 +524,7 @@ export const FileDetailRoute = createAppRoute({
 
   path: '/file/detail/:id',
   params: s => ({
-    id: s.string()
+    id: s.string('')
   }),
   search: s => ({
     filetypeOverride: s.string(null).source('transient'),

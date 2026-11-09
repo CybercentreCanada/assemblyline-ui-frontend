@@ -101,7 +101,7 @@ export const SettingsRoute = createAppRoute({
 
   path: '/settings/:tab',
   params: s => ({
-    tab: s.string()
+    tab: s.string('')
   }),
 
   ancestor: null,

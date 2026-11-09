@@ -317,7 +317,7 @@ export const ManageWorkflowCreateRoute = createAppRoute({
 
   path: '/manage/workflow/create/:id',
   params: s => ({
-    id: s.string()
+    id: s.string('')
   }),
 
   ancestor: '/manage/workflows',

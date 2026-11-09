@@ -645,7 +645,7 @@ export const ManageSignatureSourceDetailRoute = createAppRoute({
 
   path: '/manage/source/:id',
   params: s => ({
-    id: s.string()
+    id: s.string('')
   }),
   search: s => ({
     base: s.object(null as Partial<UpdateSource>).source('transient'),
