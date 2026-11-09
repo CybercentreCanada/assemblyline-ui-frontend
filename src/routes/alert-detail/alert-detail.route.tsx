@@ -1021,7 +1021,7 @@ export const AlertDetailRoute = createAppRoute({
 
   path: '/alert/:id',
   params: s => ({
-    id: s.string()
+    id: s.string('')
   }),
   search: s => ({
     alert: s

@@ -6,7 +6,7 @@ Comprehensive URL search parameter management system. Handles typed reading, wri
 
 ## 2. Features
 
-- **Typed blueprints** — Define each search param with a class-based blueprint (`BooleanBlueprint`, `NumberBlueprint`, `StringBlueprint`, `EnumBlueprint`, `FiltersBlueprint`)
+- **Typed blueprints** — Define each search param with a builder from `SEARCH_PARAM_BLUEPRINTS_MAP`
 - **Delta serialization** — Only params that differ from their default value are written to the URL, keeping it clean
 - **Multi-source resolution** — Params can resolve from `location.search`, `location.state`, or a previous snapshot
 - **Immutable snapshots** — Current param state is represented as a frozen `SearchParamSnapshot` with pick/omit/set operations
@@ -15,14 +15,15 @@ Comprehensive URL search parameter management system. Handles typed reading, wri
 - **Ignored params** — Params marked `ignored` don't trigger re-renders when they change
 - **Locked params** — Params marked `locked` always resolve to their default regardless of URL input
 - **Builder pattern** — Blueprints use fluent chainable methods (`.defaultValue()`, `.ephemeral()`, `.locked()`, `.source()`)
-- **Number clamping** — `NumberBlueprint` supports `.min()` / `.max()` bounds
-- **Filter expressions** — `FiltersBlueprint` supports `NOT()` and `!()` prefix wrappers with deduplication
+- **Number clamping** — `NumberSearchParamBlueprint` supports `.min()` / `.max()` bounds
+- **Filter expressions** — `FiltersSearchParamBlueprint` supports `NOT()` and `!()` prefix wrappers with deduplication
+- **Object params** — `ObjectSearchParamBlueprint` validates nested values against its default shape. Partial records merge recursively; arrays are replaced wholesale and their elements must match the complete template shape.
 
 ## 3. Concepts
 
 ### Blueprint
 
-A class extending `BaseBlueprint<T>` that defines:
+A class extending `BaseSearchParamBlueprint<T>` that defines:
 
 - **Key** — The query param name in the URL (e.g., `?page=2` → key = `"page"`)
 - **Default value** — What to use when the param is missing or invalid
@@ -32,19 +33,20 @@ A class extending `BaseBlueprint<T>` that defines:
 
 Available blueprint classes:
 
-| Class              | Value type  | Notes                                                                                              |
-| ------------------ | ----------- | -------------------------------------------------------------------------------------------------- |
-| `BooleanBlueprint` | `boolean`   | Parses `'true'`/`'false'`                                                                          |
-| `NumberBlueprint`  | `number`    | Supports `.min()` / `.max()` clamping                                                              |
-| `StringBlueprint`  | `string`    | Direct string passthrough                                                                          |
-| `EnumBlueprint<O>` | `O[number]` | Parses serialized option values back to their typed options; string representations must be unique |
-| `FiltersBlueprint` | `string[]`  | Handles `NOT()`/`!()` prefix expressions                                                           |
+| Class                           | Value type  | Notes                                                                                              |
+| ------------------------------- | ----------- | -------------------------------------------------------------------------------------------------- |
+| `BooleanSearchParamBlueprint`   | `boolean`   | Parses `'true'`/`'false'`                                                                          |
+| `NumberSearchParamBlueprint`    | `number`    | Supports `.min()` / `.max()` clamping                                                              |
+| `StringSearchParamBlueprint`    | `string`    | Direct string passthrough                                                                          |
+| `EnumSearchParamBlueprint<O>`   | `O[number]` | Parses serialized option values back to their typed options; string representations must be unique |
+| `FiltersSearchParamBlueprint`   | `string[]`  | Handles `NOT()`/`!()` prefix expressions                                                           |
+| `ObjectSearchParamBlueprint<O>` | `O`         | Validates and merges nested object or array values                                                 |
 
 ### Engine
 
 `SearchParamEngine<Blueprints>` is the orchestrator. Given a map of blueprints, it:
 
-1. Creates a runtime wrapper for each blueprint (exposing protected methods as public)
+1. Creates a runtime wrapper for each blueprint using `SearchParamRuntimeFactory` and `SEARCH_PARAM_RUNTIME_MAP`
 2. Provides `full(params)` — resolve all params, filling defaults for missing ones
 3. Provides `delta(params)` — resolve only non-default params (for minimal URL serialization)
 4. Provides `fromLocation(location, snapshot?)` — resolve params from the current browser location
@@ -64,7 +66,7 @@ Available blueprint classes:
 
 ### Runtime
 
-The `Runtime()` factory wraps a blueprint class, promoting its protected methods (`getDefaultValue`, `full`, `delta`, `fromLocation`, `toParams`, etc.) to public. This separation keeps the blueprint API clean for consumers while giving the engine full access.
+`SearchParamRuntimeFactory` wraps a blueprint class in a subclass that promotes protected methods (`getDefaultValue`, `full`, `delta`, `fromLocation`, `toParams`, etc.) to public. `SEARCH_PARAM_RUNTIME_MAP` contains the resulting runtime constructors for each blueprint type. This keeps the blueprint API clean for consumers while giving the engine access to the operations it needs.
 
 ### Store
 
@@ -80,37 +82,31 @@ The `Runtime()` factory wraps a blueprint class, promoting its protected methods
 ### Defining Search Params
 
 ```typescript
-import {
-  BooleanBlueprint,
-  NumberBlueprint,
-  StringBlueprint,
-  EnumBlueprint,
-  FiltersBlueprint
-} from 'features/search-params';
+import { createSearchParams } from 'features/search-params';
 
-const PARAMS = {
-  page: new NumberBlueprint().defaultValue(1).min(1),
-  rows: new NumberBlueprint().defaultValue(25).min(1).max(100),
-  query: new StringBlueprint().defaultValue(''),
-  sort: new EnumBlueprint().options(['name', 'date', 'score'] as const).defaultValue('date'),
-  filters: new FiltersBlueprint().defaultValue([]),
-  showAdvanced: new BooleanBlueprint().defaultValue(false).ephemeral()
-};
+const PARAMS = createSearchParams(blueprints => ({
+  page: blueprints.number(1).min(1),
+  rows: blueprints.number(25).min(1).max(100),
+  query: blueprints.string(''),
+  sort: blueprints.enum('date', ['name', 'date', 'score'] as const),
+  filters: blueprints.filters([]),
+  showAdvanced: blueprints.boolean(false).ephemeral()
+}));
 ```
 
 ### Blueprint Options (Builder Methods)
 
-| Method                                        | Effect                                              |
-| --------------------------------------------- | --------------------------------------------------- |
-| `.defaultValue(v)`                            | Set the default/fallback value                      |
-| `.ephemeral()`                                | Exclude from localStorage persistence               |
-| `.ignored()`                                  | Changes don't trigger snapshot difference detection |
-| `.locked()`                                   | Always returns default regardless of URL value      |
-| `.nullable()`                                 | Allows `null` as a valid value                      |
-| `.source('search' \| 'state' \| 'transient')` | Source for value resolution                         |
-| `.min(n)` / `.max(n)`                         | Number bounds (NumberBlueprint only)                |
-| `.options(valueList)`                         | Valid values list (EnumBlueprint only)              |
-| `.not(prefix)` / `.omit(prefix)`              | Prefix expressions (FiltersBlueprint only)          |
+| Method                                        | Effect                                                  |
+| --------------------------------------------- | ------------------------------------------------------- |
+| `.defaultValue(v)`                            | Set the default/fallback value                          |
+| `.ephemeral()`                                | Exclude from localStorage persistence                   |
+| `.ignored()`                                  | Changes don't trigger snapshot difference detection     |
+| `.locked()`                                   | Always returns default regardless of URL value          |
+| `.nullable()`                                 | Allows `null` as a valid value                          |
+| `.source('search' \| 'state' \| 'transient')` | Source for value resolution                             |
+| `.min(n)` / `.max(n)`                         | Number bounds (`NumberSearchParamBlueprint` only)       |
+| `.options(valueList)`                         | Valid values list (`EnumSearchParamBlueprint` only)     |
+| `.not(prefix)` / `.omit(prefix)`              | Prefix expressions (`FiltersSearchParamBlueprint` only) |
 
 ## 5. Usage (Consumer API)
 
@@ -181,11 +177,11 @@ clearDefaultParams();
 | File                           | Role                                                                                                                                                                                                                                                                                                        |
 | ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `search-params.models.tsx`     | Type definitions: `SearchParamValue`, `SearchParamSource`, `SearchParamBlueprint`, `SearchParamBlueprintMap`, `SearchParamValueMap`, `InferSearchParamValueFromBlueprint`, `InferSearchParamValueMapFromBlueprintMap`, `InferSearchParamRuntimeFromBlueprint`, `InferSearchParamRuntimeMapFromBlueprintMap` |
-| `search-params.blueprints.tsx` | `BaseBlueprint<T>` abstract class + concrete classes: `BooleanBlueprint`, `NumberBlueprint`, `StringBlueprint`, `EnumBlueprint`, `FiltersBlueprint`                                                                                                                                                         |
+| `search-params.blueprints.tsx` | `BaseSearchParamBlueprint<T>` and the concrete `BooleanSearchParamBlueprint`, `NumberSearchParamBlueprint`, `StringSearchParamBlueprint`, `EnumSearchParamBlueprint`, `FiltersSearchParamBlueprint`, and `ObjectSearchParamBlueprint` classes                                                               |
 | `search-params.engines.tsx`    | `SearchParamEngine` — orchestrates blueprints into full/delta/fromLocation resolution                                                                                                                                                                                                                       |
 | `search-params.snapshots.tsx`  | `SearchParamSnapshot` — immutable value object with has/get/pick/omit/set/toLocationSearch/toLocationState                                                                                                                                                                                                  |
-| `search-params.runtimes.tsx`   | `Runtime()` factory + `PARAM_RUNTIMES` map — promotes protected methods to public                                                                                                                                                                                                                           |
-| `search-params.stores.tsx`     | `createSearchParamsStore()` — Context provider + `useSearchParams` hook with `useSyncExternalStore`                                                                                                                                                                                                         |
+| `search-params.runtimes.tsx`   | `SearchParamRuntimeFactory` and `SEARCH_PARAM_RUNTIME_MAP` — promote protected methods to public                                                                                                                                                                                                            |
+| `search-params.stores.tsx`     | `createSearchParams`, `createSearchParamsStore`, and `useSearchParams`                                                                                                                                                                                                                                      |
 | `index.ts`                     | Public exports                                                                                                                                                                                                                                                                                              |
 
 ### Engine Methods

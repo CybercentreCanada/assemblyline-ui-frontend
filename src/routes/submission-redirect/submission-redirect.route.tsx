@@ -30,7 +30,7 @@ export const SubmissionRedirectRoute = createAppRoute({
 
   path: '/submission/:id',
   params: s => ({
-    id: s.string()
+    id: s.string('')
   }),
 
   ancestor: '/submissions',

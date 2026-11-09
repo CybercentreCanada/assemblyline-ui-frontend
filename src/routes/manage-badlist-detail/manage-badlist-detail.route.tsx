@@ -632,7 +632,7 @@ export const ManageBadlistDetailRoute = createAppRoute({
 
   path: '/manage/badlist/detail/:id',
   params: s => ({
-    id: s.string()
+    id: s.string('')
   }),
 
   ancestor: '/manage/badlists',

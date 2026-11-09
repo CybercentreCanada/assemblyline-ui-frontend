@@ -283,7 +283,7 @@ export const ManageHeuristicDetailRoute = createAppRoute({
 
   path: '/manage/heuristic/detail/:id',
   params: s => ({
-    id: s.string()
+    id: s.string('')
   }),
 
   ancestor: '/manage/heuristics',

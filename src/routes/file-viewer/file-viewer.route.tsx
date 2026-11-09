@@ -486,7 +486,7 @@ export const FileViewerRoute = createAppRoute({
 
   path: '/file/viewer/:id/:tab',
   params: s => ({
-    id: s.string(),
+    id: s.string(''),
     tab: s.enum(TAB_OPTIONS, 'ascii')
   }),
   search: s => ({
@@ -532,7 +532,7 @@ export const FileViewerRootRoute = createAppRoute({
 
   path: '/file/viewer/:id',
   params: s => ({
-    id: s.string()
+    id: s.string('')
   }),
   search: s => ({
     cursor: s.number(null),
