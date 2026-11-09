@@ -7,10 +7,6 @@ import { createAppStore } from 'features/store';
 import type { PropsWithChildren } from 'react';
 import { memo, useEffect } from 'react';
 
-// TODO CREATE DEV PAGAE/ROUTE
-// TODO CREATE UNIT TESTS
-// Add vision and milestones to Epic ticket
-
 export const {
   StoreProvider: AppFeatureFlagStoreProvider,
   useStore: useAppFeatureFlagStore,
