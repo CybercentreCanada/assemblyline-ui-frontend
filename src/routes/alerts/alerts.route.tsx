@@ -196,8 +196,8 @@ const WrappedAlertsContent = () => {
     if (!!search.get('group_by')) return;
     else if (!alerts || alerts.length === 0) setSearchObject(v => ({ ...v, tc_start: '' }));
     else {
-      const dates = alerts.map(a => new Date(a.reporting_ts));
-      const min = Math.max.apply(null, dates) as string;
+      const dates = alerts.map(a => new Date(a.reporting_ts).getTime());
+      const min = Math.max(...dates);
       setSearchObject(o => ({ ...o, tc_start: new Date(min).toISOString() }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

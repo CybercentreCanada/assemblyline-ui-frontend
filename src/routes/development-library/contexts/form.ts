@@ -1,20 +1,24 @@
 import { createFormContext } from 'features/form';
 import type { DateTimeLibraryState } from 'routes/development-library/sections/DateTime';
 import { DATETIME_LIBRARY_STATE } from 'routes/development-library/sections/DateTime';
+import { HASH_PARAMS_LIBRARY_STATE, type HashParamsLibraryState } from 'routes/development-library/sections/HashParams';
 import { INPUTS_LIBRARY_STATE, type InputsLibraryState } from 'routes/development-library/sections/Inputs';
 import { LAYOUT_LIBRARY_STATE, type LayoutLibraryState } from 'routes/development-library/sections/Layout';
 import { LIST_LIBRARY_STATE, type ListLibraryState } from 'routes/development-library/sections/List';
 import { LIST_INPUTS_LIBRARY_STATE, type ListInputsLibraryState } from 'routes/development-library/sections/ListInputs';
+import { PATH_PARAMS_LIBRARY_STATE, type PathParamsLibraryState } from 'routes/development-library/sections/PathParams';
 import {
   SEARCH_PARAMS_LIBRARY_STATE,
   type SearchParamsLibraryState
 } from 'routes/development-library/sections/search-params/SearchParams';
 
 type LibraryComponents = DateTimeLibraryState &
+  HashParamsLibraryState &
   InputsLibraryState &
   LayoutLibraryState &
   ListInputsLibraryState &
   ListLibraryState &
+  PathParamsLibraryState &
   SearchParamsLibraryState;
 
 export type LibraryFormStore = {
@@ -30,10 +34,12 @@ const LIBRARY_FORM_STORE: LibraryFormStore = Object.freeze({
   },
   components: {
     ...DATETIME_LIBRARY_STATE,
+    ...HASH_PARAMS_LIBRARY_STATE,
     ...INPUTS_LIBRARY_STATE,
     ...LAYOUT_LIBRARY_STATE,
     ...LIST_INPUTS_LIBRARY_STATE,
     ...LIST_LIBRARY_STATE,
+    ...PATH_PARAMS_LIBRARY_STATE,
     ...SEARCH_PARAMS_LIBRARY_STATE
   }
 });
