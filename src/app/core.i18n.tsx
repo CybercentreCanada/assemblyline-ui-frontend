@@ -51,6 +51,8 @@ import dashboardEN from 'routes/dashboard/dashboard.i18n.en.json';
 import dashboardFR from 'routes/dashboard/dashboard.i18n.fr.json';
 import developmentAPIEN from 'routes/development-api/development-api.i18n.en.json';
 import developmentAPIFR from 'routes/development-api/development-api.i18n.fr.json';
+import developmentFeatureFlagsEN from 'routes/development-feature-flags/development-feature-flags.i18n.en.json';
+import developmentFeatureFlagsFR from 'routes/development-feature-flags/development-feature-flags.i18n.fr.json';
 import fileDetailEN from 'routes/file-detail/file-detail.i18n.en.json';
 import fileDetailFR from 'routes/file-detail/file-detail.i18n.fr.json';
 import fileViewerEN from 'routes/file-viewer/file-viewer.i18n.en.json';
@@ -145,6 +147,7 @@ const resources = {
     dashboard: dashboardEN,
     dateTime: dateTimeEN,
     developmentAPI: developmentAPIEN,
+    developmentFeatureFlags: developmentFeatureFlagsEN,
     error403: error403EN,
     error404: error404EN,
     favorites: favoritesEN,
@@ -208,6 +211,7 @@ const resources = {
     dashboard: dashboardFR,
     dateTime: dateTimeFR,
     developmentAPI: developmentAPIFR,
+    developmentFeatureFlags: developmentFeatureFlagsFR,
     error403: error403FR,
     error404: error404FR,
     favorites: favoritesFR,

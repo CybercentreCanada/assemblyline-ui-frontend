@@ -19,6 +19,7 @@ import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import FindInPageOutlinedIcon from '@mui/icons-material/FindInPageOutlined';
 import FingerprintOutlinedIcon from '@mui/icons-material/FingerprintOutlined';
+import FlagIcon from '@mui/icons-material/Flag';
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import KeyOutlinedIcon from '@mui/icons-material/KeyOutlined';
 import LabelOutlinedIcon from '@mui/icons-material/LabelOutlined';
@@ -337,6 +338,12 @@ export default function useMySitemap() {
         path: '/development/customize',
         title: t('drawer.development.customize'),
         icon: <PaletteIcon />,
+        breadcrumbs: ['/development']
+      },
+      {
+        path: '/development/feature-flags',
+        title: t('drawer.development.feature-flags'),
+        icon: <FlagIcon />,
         breadcrumbs: ['/development']
       },
       {
