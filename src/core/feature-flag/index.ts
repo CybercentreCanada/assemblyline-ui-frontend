@@ -8,4 +8,4 @@ export {
   useAppSetFeatureFlagStore
 } from './feature-flag.providers';
 export type { AppFeatureFlagProviderProps } from './feature-flag.providers';
-export { FeatureFlagged } from './FeatureFlagged';
+export { FeatureFlagged } from './feature-flagged.component';

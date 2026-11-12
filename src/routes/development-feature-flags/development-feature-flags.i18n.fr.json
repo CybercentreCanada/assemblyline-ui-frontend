@@ -4,7 +4,7 @@
   "definitions.state": "L'état de l'indicateur est 'alpha' ou 'beta'. Il décrit la maturité de la fonctionnalité, pas son activation.",
   "definitions.subtitle": "Métadonnées servant uniquement à décrire l'indicateur et son utilisation.",
   "definitions.title": "FeatureFlagDefinition",
-  "demo.clear": "Effacer l'indicateur de démonstration",
+  "demo.clear": "Effacer la fonctionnalité expérimentale",
   "demo.component.consoleHint": "(Inspectez les journaux de la console pour voir quand le composant conditionnel est monté et démonté)",
   "demo.component.content": "!!! Ce contenu est rendu par FeatureFlagged !!!",
   "demo.component.description": "Utilisez FeatureFlagged pour afficher ou masquer un sous-arbre. Ce composant utilise le même hook d'activation et ne rend rien lorsque l'indicateur est désactivé.",
@@ -24,6 +24,6 @@
   "start.declare.title": "Déclarer l'indicateur",
   "start.register.subtitle": "Le basculement d'un indicateur non enregistré l'ajoute au magasin.",
   "start.register.title": "(Facultatif) Ajouter l'indicateur à l'état initial",
-  "title": "Indicateurs de fonctionnalité",
+  "title": "Fonctionnalités expérimentales",
   "title.sub": "Placez le comportement expérimental derrière un indicateur explicite jusqu'à ce qu'il soit prêt à être publié."
 }

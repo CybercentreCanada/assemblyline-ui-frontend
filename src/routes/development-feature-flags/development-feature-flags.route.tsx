@@ -1,7 +1,6 @@
 import { Delete } from '@mui/icons-material';
 import { Button, FormControlLabel, Switch, Typography, useTheme, type Theme } from '@mui/material';
 import useALContext from 'core/config/useALContext';
-import { FeatureFlagged } from 'core/feature-flag/FeatureFlagged';
 import { useIsFeatureEnabled, useUpdateFeatureFlag } from 'core/feature-flag/feature-flag.hooks';
 import { EMPTY_FEATURE_FLAG_STATE, type FeatureFlagStore } from 'core/feature-flag/feature-flag.models';
 import {
@@ -9,6 +8,7 @@ import {
   AppFeatureFlagStoreProvider,
   useAppSetFeatureFlagStore
 } from 'core/feature-flag/feature-flag.providers';
+import { FeatureFlagged } from 'core/feature-flag/feature-flagged.component';
 import PageFullSize from 'core/template/branding/AppPageCenter';
 import type { ChangeEvent, CSSProperties } from 'react';
 import { memo, useCallback, useEffect, useMemo } from 'react';

@@ -66,7 +66,7 @@ import Submit from 'routes/submit/submit';
 import User from 'routes/user/user.route';
 import { resetFavicon } from 'shared/utils/utils';
 
-const Development = lazy(() => import('routes/development/Development.route.tsx'));
+const Development = lazy(() => import('routes/development/development.route'));
 const DevelopmentAPI = lazy(() => import('routes/development-api/development-api.route.tsx'));
 const DevelopmentCustomize = lazy(() => import('routes/development-customize/customize'));
 const DevelopmentFeatureFlags = lazy(() => import('routes/development-feature-flags/development-feature-flags.route.tsx'));
