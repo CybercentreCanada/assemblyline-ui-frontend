@@ -3,8 +3,6 @@ import type {
   InferSearchParamValueMapFromBlueprintMap,
   ObjectParamShape,
   ObjectParamValue,
-  SearchParamBlueprintDescriptor,
-  SearchParamBlueprintKind,
   SearchParamBlueprintMap,
   SearchParamSnapshot,
   SearchParamSource,
@@ -174,29 +172,6 @@ export abstract class BaseSearchParamBlueprint<T extends SearchParamValue> {
   }
 
   // -------------------------
-  // Introspection
-  // -------------------------
-
-  /** Identifies which blueprint variant this instance is, for tooling/introspection. Overridden by each subclass. */
-  public getKind(): SearchParamBlueprintKind {
-    throw new Error('getKind() must be implemented by a concrete blueprint subclass.');
-  }
-
-  /** Plain-object description of this blueprint's configuration, for tooling/introspection. */
-  public describe(): SearchParamBlueprintDescriptor {
-    return {
-      key: this._key,
-      kind: this.getKind(),
-      defaultValue: this._defaultValue,
-      source: this._source,
-      ephemeral: this._ephemeral,
-      ignored: this._ignored,
-      locked: this._locked,
-      nullable: this._nullable
-    };
-  }
-
-  // -------------------------
   // Parsers
   // -------------------------
 
@@ -317,10 +292,6 @@ export abstract class BaseSearchParamBlueprint<T extends SearchParamValue> {
 // Boolean Blueprint
 //*****************************************************************************************
 export class BooleanSearchParamBlueprint extends BaseSearchParamBlueprint<boolean> {
-  public override getKind(): SearchParamBlueprintKind {
-    return 'boolean';
-  }
-
   protected override parse(value: unknown): boolean {
     return value === 'true' ? true : value === 'false' ? false : super.parse(value);
   }
@@ -357,14 +328,6 @@ export class NumberSearchParamBlueprint extends BaseSearchParamBlueprint<number>
     return this;
   }
 
-  public override getKind(): SearchParamBlueprintKind {
-    return 'number';
-  }
-
-  public override describe(): SearchParamBlueprintDescriptor {
-    return { ...super.describe(), min: this._min, max: this._max };
-  }
-
   private clamp(value: number): number {
     let num = value;
     if (this._min !== null) num = Math.max(num, this._min);
@@ -396,10 +359,6 @@ export class NumberSearchParamBlueprint extends BaseSearchParamBlueprint<number>
 // String Blueprint
 //*****************************************************************************************
 export class StringSearchParamBlueprint extends BaseSearchParamBlueprint<string> {
-  public override getKind(): SearchParamBlueprintKind {
-    return 'string';
-  }
-
   protected override parse(value: unknown): string {
     return typeof value === 'string' ? String(value) : super.parse(value);
   }
@@ -440,14 +399,6 @@ export class EnumSearchParamBlueprint<
 
     this._options = value;
     return this;
-  }
-
-  public override getKind(): SearchParamBlueprintKind {
-    return 'enum';
-  }
-
-  public override describe(): SearchParamBlueprintDescriptor {
-    return { ...super.describe(), options: this._options };
   }
 
   private check(value: unknown): value is O[number] {
@@ -495,14 +446,6 @@ export class FiltersSearchParamBlueprint extends BaseSearchParamBlueprint<string
   public omit(value: string = '!') {
     this._omit = value;
     return this;
-  }
-
-  public override getKind(): SearchParamBlueprintKind {
-    return 'filters';
-  }
-
-  public override describe(): SearchParamBlueprintDescriptor {
-    return { ...super.describe(), not: this._not, omit: this._omit };
   }
 
   // -------------------------
@@ -714,10 +657,6 @@ export class FiltersSearchParamBlueprint extends BaseSearchParamBlueprint<string
 export class ObjectSearchParamBlueprint<
   O extends ObjectParamValue = ObjectParamValue
 > extends BaseSearchParamBlueprint<O> {
-  public override getKind(): SearchParamBlueprintKind {
-    return 'object';
-  }
-
   private isPrimitive(value: unknown): value is string | number | boolean | null {
     return value === null || ['string', 'number', 'boolean'].includes(typeof value);
   }
