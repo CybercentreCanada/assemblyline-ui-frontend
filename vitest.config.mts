@@ -34,8 +34,7 @@ export default defineConfig(({ mode }) => {
         exclude: ['**/*.d.ts', '**/*.{test,spec,pom}.{ts,tsx}', 'src/core/test/**', 'src/core/e2e/**'],
         provider: 'v8',
         reporter: ['text-summary', 'cobertura', 'clover', 'lcov'],
-        reportsDirectory: './coverage',
-        reportOnFailure: true
+        reportsDirectory: './coverage'
       },
       maxWorkers: 6
     }
