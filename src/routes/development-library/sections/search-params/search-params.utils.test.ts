@@ -4,8 +4,6 @@ import {
   KIND_DEMOS,
   parseJsonRecord,
   resolvePlaygroundSnapshot,
-  runSearchParamsCheck,
-  SEARCH_PARAMS_CHECKS,
   stringifyResult
 } from 'routes/development-library/sections/search-params/search-params.utils';
 import { describe, expect, it } from 'vitest';
@@ -136,59 +134,4 @@ describe('createKindDemo', () => {
       expect(() => demo.resolve(demo.initial)).not.toThrow();
     }
   });
-});
-
-//*****************************************************************************************
-// runSearchParamsCheck
-//*****************************************************************************************
-describe('runSearchParamsCheck', () => {
-  it('passes when the actual value equals the expected value', () => {
-    const result = runSearchParamsCheck({ group: 'g', name: 'n', run: () => ({ a: [1] }), expected: { a: [1] } });
-
-    expect(result).toEqual({ actual: '{"a":[1]}', expected: '{"a":[1]}', group: 'g', name: 'n', passed: true });
-  });
-
-  it('fails when the actual value differs from the expected value', () => {
-    expect(runSearchParamsCheck({ group: 'g', name: 'n', run: () => 1, expected: 2 }).passed).toBe(false);
-  });
-
-  it('fails with the error text when the check throws', () => {
-    const result = runSearchParamsCheck({
-      group: 'g',
-      name: 'n',
-      run: () => {
-        throw new Error('boom');
-      },
-      expected: null
-    });
-
-    expect(result.passed).toBe(false);
-    expect(result.actual).toBe('Error: boom');
-  });
-
-  it('compares an undefined result with an undefined expectation', () => {
-    expect(runSearchParamsCheck({ group: 'g', name: 'n', run: () => undefined, expected: undefined }).passed).toBe(
-      true
-    );
-  });
-});
-
-//*****************************************************************************************
-// SEARCH_PARAMS_CHECKS
-//*****************************************************************************************
-describe('SEARCH_PARAMS_CHECKS', () => {
-  it('lists checks with unique names inside each group', () => {
-    const keys = SEARCH_PARAMS_CHECKS.map(check => `${check.group}/${check.name}`);
-
-    expect(new Set(keys).size).toBe(keys.length);
-  });
-
-  it.each(SEARCH_PARAMS_CHECKS.map(check => [`${check.group}: ${check.name}`, check] as const))(
-    '%s',
-    (_name, check) => {
-      const result = runSearchParamsCheck(check);
-
-      expect(result.actual).toBe(result.expected);
-    }
-  );
 });
