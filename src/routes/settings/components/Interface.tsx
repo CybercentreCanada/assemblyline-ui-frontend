@@ -1,6 +1,6 @@
 import { useTheme } from '@mui/material';
-import useALContext from 'core/config/useALContext';
-import React, { useMemo } from 'react';
+import { useAppConfigStore } from 'core/config';
+import { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'routes/settings/settings.form';
 import { getProfileNames } from 'routes/settings/settings.utils';
@@ -10,11 +10,12 @@ import { TextListInput } from 'ui/list-inputs/TextListInput';
 import { List } from 'ui/list/List';
 import { ListHeader } from 'ui/list/ListHeader';
 
-export const InterfaceSection = React.memo(() => {
+export const InterfaceSection = memo(() => {
   const { t } = useTranslation(['settings']);
   const theme = useTheme();
   const form = useForm();
-  const { configuration, settings } = useALContext();
+  const configuration = useAppConfigStore(s => s.configuration);
+  const settings = useAppConfigStore(s => s.settings);
 
   const profileOptions = useMemo<{ value: string; primary: string }[]>(() => {
     if (!configuration || !settings) return [];
@@ -37,9 +38,7 @@ export const InterfaceSection = React.memo(() => {
     ];
   }, [configuration, t]);
 
-  if (!configuration || !settings) return null;
-
-  return (
+  return !configuration || !settings ? null : (
     <form.Subscribe selector={state => [state.values.state.loading, state.values.state.disabled] as const}>
       {([loading, disabled]) => (
         <div style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(0.5) }}>

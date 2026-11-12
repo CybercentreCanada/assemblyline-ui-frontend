@@ -3,8 +3,6 @@ import { expect, test } from 'core/e2e/e2e.fixtures';
 import type { WaitForOptions } from 'core/e2e/e2e.models';
 import { PageObjectModel } from 'core/e2e/utils/PageObjectModel';
 
-// type NotFoundPageFixture = (r: NotFoundPage) => Promise<void>;
-
 export class PageNotFoundError extends Error {
   visible: boolean;
   path: string;
@@ -24,8 +22,10 @@ export class NotFoundPage extends PageObjectModel {
   constructor(page: Page) {
     super(page, 'Not Found page', '*');
 
-    this.deadLinkTitle = page.getByText(`404: Not found`);
-    this.deadLinkDescription = page.getByText(`The page you are looking for cannot be found...`, { exact: true });
+    this.deadLinkTitle = page.getByText('This page took a wrong turn');
+    this.deadLinkDescription = page.getByText(
+      /The route you requested could not be found. Share the navigation details below with the system administrators if this is unexpected./
+    );
   }
 
   locators(): Locator[] {

@@ -193,7 +193,7 @@ export default tseslint.config(
             },
             {
               from: { element: { type: 'core' } },
-              allow: { to: { element: { type: ['app', 'layout', 'features'] } } }
+              allow: { to: { element: { type: ['app', 'layout', 'features', 'pages'] } } }
             },
             {
               from: { element: { type: 'models' } },
@@ -335,7 +335,7 @@ export default tseslint.config(
       'no-case-declarations': 'off',
       'no-console': ['error', { allow: ['error'] }],
       'no-extra-boolean-cast': 'off',
-      'no-param-reassign': 'warn',
+      'no-param-reassign': 'off',
       'no-prototype-builtins': 'warn',
       'no-unsafe-optional-chaining': 'error',
       'no-unused-vars': 'warn',

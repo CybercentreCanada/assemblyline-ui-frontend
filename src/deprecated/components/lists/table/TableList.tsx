@@ -24,7 +24,7 @@ import {
   RowInner,
   Top
 } from 'deprecated/components/lists/table/useStyles';
-import lodash from 'lodash';
+import lodashGet from 'lodash/get';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import ReactResizeDetector from 'react-resize-detector';
 
@@ -124,7 +124,7 @@ export default function TableList<T extends LineItem>(props: TableListProps<T>) 
       <Row key={`tablelist.row[${rowIndex}]`}>
         <RowInner>
           {columns.map((column, cellIndex) => {
-            const cellValue = column.getValue ? column.getValue(item) : lodash.get(item, column.path, '');
+            const cellValue = column.getValue ? column.getValue(item) : lodashGet(item, column.path, '');
             const cellWidth = layout.columnWidths[cellIndex];
             return (
               <Cell

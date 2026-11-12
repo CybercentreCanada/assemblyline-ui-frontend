@@ -1,5 +1,7 @@
 {
   "actor": "Used by",
+  "app_route.submission_report.fullname": "Submission Report {{id}}",
+  "app_route.submission_report.shortname": "{{id}}",
   "attack": "Att&ck Matrix",
   "detail_view": "Show detailed view",
   "error.notfound": "The submission was not found",

@@ -24,26 +24,16 @@ export type LocationQuery = {
 export type LocationTypes = never;
 
 export type LocationState = {
-  location: PartialR<CursorState & SelectState & SearchState & ScrollState> & {
-    // loaded: boolean;
-    // params: Array<LocationParam>;
-    // scroll: number;
-    // cursor: number;
-    // selectStart: number;
-    // selectEnd: number;
-    // searchType: SearchType;
-    // searchValue: string;
-    // searchIndex: number;
-  };
+  location: PartialR<CursorState & SelectState & SearchState & ScrollState>;
 };
 
 export const LOCATION_PARAMS: LocationParam[] = [
-  { key: 'a', type: 'number', path: ['cursor', 'index'] },
-  { key: 'b', type: 'number', path: ['select', 'startIndex'] },
-  { key: 'c', type: 'number', path: ['select', 'endIndex'] },
-  { key: 'd', type: 'string', path: ['search', 'mode', 'type'] },
-  { key: 'e', type: 'string', path: ['search', 'inputValue'] },
-  { key: 'f', type: 'number', path: ['search', 'selectedResult'] }
+  { key: 'cursor', type: 'number', path: ['cursor', 'index'] },
+  { key: 'startIndex', type: 'number', path: ['select', 'startIndex'] },
+  { key: 'endIndex', type: 'number', path: ['select', 'endIndex'] },
+  { key: 'mode', type: 'string', path: ['search', 'mode', 'type'] },
+  { key: 'query', type: 'string', path: ['search', 'inputValue'] },
+  { key: 'selectedResult', type: 'number', path: ['search', 'selectedResult'] }
 ];
 
 export const LOCATION_STATE: LocationState = {
@@ -55,7 +45,7 @@ export const LOCATION_STATE: LocationState = {
   }
 };
 
-export const LOCATION_TYPES: TypesConfig<LocationState, LocationTypes | SearchType> = {
+export const LOCATION_TYPES: TypesConfig<LocationState, SearchType> = {
   location: {
     // searchType: [
     //   {

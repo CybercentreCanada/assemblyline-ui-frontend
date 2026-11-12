@@ -1,5 +1,6 @@
 import DataUsageOutlinedIcon from '@mui/icons-material/DataUsageOutlined';
 import HttpsOutlinedIcon from '@mui/icons-material/HttpsOutlined';
+import MapOutlinedIcon from '@mui/icons-material/MapOutlined';
 import NoEncryptionOutlinedIcon from '@mui/icons-material/NoEncryptionOutlined';
 import {
   Paper,
@@ -13,16 +14,14 @@ import {
   TableRow,
   useTheme
 } from '@mui/material';
-import useMyAPI from 'core/api/hooks/useMyAPI';
-import useALContext from 'core/config/useALContext';
-import { useAppUser } from 'core/template/components/app/hooks';
-import PageFullWidth from 'core/template/components/pages/PageFullWidth';
+import { createAppRoute } from 'core/router';
+import { AppPageFullWidth } from 'core/template';
+import useALContext from 'deprecated/hooks/useALContext';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
 import type { SiteMapResponse } from 'models/api';
-import type { CustomUser } from 'models/api/user';
 import type { Role } from 'models/base/user';
 import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate } from 'react-router';
 import type { PossibleColor } from 'shared/utils/colors';
 import CustomChip from 'ui/CustomChip';
 import { PageHeader } from 'ui/layouts/PageHeader';
@@ -43,12 +42,11 @@ const StyledTableCell = memo(
   }))
 );
 
-export default function SiteMapPage() {
+export const AdminSiteMapPage = memo(() => {
   const { t } = useTranslation(['adminSiteMap']);
   const theme = useTheme();
-  const { configuration } = useALContext();
+  const { configuration, user: currentUser } = useALContext();
   const { apiCall } = useMyAPI();
-  const { user: currentUser } = useAppUser<CustomUser>();
 
   const [siteMap, setSiteMap] = useState<SiteMapResponse>(null);
 
@@ -103,8 +101,8 @@ export default function SiteMapPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser.is_admin]);
 
-  return currentUser.is_admin ? (
-    <PageFullWidth margin={4}>
+  return (
+    <AppPageFullWidth>
       <PageHeader
         primary={t('title')}
         secondary={() => `${siteMap.length} ${t('caption')}`}
@@ -169,8 +167,21 @@ export default function SiteMapPage() {
       ) : (
         <Skeleton variant="rectangular" height="10rem" style={{ borderRadius: '4px' }} />
       )}
-    </PageFullWidth>
-  ) : (
-    <Navigate to="/forbidden" replace />
+    </AppPageFullWidth>
   );
-}
+});
+
+export const AdminSitemapRoute = createAppRoute({
+  component: AdminSiteMapPage,
+
+  path: '/admin/sitemap',
+
+  ancestor: '/admin',
+  shortname: () => ['app_route.admin_sitemap.shortname', { ns: 'adminSiteMap' }],
+  fullname: () => ['app_route.admin_sitemap.fullname', { ns: 'adminSiteMap' }],
+  shorticon: () => <MapOutlinedIcon />,
+  fullicon: () => <MapOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.is_admin
+});

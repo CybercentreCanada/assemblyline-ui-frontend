@@ -1,5 +1,7 @@
 {
   "add_user": "Ajouter un utilisateur",
+  "app_route.admin_users.fullname": "Administration des Utilisateurs",
+  "app_route.admin_users.shortname": "Utilisateurs",
   "filter": "Filtrer les utilisateurs ...",
   "filter.admins.add": "Ajouter un filtre pour afficher les administrateurs",
   "filter.admins.remove": "Supprimer le filtre pour afficher les administrateurs",

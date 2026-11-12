@@ -13,7 +13,7 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import PageContainer from 'core/template/branding/AppPageContainer';
+import { AppPageContainer } from 'core/template';
 import type { ReactNode } from 'react';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -310,15 +310,16 @@ const WrappedSearchHeader = ({
   );
 
   useEffect(() => {
-    setQueryValue(params.get(queryKey));
-  }, [params, queryKey]);
+    const nextQueryValue = params.get(queryKey) ?? defaultQuery;
+    setQueryValue(prev => (prev === nextQueryValue ? prev : nextQueryValue));
+  }, [defaultQuery, params, queryKey]);
 
   useEffect(() => {
     if (!loading) getInputEl().focus();
   }, [getInputEl, loading]);
 
   return (
-    <PageContainer isSticky={isSticky}>
+    <AppPageContainer isSticky={isSticky}>
       <Root ref={rootRef}>
         <SearchWrapper ref={inputRef}>
           <SearchContainer>
@@ -481,7 +482,7 @@ const WrappedSearchHeader = ({
         {/** Other Components */}
         {children && <Container>{children}</Container>}
       </Root>
-    </PageContainer>
+    </AppPageContainer>
   );
 };
 

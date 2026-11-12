@@ -1,7 +1,6 @@
 import type { ThemeObject } from '@microlink/react-json-view';
 import ReactJson from '@microlink/react-json-view';
 import { useTheme } from '@mui/material';
-import { useAppTheme } from 'core/template/components/app/hooks';
 import { PropProvider, usePropStore } from 'features/prop-provider';
 import React, { useMemo } from 'react';
 import {
@@ -29,7 +28,7 @@ type JSONInputController = JSONInputProps & InputRuntimeState<object>;
 
 const WrappedJSONInput = () => {
   const theme = useTheme();
-  const { isDark: isDarkTheme } = useAppTheme();
+  const isDarkTheme = theme.palette.mode === 'dark';
   const [get] = usePropStore<JSONInputController>();
 
   const disabled = get('disabled');

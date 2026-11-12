@@ -2,6 +2,8 @@
   "E": "Extended",
   "R": "Read",
   "W": "Write",
+  "app_route.admin_sitemap.fullname": "Admin Site Map",
+  "app_route.admin_sitemap.shortname": "Site Map",
   "caption": "available paths",
   "header.function": "Function",
   "header.methods": "Methods",

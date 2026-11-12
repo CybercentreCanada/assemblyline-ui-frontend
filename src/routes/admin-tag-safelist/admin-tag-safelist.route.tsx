@@ -1,27 +1,26 @@
 import Editor, { DiffEditor, loader } from '@monaco-editor/react';
-import { Dialog, DialogActions, DialogContent, DialogTitle, Skeleton, useTheme } from '@mui/material';
-import useMyAPI from 'core/api/hooks/useMyAPI';
-import useMySnackbar from 'core/snackbar/snackbar.hooks';
-import PageFullSize from 'core/template/branding/AppPageCenter';
-import { useAppTheme, useAppUser } from 'core/template/components/app/hooks';
-import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
-import type { CustomUser } from 'models/api/user';
-import { useRef, useState } from 'react';
+import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Skeleton, useTheme } from '@mui/material';
+import { createAppRoute, useAppBlocker } from 'core/router';
+import { AppPageFullSize, useAppTemplateThemeMode } from 'core/template';
+import useALContext from 'deprecated/hooks/useALContext';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useMySnackbar from 'deprecated/hooks/useMySnackbar';
+import { memo, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ReactResizeDetector from 'react-resize-detector';
-import { Navigate } from 'react-router';
-import { Button } from 'ui/buttons/Button';
 import { PageHeader } from 'ui/layouts/PageHeader';
-import { RouterPrompt } from 'ui/RouterPrompt';
 
-loader.config({ paths: { vs: '/cdn/monaco_0.35.0/vs' } });
+loader.config({
+  paths: { vs: '/cdn/monaco_0.35.0/vs' }
+});
 
-export default function AdminTagSafelist() {
+export const AdminTagSafelistPage = memo(() => {
   const { t, i18n } = useTranslation(['adminTagSafelist']);
   const theme = useTheme();
   const { apiCall } = useMyAPI();
-  const { user: currentUser } = useAppUser<CustomUser>();
-  const { isDark: isDarkTheme } = useAppTheme();
+  const { user: currentUser } = useALContext();
+  const themeMode = useAppTemplateThemeMode();
   const { showSuccessMessage } = useMySnackbar();
 
   const [tagSafelist, setTagSafelist] = useState<string>(null);
@@ -31,7 +30,12 @@ export default function AdminTagSafelist() {
   const containerEL = useRef<HTMLDivElement>(null);
   const containerDialogEL = useRef<HTMLDivElement>(null);
 
-  useEffectOnce(() => {
+  useAppBlocker(
+    () => (tagSafelist !== originalTagSafelist ? 'unsaved_changes' : null),
+    [tagSafelist, originalTagSafelist]
+  );
+
+  useEffect(() => {
     if (currentUser.is_admin) {
       reload(false);
     }
@@ -42,7 +46,7 @@ export default function AdminTagSafelist() {
     } else {
       loader.config({ 'vs/nls': { availableLanguages: { '*': '' } } });
     }
-  });
+  }, []);
 
   const reload = defValue => {
     apiCall<string>({
@@ -73,10 +77,8 @@ export default function AdminTagSafelist() {
     editor.focus();
   };
 
-  return currentUser.is_admin ? (
-    <PageFullSize margin={4}>
-      <RouterPrompt when={tagSafelist !== originalTagSafelist} />
-
+  return (
+    <AppPageFullSize>
       <PageHeader
         primary={t('title')}
         slotProps={{
@@ -116,7 +118,7 @@ export default function AdminTagSafelist() {
                 <div ref={containerDialogEL}>
                   <DiffEditor
                     language="yaml"
-                    theme={isDarkTheme ? 'vs-dark' : 'vs'}
+                    theme={themeMode === 'dark' ? 'vs-dark' : 'vs'}
                     original={originalTagSafelist}
                     width={width}
                     height="50vh"
@@ -164,7 +166,7 @@ export default function AdminTagSafelist() {
                       language="yaml"
                       width={width}
                       height={height}
-                      theme={isDarkTheme ? 'vs-dark' : 'vs'}
+                      theme={themeMode === 'dark' ? 'vs-dark' : 'vs'}
                       loading={t('loading')}
                       value={tagSafelist}
                       onChange={setTagSafelist}
@@ -180,8 +182,21 @@ export default function AdminTagSafelist() {
           </ReactResizeDetector>
         </div>
       </div>
-    </PageFullSize>
-  ) : (
-    <Navigate to="/forbidden" replace />
+    </AppPageFullSize>
   );
-}
+});
+
+export const AdminTagSafelistRoute = createAppRoute({
+  component: AdminTagSafelistPage,
+
+  path: '/admin/tag_safelist',
+
+  ancestor: '/admin',
+  shortname: () => ['app_route.admin_tag_safelist.shortname', { ns: 'adminTagSafelist' }],
+  fullname: () => ['app_route.admin_tag_safelist.fullname', { ns: 'adminTagSafelist' }],
+  shorticon: () => <VerifiedUserOutlinedIcon />,
+  fullicon: () => <VerifiedUserOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.is_admin
+});

@@ -12,7 +12,7 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import PageContainer from 'core/template/branding/AppPageContainer';
+import { AppPageContainer } from 'core/template';
 import type { IndexDefinition } from 'models/api/user';
 import type { ReactNode } from 'react';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -193,7 +193,7 @@ const WrappedSearchHeader = ({
   }, [getInputEl, loading]);
 
   return (
-    <PageContainer isSticky={isSticky}>
+    <AppPageContainer isSticky={isSticky}>
       <div style={{ paddingTop: theme.spacing(1), paddingBottom: theme.spacing(1) }}>
         <Box
           ref={rootRef}
@@ -370,7 +370,7 @@ const WrappedSearchHeader = ({
                 )}
         </Box>
       </div>
-    </PageContainer>
+    </AppPageContainer>
   );
 };
 

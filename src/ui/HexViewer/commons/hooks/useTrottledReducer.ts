@@ -1,6 +1,5 @@
-import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
 import type { MutableRefObject } from 'react';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 export const useTrottledReducer = <State, Action>(
   reducer: (state: Partial<State>, action: Action) => State,
@@ -17,9 +16,9 @@ export const useTrottledReducer = <State, Action>(
   const dispatchRef = useRef(setState);
   const timeout = useRef(null);
 
-  useEffectOnce(() => {
+  useEffect(() => {
     dispatchRef.current = setState;
-  });
+  }, []);
 
   const clear = useCallback(() => {
     clearTimeout(timeout.current);

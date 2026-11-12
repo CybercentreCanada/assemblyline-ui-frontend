@@ -1,42 +1,43 @@
+import BarChartOutlinedIcon from '@mui/icons-material/BarChartOutlined';
 import { Skeleton, Typography, useTheme } from '@mui/material';
-import useMyAPI from 'core/api/hooks/useMyAPI';
-import useALContext from 'core/config/useALContext';
-import PageFullWidth from 'core/template/components/pages/PageFullWidth';
-import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
-import useDrawer from 'layout/drawer/drawer.hooks';
-import { useCallback, useState } from 'react';
+import { createAppRoute } from 'core/router';
+import { AppPageFullWidth } from 'core/template';
+import useALContext from 'deprecated/hooks/useALContext';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
+import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import SignatureDetail from 'routes/manage-signature-detail/manage-signature-detail.route';
 import type { Cell } from 'ui/Table/enhanced_table';
 import EnhancedTable from 'ui/Table/enhanced_table';
 
-export default function StatisticsSignatures() {
+type SignatureStat = {
+  id: string;
+  type: string;
+  source: string;
+  name: string;
+  count: number;
+  min: number;
+  avg: number;
+  max: number;
+  classification?: string;
+};
+
+export const StatisticsSignaturesPage = memo(() => {
   const { t } = useTranslation(['statisticsSignatures']);
   const { apiCall } = useMyAPI();
   const theme = useTheme();
   const { c12nDef } = useALContext();
-  const { closeGlobalDrawer, setGlobalDrawer } = useDrawer();
-  const [signatureStats, setSignatureStats] = useState(null);
+  const [signatureStats, setSignatureStats] = useState<SignatureStat[]>(null);
 
-  const handleSignatureDelete = () => {
-    closeGlobalDrawer();
-    setTimeout(() => window.dispatchEvent(new CustomEvent('reloadSignatures')), 1000);
-  };
-
-  const handleRowClick = useCallback(row => {
-    setGlobalDrawer(<SignatureDetail signature_id={row.id} onUpdated={() => {}} onDeleted={handleSignatureDelete} />);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffectOnce(() => {
+  useEffect(() => {
     apiCall({
       method: 'GET',
       url: '/api/v4/signature/stats/',
       onSuccess: api_data => {
-        setSignatureStats(api_data.api_response);
+        setSignatureStats(api_data.api_response as SignatureStat[]);
       }
     });
-  });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const cells: Cell[] = [
     { id: 'type', break: false, numeric: false, disablePadding: false, label: t('type') },
@@ -59,7 +60,7 @@ export default function StatisticsSignatures() {
   }
 
   return (
-    <PageFullWidth margin={4}>
+    <AppPageFullWidth>
       <div style={{ paddingBottom: theme.spacing(2) }}>
         <Typography variant="h4">{t('title')}</Typography>
       </div>
@@ -68,14 +69,28 @@ export default function StatisticsSignatures() {
         <EnhancedTable
           cells={cells}
           rows={signatureStats}
-          linkPrefix="/manage/signature/"
+          linkPrefix="/manage/signature/detail/"
           linkField="id"
           defaultOrderBy="type"
-          onClick={handleRowClick}
         />
       ) : (
         <Skeleton height="10rem" />
       )}
-    </PageFullWidth>
+    </AppPageFullWidth>
   );
-}
+});
+
+export const StatisticsSignaturesRoute = createAppRoute({
+  component: StatisticsSignaturesPage,
+
+  path: '/manage/statistics/signatures',
+
+  ancestor: '/manage/signatures',
+  shortname: () => ['app_route.statistics_signatures.shortname', { ns: 'statisticsSignatures' }],
+  fullname: () => ['app_route.statistics_signatures.fullname', { ns: 'statisticsSignatures' }],
+  shorticon: () => <BarChartOutlinedIcon />,
+  fullicon: () => <BarChartOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.roles.includes('signature_view')
+});

@@ -1,85 +1,59 @@
 import BrokenImageOutlinedIcon from '@mui/icons-material/BrokenImageOutlined';
 import { alpha, Button, CircularProgress, styled, Tooltip, useTheme } from '@mui/material';
-import useMyAPI from 'core/api/hooks/useMyAPI';
-import type { BackgroundMode } from 'layout/carousel/components/AppCarouselImage';
-import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { useAppImageFetch } from 'core/api';
+import { useAppInterfaceStore } from 'core/interface';
+import { getAppCarouselBackgroundColor } from 'layout/carousel';
+import { memo, useMemo } from 'react';
 
-const Img = memo(
-  styled('img')(({ theme }) => ({
-    minWidth: '50%',
-    minHeight: '50%',
-    maxWidth: '100%',
-    maxHeight: '100%',
-    objectFit: 'contain',
-    imageRendering: 'pixelated',
-    filter: `brightness(50%)`,
-    transition: theme.transitions.create('filter', {
-      easing: theme.transitions.easing.easeInOut,
-      duration: theme.transitions.duration.shortest
-    }),
-    '&:hover': {
-      filter: `brightness(90%)`
-    }
-  }))
-);
+const ThumbImg = styled('img')(({ theme }) => ({
+  minWidth: '50%',
+  minHeight: '50%',
+  maxWidth: '100%',
+  maxHeight: '100%',
+  objectFit: 'contain',
+  imageRendering: 'pixelated',
+  filter: 'brightness(50%)',
+  transition: theme.transitions.create('filter', {
+    easing: theme.transitions.easing.easeInOut,
+    duration: theme.transitions.duration.shortest
+  }),
+  '&:hover': { filter: 'brightness(90%)' }
+}));
 
-type Props = {
+ThumbImg.displayName = 'ThumbImg';
+
+//*****************************************************************************************
+// AppCarouselItem
+//*****************************************************************************************
+
+/** Props for a single carousel thumbnail item. */
+export type AppCarouselItemProps = {
+  /** Alt text for the image. */
   alt: string;
+  /** Position of the image in the carousel. */
+  index: number;
+  /** Image source hash/identifier. */
   src: string;
-  selected?: boolean;
-  backgroundMode?: BackgroundMode;
-  onClick?: React.MouseEventHandler<HTMLElement>;
 };
 
-const WrappedCarouselItem = ({ alt, src, selected, backgroundMode, onClick }: Props) => {
-  // const { t } = useTranslation(['carousel']);
+export const AppCarouselItem = memo(({ alt, index, src }: AppCarouselItemProps) => {
   const theme = useTheme();
-  const { apiCall } = useMyAPI();
 
-  const [data, setData] = useState<string>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const backgroundMode = useAppInterfaceStore(s => s.carousel.backgroundMode);
+  const selected = useAppInterfaceStore(s => s.carousel.index === index);
+
+  const { data: image, isLoading: loading } = useAppImageFetch({ src, alt });
 
   const augmentedPaper = useMemo(
     () => theme.palette.augmentColor({ color: { main: theme.palette.background.default } }),
     [theme.palette]
   );
 
-  const getBackgroundColor = useCallback(
-    (mode: BackgroundMode) => {
-      switch (mode) {
-        case 'light':
-          return theme.palette.grey[100];
-        case 'dark':
-          return theme.palette.grey[900];
-        case 'transparent':
-        default:
-          return 'transparent';
-      }
-    },
-    [theme.palette.grey]
-  );
-
-  useEffect(() => {
-    apiCall({
-      url: `/api/v4/file/image/${src}/`,
-      allowCache: true,
-      onEnter: () => setLoading(true),
-      onExit: () => setLoading(false),
-      onSuccess: api_data => setData(api_data.api_response),
-      onFailure: () => setData(null)
-    });
-
-    return () => {
-      setData(null);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [alt, src]);
-
   return (
     <Tooltip title={alt} placement="top">
       <Button
         className="carousel-thumb"
-        onMouseUp={onClick}
+        data-carousel-index={index}
         sx={{
           height: '100%',
           aspectRatio: '1 / 1',
@@ -89,23 +63,20 @@ const WrappedCarouselItem = ({ alt, src, selected, backgroundMode, onClick }: Pr
           '&:hover': {
             backgroundColor: alpha(theme.palette.mode === 'dark' ? augmentedPaper.light : augmentedPaper.main, 0.7)
           },
-
           ...(selected && {
             border: `2px solid ${theme.palette.primary.main}`,
             backgroundColor: alpha(theme.palette.mode === 'dark' ? augmentedPaper.light : augmentedPaper.main, 0.5),
-            '&>img': {
-              filter: `brightness(100%)`
-            }
+            '&>img': { filter: 'brightness(100%)' }
           })
         }}
       >
-        {data ? (
-          <Img
-            src={data}
+        {image ? (
+          <ThumbImg
+            src={image}
             alt={alt}
             draggable={false}
             style={{
-              backgroundColor: backgroundMode === 'transparent' ? 'transparent' : getBackgroundColor(backgroundMode)
+              backgroundColor: getAppCarouselBackgroundColor(backgroundMode, theme)
             }}
           />
         ) : loading ? (
@@ -116,7 +87,6 @@ const WrappedCarouselItem = ({ alt, src, selected, backgroundMode, onClick }: Pr
       </Button>
     </Tooltip>
   );
-};
+});
 
-export const CarouselItem = React.memo(WrappedCarouselItem);
-export default CarouselItem;
+AppCarouselItem.displayName = 'AppCarouselItem';

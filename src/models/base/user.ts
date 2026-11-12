@@ -1,4 +1,4 @@
-import type { AppUser } from 'core/template/components/app/AppUserService';
+import type { AppUser } from '@tui/core';
 
 export const TYPES = [
   'admin',

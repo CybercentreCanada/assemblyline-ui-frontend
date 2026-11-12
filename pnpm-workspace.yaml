@@ -1,2 +1,10 @@
+packages:
+ - "lib/@tui/a11y"
+ - "lib/@tui/apps"
+ - "lib/@tui/classi"
+ - "lib/@tui/core"
+ - "lib/@tui/drawer"
+ - "lib/@tui/notis"
+
 # Wait three days after publication before resolving new dependency versions.
 minimumReleaseAge: 4320

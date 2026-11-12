@@ -5,9 +5,9 @@ import type { ReactNode } from 'react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { bytesToSize } from 'shared/utils/utils';
+import { ImageInlineBody } from 'ui/image_inline';
 import Moment from 'ui/Moment';
 import { GraphBody } from 'ui/ResultCard/graph_body';
-import { ImageInlineBody } from 'ui/image_inline';
 
 const parseValue = (value: any): ReactNode => {
   if (value instanceof Array) {
@@ -274,7 +274,7 @@ function WrappedGeneralInformation({ report }: Props) {
                           textDecoration: 'line-through',
                           color: theme.palette.text.disabled
                         }}
-                      >{`${report.file_info.type}`}</span>
+                      >{`${report?.file_info?.type}`}</span>
                     </>
                   ) : (
                     report?.file_info?.type

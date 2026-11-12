@@ -93,7 +93,6 @@ export const InputFormControl = React.memo(({ children }: { children: React.Reac
       error={isError}
       color={color}
       onSubmit={(e: React.SyntheticEvent) => e.preventDefault()}
-      {...(readOnly && !disabled && { isFocused: null })}
       {...formControlProps}
       sx={{
         ...(color && {
@@ -452,7 +451,7 @@ export const SelectInputOptionMenuItem = React.memo(
             <IconButton
               color="secondary"
               tabIndex={-1}
-              to={helpLink}
+              {...(helpLink && { nav: nav => nav.to().create(helpLink), navDeps: [helpLink] })}
               tooltip={
                 <>
                   <span style={{ color: theme.palette.text.secondary }}>{t('adornment.help.tooltip')}</span>

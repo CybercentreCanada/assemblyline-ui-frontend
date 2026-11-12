@@ -9,11 +9,10 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableSortLabel from '@mui/material/TableSortLabel';
 import { alpha, useTheme } from '@mui/material/styles';
-import PageContainer from 'core/template/branding/AppPageContainer';
-import Throttler from 'deprecated/components/utils/throttler';
+import { AppPageContainer } from 'core/template';
+import Throttler from 'deprecated/utils/throttler';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
 import Classification from 'ui/Classification';
 import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow, LinkRow } from 'ui/DivTable';
 
@@ -195,7 +194,7 @@ const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
   const theme = useTheme();
 
   return (
-    <PageContainer isSticky>
+    <AppPageContainer isSticky>
       <Grid container size="grow">
         <Grid size={{ xs: 12, md: 6 }}>
           <Box
@@ -266,7 +265,7 @@ const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
           />
         </Grid>
       </Grid>
-    </PageContainer>
+    </AppPageContainer>
   );
 };
 
@@ -335,8 +334,7 @@ const WrappedEnhancedTableBody: React.FC<EnhancedTableBodyProps> = ({
                     <LinkRow
                       key={index}
                       hover
-                      component={Link}
-                      to={`${linkPrefix}${row[linkField]}`}
+                      nav={nav => nav.to().create(`${linkPrefix}${row[linkField]}`)}
                       onClick={
                         onClick
                           ? event => {

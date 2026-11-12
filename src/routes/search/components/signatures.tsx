@@ -1,12 +1,11 @@
 import { AlertTitle, Skeleton } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
-import useALContext from 'core/config/useALContext';
+import useALContext from 'deprecated/hooks/useALContext';
 import type { SearchResult } from 'models/api/search';
 import type { SignatureIndexed } from 'models/base/signature';
-import React from 'react';
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
 import Classification from 'ui/Classification';
 import {
   DivTable,
@@ -21,18 +20,27 @@ import InformativeAlert from 'ui/InformativeAlert';
 import Moment from 'ui/Moment';
 import SignatureStatus from 'ui/SignatureStatus';
 
-type Props = {
+export type SignaturesTableProps = {
   signatureResults: SearchResult<SignatureIndexed>;
-  setSignatureID?: (id: string) => void;
   allowSort?: boolean;
+  onRowClick?: (event: React.MouseEvent<HTMLElement>, signature: SignatureIndexed) => void;
 };
 
-const WrappedSignaturesTable: React.FC<Props> = ({ signatureResults, setSignatureID = null, allowSort = true }) => {
-  const { t } = useTranslation(['search']);
-  const { c12nDef } = useALContext();
+export const SignaturesTable = memo(
+  ({ signatureResults, allowSort = true, onRowClick = () => null }: SignaturesTableProps) => {
+    const { t } = useTranslation(['search']);
+    const { c12nDef } = useALContext();
 
-  return signatureResults ? (
-    signatureResults.total !== 0 ? (
+    return !signatureResults ? (
+      <Skeleton variant="rectangular" sx={{ height: '6rem', borderRadius: '4px' }} />
+    ) : !signatureResults?.total ? (
+      <div style={{ width: '100%' }}>
+        <InformativeAlert>
+          <AlertTitle>{t('no_signatures_title')}</AlertTitle>
+          {t('no_results_desc')}
+        </InformativeAlert>
+      </div>
+    ) : (
       <TableContainer component={Paper}>
         <DivTable>
           <DivTableHead>
@@ -69,14 +77,9 @@ const WrappedSignaturesTable: React.FC<Props> = ({ signatureResults, setSignatur
             {signatureResults.items.map((signature, i) => (
               <LinkRow
                 key={`${signature.id}-${i}`}
-                component={Link}
-                to={`/manage/signature/${signature.id}`}
-                onClick={event => {
-                  if (setSignatureID) {
-                    event.preventDefault();
-                    setSignatureID(signature.id);
-                  }
-                }}
+                nav={nav => nav.to().create({ route: '/manage/signature/detail/:id', path: { id: signature.id } })}
+                navDeps={[signature.id]}
+                onClick={event => onRowClick(event, signature)}
                 hover
               >
                 <DivTableCell>{signature.type}</DivTableCell>
@@ -106,18 +109,6 @@ const WrappedSignaturesTable: React.FC<Props> = ({ signatureResults, setSignatur
           </DivTableBody>
         </DivTable>
       </TableContainer>
-    ) : (
-      <div style={{ width: '100%' }}>
-        <InformativeAlert>
-          <AlertTitle>{t('no_signatures_title')}</AlertTitle>
-          {t('no_results_desc')}
-        </InformativeAlert>
-      </div>
-    )
-  ) : (
-    <Skeleton variant="rectangular" style={{ height: '6rem', borderRadius: '4px' }} />
-  );
-};
-
-const SignaturesTable = React.memo(WrappedSignaturesTable);
-export default SignaturesTable;
+    );
+  }
+);

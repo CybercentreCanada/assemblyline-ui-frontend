@@ -1,22 +1,22 @@
 import Editor, { DiffEditor, loader } from '@monaco-editor/react';
+import PlaylistPlayOutlinedIcon from '@mui/icons-material/PlaylistPlayOutlined';
 import { Dialog, DialogActions, DialogContent, DialogTitle, Skeleton, useTheme } from '@mui/material';
-import useMyAPI from 'core/api/hooks/useMyAPI';
-import useMySnackbar from 'core/snackbar/snackbar.hooks';
-import PageFullSize from 'core/template/branding/AppPageCenter';
-import { useAppTheme, useAppUser } from 'core/template/components/app/hooks';
-import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
-import type { CustomUser } from 'models/api/user';
-import { useRef, useState } from 'react';
+import { createAppRoute, useAppBlocker } from 'core/router';
+import { AppPageFullSize, useAppTemplateThemeMode } from 'core/template';
+import useALContext from 'deprecated/hooks/useALContext';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useMySnackbar from 'deprecated/hooks/useMySnackbar';
+import { memo, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ReactResizeDetector from 'react-resize-detector';
-import { Navigate } from 'react-router';
 import { Button } from 'ui/buttons/Button';
 import { PageHeader } from 'ui/layouts/PageHeader';
-import { RouterPrompt } from 'ui/RouterPrompt';
 
-loader.config({ paths: { vs: '/cdn/monaco_0.35.0/vs' } });
+loader.config({
+  paths: { vs: '/cdn/monaco_0.35.0/vs' }
+});
 
-export default function AdminActions() {
+export const AdminActionsPage = memo(() => {
   const { t, i18n } = useTranslation(['adminActions']);
   const theme = useTheme();
   const containerEL = useRef<HTMLDivElement>(null);
@@ -26,10 +26,10 @@ export default function AdminActions() {
   const [open, setOpen] = useState(false);
   const { showSuccessMessage } = useMySnackbar();
   const { apiCall } = useMyAPI();
-  const { user: currentUser } = useAppUser<CustomUser>();
-  const { isDark: isDarkTheme } = useAppTheme();
+  const { user: currentUser } = useALContext();
+  const themeMode = useAppTemplateThemeMode();
 
-  useEffectOnce(() => {
+  useEffect(() => {
     reload(false);
     // I cannot find a way to hot switch monaco editor's locale but at least I can load
     // the right language on first load...
@@ -38,7 +38,7 @@ export default function AdminActions() {
     } else {
       loader.config({ 'vs/nls': { availableLanguages: { '*': '' } } });
     }
-  });
+  }, []);
 
   const reload = defValue => {
     if (currentUser.is_admin) {
@@ -71,10 +71,10 @@ export default function AdminActions() {
     editor.focus();
   };
 
-  return currentUser.is_admin ? (
-    <PageFullSize margin={4}>
-      <RouterPrompt when={actions !== originalActions} />
+  useAppBlocker(() => (actions !== originalActions ? 'unsaved_changes' : null), [actions, originalActions]);
 
+  return (
+    <AppPageFullSize>
       <PageHeader
         primary={t('title')}
         slotProps={{
@@ -115,7 +115,7 @@ export default function AdminActions() {
                 <div ref={containerDialogEL}>
                   <DiffEditor
                     language="yaml"
-                    theme={isDarkTheme ? 'vs-dark' : 'vs'}
+                    theme={themeMode === 'dark' ? 'vs-dark' : 'vs'}
                     original={originalActions}
                     width={width}
                     height="50vh"
@@ -163,7 +163,7 @@ export default function AdminActions() {
                       language="yaml"
                       width={width}
                       height={height}
-                      theme={isDarkTheme ? 'vs-dark' : 'vs'}
+                      theme={themeMode === 'dark' ? 'vs-dark' : 'vs'}
                       loading={t('loading')}
                       value={actions}
                       onChange={setActions}
@@ -179,8 +179,21 @@ export default function AdminActions() {
           </ReactResizeDetector>
         </div>
       </div>
-    </PageFullSize>
-  ) : (
-    <Navigate to="/forbidden" replace />
+    </AppPageFullSize>
   );
-}
+});
+
+export const AdminActionsRoute = createAppRoute({
+  component: AdminActionsPage,
+
+  path: '/admin/actions',
+
+  ancestor: '/admin',
+  shortname: () => ['app_route.admin_actions.shortname', { ns: 'adminActions' }],
+  fullname: () => ['app_route.admin_actions.fullname', { ns: 'adminActions' }],
+  shorticon: () => <PlaylistPlayOutlinedIcon />,
+  fullicon: () => <PlaylistPlayOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.is_admin
+});

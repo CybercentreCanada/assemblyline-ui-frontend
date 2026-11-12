@@ -1,10 +1,9 @@
 import { Alert, CircularProgress, styled, Tooltip, useTheme } from '@mui/material';
-import useMyAPI from 'core/api/hooks/useMyAPI';
-import { useAppUser } from 'core/template/components/app/hooks';
-import type { CustomUser } from 'models/api/user';
+import useALContext from 'deprecated/hooks/useALContext';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import ForbiddenPage from 'routes/forbidden/forbidden.route';
+import { ForbiddenPage } from 'routes/forbidden/forbidden';
 import AIMarkdown from 'ui/AiMarkdown';
 
 const Spinner = styled('div')(({ theme }) => ({
@@ -29,14 +28,14 @@ type Props = {
 
 const WrappedCodeSection: React.FC<Props> = ({ sha256, archiveOnly = false }) => {
   const { apiCall } = useMyAPI();
-  const { user: currentUser } = useAppUser<CustomUser>();
+  const { user: currentUser } = useALContext();
   const { t, i18n } = useTranslation(['fileViewer']);
   const theme = useTheme();
 
-  const [analysing, setAnalysing] = useState(false);
-  const [codeError, setCodeError] = useState(null);
-  const [codeSummary, setCodeSummary] = useState(null);
-  const [codeTruncated, setCodeTruncated] = useState(false);
+  const [analysing, setAnalysing] = useState<boolean>(false);
+  const [codeError, setCodeError] = useState<string>(null);
+  const [codeSummary, setCodeSummary] = useState<string>(null);
+  const [codeTruncated, setCodeTruncated] = useState<boolean>(false);
 
   const getCodeSummary = useCallback(
     noCache => {

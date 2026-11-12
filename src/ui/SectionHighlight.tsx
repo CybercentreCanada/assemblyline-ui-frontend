@@ -1,5 +1,5 @@
 import { useTheme } from '@mui/material';
-import useALContext from 'core/config/useALContext';
+import useALContext from 'deprecated/hooks/useALContext';
 import React from 'react';
 
 type SectionHighlightProps = {

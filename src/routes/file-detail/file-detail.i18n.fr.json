@@ -1,4 +1,6 @@
 {
+  "app_route.file_detail.fullname": "Détails du fichier {{id}}",
+  "app_route.file_detail.shortname": "{{id}}",
   "attack_matrix": "Matrice d'Att&ck",
   "badlist": "Ajouter un fichier à la liste mauvaise",
   "badlist.acceptText": "Oui, ajoutez-le !",

@@ -1,8 +1,10 @@
 import { HIDE_EVENT_ID } from '@cccsaurora/clue-ui/data/event';
-import useALContext from 'core/config/useALContext';
-import useHighlighter from 'layout/highlighter/highlighter.hooks';
-import useSafeResults from 'layout/safe-results/safe-results.hooks';
+import useALContext from 'deprecated/hooks/useALContext';
+import useHighlighter from 'deprecated/hooks/useHighlighter';
+import useSafeResults from 'deprecated/hooks/useSafeResults';
+import { useAppIsHighlighted } from 'layout/highlighter/highlighter.hooks';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
 import type { PossibleColor } from 'shared/utils/colors';
 import type { ActionMenuProps } from 'ui/ActionMenu';
 import ActionMenu from 'ui/ActionMenu';
@@ -44,11 +46,13 @@ const WrappedTag: React.FC<TagProps> = ({
   label = null
 }) => {
   const { scoreToVerdict, configuration } = useALContext();
-  const { isHighlighted, triggerHighlight } = useHighlighter();
+  const { triggerHighlight } = useHighlighter();
   const { showSafeResults } = useSafeResults();
 
   const [state, setState] = useState<typeof initialMenuState>(initialMenuState);
   const [showClueDetails, setShowClueDetails] = useState<boolean>(false);
+
+  const highlighted = useAppIsHighlighted(highlight_key);
 
   const maliciousness = useMemo<string>(() => {
     let v = lvl || scoreToVerdict(score);
@@ -109,39 +113,58 @@ const WrappedTag: React.FC<TagProps> = ({
           setClueDetails={setShowClueDetails}
         />
       )}
-      {'clue' in configuration.ui.api_proxies && type in CLUE_TYPE_MAP && value !== null ? (
-        <EnrichmentCustomChip
-          dataType={CLUE_TYPE_MAP[type as keyof typeof CLUE_TYPE_MAP]}
-          dataValue={value}
-          dataClassification={classification}
-          hideDetails={true}
-          wrap
-          label={label ? label : short_type ? `[${short_type.toUpperCase()}] ${value}` : value}
-          size="tiny"
-          type="rounded"
-          color={highlight_key && isHighlighted(highlight_key) ? 'primary' : color}
-          onClick={highlight_key ? handleClick : null}
-          fullWidth={fullWidth}
-          onContextMenu={handleMenuClick}
-          forceDetails={showClueDetails}
-          setForceDetails={setShowClueDetails}
-          icon={<ExternalLinks category="tag" type={type} value={value} />}
-        />
-      ) : (
-        <CustomChip
-          wrap
-          variant="outlined"
-          size="tiny"
-          type="rounded"
-          color={highlight_key && isHighlighted(highlight_key) ? 'primary' : color}
-          label={label ? label : short_type ? `[${short_type.toUpperCase()}] ${value}` : value}
-          style={STYLE}
-          onClick={highlight_key ? handleClick : null}
-          fullWidth={fullWidth}
-          onContextMenu={handleMenuClick}
-          icon={<ExternalLinks category="tag" type={type} value={value} />}
-        />
-      )}
+
+      <ErrorBoundary
+        fallback={
+          <CustomChip
+            wrap
+            variant="outlined"
+            size="tiny"
+            type="rounded"
+            color={highlight_key && highlighted ? 'primary' : color}
+            label={label ? label : short_type ? `[${short_type.toUpperCase()}] ${value}` : value}
+            style={STYLE}
+            onClick={highlight_key ? handleClick : null}
+            fullWidth={fullWidth}
+            onContextMenu={handleMenuClick}
+            icon={<ExternalLinks category="tag" type={type} value={value} />}
+          />
+        }
+      >
+        {'clue' in configuration.ui.api_proxies && type in CLUE_TYPE_MAP && value !== null ? (
+          <EnrichmentCustomChip
+            dataType={CLUE_TYPE_MAP[type as keyof typeof CLUE_TYPE_MAP]}
+            dataValue={value}
+            dataClassification={classification}
+            hideDetails={true}
+            wrap
+            label={label ? label : short_type ? `[${short_type.toUpperCase()}] ${value}` : value}
+            size="tiny"
+            type="rounded"
+            color={highlight_key && highlighted ? 'primary' : color}
+            onClick={highlight_key ? handleClick : null}
+            fullWidth={fullWidth}
+            onContextMenu={handleMenuClick}
+            forceDetails={showClueDetails}
+            setForceDetails={setShowClueDetails}
+            icon={<ExternalLinks category="tag" type={type} value={value} />}
+          />
+        ) : (
+          <CustomChip
+            wrap
+            variant="outlined"
+            size="tiny"
+            type="rounded"
+            color={highlight_key && highlighted ? 'primary' : color}
+            label={label ? label : short_type ? `[${short_type.toUpperCase()}] ${value}` : value}
+            style={STYLE}
+            onClick={highlight_key ? handleClick : null}
+            fullWidth={fullWidth}
+            onContextMenu={handleMenuClick}
+            icon={<ExternalLinks category="tag" type={type} value={value} />}
+          />
+        )}
+      </ErrorBoundary>
     </>
   );
 };

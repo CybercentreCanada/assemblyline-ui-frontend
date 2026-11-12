@@ -1,7 +1,7 @@
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import { Button, Slider, useTheme } from '@mui/material';
-import { default as React } from 'react';
+import React from 'react';
 import type { StoreProps } from 'ui/HexViewer';
 import { useDispatch } from 'ui/HexViewer';
 

@@ -1,0 +1,11 @@
+{
+  "router_blocker_blocked_pages_heading": "Why navigation is blocked:",
+  "router_blocker_reason_data_loss_on_leave": "Leaving the {{page}} page will discard data entered on this page.",
+  "router_blocker_reason_external_leave_risk": "You are about to leave Assemblyline and open an external destination.",
+  "router_blocker_reason_state_or_transient_loss_on_new_tab": "Opening the {{page}} page in a new tab will not carry over its current page state.",
+  "router_blocker_reason_unsaved_changes": "The {{page}} page has unsaved changes.",
+  "router_prompt_accept": "Proceed",
+  "router_prompt_cancel": "Stay",
+  "router_prompt_text": "If you proceed, information may be lost.",
+  "router_prompt_title": "Leave this page?"
+}

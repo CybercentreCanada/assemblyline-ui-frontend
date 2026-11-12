@@ -14,6 +14,7 @@ import type {
  * display purposes. They and are not expected to be used for critical access control enforcement. As such, error
  * conditions are not raised and suitable default values are returned.
  */
+
 export const getLevelText = (
   lvl: number,
   c12nDef: ClassificationDefinition,

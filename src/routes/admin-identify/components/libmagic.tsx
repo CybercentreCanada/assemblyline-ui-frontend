@@ -1,13 +1,11 @@
 import Editor, { DiffEditor, loader } from '@monaco-editor/react';
-import { Dialog, DialogActions, DialogContent, DialogTitle, Skeleton, useTheme } from '@mui/material';
-import useMyAPI from 'core/api/hooks/useMyAPI';
-import useMySnackbar from 'core/snackbar/snackbar.hooks';
-import { useAppTheme } from 'core/template/components/app/hooks';
-import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
-import React, { useRef, useState } from 'react';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Skeleton, useTheme } from '@mui/material';
+import { useAppTemplateThemeMode } from 'core/template';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useMySnackbar from 'deprecated/hooks/useMySnackbar';
+import { memo, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ReactResizeDetector from 'react-resize-detector';
-import { Button } from 'ui/buttons/Button';
 import { PageHeader } from 'ui/layouts/PageHeader';
 
 loader.config({ paths: { vs: '/cdn/monaco_0.35.0/vs' } });
@@ -56,7 +54,14 @@ const magicConfig = {
   brackets: []
 };
 
-function WrappedLibMagic({ reload, magicFile, originalMagicFile, setMagicFile }) {
+export type LibMagicProps = {
+  reload: (defValue?: boolean, autoOpen?: (open: boolean) => void) => void;
+  magicFile: string | null;
+  originalMagicFile: string | null;
+  setMagicFile: (value: string | null | undefined) => void;
+};
+
+export const LibMagic = memo(({ reload, magicFile, originalMagicFile, setMagicFile }: LibMagicProps) => {
   const { t, i18n } = useTranslation(['adminIdentify']);
   const theme = useTheme();
   const containerEL = useRef<HTMLDivElement>(null);
@@ -64,9 +69,9 @@ function WrappedLibMagic({ reload, magicFile, originalMagicFile, setMagicFile })
   const [open, setOpen] = useState(false);
   const { showSuccessMessage } = useMySnackbar();
   const { apiCall } = useMyAPI();
-  const { isDark } = useAppTheme();
+  const themeMode = useAppTemplateThemeMode();
 
-  useEffectOnce(() => {
+  useEffect(() => {
     if (!magicFile) reload();
     // I cannot find a way to hot switch monaco editor's locale but at least I can load
     // the right language on first load...
@@ -75,7 +80,7 @@ function WrappedLibMagic({ reload, magicFile, originalMagicFile, setMagicFile })
     } else {
       loader.config({ 'vs/nls': { availableLanguages: { '*': '' } } });
     }
-  });
+  }, []);
 
   const saveChanges = tagData => {
     setOpen(false);
@@ -116,7 +121,7 @@ function WrappedLibMagic({ reload, magicFile, originalMagicFile, setMagicFile })
                 <div ref={containerDialogEL}>
                   <DiffEditor
                     language="magic"
-                    theme={isDark ? 'vs-dark' : 'vs'}
+                    theme={themeMode === 'dark' ? 'vs-dark' : 'vs'}
                     original={originalMagicFile}
                     width={width}
                     height="50vh"
@@ -199,7 +204,7 @@ function WrappedLibMagic({ reload, magicFile, originalMagicFile, setMagicFile })
                       language="magic"
                       width={width}
                       height={height}
-                      theme={isDark ? 'vs-dark' : 'vs'}
+                      theme={themeMode === 'dark' ? 'vs-dark' : 'vs'}
                       loading={t('loading.magic')}
                       value={magicFile}
                       onChange={setMagicFile}
@@ -218,7 +223,4 @@ function WrappedLibMagic({ reload, magicFile, originalMagicFile, setMagicFile })
       </div>
     </>
   );
-}
-
-const LibMagic = React.memo(WrappedLibMagic);
-export default LibMagic;
+});

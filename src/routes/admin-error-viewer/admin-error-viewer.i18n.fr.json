@@ -1,4 +1,8 @@
 {
+  "app_route.admin_error_detail.fullname": "Administration de l'Erreur {{id}}",
+  "app_route.admin_error_detail.shortname": "{{id}}",
+  "app_route.admin_error_viewer.fullname": "Administration du Visualiseur d'erreurs",
+  "app_route.admin_error_viewer.shortname": "Visualisateur d'erreurs",
   "debug_info": "Informations de débogage:",
   "detail": "Détails de l'analyse du fichier",
   "download": "Télécharger le fichier",

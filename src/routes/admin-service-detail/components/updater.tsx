@@ -1,6 +1,6 @@
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
 import { Button, Grid, IconButton, Tooltip, Typography, useTheme } from '@mui/material';
-import useALContext from 'core/config/useALContext';
+import useALContext from 'deprecated/hooks/useALContext';
 import type { Service, UpdateSource } from 'models/base/service';
 import { DEFAULT_SOURCE } from 'models/base/service';
 import { useCallback, useEffect, useState } from 'react';

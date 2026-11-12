@@ -1,13 +1,6 @@
 import { Box, TextField, Typography, useMediaQuery, useTheme } from '@mui/material';
-import { insertText } from 'deprecated/components/utils/browser';
-import {
-  isArrowDown,
-  isArrowLeft,
-  isArrowRight,
-  isArrowUp,
-  isEnter,
-  isEscape
-} from 'deprecated/components/utils/keyboard';
+import { insertText } from 'deprecated/utils/browser';
+import { isArrowDown, isArrowLeft, isArrowRight, isArrowUp, isEnter, isEscape } from 'deprecated/utils/keyboard';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 

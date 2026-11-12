@@ -4,7 +4,7 @@ import MoodBadIcon from '@mui/icons-material/MoodBad';
 import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import type { SvgIconProps } from '@mui/material';
 import { Box, Grid, Skeleton, useMediaQuery, useTheme } from '@mui/material';
-import useALContext from 'core/config/useALContext';
+import useALContext from 'deprecated/hooks/useALContext';
 import type { SubmissionReport } from 'models/api/submission_report';
 import type { FC } from 'react';
 import React, { memo } from 'react';
@@ -107,7 +107,7 @@ export function WrappedAttributionBanner({ report }: Props) {
         <Grid className="print-only" style={{ color: textColor }}>
           {icon}
         </Grid>
-        <Grid style={{ flexGrow: 10 }}>
+        <Grid style={{ flex: 1 }}>
           <Box
             sx={{
               fontWeight: 500,

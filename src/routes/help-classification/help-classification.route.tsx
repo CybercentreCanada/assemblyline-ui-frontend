@@ -1,11 +1,18 @@
+import LabelOutlinedIcon from '@mui/icons-material/LabelOutlined';
 import { Skeleton, Typography, useTheme } from '@mui/material';
-import useALContext from 'core/config/useALContext';
-import NotFoundPage from 'core/template/branding/AppBanner';
-import PageCenter from 'core/template/components/pages/PageCenter';
+import { createAppRoute } from 'core/router';
+import { AppPageCenter } from 'core/template';
+import { useALContext } from 'deprecated/hooks/useALContext';
+import { memo, type ReactNode } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
-import Classification from 'ui/Classification';
+import { NotFoundPage } from 'routes/not-found/not-found';
+import { Classification } from 'ui/Classification';
 
-export default function HelpClassification() {
+const BoldText = ({ children }: { children?: ReactNode }) => <strong>{children}</strong>;
+
+const ItalicText = ({ children }: { children?: ReactNode }) => <i>{children}</i>;
+
+export const HelpClassificationPage = memo(() => {
   const { t } = useTranslation(['helpClassification']);
   const { c12nDef } = useALContext();
   const theme = useTheme();
@@ -14,7 +21,7 @@ export default function HelpClassification() {
   const sp4 = theme.spacing(4);
 
   return c12nDef.enforce ? (
-    <PageCenter margin={4} width="100%" textAlign="left">
+    <AppPageCenter style={{ textAlign: 'left' }}>
       <div style={{ marginBottom: theme.spacing(4) }}>
         <Typography variant="h4">{t('title')}</Typography>
       </div>
@@ -45,11 +52,11 @@ export default function HelpClassification() {
           </Typography>
           <ul>
             <li>
-              <Trans ns="helpClassification" i18nKey="submission_a_1" components={{ bold: <strong /> }} />
+              <Trans ns="helpClassification" i18nKey="submission_a_1" components={{ bold: <BoldText /> }} />
               <Classification size="tiny" type="text" c12n={c12nDef ? c12nDef.RESTRICTED : null} format="long" />
             </li>
             <li>
-              <Trans ns="helpClassification" i18nKey="submission_a_2" components={{ bold: <strong /> }} />
+              <Trans ns="helpClassification" i18nKey="submission_a_2" components={{ bold: <BoldText /> }} />
               <Classification
                 inline
                 size="tiny"
@@ -59,25 +66,25 @@ export default function HelpClassification() {
               />
             </li>
             <li>
-              <Trans ns="helpClassification" i18nKey="submission_a_3" components={{ bold: <strong /> }} />
+              <Trans ns="helpClassification" i18nKey="submission_a_3" components={{ bold: <BoldText /> }} />
             </li>
           </ul>
-          <Typography variant="body2" gutterBottom>
-            <Trans ns="helpClassification" i18nKey="submission_a_res_1_p1" components={{ bold: <strong /> }} />
+          <Typography component="div" variant="body2" gutterBottom>
+            <Trans ns="helpClassification" i18nKey="submission_a_res_1_p1" components={{ bold: <BoldText /> }} />
             <Classification size="tiny" type="text" c12n={c12nDef ? c12nDef.UNRESTRICTED : null} format="long" />
-            <Trans ns="helpClassification" i18nKey="submission_a_res_1_p2" components={{ bold: <strong /> }} />
+            <Trans ns="helpClassification" i18nKey="submission_a_res_1_p2" components={{ bold: <BoldText /> }} />
           </Typography>
-          <Typography variant="body2" gutterBottom>
+          <Typography component="div" variant="body2" gutterBottom>
             <Trans
               ns="helpClassification"
               i18nKey="submission_a_res_2_p1"
-              components={{ italic: <i />, bold: <strong /> }}
+              components={{ italic: <ItalicText />, bold: <BoldText /> }}
             />
             <Classification size="tiny" type="text" c12n={c12nDef ? c12nDef.RESTRICTED : null} format="long" />
             <Trans
               ns="helpClassification"
               i18nKey="submission_a_res_2_p2"
-              components={{ italic: <i />, bold: <strong /> }}
+              components={{ italic: <ItalicText />, bold: <BoldText /> }}
             />
           </Typography>
         </div>
@@ -98,11 +105,11 @@ export default function HelpClassification() {
           </Typography>
           <ul>
             <li>
-              <Trans ns="helpClassification" i18nKey="result_a_1" components={{ bold: <strong /> }} />
+              <Trans ns="helpClassification" i18nKey="result_a_1" components={{ bold: <BoldText /> }} />
               <Classification size="tiny" type="text" c12n={c12nDef ? c12nDef.RESTRICTED : null} format="long" />
             </li>
             <li>
-              <Trans ns="helpClassification" i18nKey="result_a_2" components={{ bold: <strong /> }} />
+              <Trans ns="helpClassification" i18nKey="result_a_2" components={{ bold: <BoldText /> }} />
               <Classification
                 inline
                 size="tiny"
@@ -112,7 +119,7 @@ export default function HelpClassification() {
               />
             </li>
             <li>
-              <Trans ns="helpClassification" i18nKey="result_a_3" components={{ bold: <strong /> }} />
+              <Trans ns="helpClassification" i18nKey="result_a_3" components={{ bold: <BoldText /> }} />
               <Classification
                 inline
                 size="tiny"
@@ -122,21 +129,21 @@ export default function HelpClassification() {
               />
             </li>
             <li>
-              <Trans ns="helpClassification" i18nKey="result_a_4" components={{ bold: <strong /> }} />
+              <Trans ns="helpClassification" i18nKey="result_a_4" components={{ bold: <BoldText /> }} />
               <Classification size="tiny" type="text" c12n={c12nDef ? c12nDef.RESTRICTED : null} format="long" />
             </li>
           </ul>
-          <Typography variant="body2" gutterBottom>
-            <Trans ns="helpClassification" i18nKey="result_a_res_1_p1" components={{ bold: <strong /> }} />
+          <Typography component="div" variant="body2" gutterBottom>
+            <Trans ns="helpClassification" i18nKey="result_a_res_1_p1" components={{ bold: <BoldText /> }} />
             <Classification size="tiny" type="text" c12n={c12nDef ? c12nDef.RESTRICTED : null} format="long" />
-            <Trans ns="helpClassification" i18nKey="result_a_res_1_p2" components={{ bold: <strong /> }} />
+            <Trans ns="helpClassification" i18nKey="result_a_res_1_p2" components={{ bold: <BoldText /> }} />
             <Classification size="tiny" type="text" c12n={c12nDef ? c12nDef.UNRESTRICTED : null} format="long" />
-            <Trans ns="helpClassification" i18nKey="result_a_res_1_p3" components={{ bold: <strong /> }} />
+            <Trans ns="helpClassification" i18nKey="result_a_res_1_p3" components={{ bold: <BoldText /> }} />
           </Typography>
-          <Typography variant="body2" gutterBottom>
-            <Trans ns="helpClassification" i18nKey="result_a_res_2_p1" components={{ bold: <strong /> }} />
+          <Typography component="div" variant="body2" gutterBottom>
+            <Trans ns="helpClassification" i18nKey="result_a_res_2_p1" components={{ bold: <BoldText /> }} />
             <Classification size="tiny" type="text" c12n={c12nDef ? c12nDef.RESTRICTED : null} format="long" />
-            <Trans ns="helpClassification" i18nKey="result_a_res_2_p2" components={{ bold: <strong /> }} />
+            <Trans ns="helpClassification" i18nKey="result_a_res_2_p2" components={{ bold: <BoldText /> }} />
           </Typography>
         </div>
       </div>
@@ -150,7 +157,7 @@ export default function HelpClassification() {
           {t('validation_level')}
         </Typography>
         <Typography variant="body2" gutterBottom>
-          <Trans ns="helpClassification" i18nKey="validation_level_desc" components={{ bold: <strong /> }} />
+          <Trans ns="helpClassification" i18nKey="validation_level_desc" components={{ bold: <BoldText /> }} />
         </Typography>
         <Typography variant="subtitle2" gutterBottom>
           {t('validation_level_supported')}
@@ -174,7 +181,7 @@ export default function HelpClassification() {
           {t('validation_required')}
         </Typography>
         <Typography variant="body2" gutterBottom>
-          <Trans ns="helpClassification" i18nKey="validation_required_desc" components={{ bold: <strong /> }} />
+          <Trans ns="helpClassification" i18nKey="validation_required_desc" components={{ bold: <BoldText /> }} />
         </Typography>
         <Typography variant="subtitle2" gutterBottom>
           {t('validation_required_supported')}
@@ -207,7 +214,7 @@ export default function HelpClassification() {
           {t('validation_groups')}
         </Typography>
         <Typography variant="body2" gutterBottom>
-          <Trans ns="helpClassification" i18nKey="validation_groups_desc" components={{ bold: <strong /> }} />
+          <Trans ns="helpClassification" i18nKey="validation_groups_desc" components={{ bold: <BoldText /> }} />
         </Typography>
         <Typography variant="subtitle2" gutterBottom>
           {t('validation_groups_supported')}
@@ -235,7 +242,7 @@ export default function HelpClassification() {
           )}
         </ul>
         <Typography variant="subtitle2" gutterBottom color="error">
-          <Trans ns="helpClassification" i18nKey="validation_groups_note" components={{ bold: <strong /> }} />
+          <Trans ns="helpClassification" i18nKey="validation_groups_note" components={{ bold: <BoldText /> }} />
         </Typography>
       </div>
       <div>
@@ -243,7 +250,7 @@ export default function HelpClassification() {
           {t('validation_subgroups')}
         </Typography>
         <Typography variant="body2" gutterBottom>
-          <Trans ns="helpClassification" i18nKey="validation_subgroups_desc" components={{ bold: <strong /> }} />
+          <Trans ns="helpClassification" i18nKey="validation_subgroups_desc" components={{ bold: <BoldText /> }} />
         </Typography>
         <Typography variant="subtitle2" gutterBottom>
           {t('validation_subgroups_supported')}
@@ -271,11 +278,26 @@ export default function HelpClassification() {
           )}
         </ul>
         <Typography variant="subtitle2" gutterBottom color="error">
-          <Trans ns="helpClassification" i18nKey="validation_subgroups_note" components={{ bold: <strong /> }} />
+          <Trans ns="helpClassification" i18nKey="validation_subgroups_note" components={{ bold: <BoldText /> }} />
         </Typography>
       </div>
-    </PageCenter>
+    </AppPageCenter>
   ) : (
     <NotFoundPage />
   );
-}
+});
+
+export const HelpClassificationRoute = createAppRoute({
+  component: HelpClassificationPage,
+
+  path: '/help/classification',
+
+  ancestor: '/help',
+  shortname: () => ['app_route.help_classification.shortname', { ns: 'helpClassification' }],
+  fullname: () => ['app_route.help_classification.fullname', { ns: 'helpClassification' }],
+  shorticon: () => <LabelOutlinedIcon />,
+  fullicon: () => <LabelOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
+});
