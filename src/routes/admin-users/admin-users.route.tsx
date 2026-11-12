@@ -5,7 +5,7 @@ import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
 import PageContainer from 'core/template/branding/AppPageContainer';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
-import { createSearchParams, SearchParamsProvider, useSearchParams } from 'features/SearchParams/createSearchParams';
+import { createSearchParams, SearchParamsProvider, useSearchParams } from 'features/search-params';
 import type { SearchResult } from 'models/api/search';
 import type { IndexDefinition } from 'models/api/user';
 import type { UserIndexed } from 'models/base/user';
@@ -20,12 +20,12 @@ import { SearchHeader } from 'ui/SearchBar/SearchHeader';
 
 const USERS_PARAMS = createSearchParams(p => ({
   query: p.string(''),
-  offset: p.number(0).min(0).origin('snapshot').ephemeral(),
-  rows: p.number(25).locked().origin('snapshot').ephemeral(),
+  offset: p.number(0).min(0).source('transient').ephemeral(),
+  rows: p.number(25).locked().source('transient').ephemeral(),
   sort: p.string(null).nullable().ephemeral(),
   filters: p.filters([]),
   track_total_hits: p.number(10000).nullable().ephemeral(),
-  refresh: p.boolean(false).origin('snapshot').ephemeral()
+  refresh: p.boolean(false).source('transient').ephemeral()
 }));
 
 type UsersParams = typeof USERS_PARAMS;

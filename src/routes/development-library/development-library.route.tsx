@@ -5,10 +5,13 @@ import { Navigate, useLocation, useNavigate } from 'react-router';
 import type { LibraryFormStore } from 'routes/development-library/contexts/form';
 import { FormProvider, useForm } from 'routes/development-library/contexts/form';
 import { DateTimeSection } from 'routes/development-library/sections/DateTime';
+import { HashParamsSection } from 'routes/development-library/sections/HashParams';
 import { InputsSection } from 'routes/development-library/sections/Inputs';
 import { LayoutSection } from 'routes/development-library/sections/Layout';
 import { ListSection } from 'routes/development-library/sections/List';
 import { ListInputsSection } from 'routes/development-library/sections/ListInputs';
+import { PathParamsSection } from 'routes/development-library/sections/PathParams';
+import { SearchParamsSection } from 'routes/development-library/sections/search-params/SearchParams';
 import { PageHeader } from 'ui/layouts/PageHeader';
 import { PageLayout } from 'ui/layouts/PageLayout';
 import type { PageNavigationItemProp } from 'ui/layouts/PageNavigation';
@@ -36,10 +39,13 @@ const LibraryPageContentInnerComponent: React.FC<LibraryPageContentInnerProps> =
     return (
       {
         datetime: <DateTimeSection />,
+        hash_params: <HashParamsSection />,
         inputs: <InputsSection />,
         layout: <LayoutSection />,
+        list_inputs: <ListInputsSection />,
         list: <ListSection />,
-        list_inputs: <ListInputsSection />
+        path_params: <PathParamsSection />,
+        search_params: <SearchParamsSection />
       }[tab] ?? null
     );
   }, [tab]);

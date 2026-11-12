@@ -3,7 +3,7 @@ import { AlertTitle, Skeleton, Tooltip } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
 import useALContext from 'core/config/useALContext';
-import { useSearchParams } from 'features/SearchParams/createSearchParams';
+import { useSearchParams } from 'features/search-params';
 import type { SearchResult } from 'models/api/search';
 import type { SubmissionIndexed } from 'models/base/submission';
 import React from 'react';

@@ -1,0 +1,2 @@
+# Wait three days after publication before resolving new dependency versions.
+minimumReleaseAge: 4320
