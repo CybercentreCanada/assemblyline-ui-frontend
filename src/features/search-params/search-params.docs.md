@@ -2,202 +2,145 @@
 
 ## 1. Purpose
 
-Comprehensive URL search parameter management system. Handles typed reading, writing, and persistence of query string parameters with support for multiple value types, delta-based serialization (only non-default values appear in the URL), and resolution from multiple sources (URL, location state, snapshot).
+Provides typed tools for defining, reading, and updating page parameters stored in a URL query string, router state, or in memory.
 
 ## 2. Features
 
-- **Typed blueprints** — Define each search param with a builder from `SEARCH_PARAM_BLUEPRINTS_MAP`
-- **Delta serialization** — Only params that differ from their default value are written to the URL, keeping it clean
-- **Multi-source resolution** — Params can resolve from `location.search`, `location.state`, or a previous snapshot
-- **Immutable snapshots** — Current param state is represented as a frozen `SearchParamSnapshot` with pick/omit/set operations
-- **localStorage persistence** — Optional `storageKey` saves user defaults to localStorage and restores them on mount
-- **Ephemeral params** — Params marked `ephemeral` are excluded from persistence
-- **Ignored params** — Params marked `ignored` don't trigger re-renders when they change
-- **Locked params** — Params marked `locked` always resolve to their default regardless of URL input
-- **Builder pattern** — Blueprints use fluent chainable methods (`.defaultValue()`, `.ephemeral()`, `.locked()`, `.source()`)
-- **Number clamping** — `NumberSearchParamBlueprint` supports `.min()` / `.max()` bounds
-- **Filter expressions** — `FiltersSearchParamBlueprint` supports `NOT()` and `!()` prefix wrappers with deduplication
-- **Object params** — `ObjectSearchParamBlueprint` validates nested values against its default shape. Partial records merge recursively; arrays are replaced wholesale and their elements must match the complete template shape.
+- **Typed parameters** - Define parameter names, value types, and defaults in one place.
+- **Multiple value types** - Supports booleans, numbers, strings, enums, filter lists, and structured objects.
+- **Router integration** - Reads parameter values from the current location and updates the URL or router state when values change.
+- **Compact URLs** - Writes values that differ from their defaults.
+- **Saved defaults** - Stores user-selected defaults in `localStorage` when a storage key is provided.
+- **Snapshots** - Provides a typed snapshot with helpers for reading, updating, and serializing values.
 
 ## 3. Concepts
 
 ### Blueprint
 
-A class extending `BaseSearchParamBlueprint<T>` that defines:
+A blueprint defines one parameter, including its default value, value type, and source. Create blueprints with `SEARCH_PARAM_BLUEPRINTS_MAP`:
 
-- **Key** — The query param name in the URL (e.g., `?page=2` → key = `"page"`)
-- **Default value** — What to use when the param is missing or invalid
-- **Parse** — Convert a raw string from the URL into the typed value
-- **Valid** — Check if a parsed value is acceptable
-- **Source** — Where to resolve the value from (`'search'` | `'state'` | `'transient'`)
+| Blueprint | Value type                   | Description                                                                                                                   |
+| --------- | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `boolean` | `boolean`                    | Reads and writes true or false values.                                                                                        |
+| `number`  | `number`                     | Reads and writes numeric values; can clamp them to a range.                                                                   |
+| `string`  | `string`                     | Reads and writes text values.                                                                                                 |
+| `enum`    | One of the provided values   | Reads and writes a choice from a list of strings, numbers, or booleans.                                                       |
+| `filters` | `string[]`                   | Reads and writes a list of filter expressions.                                                                                |
+| `object`  | A structured object or array | Reads and writes structured values as JSON. Partial objects are combined with their defaults; arrays are replaced as a whole. |
 
-Available blueprint classes:
+Blueprints also support settings such as `.source()`, `.ephemeral()`, `.ignored()`, `.locked()`, and `.nullable()`.
 
-| Class                           | Value type  | Notes                                                                                              |
-| ------------------------------- | ----------- | -------------------------------------------------------------------------------------------------- |
-| `BooleanSearchParamBlueprint`   | `boolean`   | Parses `'true'`/`'false'`                                                                          |
-| `NumberSearchParamBlueprint`    | `number`    | Supports `.min()` / `.max()` clamping                                                              |
-| `StringSearchParamBlueprint`    | `string`    | Direct string passthrough                                                                          |
-| `EnumSearchParamBlueprint<O>`   | `O[number]` | Parses serialized option values back to their typed options; string representations must be unique |
-| `FiltersSearchParamBlueprint`   | `string[]`  | Handles `NOT()`/`!()` prefix expressions                                                           |
-| `ObjectSearchParamBlueprint<O>` | `O`         | Validates and merges nested object or array values                                                 |
+### Parameter Sources
 
-### Engine
+Use `.source()` to choose where a parameter is stored:
 
-`SearchParamEngine<Blueprints>` is the orchestrator. Given a map of blueprints, it:
-
-1. Creates a runtime wrapper for each blueprint using `SearchParamRuntimeFactory` and `SEARCH_PARAM_RUNTIME_MAP`
-2. Provides `full(params)` — resolve all params, filling defaults for missing ones
-3. Provides `delta(params)` — resolve only non-default params (for minimal URL serialization)
-4. Provides `fromLocation(location, snapshot?)` — resolve params from the current browser location
+| Source        | Stored value                               |
+| ------------- | ------------------------------------------ |
+| `'search'`    | The URL query string. This is the default. |
+| `'state'`     | React Router location state.               |
+| `'transient'` | The current in-memory search snapshot.     |
 
 ### Snapshot
 
-`SearchParamSnapshot<Blueprints>` is an immutable value object holding the current resolved values. It provides:
+`SearchParamSnapshot` contains the current typed values. It provides helpers such as `get`, `has`, `pick`, `omit`, `set`, and `toObject`. It can also serialize values as query parameters or router state.
 
-- `has(key, value?)` — Check if a param has a valid value (optionally matching a specific value)
-- `get(key)` — Get a single param value
-- `pick(keys)` / `omit(keys)` — Create a subset snapshot
-- `set(input)` — Create a new snapshot with updated values (functional or direct)
-- `toLocationSearch()` — Serialize to `?key=value` string (delta of `search`-source params only)
-- `toLocationState()` — Serialize to `location.state` object (delta of `state`-source params only)
-- `toParams()` → `URLSearchParams`
-- `toString()` → sorted query string
+### Provider and Hook
 
-### Runtime
-
-`SearchParamRuntimeFactory` wraps a blueprint class in a subclass that promotes protected methods (`getDefaultValue`, `full`, `delta`, `fromLocation`, `toParams`, etc.) to public. `SEARCH_PARAM_RUNTIME_MAP` contains the resulting runtime constructors for each blueprint type. This keeps the blueprint API clean for consumers while giving the engine access to the operations it needs.
-
-### Store
-
-`createSearchParamsStore()` creates a context-based store with:
-
-- A `SearchParamsProvider` that wires up the engine + location sync
-- A `useSearchParams` hook that returns the current snapshot + setters
-- Uses `useSyncExternalStore` for tear-free reads
-- Batches notifications via `queueMicrotask` to prevent cascading renders
+`SearchParamsProvider` connects a page's blueprint map to the current router location. `useSearchParams` reads the current snapshot and provides methods to update values or save defaults.
 
 ## 4. Configuration
 
-### Defining Search Params
+### Define Parameters
 
 ```typescript
 import { createSearchParams } from 'features/search-params';
 
-const PARAMS = createSearchParams(blueprints => ({
+const ALERT_PARAMS = createSearchParams(blueprints => ({
   page: blueprints.number(1).min(1),
-  rows: blueprints.number(25).min(1).max(100),
   query: blueprints.string(''),
   sort: blueprints.enum('date', ['name', 'date', 'score'] as const),
-  filters: blueprints.filters([]),
-  showAdvanced: blueprints.boolean(false).ephemeral()
+  filters: blueprints.filters([])
 }));
 ```
 
-### Blueprint Options (Builder Methods)
+The parameter names and value types are inferred from the blueprint map.
 
-| Method                                        | Effect                                                  |
-| --------------------------------------------- | ------------------------------------------------------- |
-| `.defaultValue(v)`                            | Set the default/fallback value                          |
-| `.ephemeral()`                                | Exclude from localStorage persistence                   |
-| `.ignored()`                                  | Changes don't trigger snapshot difference detection     |
-| `.locked()`                                   | Always returns default regardless of URL value          |
-| `.nullable()`                                 | Allows `null` as a valid value                          |
-| `.source('search' \| 'state' \| 'transient')` | Source for value resolution                             |
-| `.min(n)` / `.max(n)`                         | Number bounds (`NumberSearchParamBlueprint` only)       |
-| `.options(valueList)`                         | Valid values list (`EnumSearchParamBlueprint` only)     |
-| `.not(prefix)` / `.omit(prefix)`              | Prefix expressions (`FiltersSearchParamBlueprint` only) |
+### Blueprint Settings
 
-## 5. Usage (Consumer API)
+| Setting                                       | Effect                                                 |
+| --------------------------------------------- | ------------------------------------------------------ |
+| `.defaultValue(value)`                        | Changes the parameter's default.                       |
+| `.source('search' \| 'state' \| 'transient')` | Chooses where the value is stored.                     |
+| `.min(value)` / `.max(value)`                 | Sets number bounds. Values are clamped to the range.   |
+| `.options(values)`                            | Updates the choices for an enum.                       |
+| `.not(prefix)` / `.omit(prefix)`              | Sets filter-expression prefixes.                       |
+| `.nullable()`                                 | Allows `null` as a value.                              |
+| `.ephemeral()`                                | Excludes the parameter from saved defaults.            |
+| `.ignored()`                                  | Excludes the parameter from snapshot change detection. |
+| `.locked()`                                   | Resolves the parameter to its default.                 |
 
-### Providing Search Params to a Route
+## 5. Usage
+
+### Provide Parameters to a Page
 
 ```typescript
-const { SearchParamsProvider, useSearchParams } = createSearchParamsStore();
+import { SearchParamsProvider } from 'features/search-params';
 
-// In a layout/page:
-<SearchParamsProvider params={PARAMS} storageKey="alerts-search">
-  <AlertList />
+<SearchParamsProvider params={ALERT_PARAMS} storageKey="alerts-search">
+  <AlertsPage />
 </SearchParamsProvider>
 ```
 
-### Reading Search Params
+The `storageKey` enables saving user defaults for this page.
+
+### Read and Update Values
 
 ```typescript
-const { search } = useSearchParams();
+import { useSearchParams } from 'features/search-params';
 
-const page = search.get('page'); // number
-const sort = search.get('sort'); // 'name' | 'date' | 'score'
-const hasFilters = search.has('filters'); // boolean
+const { search, setSearchObject, setSearchParams } = useSearchParams();
+const values = search.toObject();
+
+const page = values.page; // number
+const sort = values.sort; // 'name' | 'date' | 'score'
+
+// Use these callbacks in event handlers.
+const updatePage = () => setSearchObject({ ...values, page: 2 });
+
+const updateFromQuery = () => setSearchParams(new URLSearchParams('page=3&sort=name'));
 ```
 
-### Writing Search Params
+Updates are reflected in the current snapshot and stored according to each parameter's source.
 
-```typescript
-const { setSearchObject } = useSearchParams();
-
-// Direct update
-setSearchObject({ page: 2, sort: 'name' });
-
-// Functional update
-setSearchObject(prev => {
-  const next = structuredClone(prev);
-  next.page = prev.page + 1;
-  return next;
-});
-
-// With replace (no history entry)
-setSearchObject({ page: 1 }, true);
-```
-
-### Writing via URLSearchParams
-
-```typescript
-const { setSearchParams } = useSearchParams();
-
-setSearchParams(new URLSearchParams('page=3&sort=date'));
-```
-
-### Persisting User Defaults
+### Save User Defaults
 
 ```typescript
 const { setDefaultParams, clearDefaultParams } = useSearchParams();
 
-// Save current params as user defaults (written to localStorage)
-setDefaultParams({ page: 1, rows: 50, sort: 'name' });
-
-// Clear saved defaults
+setDefaultParams({ page: 1, query: '', sort: 'date', filters: [] });
 clearDefaultParams();
 ```
+
+Saved defaults are stored in `localStorage` under the provider's `storageKey`. Parameters marked with `.ephemeral()` are left out.
 
 ## 6. Codebase (Internals)
 
 ### Key Files
 
-| File                           | Role                                                                                                                                                                                                                                                                                                        |
-| ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `search-params.models.tsx`     | Type definitions: `SearchParamValue`, `SearchParamSource`, `SearchParamBlueprint`, `SearchParamBlueprintMap`, `SearchParamValueMap`, `InferSearchParamValueFromBlueprint`, `InferSearchParamValueMapFromBlueprintMap`, `InferSearchParamRuntimeFromBlueprint`, `InferSearchParamRuntimeMapFromBlueprintMap` |
-| `search-params.blueprints.tsx` | `BaseSearchParamBlueprint<T>` and the concrete `BooleanSearchParamBlueprint`, `NumberSearchParamBlueprint`, `StringSearchParamBlueprint`, `EnumSearchParamBlueprint`, `FiltersSearchParamBlueprint`, and `ObjectSearchParamBlueprint` classes                                                               |
-| `search-params.engines.tsx`    | `SearchParamEngine` — orchestrates blueprints into full/delta/fromLocation resolution                                                                                                                                                                                                                       |
-| `search-params.snapshots.tsx`  | `SearchParamSnapshot` — immutable value object with has/get/pick/omit/set/toLocationSearch/toLocationState                                                                                                                                                                                                  |
-| `search-params.runtimes.tsx`   | `SearchParamRuntimeFactory` and `SEARCH_PARAM_RUNTIME_MAP` — promote protected methods to public                                                                                                                                                                                                            |
-| `search-params.stores.tsx`     | `createSearchParams`, `createSearchParamsStore`, and `useSearchParams`                                                                                                                                                                                                                                      |
-| `index.ts`                     | Public exports                                                                                                                                                                                                                                                                                              |
+| File                           | Role                                                                 |
+| ------------------------------ | -------------------------------------------------------------------- |
+| `search-params.models.tsx`     | Parameter, blueprint, source, and inferred-value types.              |
+| `search-params.blueprints.tsx` | Blueprint classes and the `SEARCH_PARAM_BLUEPRINTS_MAP` factories.   |
+| `search-params.engines.tsx`    | Resolves values from blueprints, locations, and snapshots.           |
+| `search-params.snapshots.tsx`  | Typed value snapshots and serialization helpers.                     |
+| `search-params.stores.tsx`     | `createSearchParams`, `SearchParamsProvider`, and `useSearchParams`. |
+| `search-params.runtimes.tsx`   | Runtime wrappers used by the engine.                                 |
+| `index.ts`                     | Public exports for the module.                                       |
 
-### Engine Methods
+### Type Inference
 
-| Method                              | Purpose                                                                |
-| ----------------------------------- | ---------------------------------------------------------------------- |
-| `getDefaultValues()`                | Snapshot with all defaults                                             |
-| `setDefaultValues(params)`          | Override defaults from URLSearchParams (used for localStorage restore) |
-| `getEphemeralKeys()`                | Keys excluded from persistence                                         |
-| `getIgnoredKeys()`                  | Keys excluded from difference detection                                |
-| `getLockedKeys()`                   | Keys that always return default                                        |
-| `full(value)`                       | Resolve all params, filling defaults                                   |
-| `delta(value)`                      | Resolve only non-default params                                        |
-| `fromLocation(location, snapshot?)` | Resolve from browser location                                          |
+`InferSearchParamValueMapFromBlueprintMap<Blueprints>` derives the value type for every key in a blueprint map. The same inferred types are used by the engine, snapshots, and store update methods.
 
-### Related Modules
+### Data Flow
 
-- `core/routes/` — Consumes engines via `createAppRoute` to define per-route search params
-- `features/path-params/` — Parallel system for path segment params (same philosophy, simpler API)
+`createSearchParams` builds a typed blueprint map. `SearchParamsProvider` uses the map to resolve values from the current location and expose them through `useSearchParams`. Updates create a new snapshot and write the relevant values to the query string or router state. When a storage key is configured, saved user defaults are loaded from and written to `localStorage`.
