@@ -27,7 +27,7 @@ export default defineConfig(({ mode }) => {
       clearMocks: true,
       coverage: {
         all: true,
-        include: ['src/**/*.tsx'],
+        include: ['src/**/*.tsx', 'src/**/*.ts'],
         provider: 'v8',
         reporter: ['cobertura', 'clover', 'lcov'],
         reportsDirectory: './coverage'
