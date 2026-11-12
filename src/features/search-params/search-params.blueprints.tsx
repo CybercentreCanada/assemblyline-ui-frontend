@@ -1,9 +1,12 @@
 import type {
+  BaseSearchParamBlueprintDescriptor,
   EnumParamValue,
+  EnumSearchParamBlueprintDescriptor,
+  FiltersSearchParamBlueprintDescriptor,
   InferSearchParamValueMapFromBlueprintMap,
+  NumberSearchParamBlueprintDescriptor,
   ObjectParamShape,
   ObjectParamValue,
-  SearchParamBlueprintDescriptor,
   SearchParamBlueprintKind,
   SearchParamBlueprintMap,
   SearchParamSnapshot,
@@ -16,7 +19,10 @@ import type { Location } from 'react-router';
 //*****************************************************************************************
 // Base Blueprint
 //*****************************************************************************************
-export abstract class BaseSearchParamBlueprint<T extends SearchParamValue> {
+export abstract class BaseSearchParamBlueprint<
+  T extends SearchParamValue,
+  Kind extends SearchParamBlueprintKind = SearchParamBlueprintKind
+> {
   /**
    * Unique identifier for this parameter in `location.search` or `location.state`.
    * Example: `?page=2` → key = "page".
@@ -61,7 +67,7 @@ export abstract class BaseSearchParamBlueprint<T extends SearchParamValue> {
    */
   protected _source: SearchParamSource = 'search';
 
-  constructor(key: string = null, param: BaseSearchParamBlueprint<T> = null) {
+  constructor(key: string = null, param: BaseSearchParamBlueprint<T, Kind> = null) {
     this._key = key;
     if (!param) return;
     this._defaultValue = param._defaultValue;
@@ -178,12 +184,12 @@ export abstract class BaseSearchParamBlueprint<T extends SearchParamValue> {
   // -------------------------
 
   /** Identifies which blueprint variant this instance is, for tooling/introspection. Overridden by each subclass. */
-  public getKind(): SearchParamBlueprintKind {
+  public getKind(): Kind {
     throw new Error('getKind() must be implemented by a concrete blueprint subclass.');
   }
 
   /** Plain-object description of this blueprint's configuration, for tooling/introspection. */
-  public describe(): SearchParamBlueprintDescriptor {
+  public describe(): BaseSearchParamBlueprintDescriptor<Kind, T> {
     return {
       key: this._key,
       kind: this.getKind(),
@@ -316,8 +322,8 @@ export abstract class BaseSearchParamBlueprint<T extends SearchParamValue> {
 //*****************************************************************************************
 // Boolean Blueprint
 //*****************************************************************************************
-export class BooleanSearchParamBlueprint extends BaseSearchParamBlueprint<boolean> {
-  public override getKind(): SearchParamBlueprintKind {
+export class BooleanSearchParamBlueprint extends BaseSearchParamBlueprint<boolean, 'boolean'> {
+  public override getKind(): 'boolean' {
     return 'boolean';
   }
 
@@ -333,7 +339,7 @@ export class BooleanSearchParamBlueprint extends BaseSearchParamBlueprint<boolea
 //*****************************************************************************************
 // Number Blueprint
 //*****************************************************************************************
-export class NumberSearchParamBlueprint extends BaseSearchParamBlueprint<number> {
+export class NumberSearchParamBlueprint extends BaseSearchParamBlueprint<number, 'number'> {
   private _min: null | number = null;
 
   private _max: null | number = null;
@@ -357,11 +363,11 @@ export class NumberSearchParamBlueprint extends BaseSearchParamBlueprint<number>
     return this;
   }
 
-  public override getKind(): SearchParamBlueprintKind {
+  public override getKind(): 'number' {
     return 'number';
   }
 
-  public override describe(): SearchParamBlueprintDescriptor {
+  public override describe(): NumberSearchParamBlueprintDescriptor {
     return { ...super.describe(), min: this._min, max: this._max };
   }
 
@@ -395,8 +401,8 @@ export class NumberSearchParamBlueprint extends BaseSearchParamBlueprint<number>
 //*****************************************************************************************
 // String Blueprint
 //*****************************************************************************************
-export class StringSearchParamBlueprint extends BaseSearchParamBlueprint<string> {
-  public override getKind(): SearchParamBlueprintKind {
+export class StringSearchParamBlueprint extends BaseSearchParamBlueprint<string, 'string'> {
+  public override getKind(): 'string' {
     return 'string';
   }
 
@@ -414,7 +420,7 @@ export class StringSearchParamBlueprint extends BaseSearchParamBlueprint<string>
 //*****************************************************************************************
 export class EnumSearchParamBlueprint<
   O extends readonly [EnumParamValue, ...EnumParamValue[]]
-> extends BaseSearchParamBlueprint<O[number]> {
+> extends BaseSearchParamBlueprint<O[number], 'enum'> {
   private _options: O;
 
   constructor(key: string = null, param: EnumSearchParamBlueprint<O> = null) {
@@ -442,11 +448,11 @@ export class EnumSearchParamBlueprint<
     return this;
   }
 
-  public override getKind(): SearchParamBlueprintKind {
+  public override getKind(): 'enum' {
     return 'enum';
   }
 
-  public override describe(): SearchParamBlueprintDescriptor {
+  public override describe(): EnumSearchParamBlueprintDescriptor {
     return { ...super.describe(), options: this._options };
   }
 
@@ -471,7 +477,7 @@ export class EnumSearchParamBlueprint<
 //*****************************************************************************************
 // Filter Blueprint
 //*****************************************************************************************
-export class FiltersSearchParamBlueprint extends BaseSearchParamBlueprint<string[]> {
+export class FiltersSearchParamBlueprint extends BaseSearchParamBlueprint<string[], 'filters'> {
   private _not: string = 'NOT';
 
   private _omit: string = '!';
@@ -497,11 +503,11 @@ export class FiltersSearchParamBlueprint extends BaseSearchParamBlueprint<string
     return this;
   }
 
-  public override getKind(): SearchParamBlueprintKind {
+  public override getKind(): 'filters' {
     return 'filters';
   }
 
-  public override describe(): SearchParamBlueprintDescriptor {
+  public override describe(): FiltersSearchParamBlueprintDescriptor {
     return { ...super.describe(), not: this._not, omit: this._omit };
   }
 
@@ -711,10 +717,11 @@ export class FiltersSearchParamBlueprint extends BaseSearchParamBlueprint<string
 //*****************************************************************************************
 // Object Blueprint
 //*****************************************************************************************
-export class ObjectSearchParamBlueprint<
-  O extends ObjectParamValue = ObjectParamValue
-> extends BaseSearchParamBlueprint<O> {
-  public override getKind(): SearchParamBlueprintKind {
+export class ObjectSearchParamBlueprint<O extends ObjectParamValue = ObjectParamValue> extends BaseSearchParamBlueprint<
+  O,
+  'object'
+> {
+  public override getKind(): 'object' {
     return 'object';
   }
 

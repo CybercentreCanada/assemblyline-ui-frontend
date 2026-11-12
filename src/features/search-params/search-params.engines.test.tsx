@@ -198,6 +198,95 @@ describe('SearchParamEngine key introspection', () => {
 });
 
 //*****************************************************************************************
+// describeParams
+//*****************************************************************************************
+
+describe('SearchParamEngine.describeParams', () => {
+  it('returns descriptors narrowed to each blueprint kind', () => {
+    const engine = new SearchParamEngine({
+      enabled: SEARCH_PARAM_BLUEPRINTS_MAP.boolean(true),
+      page: SEARCH_PARAM_BLUEPRINTS_MAP.number(2).min(1).max(5),
+      query: SEARCH_PARAM_BLUEPRINTS_MAP.string('hello'),
+      mode: SEARCH_PARAM_BLUEPRINTS_MAP.enum('fast', ['fast', 'slow'] as const),
+      filters: SEARCH_PARAM_BLUEPRINTS_MAP.filters(['type:file']).not('EXCLUDE').omit('SKIP'),
+      config: SEARCH_PARAM_BLUEPRINTS_MAP.object({ limit: 5 })
+    });
+
+    expect(engine.describeParams()).toEqual({
+      enabled: {
+        key: 'enabled',
+        kind: 'boolean',
+        defaultValue: true,
+        source: 'search',
+        ephemeral: false,
+        ignored: false,
+        locked: false,
+        nullable: false
+      },
+      page: {
+        key: 'page',
+        kind: 'number',
+        defaultValue: 2,
+        source: 'search',
+        ephemeral: false,
+        ignored: false,
+        locked: false,
+        nullable: false,
+        min: 1,
+        max: 5
+      },
+      query: {
+        key: 'query',
+        kind: 'string',
+        defaultValue: 'hello',
+        source: 'search',
+        ephemeral: false,
+        ignored: false,
+        locked: false,
+        nullable: false
+      },
+      mode: {
+        key: 'mode',
+        kind: 'enum',
+        defaultValue: 'fast',
+        source: 'search',
+        ephemeral: false,
+        ignored: false,
+        locked: false,
+        nullable: false,
+        options: ['fast', 'slow']
+      },
+      filters: {
+        key: 'filters',
+        kind: 'filters',
+        defaultValue: ['type:file'],
+        source: 'search',
+        ephemeral: false,
+        ignored: false,
+        locked: false,
+        nullable: false,
+        not: 'EXCLUDE',
+        omit: 'SKIP'
+      },
+      config: {
+        key: 'config',
+        kind: 'object',
+        defaultValue: { limit: 5 },
+        source: 'search',
+        ephemeral: false,
+        ignored: false,
+        locked: false,
+        nullable: false
+      }
+    });
+  });
+
+  it('returns an empty record when no params are configured', () => {
+    expect(new SearchParamEngine({}).describeParams()).toEqual({});
+  });
+});
+
+//*****************************************************************************************
 // full
 //*****************************************************************************************
 

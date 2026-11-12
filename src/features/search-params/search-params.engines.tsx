@@ -58,7 +58,7 @@ export class SearchParamEngine<Blueprints extends SearchParamBlueprintMap> {
   }
 
   private runtimeEntries() {
-    return Object.entries(this.runtimes) as [string, SearchParamRuntime][];
+    return Object.entries(this.runtimes) as [string, (typeof this.runtimes)[keyof typeof this.runtimes]][];
   }
 
   private getKeysFor(fieldFilter: (runtime: SearchParamRuntime) => boolean): string[] {

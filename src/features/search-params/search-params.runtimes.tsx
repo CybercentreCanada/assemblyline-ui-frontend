@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { BaseSearchParamBlueprint, SearchParamValue } from 'features/search-params';
+import type { BaseSearchParamBlueprint, SearchParamBlueprintKind, SearchParamValue } from 'features/search-params';
 import {
   BooleanSearchParamBlueprint,
   EnumSearchParamBlueprint,
@@ -15,7 +15,8 @@ import {
  */
 export function SearchParamRuntimeFactory<
   T extends SearchParamValue,
-  B extends abstract new (...args: any[]) => BaseSearchParamBlueprint<T>
+  Kind extends SearchParamBlueprintKind,
+  B extends abstract new (...args: any[]) => BaseSearchParamBlueprint<T, Kind>
 >(Base: B) {
   abstract class Accessor extends Base {
     // Getters

@@ -1,4 +1,4 @@
-import { Button, styled, Typography, useTheme } from '@mui/material';
+import { Button, styled, Typography } from '@mui/material';
 import { createSearchParamsStore } from 'features/search-params';
 import type { ReactNode } from 'react';
 import { memo, useCallback, useMemo, useState } from 'react';
@@ -13,8 +13,6 @@ import {
   LIVE_STORAGE_KEY,
   LIVE_TAB,
   resolvePlaygroundSnapshot,
-  runSearchParamsCheck,
-  SEARCH_PARAMS_CHECKS,
   SORT_OPTIONS,
   stringifyResult
 } from 'routes/development-library/sections/search-params/search-params.utils';
@@ -337,59 +335,6 @@ const LiveStoreControls = memo(() => {
 LiveStoreControls.displayName = 'LiveStoreControls';
 
 //*****************************************************************************************
-// Checks Table
-//*****************************************************************************************
-
-const ChecksTable = memo(() => {
-  const theme = useTheme();
-
-  const results = useMemo(() => SEARCH_PARAMS_CHECKS.map(runSearchParamsCheck), []);
-  const passed = useMemo(() => results.filter(result => result.passed).length, [results]);
-
-  return (
-    <Column>
-      <Typography
-        variant="subtitle1"
-        sx={{ color: passed === results.length ? theme.palette.success.main : theme.palette.error.main }}
-      >
-        {`${passed} of ${results.length} checks passed`}
-      </Typography>
-
-      <table style={{ borderCollapse: 'collapse', width: '100%' }}>
-        <tbody>
-          {results.map(result => (
-            <tr key={`${result.group}/${result.name}`} style={{ borderTop: `1px solid ${theme.palette.divider}` }}>
-              <td style={{ padding: theme.spacing(0.5, 1), color: theme.palette.text.secondary, whiteSpace: 'nowrap' }}>
-                {result.group}
-              </td>
-              <td style={{ padding: theme.spacing(0.5, 1) }}>
-                {result.name}
-                {!result.passed && (
-                  <pre style={{ margin: 0, fontFamily: 'monospace', whiteSpace: 'pre-wrap' }}>
-                    {`expected ${result.expected}\nreceived ${result.actual}`}
-                  </pre>
-                )}
-              </td>
-              <td
-                style={{
-                  padding: theme.spacing(0.5, 1),
-                  fontWeight: theme.typography.fontWeightBold,
-                  color: result.passed ? theme.palette.success.main : theme.palette.error.main
-                }}
-              >
-                {result.passed ? 'PASS' : 'FAIL'}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </Column>
-  );
-});
-
-ChecksTable.displayName = 'ChecksTable';
-
-//*****************************************************************************************
 // Search Params Section
 //*****************************************************************************************
 
@@ -701,15 +646,6 @@ clearDefaultParams();`}
           />
         }
       />
-
-      <PageSection
-        id="Search Params: Self tests"
-        primary="Self tests"
-        secondary="Assertions on the search-params feature, evaluated each time this section renders."
-        anchor
-      >
-        <ChecksTable />
-      </PageSection>
     </DemoContainer>
   );
 });

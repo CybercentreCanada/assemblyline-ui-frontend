@@ -1,49 +1,4 @@
 //*****************************************************************************************
-// Search Params Checks
-//*****************************************************************************************
-
-/** A single assertion against the search-params feature, evaluated live in the library. */
-export type SearchParamsCheck = {
-  /** Value the check is expected to produce, compared as JSON. */
-  expected: unknown;
-  /** Group the check is listed under. */
-  group: string;
-  /** Short description of the behavior under test. */
-  name: string;
-  /** Produces the actual value that is compared against `expected`. */
-  run: () => unknown;
-};
-
-export const DEFAULT_SEARCH_PARAMS_CHECK: SearchParamsCheck = {
-  expected: null,
-  group: '',
-  name: '',
-  run: () => null
-};
-
-/** Outcome of evaluating a `SearchParamsCheck`. */
-export type SearchParamsCheckResult = {
-  /** JSON of the value the check produced, or the error it threw. */
-  actual: string;
-  /** JSON of the value the check was expected to produce. */
-  expected: string;
-  /** Group the check is listed under. */
-  group: string;
-  /** Short description of the behavior under test. */
-  name: string;
-  /** Whether `actual` equals `expected`. */
-  passed: boolean;
-};
-
-export const DEFAULT_SEARCH_PARAMS_CHECK_RESULT: SearchParamsCheckResult = {
-  actual: '',
-  expected: '',
-  group: '',
-  name: '',
-  passed: false
-};
-
-//*****************************************************************************************
 // Search Params Kind Demo
 //*****************************************************************************************
 

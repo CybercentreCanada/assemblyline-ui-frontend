@@ -29,6 +29,132 @@ describe('BaseSearchParamBlueprint builder methods', () => {
 });
 
 //*****************************************************************************************
+// Blueprint introspection
+//*****************************************************************************************
+
+describe('BooleanSearchParamBlueprint introspection', () => {
+  it('describes its kind and shared configuration', () => {
+    const blueprint = new BooleanSearchParamBlueprint('enabled')
+      .defaultValue(true)
+      .ephemeral()
+      .ignored()
+      .locked()
+      .nullable()
+      .source('state');
+
+    expect(blueprint.getKind()).toBe('boolean');
+    expect(blueprint.describe()).toEqual({
+      key: 'enabled',
+      kind: 'boolean',
+      defaultValue: true,
+      source: 'state',
+      ephemeral: true,
+      ignored: true,
+      locked: true,
+      nullable: true
+    });
+  });
+});
+
+describe('NumberSearchParamBlueprint introspection', () => {
+  it('describes its range constraints', () => {
+    const blueprint = new NumberSearchParamBlueprint('page').defaultValue(2).min(1).max(5);
+
+    expect(blueprint.getKind()).toBe('number');
+    expect(blueprint.describe()).toEqual({
+      key: 'page',
+      kind: 'number',
+      defaultValue: 2,
+      source: 'search',
+      ephemeral: false,
+      ignored: false,
+      locked: false,
+      nullable: false,
+      min: 1,
+      max: 5
+    });
+  });
+});
+
+describe('StringSearchParamBlueprint introspection', () => {
+  it('describes its string default value', () => {
+    const blueprint = new StringSearchParamBlueprint('query').defaultValue('hello');
+
+    expect(blueprint.getKind()).toBe('string');
+    expect(blueprint.describe()).toEqual({
+      key: 'query',
+      kind: 'string',
+      defaultValue: 'hello',
+      source: 'search',
+      ephemeral: false,
+      ignored: false,
+      locked: false,
+      nullable: false
+    });
+  });
+});
+
+describe('EnumSearchParamBlueprint introspection', () => {
+  it('describes its available options', () => {
+    const blueprint = new EnumSearchParamBlueprint('mode').defaultValue(1).options([1, 2]);
+
+    expect(blueprint.getKind()).toBe('enum');
+    expect(blueprint.describe()).toEqual({
+      key: 'mode',
+      kind: 'enum',
+      defaultValue: 1,
+      source: 'search',
+      ephemeral: false,
+      ignored: false,
+      locked: false,
+      nullable: false,
+      options: [1, 2]
+    });
+  });
+});
+
+describe('FiltersSearchParamBlueprint introspection', () => {
+  it('describes its filter prefix tokens', () => {
+    const blueprint = new FiltersSearchParamBlueprint('filters')
+      .defaultValue(['type:file'])
+      .not('EXCLUDE')
+      .omit('SKIP');
+
+    expect(blueprint.getKind()).toBe('filters');
+    expect(blueprint.describe()).toEqual({
+      key: 'filters',
+      kind: 'filters',
+      defaultValue: ['type:file'],
+      source: 'search',
+      ephemeral: false,
+      ignored: false,
+      locked: false,
+      nullable: false,
+      not: 'EXCLUDE',
+      omit: 'SKIP'
+    });
+  });
+});
+
+describe('ObjectSearchParamBlueprint introspection', () => {
+  it('describes its structured default value', () => {
+    const blueprint = new ObjectSearchParamBlueprint('config').defaultValue({ enabled: true });
+
+    expect(blueprint.getKind()).toBe('object');
+    expect(blueprint.describe()).toEqual({
+      key: 'config',
+      kind: 'object',
+      defaultValue: { enabled: true },
+      source: 'search',
+      ephemeral: false,
+      ignored: false,
+      locked: false,
+      nullable: false
+    });
+  });
+});
+
+//*****************************************************************************************
 // SEARCH_PARAM_BLUEPRINTS_MAP factories
 //*****************************************************************************************
 
