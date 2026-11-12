@@ -568,10 +568,7 @@ p.object({ a: 1 }).nullable();     // config=null resolves to null
 p.string('').ephemeral();          // excluded from saved defaults
 p.string('').ignored();            // excluded from change detection
 p.string('').source('state');      // read from location.state
-p.string('').source('transient');  // read from the transient values
-
-engine.describeParams();
-// { page: { kind: 'number', min: 1, max: 50, source: 'search', locked: false, ... } }`}
+p.string('').source('transient');  // read from the transient values`}
           />
         }
       />

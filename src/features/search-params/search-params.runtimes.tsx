@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { BaseSearchParamBlueprint, SearchParamBlueprintKind, SearchParamValue } from 'features/search-params';
+import type { BaseSearchParamBlueprint, SearchParamValue } from 'features/search-params';
 import {
   BooleanSearchParamBlueprint,
   EnumSearchParamBlueprint,
@@ -15,8 +15,7 @@ import {
  */
 export function SearchParamRuntimeFactory<
   T extends SearchParamValue,
-  Kind extends SearchParamBlueprintKind,
-  B extends abstract new (...args: any[]) => BaseSearchParamBlueprint<T, Kind>
+  B extends abstract new (...args: any[]) => BaseSearchParamBlueprint<T>
 >(Base: B) {
   abstract class Accessor extends Base {
     // Getters
@@ -26,10 +25,6 @@ export function SearchParamRuntimeFactory<
     public override isLocked = super.isLocked;
     public override isNullable = super.isNullable;
     public override getSource = super.getSource;
-
-    // Introspection
-    public override getKind = super.getKind;
-    public override describe = super.describe;
 
     // Setters
     public override setDefaultValue = super.setDefaultValue;
