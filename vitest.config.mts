@@ -25,15 +25,19 @@ export default defineConfig(({ mode }) => {
       exclude: [...configDefaults.exclude],
       testTimeout: 30000,
       clearMocks: true,
-      coverage: {
-        all: true,
-        include: ['src/**/*.tsx', 'src/**/*.ts'],
-        provider: 'v8',
-        reporter: ['cobertura', 'clover', 'lcov'],
-        reportsDirectory: './coverage'
+      reporters: ['default', 'junit'],
+      outputFile: {
+        junit: './test-results/vitest.xml'
       },
-      maxWorkers: 6,
-      minWorkers: 3
+      coverage: {
+        include: ['src/**/*.{ts,tsx}'],
+        exclude: ['**/*.d.ts', '**/*.{test,spec,pom}.{ts,tsx}', 'src/core/test/**', 'src/core/e2e/**'],
+        provider: 'v8',
+        reporter: ['text-summary', 'cobertura', 'clover', 'lcov'],
+        reportsDirectory: './coverage',
+        reportOnFailure: true
+      },
+      maxWorkers: 6
     }
   };
 });
