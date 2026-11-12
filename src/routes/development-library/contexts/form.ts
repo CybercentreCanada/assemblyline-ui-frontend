@@ -7,6 +7,10 @@ import { LAYOUT_LIBRARY_STATE, type LayoutLibraryState } from 'routes/developmen
 import { LIST_LIBRARY_STATE, type ListLibraryState } from 'routes/development-library/sections/List';
 import { LIST_INPUTS_LIBRARY_STATE, type ListInputsLibraryState } from 'routes/development-library/sections/ListInputs';
 import { PATH_PARAMS_LIBRARY_STATE, type PathParamsLibraryState } from 'routes/development-library/sections/PathParams';
+import {
+  SEARCH_PARAMS_LIBRARY_STATE,
+  type SearchParamsLibraryState
+} from 'routes/development-library/sections/search-params/SearchParams';
 
 type LibraryComponents = DateTimeLibraryState &
   HashParamsLibraryState &
@@ -14,7 +18,8 @@ type LibraryComponents = DateTimeLibraryState &
   LayoutLibraryState &
   ListInputsLibraryState &
   ListLibraryState &
-  PathParamsLibraryState;
+  PathParamsLibraryState &
+  SearchParamsLibraryState;
 
 export type LibraryFormStore = {
   state: {
@@ -34,7 +39,8 @@ const LIBRARY_FORM_STORE: LibraryFormStore = Object.freeze({
     ...LAYOUT_LIBRARY_STATE,
     ...LIST_INPUTS_LIBRARY_STATE,
     ...LIST_LIBRARY_STATE,
-    ...PATH_PARAMS_LIBRARY_STATE
+    ...PATH_PARAMS_LIBRARY_STATE,
+    ...SEARCH_PARAMS_LIBRARY_STATE
   }
 });
 

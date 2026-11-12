@@ -26,9 +26,6 @@ export function SearchParamRuntimeFactory<
     public override isNullable = super.isNullable;
     public override getSource = super.getSource;
 
-    // Introspection
-    public override getKind = super.getKind;
-
     // Setters
     public override setDefaultValue = super.setDefaultValue;
 
