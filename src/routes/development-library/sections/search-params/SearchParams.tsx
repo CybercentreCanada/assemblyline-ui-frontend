@@ -79,7 +79,7 @@ type ResultBlockProps = {
 };
 
 const ResultBlock = memo(({ children, label }: ResultBlockProps) => (
-  <div>
+  <div aria-live="polite" aria-atomic="true">
     <Typography color="textSecondary" variant="caption">
       {label}
     </Typography>

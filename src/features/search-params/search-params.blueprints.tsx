@@ -193,7 +193,7 @@ export abstract class BaseSearchParamBlueprint<
     return {
       key: this._key,
       kind: this.getKind(),
-      defaultValue: this._defaultValue,
+      defaultValue: structuredClone(this._defaultValue),
       source: this._source,
       ephemeral: this._ephemeral,
       ignored: this._ignored,
