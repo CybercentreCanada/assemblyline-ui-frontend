@@ -1,4 +1,5 @@
 {
+  "flag-updated": "Feature flag updated",
   "state.alpha": "Alpha",
   "state.beta": "Beta",
   "title": "Feature Flags",

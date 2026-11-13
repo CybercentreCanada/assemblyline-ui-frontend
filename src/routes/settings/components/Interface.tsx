@@ -170,6 +170,7 @@ export const InterfaceSection = React.memo(() => {
             </List>
           </div>
 
+          {/* Feature flags (admin only) */}
           {currentUser?.is_admin && <ManageFeatureFlags definitions={ALL_FEATURE_FLAG_DEFINITIONS} />}
         </div>
       )}

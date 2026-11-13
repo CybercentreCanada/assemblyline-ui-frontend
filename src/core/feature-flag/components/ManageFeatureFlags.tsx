@@ -1,6 +1,7 @@
 import { Typography, useTheme } from '@mui/material';
 import { useFeatureFlags, useUpdateFeatureFlag, type FeatureFlag, type FeatureFlagDefinition } from 'core/feature-flag';
-import { memo } from 'react';
+import useMySnackbar from 'core/snackbar/snackbar.hooks';
+import { memo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BooleanListInput } from 'ui/list-inputs/BooleanListInput';
 import { List } from 'ui/list/List';
@@ -15,9 +16,18 @@ export type ManageFeatureFlagProps = {
 export const ManageFeatureFlags = memo(({ definitions }: ManageFeatureFlagProps) => {
   const { t } = useTranslation(['featureFlags', 'translation']);
   const theme = useTheme();
+  const updateFeatureFlag = useUpdateFeatureFlag();
+  const { showSuccessMessage } = useMySnackbar();
 
   const storeFlags = useFeatureFlags();
-  const updateFlag = useUpdateFeatureFlag();
+
+  const updateFlag = useCallback(
+    (flag: string, enabled: boolean) => {
+      updateFeatureFlag(flag, enabled);
+      showSuccessMessage(t('flag-updated'));
+    },
+    [showSuccessMessage, updateFeatureFlag, t]
+  );
 
   const flagDefs: FeatureFlagDefinitionState[] = definitions
     .toSorted((a, b) => a.flag.localeCompare(b.flag))
