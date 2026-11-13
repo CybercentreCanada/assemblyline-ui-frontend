@@ -45,11 +45,11 @@ export class SubmitPage extends PageObjectModel {
   }
 
   locators(): Locator[] {
-    return [this.fileDropper];
+    return [this.bannerImage];
   }
 
   async waitForPage({ state = 'visible', timeout = 0 }: WaitForOptions = {}) {
-    await this.fileDropper.waitFor({ state, timeout });
+    await this.bannerImage.waitFor({ state, timeout });
   }
 
   async switchTab(tabLabel: 'File' | 'Hash/URL') {
