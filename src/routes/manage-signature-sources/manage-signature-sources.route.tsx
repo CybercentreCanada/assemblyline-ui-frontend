@@ -1,6 +1,7 @@
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import CardMembershipOutlinedIcon from '@mui/icons-material/CardMembershipOutlined';
 import CheckIcon from '@mui/icons-material/Check';
+import CodeOutlinedIcon from '@mui/icons-material/CodeOutlined';
 import DnsOutlinedIcon from '@mui/icons-material/DnsOutlined';
 import FingerprintOutlinedIcon from '@mui/icons-material/FingerprintOutlined';
 import NoEncryptionOutlinedIcon from '@mui/icons-material/NoEncryptionOutlined';
@@ -25,6 +26,7 @@ import {
 } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
+import { createAppRoute } from 'core/router';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import { useAppUser } from 'core/template/components/app/hooks';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
@@ -700,3 +702,18 @@ export default function SignatureSources() {
     <ForbiddenPage />
   );
 }
+
+export const ManageSignatureSourcesRoute = createAppRoute({
+  component: <SignatureSources />,
+
+  path: '/manage/sources',
+
+  ancestor: '/manage',
+  shortname: () => ['app_route.manage_signature_sources.shortname', { ns: 'manageSignatureSources' }],
+  fullname: () => ['app_route.manage_signature_sources.fullname', { ns: 'manageSignatureSources' }],
+  shorticon: () => <CodeOutlinedIcon />,
+  fullicon: () => <CodeOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.roles.includes('signature_manage')
+});

@@ -1,8 +1,10 @@
 import BlockIcon from '@mui/icons-material/Block';
+import FingerprintOutlinedIcon from '@mui/icons-material/FingerprintOutlined';
 import RecordVoiceOverOutlinedIcon from '@mui/icons-material/RecordVoiceOverOutlined';
 import { useMediaQuery, useTheme } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
+import { createAppRoute } from 'core/router';
 import PageContainer from 'core/template/branding/AppPageContainer';
 import { useAppUser } from 'core/template/components/app/hooks';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
@@ -223,3 +225,27 @@ const WrappedSignaturesPage = () => (
 
 export const SignaturesPage = React.memo(WrappedSignaturesPage);
 export default SignaturesPage;
+
+export const ManageSignaturesRoute = createAppRoute({
+  component: <SignaturesPage />,
+
+  path: '/manage/signatures',
+  search: s => ({
+    query: s.string(''),
+    offset: s.number(0).min(0).source('transient').ephemeral(),
+    rows: s.number(25).locked().source('transient').ephemeral(),
+    sort: s.string('type asc').ephemeral(),
+    filters: s.filters([]),
+    track_total_hits: s.number(10000).nullable().ephemeral(),
+    refresh: s.boolean(false).source('transient').ephemeral()
+  }),
+
+  ancestor: '/manage',
+  shortname: () => ['app_route.manage_signatures.shortname', { ns: 'manageSignatures' }],
+  fullname: () => ['app_route.manage_signatures.fullname', { ns: 'manageSignatures' }],
+  shorticon: () => <FingerprintOutlinedIcon />,
+  fullicon: () => <FingerprintOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.roles.includes('signature_view')
+});

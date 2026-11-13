@@ -1,5 +1,6 @@
 import DataUsageOutlinedIcon from '@mui/icons-material/DataUsageOutlined';
 import HttpsOutlinedIcon from '@mui/icons-material/HttpsOutlined';
+import MapOutlinedIcon from '@mui/icons-material/MapOutlined';
 import NoEncryptionOutlinedIcon from '@mui/icons-material/NoEncryptionOutlined';
 import {
   Paper,
@@ -15,6 +16,7 @@ import {
 } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
+import { createAppRoute } from 'core/router';
 import { useAppUser } from 'core/template/components/app/hooks';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
 import type { SiteMapResponse } from 'models/api';
@@ -174,3 +176,18 @@ export default function SiteMapPage() {
     <Navigate to="/forbidden" replace />
   );
 }
+
+export const AdminSitemapRoute = createAppRoute({
+  component: <SiteMapPage />,
+
+  path: '/admin/sitemap',
+
+  ancestor: '/admin',
+  shortname: () => ['app_route.admin_sitemap.shortname', { ns: 'adminSiteMap' }],
+  fullname: () => ['app_route.admin_sitemap.fullname', { ns: 'adminSiteMap' }],
+  shorticon: () => <MapOutlinedIcon />,
+  fullicon: () => <MapOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.is_admin
+});

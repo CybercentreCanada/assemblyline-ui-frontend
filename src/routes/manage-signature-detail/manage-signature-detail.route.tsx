@@ -1,4 +1,5 @@
 import Editor, { loader } from '@monaco-editor/react';
+import ListOutlinedIcon from '@mui/icons-material/ListOutlined';
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
 import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
 import {
@@ -19,6 +20,7 @@ import {
 import FormControl from '@mui/material/FormControl';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
+import { createAppRoute } from 'core/router';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import { useAppTheme } from 'core/template/components/app/hooks';
 import PageCenter from 'core/template/components/pages/PageCenter';
@@ -652,3 +654,53 @@ const SignatureDetail = ({
 };
 
 export default SignatureDetail;
+
+export const ManageSignatureDetailRoute = createAppRoute({
+  component: <SignatureDetail />,
+
+  path: '/manage/signature/detail/:id',
+  params: s => ({
+    id: s.string()
+  }),
+
+  ancestor: '/manage/signatures',
+  shortname: location => [
+    'app_route.manage_signature_detail_id.shortname',
+    { ns: 'manageSignatureDetail', id: location.path.id }
+  ],
+  fullname: location => [
+    'app_route.manage_signature_detail_id.fullname',
+    { ns: 'manageSignatureDetail', id: location.path.id }
+  ],
+  shorticon: () => <ListOutlinedIcon />,
+  fullicon: () => <ListOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.roles.includes('signature_view')
+});
+
+export const ManageSignatureDetailRoute2 = createAppRoute({
+  component: <SignatureDetail />,
+
+  path: '/manage/signature/detail/:type/:source/:name',
+  params: s => ({
+    type: s.string(),
+    source: s.string(),
+    name: s.string()
+  }),
+
+  ancestor: '/manage/signatures',
+  shortname: location => [
+    'app_route.manage_signature_detail_type_source_name.shortname',
+    { ns: 'manageSignatureDetail', name: location.path.name }
+  ],
+  fullname: location => [
+    'app_route.manage_signature_detail_type_source_name.fullname',
+    { ns: 'manageSignatureDetail', type: location.path.type, source: location.path.source, name: location.path.name }
+  ],
+  shorticon: () => <ListOutlinedIcon />,
+  fullicon: () => <ListOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.roles.includes('signature_view')
+});

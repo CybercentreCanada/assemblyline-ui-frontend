@@ -1,3 +1,5 @@
+import BusinessOutlinedIcon from '@mui/icons-material/BusinessOutlined';
+import { createAppRoute } from 'core/router';
 import { useAppConfigs, useAppUser } from 'core/template/components/app/hooks';
 import PageCenter from 'core/template/components/pages/PageCenter';
 import type { CustomUser } from 'models/api/user';
@@ -26,3 +28,18 @@ export default function Admin() {
     <Navigate to="/forbidden" replace />
   );
 }
+
+export const AdminRoute = createAppRoute({
+  component: <Admin />,
+
+  path: '/admin',
+
+  ancestor: null,
+  shortname: () => ['app_route.admin.shortname', { ns: 'adminActions' }],
+  fullname: () => ['app_route.admin.fullname', { ns: 'adminActions' }],
+  shorticon: () => <BusinessOutlinedIcon />,
+  fullicon: () => <BusinessOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.is_admin
+});

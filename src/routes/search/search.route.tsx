@@ -1,9 +1,15 @@
+import { FingerprintOutlined, ViewCarouselOutlined } from '@mui/icons-material';
 import ArchiveIcon from '@mui/icons-material/Archive';
 import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
 import CenterFocusStrongOutlinedIcon from '@mui/icons-material/CenterFocusStrongOutlined';
+import DataObjectOutlinedIcon from '@mui/icons-material/DataObjectOutlined';
+import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
+import NotificationImportantOutlinedIcon from '@mui/icons-material/NotificationImportantOutlined';
+import SearchIcon from '@mui/icons-material/Search';
 import { IconButton, Paper, Tab, Tabs, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
+import { createAppRoute } from 'core/router';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import PageContainer from 'core/template/branding/AppPageContainer';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
@@ -37,6 +43,7 @@ import SearchPager from 'ui/SearchPager';
 import SearchResultCount from 'ui/SearchResultCount';
 
 const PAGE_SIZE = 25;
+const SEARCH_INDICES = ['submission', 'file', 'result', 'signature', 'alert', 'retrohunt'] as const;
 
 type SearchIndexes = Pick<Indexes, 'submission' | 'file' | 'result' | 'signature' | 'alert' | 'retrohunt'>;
 
@@ -445,3 +452,86 @@ function Search({ index = null }: Props) {
 }
 
 export default Search;
+
+export const SearchRoute = createAppRoute({
+  component: <Search />,
+
+  path: '/search/:index',
+  params: s => ({
+    index: s.enum(SEARCH_INDICES, 'submission')
+  }),
+  search: s => ({
+    index: s.enum(null, SEARCH_INDICES).nullable(),
+    query: s.string(''),
+    offset: s.number(0).min(0).source('transient').ephemeral(),
+    rows: s.number(25).locked().source('transient').ephemeral(),
+    sort: s.string(null).ephemeral(),
+    use_archive: s.boolean(false)
+  }),
+
+  ancestor: '/search',
+  shortname: location => {
+    switch (location?.path?.index) {
+      case 'alert':
+        return ['app_route.search_index.alert.shortname', { ns: 'search' }];
+      case 'file':
+        return ['app_route.search_index.file.shortname', { ns: 'search' }];
+      case 'result':
+        return ['app_route.search_index.result.shortname', { ns: 'search' }];
+      case 'retrohunt':
+        return ['app_route.search_index.retrohunt.shortname', { ns: 'search' }];
+      case 'signature':
+        return ['app_route.search_index.signature.shortname', { ns: 'search' }];
+      case 'submission':
+        return ['app_route.search_index.submission.shortname', { ns: 'search' }];
+      default:
+        return ['app_route.search_index.shortname', { ns: 'search' }];
+    }
+  },
+  fullname: location => ['app_route.search_index.fullname', { ns: 'search', index: location.path.index }],
+  shorticon: location => {
+    switch (location?.path?.index) {
+      case 'alert':
+        return <NotificationImportantOutlinedIcon />;
+      case 'file':
+        return <DescriptionOutlinedIcon />;
+      case 'result':
+        return <DescriptionOutlinedIcon />;
+      case 'retrohunt':
+        return <DataObjectOutlinedIcon />;
+      case 'signature':
+        return <FingerprintOutlined />;
+      case 'submission':
+        return <ViewCarouselOutlined />;
+      default:
+        return <SearchIcon />;
+    }
+  },
+  fullicon: () => <SearchIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
+});
+
+export const SearchRootRoute = createAppRoute({
+  component: <Search />,
+
+  path: '/search',
+  search: s => ({
+    index: s.enum(null, SEARCH_INDICES).nullable(),
+    query: s.string(''),
+    offset: s.number(0).min(0).source('transient').ephemeral(),
+    rows: s.number(25).locked().source('transient').ephemeral(),
+    sort: s.string(null).ephemeral(),
+    use_archive: s.boolean(false)
+  }),
+
+  ancestor: null,
+  shortname: () => ['app_route.search_root.shortname', { ns: 'search' }],
+  fullname: () => ['app_route.search_root.fullname', { ns: 'search' }],
+  shorticon: () => <SearchIcon />,
+  fullicon: () => <SearchIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
+});

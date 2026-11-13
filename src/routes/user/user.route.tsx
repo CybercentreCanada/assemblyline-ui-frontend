@@ -1,3 +1,4 @@
+import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import ChevronRightOutlinedIcon from '@mui/icons-material/ChevronRightOutlined';
 import CloseIcon from '@mui/icons-material/Close';
 import {
@@ -27,6 +28,7 @@ import Skeleton from '@mui/material/Skeleton';
 import { red } from '@mui/material/colors';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
+import { createAppRoute } from 'core/router';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import PageCenter from 'core/template/components/pages/PageCenter';
 import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
@@ -1075,3 +1077,21 @@ function User({ username = null }: UserProps) {
 }
 
 export default memo(User);
+
+export const AdminUserDetailRoute = createAppRoute({
+  component: <User />,
+
+  path: '/admin/users/:id',
+  params: s => ({
+    id: s.string()
+  }),
+
+  ancestor: '/admin/users',
+  shortname: location => ['app_route.user_id.shortname', { ns: 'user', id: location.path.id }],
+  fullname: location => ['app_route.user_id.fullname', { ns: 'user', id: location.path.id }],
+  shorticon: () => <AccountCircleOutlinedIcon />,
+  fullicon: () => <AccountCircleOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.is_admin
+});

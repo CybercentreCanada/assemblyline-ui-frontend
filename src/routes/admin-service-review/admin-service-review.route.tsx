@@ -1,10 +1,12 @@
 import ArrowDownwardOutlinedIcon from '@mui/icons-material/ArrowDownwardOutlined';
 import ArrowUpwardOutlinedIcon from '@mui/icons-material/ArrowUpwardOutlined';
+import CompareArrowsOutlinedIcon from '@mui/icons-material/CompareArrowsOutlined';
 import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import type { TypographyProps } from '@mui/material';
 import { Grid, IconButton, MenuItem, Select, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
 import useMyAPI from 'core/api/hooks/useMyAPI';
+import { createAppRoute } from 'core/router';
 import { useAppUser } from 'core/template/components/app/hooks';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
 import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
@@ -353,3 +355,23 @@ export default function ServiceReview() {
     <Navigate to="/forbidden" replace />
   );
 }
+
+export const AdminServiceReviewRoute = createAppRoute({
+  component: <ServiceReview />,
+
+  path: '/admin/service_review',
+  search: s => ({
+    service: s.string(''),
+    v1: s.string(''),
+    v2: s.string('')
+  }),
+
+  ancestor: '/admin',
+  shortname: () => ['app_route.admin_service_review.shortname', { ns: 'adminServiceReview' }],
+  fullname: () => ['app_route.admin_service_review.fullname', { ns: 'adminServiceReview' }],
+  shorticon: () => <CompareArrowsOutlinedIcon />,
+  fullicon: () => <CompareArrowsOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.is_admin
+});

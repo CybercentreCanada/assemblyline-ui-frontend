@@ -1,9 +1,11 @@
 import type { Monaco } from '@monaco-editor/react';
 import Editor, { loader } from '@monaco-editor/react';
+import ApiIcon from '@mui/icons-material/Api';
 import { Button, Grid, Paper, Skeleton, Typography, useTheme } from '@mui/material';
 import { useAPIMutation } from 'core/api/hooks/useApiMutation';
 import { useALQuery } from 'core/api/hooks/useAppQuery';
 import useALContext from 'core/config/useALContext';
+import { createAppRoute } from 'core/router';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import PageFullSize from 'core/template/branding/AppPageCenter';
 import type { ApiDocumentation } from 'models/api';
@@ -384,3 +386,19 @@ export const DevelopmentAPI = () => {
 };
 
 export default DevelopmentAPI;
+
+export const DevelopmentAPIRoute = createAppRoute({
+  component: <DevelopmentAPI />,
+
+  path: '/development/api',
+
+  ancestor: '/development',
+  shortname: () => ['app_route.development_api.shortname', { ns: 'developmentAPI' }],
+  fullname: () => ['app_route.development_api.fullname', { ns: 'developmentAPI' }],
+  shorticon: () => <ApiIcon />,
+  fullicon: () => <ApiIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) =>
+    !config.user.is_admin || !['development', 'staging'].includes(config.configuration.system.type)
+});

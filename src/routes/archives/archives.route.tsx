@@ -1,3 +1,4 @@
+import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
 import AssignmentLateOutlinedIcon from '@mui/icons-material/AssignmentLateOutlined';
 import ClassOutlinedIcon from '@mui/icons-material/ClassOutlined';
 import FileOpenOutlinedIcon from '@mui/icons-material/FileOpenOutlined';
@@ -5,6 +6,7 @@ import { Chip, Grid, MenuItem, Select, Tooltip, Typography, useMediaQuery, useTh
 import FormControl from '@mui/material/FormControl';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
+import { createAppRoute } from 'core/router';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import PageContainer from 'core/template/branding/AppPageContainer';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
@@ -472,3 +474,29 @@ export default function MalwareArchive() {
       </PageFullWidth>
     );
 }
+
+export const ArchivesRoute = createAppRoute({
+  component: <MalwareArchive />,
+
+  path: '/archives',
+  search: s => ({
+    query: s.string(''),
+    offset: s.number(0).min(0).source('transient').ephemeral(),
+    rows: s.number(PAGE_SIZE).locked().source('transient').ephemeral(),
+    sort: s.string('archive_ts desc'),
+    filters: s.filters([]),
+    tc: s.string(DEFAULT_TC),
+    supplementary: s.boolean(false),
+    track_total_hits: s.number(null).source('transient').nullable().ephemeral(),
+    archive_only: s.boolean(true).locked().source('transient').ephemeral()
+  }),
+
+  ancestor: null,
+  shortname: () => ['app_route.archives.shortname', { ns: 'archive' }],
+  fullname: () => ['app_route.archives.fullname', { ns: 'archive' }],
+  shorticon: () => <ArchiveOutlinedIcon />,
+  fullicon: () => <ArchiveOutlinedIcon />,
+
+  disabled: (_location, config) => !config.configuration?.datastore?.archive?.enabled,
+  forbidden: (_location, config) => !config.user.roles.includes('archive_view')
+});

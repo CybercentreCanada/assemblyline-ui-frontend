@@ -1,3 +1,4 @@
+import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
 import {
   Button,
   Chip,
@@ -15,6 +16,7 @@ import {
 import Autocomplete from '@mui/material/Autocomplete';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
+import { createAppRoute } from 'core/router';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
 import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
@@ -439,3 +441,18 @@ const BadlistNew = ({}: Props) => {
 };
 
 export default BadlistNew;
+
+export const ManageBadlistAddRoute = createAppRoute({
+  component: <BadlistNew />,
+
+  path: '/manage/badlist/add',
+
+  ancestor: '/manage/badlists',
+  shortname: () => ['app_route.manage_badlist_add.shortname', { ns: 'manageBadlistAdd' }],
+  fullname: () => ['app_route.manage_badlist_add.fullname', { ns: 'manageBadlistAdd' }],
+  shorticon: () => <BugReportOutlinedIcon />,
+  fullicon: () => <BugReportOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.roles.includes('badlist_view')
+});

@@ -1,5 +1,7 @@
+import LabelOutlinedIcon from '@mui/icons-material/LabelOutlined';
 import { Skeleton, Typography, useTheme } from '@mui/material';
 import useALContext from 'core/config/useALContext';
+import { createAppRoute } from 'core/router';
 import NotFoundPage from 'core/template/branding/AppBanner';
 import PageCenter from 'core/template/components/pages/PageCenter';
 import { Trans, useTranslation } from 'react-i18next';
@@ -279,3 +281,18 @@ export default function HelpClassification() {
     <NotFoundPage />
   );
 }
+
+export const HelpClassificationRoute = createAppRoute({
+  component: <HelpClassification />,
+
+  path: '/help/classification',
+
+  ancestor: '/help',
+  shortname: () => ['app_route.help_classification.shortname', { ns: 'helpClassification' }],
+  fullname: () => ['app_route.help_classification.fullname', { ns: 'helpClassification' }],
+  shorticon: () => <LabelOutlinedIcon />,
+  fullicon: () => <LabelOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
+});

@@ -1,3 +1,4 @@
+import SearchIcon from '@mui/icons-material/Search';
 import type { CardProps } from '@mui/material';
 import {
   Box,
@@ -12,6 +13,7 @@ import {
   useTheme
 } from '@mui/material';
 import useALContext from 'core/config/useALContext';
+import { createAppRoute } from 'core/router';
 import { useAppBar, useAppLayout } from 'core/template/components/app/hooks';
 import PageCenter from 'core/template/components/pages/PageCenter';
 import type { ContentWithTOCItemDef } from 'deprecated/components/toc/Toc';
@@ -512,3 +514,19 @@ export default function Search() {
     </PageCenter>
   );
 }
+
+export const HelpSearchRoute = createAppRoute({
+  component: <Search />,
+
+  path: '/help/search',
+  hash: s => s.string(null),
+
+  ancestor: '/help',
+  shortname: () => ['app_route.help_search.shortname', { ns: 'helpSearch' }],
+  fullname: () => ['app_route.help_search.fullname', { ns: 'helpSearch' }],
+  shorticon: () => <SearchIcon />,
+  fullicon: () => <SearchIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
+});

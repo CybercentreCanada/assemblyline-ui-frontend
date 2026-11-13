@@ -1,5 +1,6 @@
 import AssistantIcon from '@mui/icons-material/Assistant';
 import AssistantOutlinedIcon from '@mui/icons-material/AssistantOutlined';
+import ChromeReaderModeOutlinedIcon from '@mui/icons-material/ChromeReaderModeOutlined';
 import InfoIcon from '@mui/icons-material/Info';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import ListAltOutlinedIcon from '@mui/icons-material/ListAltOutlined';
@@ -8,6 +9,7 @@ import type { TooltipProps } from '@mui/material';
 import { Box, Grid, IconButton, Skeleton, styled, Tooltip, Typography, useTheme } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
+import { createAppRoute } from 'core/router';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import PageCenter from 'core/template/components/pages/PageCenter';
 import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
@@ -324,3 +326,21 @@ export default function SubmissionReportPage() {
     <ForbiddenPage />
   );
 }
+
+export const SubmissionReportRoute = createAppRoute({
+  component: <SubmissionReportPage />,
+
+  path: '/submission/report/:id',
+  params: s => ({
+    id: s.string()
+  }),
+
+  ancestor: '/submissions',
+  shortname: location => ['app_route.submission_report.shortname', { ns: 'submissionReport', id: location.path.id }],
+  fullname: location => ['app_route.submission_report.fullname', { ns: 'submissionReport', id: location.path.id }],
+  shorticon: () => <ChromeReaderModeOutlinedIcon />,
+  fullicon: () => <ChromeReaderModeOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.roles.includes('submission_view')
+});

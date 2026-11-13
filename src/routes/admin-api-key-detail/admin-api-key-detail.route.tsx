@@ -1,4 +1,5 @@
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import KeyOutlinedIcon from '@mui/icons-material/KeyOutlined';
 import {
   Button,
   CircularProgress,
@@ -13,6 +14,7 @@ import {
 } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
+import { createAppRoute } from 'core/router';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import PageCenter from 'core/template/components/pages/PageCenter';
 import { type ApiKey } from 'models/base/user';
@@ -359,3 +361,19 @@ const ApikeyDetail = ({ key_id = null, onClose = () => null }: ApikeyDetailProps
 };
 
 export default ApikeyDetail;
+
+export const AdminAPIKeyDetailRoute = createAppRoute({
+  component: <ApikeyDetail />,
+
+  path: '/admin/apikeys/:id',
+  params: s => ({ id: s.string(null) }),
+
+  ancestor: '/admin/apikeys',
+  shortname: location => ['app_route.admin_api_key_detail.shortname', { ns: 'adminAPIkeys', id: location.path.id }],
+  fullname: location => ['app_route.admin_api_key_detail.fullname', { ns: 'adminAPIkeys', id: location.path.id }],
+  shorticon: () => <KeyOutlinedIcon />,
+  fullicon: () => <KeyOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.is_admin
+});

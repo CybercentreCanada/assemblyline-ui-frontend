@@ -3,6 +3,7 @@ import DataObjectOutlinedIcon from '@mui/icons-material/DataObjectOutlined';
 import DoneOutlinedIcon from '@mui/icons-material/DoneOutlined';
 import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import ListOutlinedIcon from '@mui/icons-material/ListOutlined';
 import {
   AlertTitle,
   Divider,
@@ -18,6 +19,7 @@ import {
 import TableContainer from '@mui/material/TableContainer';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
+import { createAppRoute } from 'core/router';
 import PageFullSize from 'core/template/branding/AppPageCenter';
 import { useAppUser } from 'core/template/components/app/hooks';
 import useDrawer from 'layout/drawer/drawer.hooks';
@@ -873,3 +875,29 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
 
 export const RetrohuntDetailPage = React.memo(WrappedRetrohuntDetailPage);
 export default WrappedRetrohuntDetailPage;
+
+export const RetrohuntDetailRoute = createAppRoute({
+  component: <WrappedRetrohuntDetailPage />,
+
+  path: '/retrohunt/detail/:id',
+  params: s => ({
+    id: s.string()
+  }),
+  search: s => ({
+    query: s.string(''),
+    offset: s.number(0).min(0).source('transient').ephemeral(),
+    rows: s.number(10).locked().source('transient').ephemeral(),
+    sort: s.string('seen.last desc'),
+    filters: s.filters([]),
+    track_total_hits: s.number(null).source('transient').nullable().ephemeral()
+  }),
+
+  ancestor: '/retrohunt',
+  shortname: location => ['app_route.retrohunt_detail.shortname', { ns: 'retrohunt', id: location.path.id }],
+  fullname: location => ['app_route.retrohunt_detail.fullname', { ns: 'retrohunt', id: location.path.id }],
+  shorticon: () => <ListOutlinedIcon />,
+  fullicon: () => <ListOutlinedIcon />,
+
+  disabled: (_location, config) => !config.configuration?.retrohunt?.enabled,
+  forbidden: (_location, config) => !config.user.roles.includes('retrohunt_view')
+});

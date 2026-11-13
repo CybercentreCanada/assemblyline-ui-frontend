@@ -2,9 +2,11 @@ import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOu
 import BlockOutlinedIcon from '@mui/icons-material/BlockOutlined';
 import LabelOutlinedIcon from '@mui/icons-material/LabelOutlined';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
+import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import { useTheme } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
+import { createAppRoute } from 'core/router';
 import PageContainer from 'core/template/branding/AppPageContainer';
 import { useAppUser } from 'core/template/components/app/hooks';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
@@ -207,3 +209,27 @@ const WrappedSafelistPage = () => (
 
 export const SafelistPage = React.memo(WrappedSafelistPage);
 export default SafelistPage;
+
+export const ManageSafelistsRoute = createAppRoute({
+  component: <SafelistPage />,
+
+  path: '/manage/safelists',
+  search: s => ({
+    query: s.string(''),
+    offset: s.number(0).min(0).source('transient').ephemeral(),
+    rows: s.number(25).locked().source('transient').ephemeral(),
+    sort: s.string('added desc').ephemeral(),
+    filters: s.filters([]),
+    track_total_hits: s.number(10000).nullable().ephemeral(),
+    refresh: s.boolean(false).source('transient').ephemeral()
+  }),
+
+  ancestor: '/manage',
+  shortname: () => ['app_route.manage_safelists.shortname', { ns: 'manageSafelists' }],
+  fullname: () => ['app_route.manage_safelists.fullname', { ns: 'manageSafelists' }],
+  shorticon: () => <VerifiedUserOutlinedIcon />,
+  fullicon: () => <VerifiedUserOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.roles.includes('safelist_view')
+});
