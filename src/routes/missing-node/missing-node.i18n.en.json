@@ -1,0 +1,6 @@
+{
+  "app_route.missing_node.fullname": "Missing Node",
+  "app_route.missing_node.shortname": "Missing Node",
+  "description": "The panel does not have an assigned rendering node. Please try navigating to a different page.",
+  "title": "The layout forgot its node"
+}

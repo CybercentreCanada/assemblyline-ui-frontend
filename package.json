@@ -27,6 +27,7 @@
     "@mui/x-tree-view": "^7.28.1",
     "@tanstack/query-sync-storage-persister": "^5.69.0",
     "@tanstack/react-form": "^1.23.8",
+    "@tanstack/react-pacer": "^0.24.1",
     "@tanstack/react-query": "^5.69.0",
     "@tanstack/react-query-persist-client": "^5.69.0",
     "@tanstack/react-table": "^8.21.3",
