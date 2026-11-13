@@ -1,3 +1,4 @@
+import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import CheckOutlinedIcon from '@mui/icons-material/CheckOutlined';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -5,6 +6,7 @@ import { Box, Card, Collapse, Grid, styled, Typography, useMediaQuery, useTheme 
 import Skeleton from '@mui/material/Skeleton';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
+import { createAppRoute } from 'core/router';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
 import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -388,3 +390,18 @@ export default function ApiDoc() {
     </PageFullWidth>
   );
 }
+
+export const HelpAPIRoute = createAppRoute({
+  component: <ApiDoc />,
+
+  path: '/help/api',
+
+  ancestor: '/help',
+  shortname: () => ['app_route.help_api.shortname', { ns: 'helpAPI' }],
+  fullname: () => ['app_route.help_api.fullname', { ns: 'helpAPI' }],
+  shorticon: () => <AssignmentOutlinedIcon />,
+  fullicon: () => <AssignmentOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
+});

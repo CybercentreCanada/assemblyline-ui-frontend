@@ -1,8 +1,10 @@
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
+import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import PanToolOutlinedIcon from '@mui/icons-material/PanToolOutlined';
 import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
 import { Grid, Typography, useTheme } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
+import { createAppRoute } from 'core/router';
 import PageContainer from 'core/template/branding/AppPageContainer';
 import { useAppUser } from 'core/template/components/app/hooks';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
@@ -311,3 +313,33 @@ const WrappedErrorViewerPage = () => (
 
 export const ErrorViewerPage = React.memo(WrappedErrorViewerPage);
 export default ErrorViewerPage;
+
+export const AdminErrorViewerRoute = createAppRoute({
+  component: <ErrorViewerPage />,
+
+  path: '/admin/errors',
+  search: s => ({
+    query: s.string(''),
+    offset: s.number(0).min(0).source('transient').ephemeral(),
+    rows: s.number(25).locked().source('transient').ephemeral(),
+    sort: s.string('created desc').ephemeral(),
+    start: s.string('now-4d'),
+    end: s.string('now'),
+    gap: s.string('4h'),
+    filters: s.filters([]),
+    track_total_hits: s.number(10000).nullable().ephemeral(),
+    mincount: s.number(0).min(0).source('transient').ephemeral(),
+    use_archive: s.boolean(false),
+    archive_only: s.boolean(false),
+    timeout: s.string('').source('transient').ephemeral()
+  }),
+
+  ancestor: '/admin',
+  shortname: () => ['app_route.admin_error_viewer.shortname', { ns: 'adminErrorViewer' }],
+  fullname: () => ['app_route.admin_error_viewer.fullname', { ns: 'adminErrorViewer' }],
+  shorticon: () => <ErrorOutlineOutlinedIcon />,
+  fullicon: () => <ErrorOutlineOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.is_admin
+});

@@ -1,6 +1,8 @@
 import { loader } from '@monaco-editor/react';
+import FindInPageOutlinedIcon from '@mui/icons-material/FindInPageOutlined';
 import { Alert, Box, Grid, Paper, styled, Tab, Tabs, Typography, useTheme } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
+import { createAppRoute } from 'core/router';
 import PageFullSize from 'core/template/branding/AppPageCenter';
 import { useAppUser } from 'core/template/components/app/hooks';
 import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
@@ -188,3 +190,18 @@ export default function AdminIdentify() {
     <Navigate to="/forbidden" replace />
   );
 }
+
+export const AdminIdentifyRoute = createAppRoute({
+  component: <AdminIdentify />,
+
+  path: '/admin/identify',
+
+  ancestor: '/admin',
+  shortname: () => ['app_route.admin_identify.shortname', { ns: 'adminIdentify' }],
+  fullname: () => ['app_route.admin_identify.fullname', { ns: 'adminIdentify' }],
+  shorticon: () => <FindInPageOutlinedIcon />,
+  fullicon: () => <FindInPageOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.is_admin
+});

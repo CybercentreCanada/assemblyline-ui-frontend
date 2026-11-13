@@ -1,9 +1,11 @@
 import CheckIcon from '@mui/icons-material/Check';
+import CreateOutlinedIcon from '@mui/icons-material/CreateOutlined';
 import DoDisturbAltOutlinedIcon from '@mui/icons-material/DoDisturbAltOutlined';
 import { Grid, useTheme } from '@mui/material';
 import { useAPIMutation } from 'core/api/hooks/useApiMutation';
 import { useAPIQuery } from 'core/api/hooks/useApiQuery';
 import useALContext from 'core/config/useALContext';
+import { createAppRoute } from 'core/router';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import PageCenter from 'core/template/components/pages/PageCenter';
 import _ from 'lodash';
@@ -306,3 +308,51 @@ const WrappedWorkflowCreate = ({ id: propID = null, onClose = () => null }: Prop
 
 export const WorkflowCreate = React.memo(WrappedWorkflowCreate);
 export default WorkflowCreate;
+
+export const ManageWorkflowCreateRoute = createAppRoute({
+  component: <WorkflowCreate />,
+
+  path: '/manage/workflow/create/:id',
+  params: s => ({
+    id: s.string()
+  }),
+
+  ancestor: '/manage/workflows',
+  shortname: location => [
+    'app_route.manage_workflow_create_id.shortname',
+    { ns: 'manageWorkflowDetail', id: location.path.id }
+  ],
+  fullname: location => [
+    'app_route.manage_workflow_create_id.fullname',
+    { ns: 'manageWorkflowDetail', id: location.path.id }
+  ],
+  shorticon: () => <CreateOutlinedIcon />,
+  fullicon: () => <CreateOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.roles.includes('workflow_manage')
+});
+
+export const ManageWorkflowCreateRootRoute = createAppRoute({
+  component: <WorkflowCreate />,
+
+  path: '/manage/workflow/create',
+  search: s => ({
+    classification: s.string('').source('transient').ephemeral(),
+    name: s.string('').source('transient').ephemeral(),
+    query: s.string('').source('transient').ephemeral(),
+    labels: s.filters([]).source('transient').ephemeral(),
+    priority: s.string('').source('transient').ephemeral(),
+    status: s.string('').source('transient').ephemeral(),
+    enabled: s.boolean(true).source('transient').ephemeral()
+  }),
+
+  ancestor: '/manage/workflows',
+  shortname: () => ['app_route.manage_workflow_create_root.shortname', { ns: 'manageWorkflowDetail' }],
+  fullname: () => ['app_route.manage_workflow_create_root.fullname', { ns: 'manageWorkflowDetail' }],
+  shorticon: () => <CreateOutlinedIcon />,
+  fullicon: () => <CreateOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.roles.includes('workflow_manage')
+});

@@ -1,11 +1,13 @@
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
+import ListOutlinedIcon from '@mui/icons-material/ListOutlined';
 import PageviewOutlinedIcon from '@mui/icons-material/PageviewOutlined';
 import PanToolOutlinedIcon from '@mui/icons-material/PanToolOutlined';
 import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
 import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
 import { Card, Grid, IconButton, styled, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
+import { createAppRoute } from 'core/router';
 import { useAppUser } from 'core/template/components/app/hooks';
 import PageCenter from 'core/template/components/pages/PageCenter';
 import useClipboard from 'layout/clipboard/clipboard.hooks';
@@ -213,3 +215,19 @@ export const ErrorDetail = ({ error_key = null }: ErrorDetailProps) => {
 };
 
 export default ErrorDetail;
+
+export const AdminErrorDetailRoute = createAppRoute({
+  component: <ErrorDetail />,
+
+  path: '/admin/errors/:id',
+  params: s => ({ id: s.string() }),
+
+  ancestor: '/admin/errors',
+  shortname: location => ['app_route.admin_error_detail.shortname', { ns: 'adminErrorViewer', id: location.path.id }],
+  fullname: location => ['app_route.admin_error_detail.fullname', { ns: 'adminErrorViewer', id: location.path.id }],
+  shorticon: () => <ListOutlinedIcon />,
+  fullicon: () => <ListOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.is_admin
+});

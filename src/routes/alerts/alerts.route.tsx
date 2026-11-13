@@ -1,7 +1,9 @@
 import AddIcon from '@mui/icons-material/Add';
+import NotificationImportantOutlinedIcon from '@mui/icons-material/NotificationImportantOutlined';
 import { AlertTitle, useMediaQuery, useTheme } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
+import { createAppRoute } from 'core/router';
 import { useAppUser } from 'core/template/components/app/hooks';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
 import SimpleList from 'deprecated/components/lists/simplelist/SimpleList';
@@ -323,3 +325,33 @@ const WrappedAlertsPage = () => (
 
 export const AlertsPage = React.memo(WrappedAlertsPage);
 export default AlertsPage;
+
+export const AlertsRoute = createAppRoute({
+  component: <AlertsPage />,
+
+  path: '/alerts',
+  search: s => ({
+    q: s.string(''),
+    offset: s.number(0).min(0).source('transient').ephemeral(),
+    rows: s.number(PAGE_SIZE).locked().source('transient').ephemeral(),
+    sort: s.string('reporting_ts desc'),
+    group_by: s.string('file.sha256'),
+    fq: s.filters([]),
+
+    no_delay: s.boolean(false),
+
+    tc_start: s.string('').source('transient').ephemeral(),
+    tc: s.string('4d'),
+    track_total_hits: s.number(null).source('transient').nullable().ephemeral(),
+    refresh: s.boolean(false).ephemeral()
+  }),
+
+  ancestor: null,
+  shortname: () => ['app_route.alerts.shortname', { ns: 'alerts' }],
+  fullname: () => ['app_route.alerts.fullname', { ns: 'alerts' }],
+  shorticon: () => <NotificationImportantOutlinedIcon />,
+  fullicon: () => <NotificationImportantOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
+});

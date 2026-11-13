@@ -4,6 +4,7 @@ import EventOutlinedIcon from '@mui/icons-material/EventOutlined';
 import { Grid, IconButton, Tooltip, useTheme } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
+import { createAppRoute } from 'core/router';
 import PageContainer from 'core/template/branding/AppPageContainer';
 import { useAppUser } from 'core/template/components/app/hooks';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
@@ -13,6 +14,7 @@ import type { CustomUser, IndexDefinition } from 'models/api/user';
 import type { WorkflowIndexed } from 'models/base/workflow';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { BiNetworkChart } from 'react-icons/bi';
 import { useLocation, useNavigate } from 'react-router';
 import ForbiddenPage from 'routes/forbidden/forbidden.route';
 import WorkflowCreate from 'routes/manage-workflow-create/manage-workflow-create.route';
@@ -229,3 +231,27 @@ const WrappedWorkflowsPage = () => (
 
 export const WorkflowsPage = React.memo(WrappedWorkflowsPage);
 export default WorkflowsPage;
+
+export const ManageWorkflowsRoute = createAppRoute({
+  component: <WorkflowsPage />,
+
+  path: '/manage/workflows',
+  search: s => ({
+    query: s.string(''),
+    offset: s.number(0).min(0).source('transient').ephemeral(),
+    rows: s.number(25).locked().source('transient').ephemeral(),
+    sort: s.string('last_seen desc').ephemeral(),
+    filters: s.filters([]),
+    track_total_hits: s.number(10000).nullable().ephemeral(),
+    refresh: s.boolean(false).source('transient').ephemeral()
+  }),
+
+  ancestor: '/manage',
+  shortname: () => ['app_route.manage_workflows.shortname', { ns: 'manageWorkflows' }],
+  fullname: () => ['app_route.manage_workflows.fullname', { ns: 'manageWorkflows' }],
+  shorticon: () => <BiNetworkChart fontSize="1.3rem" />,
+  fullicon: () => <BiNetworkChart fontSize="1.3rem" />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.roles.includes('workflow_view')
+});

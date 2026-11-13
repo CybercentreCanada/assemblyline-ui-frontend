@@ -1,6 +1,8 @@
+import ListOutlinedIcon from '@mui/icons-material/ListOutlined';
 import { Grid, Skeleton, Typography, useTheme } from '@mui/material';
 import { useAPIQuery } from 'core/api/hooks/useApiQuery';
 import useALContext from 'core/config/useALContext';
+import { createAppRoute } from 'core/router';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import PageCenter from 'core/template/components/pages/PageCenter';
 import { PRIORITIES, STATUSES, type Workflow } from 'models/base/workflow';
@@ -235,3 +237,27 @@ const WrappedWorkflowDetail = ({ id: propID = null, onClose = null }: Props) => 
 
 export const WorkflowDetail = React.memo(WrappedWorkflowDetail);
 export default WorkflowDetail;
+
+export const ManageWorkflowDetailRoute = createAppRoute({
+  component: <WorkflowDetail />,
+
+  path: '/manage/workflow/detail/:id',
+  params: s => ({
+    id: s.string()
+  }),
+
+  ancestor: '/manage/workflows',
+  shortname: location => [
+    'app_route.manage_workflow_detail.shortname',
+    { ns: 'manageWorkflowDetail', id: location.path.id }
+  ],
+  fullname: location => [
+    'app_route.manage_workflow_detail.fullname',
+    { ns: 'manageWorkflowDetail', id: location.path.id }
+  ],
+  shorticon: () => <ListOutlinedIcon />,
+  fullicon: () => <ListOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.roles.includes('workflow_view')
+});

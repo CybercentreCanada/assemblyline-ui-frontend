@@ -1,5 +1,6 @@
 import { ClearOutlined } from '@mui/icons-material';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
 import ToggleOffOutlinedIcon from '@mui/icons-material/ToggleOffOutlined';
 import ToggleOnIcon from '@mui/icons-material/ToggleOn';
@@ -10,6 +11,7 @@ import { useALQuery } from 'core/api/hooks/useAppQuery';
 import { invalidateALQuery } from 'core/api/utils/invalidateAppQuery';
 import { updateALQuery } from 'core/api/utils/updateAppQuery';
 import useALContext from 'core/config/useALContext';
+import { createAppRoute } from 'core/router';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import PageCenter from 'core/template/components/pages/PageCenter';
 import type { Badlist } from 'models/base/badlist';
@@ -629,3 +631,27 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
 };
 
 export default BadlistDetail;
+
+export const ManageBadlistDetailRoute = createAppRoute({
+  component: <BadlistDetail />,
+
+  path: '/manage/badlist/detail/:id',
+  params: s => ({
+    id: s.string()
+  }),
+
+  ancestor: '/manage/badlists',
+  shortname: location => [
+    'app_route.manage_badlist_detail.shortname',
+    { ns: 'manageBadlistDetail', id: location.path.id }
+  ],
+  fullname: location => [
+    'app_route.manage_badlist_detail.fullname',
+    { ns: 'manageBadlistDetail', id: location.path.id }
+  ],
+  shorticon: () => <BugReportOutlinedIcon />,
+  fullicon: () => <BugReportOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.roles.includes('badlist_view')
+});

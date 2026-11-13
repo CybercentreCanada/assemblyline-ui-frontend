@@ -1,6 +1,8 @@
+import BarChartOutlinedIcon from '@mui/icons-material/BarChartOutlined';
 import { Skeleton, Typography, useTheme } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
+import { createAppRoute } from 'core/router';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
 import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
 import useDrawer from 'layout/drawer/drawer.hooks';
@@ -79,3 +81,18 @@ export default function StatisticsSignatures() {
     </PageFullWidth>
   );
 }
+
+export const StatisticsSignaturesRoute = createAppRoute({
+  component: <StatisticsSignatures />,
+
+  path: '/manage/statistics/signatures',
+
+  ancestor: '/manage/signatures',
+  shortname: () => ['app_route.statistics_signatures.shortname', { ns: 'statisticsSignatures' }],
+  fullname: () => ['app_route.statistics_signatures.fullname', { ns: 'statisticsSignatures' }],
+  shorticon: () => <BarChartOutlinedIcon />,
+  fullicon: () => <BarChartOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.roles.includes('signature_view')
+});

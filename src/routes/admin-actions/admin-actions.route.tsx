@@ -1,6 +1,8 @@
 import Editor, { DiffEditor, loader } from '@monaco-editor/react';
+import PlaylistPlayOutlinedIcon from '@mui/icons-material/PlaylistPlayOutlined';
 import { Dialog, DialogActions, DialogContent, DialogTitle, Skeleton, useTheme } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
+import { createAppRoute } from 'core/router';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import PageFullSize from 'core/template/branding/AppPageCenter';
 import { useAppTheme, useAppUser } from 'core/template/components/app/hooks';
@@ -184,3 +186,18 @@ export default function AdminActions() {
     <Navigate to="/forbidden" replace />
   );
 }
+
+export const AdminActionsRoute = createAppRoute({
+  component: <AdminActions />,
+
+  path: '/admin/actions',
+
+  ancestor: '/admin',
+  shortname: () => ['app_route.admin_actions.shortname', { ns: 'adminActions' }],
+  fullname: () => ['app_route.admin_actions.fullname', { ns: 'adminActions' }],
+  shorticon: () => <PlaylistPlayOutlinedIcon />,
+  fullicon: () => <PlaylistPlayOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.is_admin
+});

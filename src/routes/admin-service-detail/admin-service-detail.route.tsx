@@ -1,10 +1,12 @@
 import CompareArrowsOutlinedIcon from '@mui/icons-material/CompareArrowsOutlined';
 import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
+import WebAssetIcon from '@mui/icons-material/WebAsset';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { Button, CircularProgress, Paper, Skeleton, Tab, useTheme } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
+import { createAppRoute } from 'core/router';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import PageCenter from 'core/template/components/pages/PageCenter';
 import type { JSONFeedItem } from 'layout/notifications/notifications.hooks';
@@ -353,3 +355,21 @@ const Service = ({ name = null, onDeleted = () => null, onUpdated = () => null }
 };
 
 export default Service;
+
+export const AdminServiceDetailRoute = createAppRoute({
+  component: <Service />,
+
+  path: '/admin/services/:svc',
+  params: s => ({
+    svc: s.string()
+  }),
+
+  ancestor: '/admin/services',
+  shortname: location => ['app_route.admin_service_detail.shortname', { ns: 'adminServices', svc: location.path.svc }],
+  fullname: location => ['app_route.admin_service_detail.fullname', { ns: 'adminServices', svc: location.path.svc }],
+  shorticon: () => <WebAssetIcon />,
+  fullicon: () => <WebAssetIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.is_admin
+});

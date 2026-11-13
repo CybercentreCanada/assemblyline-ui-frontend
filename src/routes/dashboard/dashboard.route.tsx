@@ -1,3 +1,4 @@
+import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined';
 import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import PauseCircleOutlineIcon from '@mui/icons-material/PauseCircleOutline';
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
@@ -6,6 +7,7 @@ import type { CardProps, SwitchProps, TooltipProps } from '@mui/material';
 import { Card, Grid, Skeleton, styled, Switch, Tooltip, Typography, useTheme } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
+import { createAppRoute } from 'core/router';
 import { useAppUser } from 'core/template/components/app/hooks';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
 import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
@@ -1762,3 +1764,18 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+
+export const DashboardRoute = createAppRoute({
+  component: <Dashboard />,
+
+  path: '/dashboard',
+
+  ancestor: null,
+  shortname: () => ['app_route.dashboard.shortname', { ns: 'dashboard' }],
+  fullname: () => ['app_route.dashboard.fullname', { ns: 'dashboard' }],
+  shorticon: () => <DashboardOutlinedIcon />,
+  fullicon: () => <DashboardOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
+});

@@ -1,5 +1,7 @@
+import PublishOutlinedIcon from '@mui/icons-material/PublishOutlined';
 import { Alert, Collapse, styled, useMediaQuery, useTheme } from '@mui/material';
 import useALContext from 'core/config/useALContext';
+import { createAppRoute } from 'core/router';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import { useAppBanner } from 'core/template/components/app/hooks';
 import PageCenter from 'core/template/components/pages/PageCenter';
@@ -28,6 +30,7 @@ import {
 } from 'routes/submit/components/SubmissionInputs';
 import { SubmissionMetadata } from 'routes/submit/components/SubmissionMetadata';
 import { SubmissionOptions } from 'routes/submit/components/SubmissionOptions';
+import SubmitPage from 'routes/submit/submit';
 import type { SubmitState, SubmitStore } from 'routes/submit/submit.form';
 import { FLOW, useForm } from 'routes/submit/submit.form';
 import {
@@ -402,3 +405,55 @@ const WrappedSubmitRoute = () => {
 };
 
 export const SubmitRoute = React.memo(WrappedSubmitRoute);
+
+export const SubmitAppRoute = createAppRoute({
+  component: <SubmitPage />,
+
+  path: '/submit',
+  search: s => ({
+    classification: s.string(null).source('transient'),
+    description: s.string('').source('transient'),
+    filetypeOverride: s.string(null).source('transient'),
+    hash: s.string(null),
+    metadata: s.object(null).source('transient'),
+    priority: s.number(null).source('transient'),
+    profile: s.string(null).source('transient'),
+    raw: s.string('').source('transient'),
+    ttl: s.number(null).source('transient')
+  }),
+
+  ancestor: null,
+  shortname: () => ['app_route.submit.shortname', { ns: 'submit' }],
+  fullname: () => ['app_route.submit.fullname', { ns: 'submit' }],
+  shorticon: () => <PublishOutlinedIcon />,
+  fullicon: () => <PublishOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
+});
+
+export const SubmitRootRoute = createAppRoute({
+  component: <SubmitPage />,
+
+  path: '/',
+  search: s => ({
+    classification: s.string(null).source('transient').nullable(),
+    description: s.string('').source('transient').nullable(),
+    filetypeOverride: s.string(null).source('transient').nullable(),
+    hash: s.string(null),
+    metadata: s.object(null).source('transient').nullable(),
+    priority: s.enum(null, [500, 1000, 1500]).source('transient').nullable(),
+    profile: s.string(null).source('transient').nullable(),
+    raw: s.string('').source('transient').nullable(),
+    ttl: s.number(null).source('transient').nullable()
+  }),
+
+  ancestor: null,
+  shortname: () => ['app_route.submit.shortname', { ns: 'submit' }],
+  fullname: () => ['app_route.submit.fullname', { ns: 'submit' }],
+  shorticon: () => <PublishOutlinedIcon />,
+  fullicon: () => <PublishOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
+});

@@ -1,6 +1,8 @@
+import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined';
 import { Card, CardHeader, Grid, Typography, useTheme } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
 import useMyAPI from 'core/api/hooks/useMyAPI';
+import { createAppRoute } from 'core/router';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
 import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
 import { useState } from 'react';
@@ -124,3 +126,18 @@ export default function Services() {
     </PageFullWidth>
   );
 }
+
+export const HelpServicesRoute = createAppRoute({
+  component: <Services />,
+
+  path: '/help/services',
+
+  ancestor: '/help',
+  shortname: () => ['app_route.help_services.shortname', { ns: 'helpServices' }],
+  fullname: () => ['app_route.help_services.fullname', { ns: 'helpServices' }],
+  shorticon: () => <AccountTreeOutlinedIcon />,
+  fullicon: () => <AccountTreeOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
+});

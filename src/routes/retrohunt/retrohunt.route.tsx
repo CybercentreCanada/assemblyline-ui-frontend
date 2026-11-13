@@ -1,9 +1,11 @@
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
+import DataObjectOutlinedIcon from '@mui/icons-material/DataObjectOutlined';
 import PersonIcon from '@mui/icons-material/Person';
 import TimerOutlinedIcon from '@mui/icons-material/TimerOutlined';
 import { Pagination, Typography, useMediaQuery, useTheme } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
+import { createAppRoute } from 'core/router';
 import PageContainer from 'core/template/branding/AppPageContainer';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
 import useDrawer from 'layout/drawer/drawer.hooks';
@@ -408,3 +410,29 @@ export default function RetrohuntPage() {
       </PageFullWidth>
     );
 }
+
+export const RetrohuntRoute = createAppRoute({
+  component: <RetrohuntPage />,
+
+  path: '/retrohunt',
+  search: s => ({
+    query: s.string(''),
+    offset: s.number(0).min(0).source('transient').ephemeral(),
+    rows: s.number(25).locked().source('transient').ephemeral(),
+    sort: s.string('created_time desc'),
+    fl: s.string(
+      'indices,classification,search_classification,creator,description,expiry_ts,start_group,end_group,created_time,started_time,completed_time,key,raw_query,yara_signature,finished,truncated'
+    ),
+    filters: s.filters([]),
+    track_total_hits: s.number(null).source('transient').nullable().ephemeral()
+  }),
+
+  ancestor: null,
+  shortname: () => ['app_route.retrohunt.shortname', { ns: 'retrohunt' }],
+  fullname: () => ['app_route.retrohunt.fullname', { ns: 'retrohunt' }],
+  shorticon: () => <DataObjectOutlinedIcon />,
+  fullicon: () => <DataObjectOutlinedIcon />,
+
+  disabled: (_location, config) => !config.configuration?.retrohunt?.enabled,
+  forbidden: (_location, config) => !config.user.roles.includes('retrohunt_view')
+});

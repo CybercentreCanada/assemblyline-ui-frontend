@@ -1,8 +1,10 @@
 import BlockIcon from '@mui/icons-material/Block';
 import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount';
+import SupervisorAccountOutlinedIcon from '@mui/icons-material/SupervisorAccountOutlined';
 import { useTheme } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
+import { createAppRoute } from 'core/router';
 import PageContainer from 'core/template/branding/AppPageContainer';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
 import { createSearchParams, SearchParamsProvider, useSearchParams } from 'features/search-params';
@@ -166,3 +168,27 @@ const WrappedUsersPage = () => (
 
 export const Users = React.memo(WrappedUsersPage);
 export default Users;
+
+export const AdminUsersRoute = createAppRoute({
+  component: <Users />,
+
+  path: '/admin/users',
+  search: s => ({
+    query: s.string(''),
+    offset: s.number(0).min(0).source('transient').ephemeral(),
+    rows: s.number(25).locked().source('transient').ephemeral(),
+    sort: s.string(null).nullable().ephemeral(),
+    filters: s.filters([]),
+    track_total_hits: s.number(10000).nullable().ephemeral(),
+    refresh: s.boolean(false).source('transient').ephemeral()
+  }),
+
+  ancestor: '/admin',
+  shortname: () => ['app_route.admin_users.shortname', { ns: 'adminUsers' }],
+  fullname: () => ['app_route.admin_users.fullname', { ns: 'adminUsers' }],
+  shorticon: () => <SupervisorAccountOutlinedIcon />,
+  fullicon: () => <SupervisorAccountOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.is_admin
+});

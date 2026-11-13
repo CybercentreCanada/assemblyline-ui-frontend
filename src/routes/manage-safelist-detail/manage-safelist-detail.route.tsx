@@ -1,4 +1,5 @@
 import { ClearOutlined } from '@mui/icons-material';
+import ListOutlinedIcon from '@mui/icons-material/ListOutlined';
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
 import ToggleOffOutlinedIcon from '@mui/icons-material/ToggleOffOutlined';
 import ToggleOnIcon from '@mui/icons-material/ToggleOn';
@@ -6,6 +7,7 @@ import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
 import { Divider, Grid, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
+import { createAppRoute } from 'core/router';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import PageCenter from 'core/template/components/pages/PageCenter';
 import type { Safelist } from 'models/base/safelist';
@@ -540,3 +542,27 @@ const SafelistDetail = ({ safelist_id = null, close = () => null }: SafelistDeta
 };
 
 export default SafelistDetail;
+
+export const ManageSafelistDetailRoute = createAppRoute({
+  component: <SafelistDetail />,
+
+  path: '/manage/safelist/detail/:id',
+  params: s => ({
+    id: s.string()
+  }),
+
+  ancestor: '/manage/safelists',
+  shortname: location => [
+    'app_route.manage_safelist_detail.shortname',
+    { ns: 'manageSafelistDetail', id: location.path.id }
+  ],
+  fullname: location => [
+    'app_route.manage_safelist_detail.fullname',
+    { ns: 'manageSafelistDetail', id: location.path.id }
+  ],
+  shorticon: () => <ListOutlinedIcon />,
+  fullicon: () => <ListOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.roles.includes('safelist_view')
+});

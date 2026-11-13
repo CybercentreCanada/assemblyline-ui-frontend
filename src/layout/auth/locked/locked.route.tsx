@@ -2,6 +2,7 @@ import HourglassEmptyOutlinedIcon from '@mui/icons-material/HourglassEmptyOutlin
 import { useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import useALContext from 'core/config/useALContext';
+import { createAppRoute } from 'core/router';
 import PageCenter from 'core/template/components/pages/PageCenter';
 import { useTranslation } from 'react-i18next';
 import ForbiddenPage from 'routes/forbidden/forbidden.route';
@@ -39,3 +40,18 @@ const LockedPage = () => {
 };
 
 export default LockedPage;
+
+export const LockedRoute = createAppRoute({
+  component: <LockedPage />,
+
+  path: '/locked',
+
+  ancestor: null,
+  shortname: () => ['app_route.locked.shortname', { ns: 'locked' }],
+  fullname: () => ['app_route.locked.fullname', { ns: 'locked' }],
+  shorticon: () => <HourglassEmptyOutlinedIcon />,
+  fullicon: () => <HourglassEmptyOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
+});

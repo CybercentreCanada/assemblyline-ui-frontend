@@ -1,7 +1,7 @@
 import { findNode, findPageKeyFromPanelKey, useAppRouterStore } from 'core/router';
 import { OutPortal } from 'features/portal';
 import { memo } from 'react';
-import { MissingNodePage } from 'routes/missing-node/missing-node.route';
+import { MissingNodePage } from 'routes/missing-node/missing-node.page';
 
 export type AppRouterPanelLayoutProps = {
   /** Panel index within the router panels array. */

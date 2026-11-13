@@ -1,3 +1,4 @@
+import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
 import {
   Button,
   CircularProgress,
@@ -14,6 +15,7 @@ import {
 import Autocomplete from '@mui/material/Autocomplete';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
+import { createAppRoute } from 'core/router';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
 import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
@@ -441,3 +443,18 @@ const SafelistNew = ({}: Props) => {
 };
 
 export default SafelistNew;
+
+export const ManageSafelistAddRoute = createAppRoute({
+  component: <SafelistNew />,
+
+  path: '/manage/safelist/add',
+
+  ancestor: '/manage/safelists',
+  shortname: () => ['app_route.manage_safelist_add.shortname', { ns: 'manageSafelistAdd' }],
+  fullname: () => ['app_route.manage_safelist_add.fullname', { ns: 'manageSafelistAdd' }],
+  shorticon: () => <BugReportOutlinedIcon />,
+  fullicon: () => <BugReportOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.roles.includes('safelist_view')
+});

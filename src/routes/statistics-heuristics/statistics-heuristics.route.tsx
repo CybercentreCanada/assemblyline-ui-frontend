@@ -1,6 +1,8 @@
+import BarChartOutlinedIcon from '@mui/icons-material/BarChartOutlined';
 import { Skeleton, Typography, useTheme } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
+import { createAppRoute } from 'core/router';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
 import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
 import useDrawer from 'layout/drawer/drawer.hooks';
@@ -73,3 +75,18 @@ export default function StatisticsSignatures() {
     </PageFullWidth>
   );
 }
+
+export const StatisticsHeuristicsRoute = createAppRoute({
+  component: <StatisticsSignatures />,
+
+  path: '/manage/statistics/heuristics',
+
+  ancestor: '/manage/heuristics',
+  shortname: () => ['app_route.statistics_heuristics.shortname', { ns: 'statisticsHeuristics' }],
+  fullname: () => ['app_route.statistics_heuristics.fullname', { ns: 'statisticsHeuristics' }],
+  shorticon: () => <BarChartOutlinedIcon />,
+  fullicon: () => <BarChartOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.roles.includes('heuristic_view')
+});

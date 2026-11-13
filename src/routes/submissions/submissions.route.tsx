@@ -1,10 +1,12 @@
 import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
 import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
 import PersonIcon from '@mui/icons-material/Person';
+import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
 import { useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
+import { createAppRoute } from 'core/router';
 import PageContainer from 'core/template/branding/AppPageContainer';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
 import { createSearchParams, SearchParamsProvider, useSearchParams } from 'features/search-params';
@@ -171,3 +173,26 @@ const WrappedSubmissionPage = () => (
 
 export const SubmissionPage = React.memo(WrappedSubmissionPage);
 export default SubmissionPage;
+
+export const SubmissionsRoute = createAppRoute({
+  component: <SubmissionPage />,
+
+  path: '/submissions',
+  search: s => ({
+    query: s.string(''),
+    offset: s.number(0).min(0).source('transient').ephemeral(),
+    rows: s.number(25).locked().source('transient').ephemeral(),
+    sort: s.string('times.submitted desc').ephemeral(),
+    filters: s.filters([]),
+    track_total_hits: s.number(null).source('transient').nullable().ephemeral()
+  }),
+
+  ancestor: null,
+  shortname: () => ['app_route.submissions.shortname', { ns: 'submissions' }],
+  fullname: () => ['app_route.submissions.fullname', { ns: 'submissions' }],
+  shorticon: () => <ViewCarouselOutlinedIcon />,
+  fullicon: () => <ViewCarouselOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.roles.includes('submission_view')
+});

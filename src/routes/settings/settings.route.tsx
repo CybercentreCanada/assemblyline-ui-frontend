@@ -1,4 +1,6 @@
+import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import useALContext from 'core/config/useALContext';
+import { createAppRoute } from 'core/router';
 import { useTableOfContent } from 'features/table-of-content/table-of-content.providers';
 import React, { useCallback, useEffect } from 'react';
 import { useParams } from 'react-router';
@@ -89,3 +91,36 @@ const WrappedSettingsRoute = () => {
 };
 
 export const SettingsRoute = React.memo(WrappedSettingsRoute);
+
+export const SettingsAppRoute = createAppRoute({
+  component: <SettingsRoute />,
+
+  path: '/settings/:tab',
+  params: s => ({
+    tab: s.string()
+  }),
+
+  ancestor: null,
+  shortname: location => ['app_route.settings_tab.shortname', { ns: 'settings', tab: location.path.tab }],
+  fullname: location => ['app_route.settings_tab.fullname', { ns: 'settings', tab: location.path.tab }],
+  shorticon: () => <SettingsOutlinedIcon />,
+  fullicon: () => <SettingsOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.is_admin && !config.user.roles.includes('self_manage')
+});
+
+export const SettingsRootRoute = createAppRoute({
+  component: <SettingsRoute />,
+
+  path: '/settings',
+
+  ancestor: null,
+  shortname: () => ['app_route.settings_root.shortname', { ns: 'settings' }],
+  fullname: () => ['app_route.settings_root.fullname', { ns: 'settings' }],
+  shorticon: () => <SettingsOutlinedIcon />,
+  fullicon: () => <SettingsOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.is_admin && !config.user.roles.includes('self_manage')
+});

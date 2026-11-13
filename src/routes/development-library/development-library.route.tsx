@@ -1,4 +1,6 @@
+import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
 import useALContext from 'core/config/useALContext';
+import { createAppRoute } from 'core/router';
 import { TableOfContentLayout, useTableOfContent } from 'features/table-of-content/table-of-content.providers';
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router';
@@ -147,3 +149,22 @@ const WrappedLibraryPage: React.FC = () => (
 
 export const LibraryPage = React.memo(WrappedLibraryPage);
 export default LibraryPage;
+
+export const DevelopmentLibraryRoute = createAppRoute({
+  component: <LibraryPage />,
+
+  path: '/development/library',
+  search: s => ({
+    tab: s.enum(null, ['datetime', 'inputs', 'layout', 'list', 'list_inputs'])
+  }),
+
+  ancestor: '/development',
+  shortname: () => ['app_route.development_library.shortname', { ns: 'developmentAPI' }],
+  fullname: () => ['app_route.development_library.fullname', { ns: 'developmentAPI' }],
+  shorticon: () => <LibraryBooksIcon />,
+  fullicon: () => <LibraryBooksIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) =>
+    !config.user.is_admin || !['development', 'staging'].includes(config.configuration.system.type)
+});

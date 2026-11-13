@@ -5,6 +5,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import CloudDownloadOutlinedIcon from '@mui/icons-material/CloudDownloadOutlined';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ListAltOutlinedIcon from '@mui/icons-material/ListAltOutlined';
 import OndemandVideoOutlinedIcon from '@mui/icons-material/OndemandVideoOutlined';
 import PauseCircleOutlineOutlinedIcon from '@mui/icons-material/PauseCircleOutlineOutlined';
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
@@ -37,6 +38,7 @@ import {
 } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
+import { createAppRoute } from 'core/router';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import PageCenter from 'core/template/components/pages/PageCenter';
 import useAssistant from 'layout/assistant/assistant.hooks';
@@ -1549,3 +1551,21 @@ function WrappedSubmissionDetail() {
 
 const SubmissionDetail = React.memo(WrappedSubmissionDetail);
 export default SubmissionDetail;
+
+export const SubmissionDetailRoute = createAppRoute({
+  component: <SubmissionDetail />,
+
+  path: '/submission/detail/:id',
+  params: s => ({
+    id: s.string()
+  }),
+
+  ancestor: '/submissions',
+  shortname: location => ['app_route.submission_detail.shortname', { ns: 'submissionDetail', id: location.path.id }],
+  fullname: location => ['app_route.submission_detail.fullname', { ns: 'submissionDetail', id: location.path.id }],
+  shorticon: () => <ListAltOutlinedIcon />,
+  fullicon: () => <ListAltOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.roles.includes('submission_view')
+});

@@ -1,7 +1,9 @@
+import SettingsApplicationsOutlinedIcon from '@mui/icons-material/SettingsApplicationsOutlined';
 import { Grid, Typography, useTheme } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
+import { createAppRoute } from 'core/router';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -242,3 +244,18 @@ export default function Configuration() {
     </PageFullWidth>
   );
 }
+
+export const HelpConfigurationRoute = createAppRoute({
+  component: <Configuration />,
+
+  path: '/help/configuration',
+
+  ancestor: '/help',
+  shortname: () => ['app_route.help_configuration.shortname', { ns: 'helpConfiguration' }],
+  fullname: () => ['app_route.help_configuration.fullname', { ns: 'helpConfiguration' }],
+  shorticon: () => <SettingsApplicationsOutlinedIcon />,
+  fullicon: () => <SettingsApplicationsOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
+});

@@ -5,6 +5,7 @@ import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import OndemandVideoOutlinedIcon from '@mui/icons-material/OndemandVideoOutlined';
+import PageviewOutlinedIcon from '@mui/icons-material/PageviewOutlined';
 import TuneOutlinedIcon from '@mui/icons-material/TuneOutlined';
 import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
 import WrapTextOutlinedIcon from '@mui/icons-material/WrapTextOutlined';
@@ -27,6 +28,7 @@ import {
 } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
+import { createAppRoute } from 'core/router';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import PageFullSize from 'core/template/branding/AppPageCenter';
 import { useAppUser } from 'core/template/components/app/hooks';
@@ -58,9 +60,9 @@ const TabContent = styled('div')(({ theme }) => ({
   paddingTop: theme.spacing(2)
 }));
 
-export type Tab = 'ascii' | 'code' | 'strings' | 'hex' | 'image';
+export const TAB_OPTIONS = ['ascii', 'code', 'strings', 'hex', 'image'] as const;
 
-export const TAB_OPTIONS: Tab[] = ['ascii', 'code', 'strings', 'hex', 'image'];
+export type Tab = (typeof TAB_OPTIONS)[number];
 
 export const DEFAULT_TAB: Tab = 'ascii';
 
@@ -467,3 +469,61 @@ export const FileViewer = React.memo(props => (
 ));
 
 export default FileViewer;
+
+export const FileViewerRoute = createAppRoute({
+  component: <FileViewer />,
+
+  path: '/file/viewer/:id/:tab',
+  params: s => ({
+    id: s.string(),
+    tab: s.enum(TAB_OPTIONS, 'ascii')
+  }),
+  search: s => ({
+    cursor: s.number(null),
+    endIndex: s.number(null),
+    mode: s.enum('text', ['cursor', 'hex', 'text']),
+    query: s.string(''),
+    scroll: s.number(null),
+    selectedResult: s.number(null),
+    startIndex: s.number(null)
+  }),
+
+  ancestor: null,
+  shortname: location => ['app_route.file_viewer_id_tab.shortname', { ns: 'fileViewer', id: location.path.id }],
+  fullname: location => [
+    'app_route.file_viewer_id_tab.fullname',
+    { ns: 'fileViewer', id: location.path.id, tab: location.path.tab }
+  ],
+  shorticon: () => <PageviewOutlinedIcon />,
+  fullicon: () => <PageviewOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
+});
+
+export const FileViewerRootRoute = createAppRoute({
+  component: <FileViewer />,
+
+  path: '/file/viewer/:id',
+  params: s => ({
+    id: s.string()
+  }),
+  search: s => ({
+    cursor: s.number(null),
+    endIndex: s.number(null),
+    mode: s.enum('text', ['cursor', 'hex', 'text']),
+    query: s.string(''),
+    scroll: s.number(null),
+    selectedResult: s.number(null),
+    startIndex: s.number(null)
+  }),
+
+  ancestor: null,
+  shortname: location => ['app_route.file_viewer_id.shortname', { ns: 'fileViewer', id: location.path.id }],
+  fullname: location => ['app_route.file_viewer_id.fullname', { ns: 'fileViewer', id: location.path.id }],
+  shorticon: () => <PageviewOutlinedIcon />,
+  fullicon: () => <PageviewOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.roles.includes('file_detail')
+});
