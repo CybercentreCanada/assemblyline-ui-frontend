@@ -1,0 +1,8 @@
+{
+  "flag-updated": "Fonctionnalité expérimental mise à jour avec succès",
+  "no-flags": "Aucune fonctionnalité expérimentale disponible",
+  "state.alpha": "Alpha",
+  "state.beta": "Bêta",
+  "title": "Fonctionnalités expérimentales",
+  "title.sub": "Configurer les fonctionnalités expérimentales personnelles. N'affecte que votre compte."
+}
