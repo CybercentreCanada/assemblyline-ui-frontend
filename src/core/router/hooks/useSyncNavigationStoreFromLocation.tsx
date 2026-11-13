@@ -54,7 +54,7 @@ export function useSyncNavigationStoreFromLocation() {
         }
 
         for (const [nextPanelKey, nextPanel] of (location.state?.panels || []).entries()) {
-          [store] = upsertPanel(store, nextPanelKey, nextPanel, preferenceState);
+          [store] = upsertPanel(store, preferenceState, nextPanelKey, nextPanel);
         }
 
         for (
@@ -112,7 +112,7 @@ export function useSyncNavigationStoreFromLocation() {
             store = updatePage(store, store.panels[panelKey].pageKey, nextPage);
           } else {
             const [store1, nextPageKey] = addPage(store, nextPage);
-            [store] = upsertPanel(store1, panelKey, { pageKey: nextPageKey }, preferenceState);
+            [store] = upsertPanel(store1, preferenceState, panelKey, { pageKey: nextPageKey });
           }
         }
 
@@ -169,7 +169,7 @@ export function useSyncNavigationStoreFromLocation() {
             store = updatePage(store, store.panels[panelKey].pageKey, legacyRoute);
           } else {
             const [store1, nextPageKey] = addPage(store, legacyRoute);
-            [store] = upsertPanel(store1, panelKey, { pageKey: nextPageKey }, preferenceState);
+            [store] = upsertPanel(store1, preferenceState, panelKey, { pageKey: nextPageKey });
           }
         }
 
@@ -201,7 +201,6 @@ export function useSyncNavigationStoreFromLocation() {
       else if (location?.pathname === '/v1') return getNavigationFromLocationHash();
       else return getNavigationFromLegacyLocation();
     } catch (e) {
-      // eslint-disable-next-line no-console
       console.error('error parsing the location', e);
     }
   }, [
