@@ -2,7 +2,7 @@ import type { AppRouterStore } from 'core/router';
 import { createAppStore } from 'features/store';
 import type { PropsWithChildren } from 'react';
 import { memo } from 'react';
-import { BrowserRouter } from 'react-router';
+import { BrowserRouter } from 'react-router-dom';
 import { generateRandomUUID } from 'shared/utils/app.utils';
 import type { StoreApi } from 'zustand';
 
@@ -14,8 +14,7 @@ export const {
   StoreProvider: AppRouterStoreProvider,
   useStore: useAppRouterStore,
   useSetStore: useAppSetRouterStore,
-  useStoreApi: useAppRouterStoreApi,
-  useSubscriberCount: useAppRouterStoreSubscriberCount
+  useStoreApi: useAppRouterStoreApi
 } = createAppStore<AppRouterStore>(getDefaultRouterStore());
 
 AppRouterStoreProvider.displayName = 'AppRouterStoreProvider';

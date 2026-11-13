@@ -18,7 +18,7 @@ import {
   updateNode,
   upsertNode
 } from 'core/router';
-import { makePage, makePreferences } from 'core/router-old/tests/test-defaults';
+import { makePage, makePreferences } from 'core/router/tests/test-defaults';
 import { createReversePortalNode } from 'features/portal';
 import { describe, expect, it } from 'vitest';
 
