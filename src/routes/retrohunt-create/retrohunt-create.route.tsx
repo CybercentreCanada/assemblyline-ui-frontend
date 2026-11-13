@@ -1,3 +1,4 @@
+import DataObjectOutlinedIcon from '@mui/icons-material/DataObjectOutlined';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import {
   Button,
@@ -13,6 +14,7 @@ import {
 } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
+import { createAppRoute } from 'core/router';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import PageFullSize from 'core/template/branding/AppPageCenter';
 import { useAppUser } from 'core/template/components/app/hooks';
@@ -305,3 +307,18 @@ export const RetrohuntCreatePage = memo(
     else return <ForbiddenPage />;
   }
 );
+
+export const RetrohuntCreateRoute = createAppRoute({
+  component: <RetrohuntCreatePage />,
+
+  path: '/retrohunt/create',
+
+  ancestor: '/retrohunt',
+  shortname: () => ['app_route.retrohunt_create.shortname', { ns: 'retrohunt' }],
+  fullname: () => ['app_route.retrohunt_create.fullname', { ns: 'retrohunt' }],
+  shorticon: () => <DataObjectOutlinedIcon />,
+  fullicon: () => <DataObjectOutlinedIcon />,
+
+  disabled: (_location, config) => !config.configuration?.retrohunt?.enabled,
+  forbidden: (_location, config) => !config.user.roles.includes('retrohunt_run')
+});

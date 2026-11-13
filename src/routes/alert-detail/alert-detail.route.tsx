@@ -1,4 +1,5 @@
 import { Fetcher, useClueFetcherSelector } from '@cccsaurora/clue-ui';
+import BallotOutlinedIcon from '@mui/icons-material/BallotOutlined';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import {
@@ -16,6 +17,7 @@ import {
 import Alert from '@mui/material/Alert';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
+import { createAppRoute } from 'core/router';
 import { useAppUser } from 'core/template/components/app/hooks';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
 import ListCarousel from 'deprecated/components/lists/carousel/ListCarousel';
@@ -1037,3 +1039,33 @@ export const AlertDetailPage = memo((props: AlertDetailPageProps) => (
     <AlertDetailContent {...props} />
   </SearchParamsProvider>
 ));
+
+export const AlertDetailRoute = createAppRoute({
+  component: <AlertDetailPage />,
+
+  path: '/alert/:id',
+  params: s => ({
+    id: s.string()
+  }),
+  search: s => ({
+    alert: s
+      .object(null as AlertItem)
+      .nullable()
+      .source('state'),
+
+    q: s.string('').source('state'),
+    fq: s.filters([]).source('state'),
+    group_by: s.string('file.sha256').source('state'),
+    tc_start: s.string('').source('state').ephemeral(),
+    tc: s.string('4d').source('state')
+  }),
+
+  ancestor: '/alerts',
+  shortname: location => ['app_route.alert_detail.shortname', { ns: 'alerts', id: location.path.id }],
+  fullname: location => ['app_route.alert_detail.fullname', { ns: 'alerts', id: location.path.id }],
+  shorticon: () => <BallotOutlinedIcon />,
+  fullicon: () => <BallotOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
+});
