@@ -18,7 +18,14 @@ describe('loadFeatureFlags', () => {
     localStorage.setItem('flags', JSON.stringify(saved));
     localStorage.setItem('other', JSON.stringify({ flags: [] }));
 
-    expect(loadFeatureFlags('flags', { flags: [] })).toEqual(saved);
+    const defaults: FeatureFlagStore = {
+      flags: [
+        { flag: 'enabled', enabled: false },
+        { flag: 'disabled', enabled: true }
+      ]
+    };
+
+    expect(loadFeatureFlags('flags', defaults)).toEqual(saved);
   });
 
   it('returns the provided defaults when the key is missing', () => {
@@ -27,10 +34,41 @@ describe('loadFeatureFlags', () => {
     expect(loadFeatureFlags('missing', defaults)).toBe(defaults);
   });
 
-  it('preserves an intentionally empty stored flag list instead of using defaults', () => {
+  it('adds defaults when the stored flag list is empty', () => {
     localStorage.setItem('flags', JSON.stringify({ flags: [] }));
+    const defaults: FeatureFlagStore = { flags: [{ flag: 'demo', enabled: true }] };
 
-    expect(loadFeatureFlags('flags', { flags: [{ flag: 'demo', enabled: true }] })).toEqual({ flags: [] });
+    expect(loadFeatureFlags('flags', defaults)).toEqual(defaults);
+  });
+
+  it('adds new flags and removes obsolete flags while preserving saved values', () => {
+    const saved: FeatureFlagStore = {
+      flags: [
+        { flag: 'existing', enabled: true },
+        { flag: 'removed', enabled: true }
+      ]
+    };
+    const defaults: FeatureFlagStore = {
+      flags: [
+        { flag: 'new', enabled: false },
+        { flag: 'existing', enabled: false }
+      ]
+    };
+    localStorage.setItem('flags', JSON.stringify(saved));
+
+    expect(loadFeatureFlags('flags', defaults)).toEqual({
+      flags: [
+        { flag: 'new', enabled: false },
+        { flag: 'existing', enabled: true }
+      ]
+    });
+    expect(defaults.flags[1].enabled).toBe(false);
+  });
+
+  it('removes all stored flags when no flags are defined', () => {
+    localStorage.setItem('flags', JSON.stringify({ flags: [{ flag: 'removed', enabled: true }] }));
+
+    expect(loadFeatureFlags('flags', { flags: [] })).toEqual({ flags: [] });
   });
 
   it.each([
@@ -67,7 +105,7 @@ describe('saveFeatureFlags', () => {
 
     saveFeatureFlags('flags', state);
 
-    expect(loadFeatureFlags('flags', { flags: [] })).toEqual(state);
+    expect(loadFeatureFlags('flags', state)).toEqual(state);
     expect(localStorage.getItem('other')).toBe('unchanged');
   });
 
