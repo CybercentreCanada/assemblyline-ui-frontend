@@ -2,7 +2,7 @@ import { useAppConfigStore } from 'core/config';
 import { getRouteParamFromKey, useAppLocationParamStore, useAppPageKey } from 'core/router';
 import type { ComponentType, MemoExoticComponent, PropsWithChildren, ReactNode } from 'react';
 import { memo } from 'react';
-import { ForbiddenPage } from 'routes/forbidden/forbidden';
+import { ForbiddenPage } from 'routes/forbidden/forbidden.route';
 import { toElement } from 'shared/utils/app.utils';
 
 export type ForbiddenBoundaryProps = PropsWithChildren<{

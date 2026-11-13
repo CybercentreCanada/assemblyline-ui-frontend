@@ -61,7 +61,6 @@ export {
   getDefaultLocationParamStore,
   useAppLocationParamStore,
   useAppLocationParamStoreApi,
-  useAppLocationParamStoreSubscriberCount,
   useAppSetLocationParamStore
 } from './providers/AppLocationParamProvider';
 export type { AppLocationParamProviderProps } from './providers/AppLocationParamProvider';
@@ -72,7 +71,6 @@ export {
   getDefaultNavigationStore,
   useAppNavigationStore,
   useAppNavigationStoreApi,
-  useAppNavigationStoreSubscriberCount,
   useAppSetNavigationStore
 } from './providers/AppNavigationProvider';
 export { AppPageKeyProvider, AppPageKeyStoreProvider, useAppPageKeyStore } from './providers/AppPageKeyProvider';
@@ -84,7 +82,6 @@ export {
   getDefaultRouterStore,
   useAppRouterStore,
   useAppRouterStoreApi,
-  useAppRouterStoreSubscriberCount,
   useAppSetRouterStore
 } from './providers/AppRouterProvider';
 export {

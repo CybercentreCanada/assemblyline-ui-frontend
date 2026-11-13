@@ -8,7 +8,7 @@ import {
   removeBlockedPage,
   setBlockedPage
 } from 'core/router';
-import { makePage } from 'core/router-old/tests/test-defaults';
+import { makePage } from 'core/router/tests/test-defaults';
 import { describe, expect, it } from 'vitest';
 
 describe('addBlockedPage', () => {

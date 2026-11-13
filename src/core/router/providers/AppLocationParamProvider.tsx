@@ -13,8 +13,7 @@ export const {
   StoreProvider: AppLocationParamStoreProvider,
   useStore: useAppLocationParamStore,
   useSetStore: useAppSetLocationParamStore,
-  useStoreApi: useAppLocationParamStoreApi,
-  useSubscriberCount: useAppLocationParamStoreSubscriberCount
+  useStoreApi: useAppLocationParamStoreApi
 } = createAppStore<AppLocationParamStore>(getDefaultLocationParamStore());
 
 AppLocationParamStoreProvider.displayName = 'AppLocationParamStoreProvider';
