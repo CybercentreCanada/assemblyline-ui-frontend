@@ -44,35 +44,40 @@ export const ManageFeatureFlags = memo(({ definitions }: ManageFeatureFlagProps)
         secondary={t('title.sub')}
         slotProps={{ primary: { className: 'Anchor', variant: 'h6' } }}
       />
+      {flagDefs.length === 0 ? (
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <Typography variant="body2">{t('no-flags')}</Typography>
+        </div>
+      ) : (
+        <List>
+          {flagDefs.map(({ flag, descriptionKey, state, enabled }, index) => (
+            <BooleanListInput
+              divider={index < flagDefs.length - 1}
+              key={flag}
+              primary={
+                <span style={{ display: 'flex', alignItems: 'baseline', gap: theme.spacing(1) }}>
+                  <Typography component="span" variant="body1">
+                    {flag}
+                  </Typography>
 
-      <List>
-        {flagDefs.map(({ flag, descriptionKey, state, enabled }, index) => (
-          <BooleanListInput
-            divider={index < flagDefs.length - 1}
-            key={flag}
-            primary={
-              <span style={{ display: 'flex', alignItems: 'baseline', gap: theme.spacing(1) }}>
-                <Typography component="span" variant="body1">
-                  {flag}
-                </Typography>
-
-                <Typography
-                  component="span"
-                  variant="caption"
-                  sx={{
-                    color: state === 'alpha' ? theme.palette.warning.main : theme.palette.info.main
-                  }}
-                >
-                  ({t(`state.${state}`)})
-                </Typography>
-              </span>
-            }
-            secondary={t(descriptionKey, { ns: 'translation' })}
-            value={enabled}
-            onChange={(_, checked) => updateFlag(flag, checked)}
-          />
-        ))}
-      </List>
+                  <Typography
+                    component="span"
+                    variant="caption"
+                    sx={{
+                      color: state === 'alpha' ? theme.palette.warning.main : theme.palette.info.main
+                    }}
+                  >
+                    ({t(`state.${state}`)})
+                  </Typography>
+                </span>
+              }
+              secondary={t(descriptionKey, { ns: 'translation' })}
+              value={enabled}
+              onChange={(_, checked) => updateFlag(flag, checked)}
+            />
+          ))}
+        </List>
+      )}
     </div>
   );
 });
