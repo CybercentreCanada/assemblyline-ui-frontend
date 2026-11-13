@@ -27,6 +27,8 @@ import adminCommunityServicesEN from 'routes/admin-community-services/admin-comm
 import adminCommunityServicesFR from 'routes/admin-community-services/admin-community-services.i18n.fr.json';
 import adminErrorViewerEN from 'routes/admin-error-viewer/admin-error-viewer.i18n.en.json';
 import adminErrorViewerFR from 'routes/admin-error-viewer/admin-error-viewer.i18n.fr.json';
+import adminFeatureFlagsEN from 'routes/admin-feature-flags/admin-feature-flags.i18n.en.json';
+import adminFeatureFlagsFR from 'routes/admin-feature-flags/admin-feature-flags.i18n.fr.json';
 import adminIdentifyEN from 'routes/admin-identify/admin-identify.i18n.en.json';
 import adminIdentifyFR from 'routes/admin-identify/admin-identify.i18n.fr.json';
 import adminServiceReviewEN from 'routes/admin-service-review/admin-service-review.i18n.en.json';
@@ -132,6 +134,7 @@ const resources = {
     adminAPIkeys: adminAPIkeysEN,
     adminCommunityServices: adminCommunityServicesEN,
     adminErrorViewer: adminErrorViewerEN,
+    adminFeatureFlags: adminFeatureFlagsEN,
     adminIdentify: adminIdentifyEN,
     adminServiceReview: adminServiceReviewEN,
     adminServices: adminServicesEN,
@@ -196,6 +199,7 @@ const resources = {
     adminAPIkeys: adminAPIkeysFR,
     adminCommunityServices: adminCommunityServicesFR,
     adminErrorViewer: adminErrorViewerFR,
+    adminFeatureFlags: adminFeatureFlagsFR,
     adminIdentify: adminIdentifyFR,
     adminServiceReview: adminServiceReviewFR,
     adminServices: adminServicesFR,

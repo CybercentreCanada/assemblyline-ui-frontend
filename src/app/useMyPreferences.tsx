@@ -17,6 +17,7 @@ import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import FindInPageOutlinedIcon from '@mui/icons-material/FindInPageOutlined';
 import FingerprintOutlinedIcon from '@mui/icons-material/FingerprintOutlined';
 import FlagIcon from '@mui/icons-material/Flag';
+import FlagOutlinedIcon from '@mui/icons-material/FlagOutlined';
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import KeyOutlinedIcon from '@mui/icons-material/KeyOutlined';
 import LabelOutlinedIcon from '@mui/icons-material/LabelOutlined';
@@ -337,6 +338,13 @@ const useMyPreferences = () => {
               i18nKey: 'adminmenu.errors',
               route: '/admin/errors',
               icon: <ErrorOutlineOutlinedIcon />,
+              nested: true
+            },
+            {
+              id: 'adminmenu.feature-flags',
+              i18nKey: 'adminmenu.feature-flags',
+              route: '/admin/feature-flags',
+              icon: <FlagOutlinedIcon />,
               nested: true
             },
             {

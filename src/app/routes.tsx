@@ -18,6 +18,7 @@ import AdminApikeysDetail from 'routes/admin-api-key-detail/admin-api-key-detail
 import AdminApikeys from 'routes/admin-api-keys/admin-api-keys.route';
 import AdminErrorDetail from 'routes/admin-error-detail/admin-error-detail.route';
 import AdminErrorViewer from 'routes/admin-error-viewer/admin-error-viewer.route';
+import AdminFeatureFlags from 'routes/admin-feature-flags/admin-feature-flags.route';
 import AdminIdentify from 'routes/admin-identify/admin-identify.route';
 import Service from 'routes/admin-service-detail/admin-service-detail.route';
 import ServiceReview from 'routes/admin-service-review/admin-service-review.route';
@@ -141,6 +142,7 @@ const WrappedRoutes = () => {
         <Route path="/admin/actions" element={<AdminActions />} />
         <Route path="/admin/apikeys" element={<AdminApikeys />} />
         <Route path="/admin/apikeys/:id" element={<AdminApikeysDetail />} />
+        <Route path="/admin/feature-flags" element={<AdminFeatureFlags />} />
         <Route path="/admin/errors" element={<AdminErrorViewer />} />
         <Route path="/admin/errors/:key" element={<AdminErrorDetail />} />
         <Route path="/admin/identify" element={<AdminIdentify />} />

@@ -3,6 +3,7 @@
   "adminmenu.actions": "Post-process actions",
   "adminmenu.apikeys": "API Keys",
   "adminmenu.config": "Configuration",
+  "adminmenu.feature-flags": "Feature Flags",
   "adminmenu.errors": "Error Viewer",
   "adminmenu.identify": "File Identification",
   "adminmenu.service_review": "Service Review",
