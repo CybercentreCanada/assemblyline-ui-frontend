@@ -1,6 +1,8 @@
 import BedtimeOutlinedIcon from '@mui/icons-material/BedtimeOutlined';
+import BlockIcon from '@mui/icons-material/Block';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { Typography, useMediaQuery, useTheme } from '@mui/material';
+import { createAppRoute } from 'core/router';
 import PageCenter from 'core/template/components/pages/PageCenter';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -35,6 +37,36 @@ export const ForbiddenPage = memo(({ disabled = false }: ForbiddenPageProps) => 
       </div>
     </PageCenter>
   );
+});
+
+export const ForbiddenRoute = createAppRoute({
+  component: ForbiddenPage,
+
+  path: '/forbidden',
+
+  ancestor: null,
+  shortname: () => ['app_route.forbidden.shortname', { ns: 'error403' }],
+  fullname: () => ['app_route.forbidden.fullname', { ns: 'error403' }],
+  shorticon: () => <BlockIcon />,
+  fullicon: () => <BlockIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
+});
+
+export const DisabledRoute = createAppRoute({
+  component: memo(() => <ForbiddenPage disabled />),
+
+  path: '/disabled',
+
+  ancestor: null,
+  shortname: () => ['app_route.disabled.shortname', { ns: 'error403' }],
+  fullname: () => ['app_route.disabled.fullname', { ns: 'error403' }],
+  shorticon: () => <BlockIcon />,
+  fullicon: () => <BlockIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
 });
 
 ForbiddenPage.displayName = 'ForbiddenPage';
