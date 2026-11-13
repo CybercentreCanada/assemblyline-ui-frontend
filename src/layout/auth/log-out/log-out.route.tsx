@@ -1,5 +1,7 @@
+import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import { CircularProgress, Typography, useTheme } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
+import { createAppRoute } from 'core/router';
 import PageCardCentered from 'core/template/branding/AppPageCardCentered';
 import { useAppLayout } from 'core/template/components/app/hooks';
 import useAppBannerVert from 'core/template/components/app/hooks/useAppBannerVert';
@@ -38,4 +40,19 @@ export const LogoutPage = memo(() => {
       </div>
     </PageCardCentered>
   );
+});
+
+export const LogoutRoute = createAppRoute({
+  component: <LogoutPage />,
+
+  path: '/logout',
+
+  ancestor: null,
+  shortname: () => ['app_route.log_out.shortname', { ns: 'logout' }],
+  fullname: () => ['app_route.log_out.fullname', { ns: 'logout' }],
+  shorticon: () => <LogoutOutlinedIcon />,
+  fullicon: () => <LogoutOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
 });

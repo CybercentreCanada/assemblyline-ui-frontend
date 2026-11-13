@@ -1,6 +1,8 @@
 import Editor, { DiffEditor, loader } from '@monaco-editor/react';
+import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import { Dialog, DialogActions, DialogContent, DialogTitle, Skeleton, useTheme } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
+import { createAppRoute } from 'core/router';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import PageFullSize from 'core/template/branding/AppPageCenter';
 import { useAppTheme, useAppUser } from 'core/template/components/app/hooks';
@@ -184,4 +186,19 @@ export const AdminTagSafelistPage = memo(() => {
   ) : (
     <Navigate to="/forbidden" replace />
   );
+});
+
+export const AdminTagSafelistRoute = createAppRoute({
+  component: <AdminTagSafelistPage />,
+
+  path: '/admin/tag_safelist',
+
+  ancestor: '/admin',
+  shortname: () => ['app_route.admin_tag_safelist.shortname', { ns: 'adminTagSafelist' }],
+  fullname: () => ['app_route.admin_tag_safelist.fullname', { ns: 'adminTagSafelist' }],
+  shorticon: () => <VerifiedUserOutlinedIcon />,
+  fullicon: () => <VerifiedUserOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.is_admin
 });
