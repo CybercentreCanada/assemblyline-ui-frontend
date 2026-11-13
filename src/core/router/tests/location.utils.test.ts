@@ -5,7 +5,7 @@ import {
   getExternalHrefFromParam,
   syncRouteParamsFromRouter
 } from 'core/router';
-import { makePage, makeSimpleRoute, makeStore } from 'core/router-old/tests/test-defaults';
+import { makePage, makeSimpleRoute, makeStore } from 'core/router/tests/test-defaults';
 import { describe, expect, it } from 'vitest';
 import type { StoreApi } from 'zustand/vanilla';
 

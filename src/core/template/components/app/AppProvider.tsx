@@ -1,6 +1,6 @@
 import { ClueDatabaseContext, ClueProvider } from '@cccsaurora/clue-ui';
 import i18n from 'app/core.i18n';
-import { AppErrorProvider } from 'core/error/error.components';
+import { AppErrorProvider } from 'core/error';
 import type {
   AppOverrideConfigs,
   AppPreferenceConfigs,

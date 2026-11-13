@@ -1,7 +1,7 @@
 import { AppErrorProvider } from 'core/error';
 import type { InferAppLocationFromParams, RouteName } from 'core/router';
-import { DisabledBoundary } from 'core/router-old/components/DisabledBoundary';
-import { ForbiddenBoundary } from 'core/router-old/components/ForbiddenBoundary';
+import { DisabledBoundary } from 'core/router/components/DisabledBoundary';
+import { ForbiddenBoundary } from 'core/router/components/ForbiddenBoundary';
 import type { HASH_PARAM_BLUEPRINTS, HashParamValue, InferHashParamBlueprintFromValue } from 'features/hash-params';
 import { createHashParamCodec } from 'features/hash-params';
 import type { InferPathParamBlueprintMapFromPath, PATH_PARAM_BLUEPRINTS_MAP, RoutePath } from 'features/path-params';

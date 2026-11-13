@@ -2,8 +2,8 @@ import type { InferAppNavigationPropsFromPath } from 'core/router';
 import { useAppExternalHref, useAppNavigate } from 'core/router';
 import type { ForwardedRef } from 'react';
 import { forwardRef, memo, useCallback } from 'react';
-import type { LinkProps as RouterLinkProps } from 'react-router';
-import { Link } from 'react-router';
+import type { LinkProps as RouterLinkProps } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 export type AppLinkProps<Origin extends AppRoute['path']> = InferAppNavigationPropsFromPath<Origin> &
   Omit<RouterLinkProps, 'to' | 'pathname' | 'search' | 'hash'>;

@@ -20,7 +20,7 @@ import {
   updatePanel,
   upsertPanel
 } from 'core/router';
-import { makePage, makePreferences } from 'core/router-old/tests/test-defaults';
+import { makePage, makePreferences } from 'core/router/tests/test-defaults';
 import { describe, expect, it } from 'vitest';
 
 describe('getDefaultRouterPanel', () => {
