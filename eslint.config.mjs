@@ -172,7 +172,7 @@ export default tseslint.config(
             },
             {
               from: { element: { type: 'core' } },
-              allow: { to: { element: { type: ['models', 'shared', 'ui'] } } }
+              allow: { to: { element: { type: ['models', 'pages', 'shared', 'ui'] } } }
             },
             {
               from: { element: { type: 'shared' } },

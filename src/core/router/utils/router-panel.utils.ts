@@ -292,9 +292,9 @@ export const setPanel = function <const Store extends AppSharedRouterStore>(
  */
 export const insertLeftPanel = function <const Store extends AppSharedRouterStore>(
   store: Store,
+  preferences: AppPreferenceStore,
   panelKey: number = 0,
-  partialPanel: Partial<AppRouterPanel> = null,
-  preferences: AppPreferenceStore
+  partialPanel: Partial<AppRouterPanel> = null
 ): [Store, number] {
   if (preferences.router.maxPanels <= 0) return [store, null];
 
@@ -315,9 +315,9 @@ export const insertLeftPanel = function <const Store extends AppSharedRouterStor
  */
 export const insertRightPanel = function <const Store extends AppSharedRouterStore>(
   store: Store,
+  preferences: AppPreferenceStore,
   sourcePanelKey: number = store.panels.length - 1,
-  partialPanel: Partial<AppRouterPanel> = null,
-  preferences: AppPreferenceStore
+  partialPanel: Partial<AppRouterPanel> = null
 ): [Store, number] {
   if (preferences.router.maxPanels <= 0) return [store, null];
 
@@ -342,12 +342,12 @@ export const insertRightPanel = function <const Store extends AppSharedRouterSto
  */
 export const upsertPanel = function <const Store extends AppSharedRouterStore>(
   store: Store,
+  preferences: AppPreferenceStore,
   panelKey: number = store.panels.length - 1,
-  partialPanel: Partial<AppRouterPanel> = null,
-  preferences: AppPreferenceStore
+  partialPanel: Partial<AppRouterPanel> = null
 ): [Store, number] {
   if (panelKey >= 0 && panelKey < (store?.panels?.length || 0)) store = updatePanel(store, panelKey, partialPanel);
-  else [store, panelKey] = insertRightPanel(store, panelKey, partialPanel, preferences);
+  else [store, panelKey] = insertRightPanel(store, preferences, panelKey, partialPanel);
   return [store, panelKey];
 };
 
