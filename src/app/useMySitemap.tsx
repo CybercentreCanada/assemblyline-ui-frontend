@@ -20,7 +20,6 @@ import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import FindInPageOutlinedIcon from '@mui/icons-material/FindInPageOutlined';
 import FingerprintOutlinedIcon from '@mui/icons-material/FingerprintOutlined';
 import FlagIcon from '@mui/icons-material/Flag';
-import FlagOutlinedIcon from '@mui/icons-material/FlagOutlined';
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import KeyOutlinedIcon from '@mui/icons-material/KeyOutlined';
 import LabelOutlinedIcon from '@mui/icons-material/LabelOutlined';
@@ -275,12 +274,6 @@ export default function useMySitemap() {
         path: '/admin/identify',
         title: t('adminmenu.identify'),
         icon: <FindInPageOutlinedIcon />,
-        breadcrumbs: ['/admin']
-      },
-      {
-        path: '/admin/feature-flags',
-        title: t('adminmenu.feature-flags'),
-        icon: <FlagOutlinedIcon />,
         breadcrumbs: ['/admin']
       },
       {

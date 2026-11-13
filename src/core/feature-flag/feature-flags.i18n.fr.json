@@ -1,4 +1,6 @@
 {
+  "state.alpha": "Alpha",
+  "state.beta": "Bêta",
   "title": "Fonctionnalités expérimentales",
   "title.sub": "Configurer les fonctionnalités expérimentales personnelles. N'affecte que votre compte."
 }

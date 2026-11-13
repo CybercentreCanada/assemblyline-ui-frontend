@@ -1,4 +1,6 @@
 {
+  "state.alpha": "Alpha",
+  "state.beta": "Beta",
   "title": "Feature Flags",
   "title.sub": "Configure personal feature flags. Only affects your account."
 }

@@ -1,3 +1,4 @@
+export { ManageFeatureFlags, type ManageFeatureFlagProps } from './components/ManageFeatureFlags';
 export { useFeatureFlags, useIsFeatureEnabled, useToggleFeatureFlag, useUpdateFeatureFlag } from './feature-flag.hooks';
 export { EMPTY_FEATURE_FLAG_STATE } from './feature-flag.models';
 export type { FeatureFlag, FeatureFlagDefinition, FeatureFlagStore, FeatureFlagType } from './feature-flag.models';
