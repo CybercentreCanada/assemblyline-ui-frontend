@@ -409,7 +409,7 @@ export const SubmitPage = memo(() => (
   </FormProvider>
 ));
 
-export const SubmitAppRoute = createAppRoute({
+export const SubmitRoute = createAppRoute({
   component: <SubmitPage />,
 
   path: '/submit',

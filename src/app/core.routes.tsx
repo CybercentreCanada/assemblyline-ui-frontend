@@ -64,14 +64,14 @@ import { RetrohuntCreateRoute } from 'routes/retrohunt-create/retrohunt-create.r
 import { RetrohuntDetailRoute } from 'routes/retrohunt-detail/retrohunt-detail.route';
 import { RetrohuntRoute } from 'routes/retrohunt/retrohunt.route';
 import { SearchRootRoute, SearchRoute } from 'routes/search/search.route';
-import { SettingsRootRoute, SettingsAppRoute as SettingsRoute } from 'routes/settings/settings.route';
+import { SettingsRootRoute, SettingsRoute } from 'routes/settings/settings.route';
 import { StatisticsHeuristicsRoute } from 'routes/statistics-heuristics/statistics-heuristics.route';
 import { StatisticsSignaturesRoute } from 'routes/statistics-signatures/statistics-signatures.route';
 import { SubmissionDetailRoute } from 'routes/submission-detail/submission-detail.route';
 import { SubmissionRedirectRoute } from 'routes/submission-redirect/submission-redirect.route';
 import { SubmissionReportRoute } from 'routes/submission-report/submission-report.route';
 import { SubmissionsRoute } from 'routes/submissions/submissions.route';
-import { SubmitRootRoute, SubmitAppRoute as SubmitRoute } from 'routes/submit/submit.route';
+import { SubmitRootRoute, SubmitRoute } from 'routes/submit/submit.route';
 import { AccountRoute, AdminUserDetailRoute } from 'routes/user/user.route';
 
 const APP_ROUTES = [

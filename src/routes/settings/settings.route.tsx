@@ -99,7 +99,7 @@ export const SettingsPage = memo(() => (
   </TableOfContentLayout>
 ));
 
-export const SettingsAppRoute = createAppRoute({
+export const SettingsRoute = createAppRoute({
   component: <SettingsPage />,
 
   path: '/settings/:tab',
