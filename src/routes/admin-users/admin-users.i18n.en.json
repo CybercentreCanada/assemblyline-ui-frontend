@@ -1,5 +1,7 @@
 {
   "add_user": "Add a user",
+  "app_route.admin_users.fullname": "Admin Users",
+  "app_route.admin_users.shortname": "Users",
   "filter": "Filter users ...",
   "filter.admins.add": "Add filter query to show administrators",
   "filter.admins.remove": "Remove filter query to show administrators",

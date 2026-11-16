@@ -1,5 +1,7 @@
 {
   "add.success": "The safelist item was successfully added to the system.",
+  "app_route.manage_safelist_add.fullname": "Manage Add Safelist",
+  "app_route.manage_safelist_add.shortname": "Add",
   "details": "Item Details",
   "expiry.title": "Expiry date",
   "file": "File",
