@@ -1,0 +1,8 @@
+{
+  "flag-updated": "Feature flag updated",
+  "no-flags": "No experimental features available",
+  "state.alpha": "Alpha",
+  "state.beta": "Beta",
+  "title": "Feature Flags",
+  "title.sub": "Configure personal feature flags. Only affects your account."
+}

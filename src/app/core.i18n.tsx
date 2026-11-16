@@ -27,6 +27,8 @@ import adminCommunityServicesEN from 'routes/admin-community-services/admin-comm
 import adminCommunityServicesFR from 'routes/admin-community-services/admin-community-services.i18n.fr.json';
 import adminErrorViewerEN from 'routes/admin-error-viewer/admin-error-viewer.i18n.en.json';
 import adminErrorViewerFR from 'routes/admin-error-viewer/admin-error-viewer.i18n.fr.json';
+import featureFlagsEN from 'core/feature-flag/feature-flags.i18n.en.json';
+import featureFlagsFR from 'core/feature-flag/feature-flags.i18n.fr.json';
 import adminIdentifyEN from 'routes/admin-identify/admin-identify.i18n.en.json';
 import adminIdentifyFR from 'routes/admin-identify/admin-identify.i18n.fr.json';
 import adminServiceReviewEN from 'routes/admin-service-review/admin-service-review.i18n.en.json';
@@ -151,6 +153,7 @@ const resources = {
     error403: error403EN,
     error404: error404EN,
     favorites: favoritesEN,
+    featureFlags: featureFlagsEN,
     fileDetail: fileDetailEN,
     fileViewer: fileViewerEN,
     helpAPI: helpAPIEN,
@@ -215,6 +218,7 @@ const resources = {
     error403: error403FR,
     error404: error404FR,
     favorites: favoritesFR,
+    featureFlags: featureFlagsFR,
     fileDetail: fileDetailFR,
     fileViewer: fileViewerFR,
     helpAPI: helpAPIFR,

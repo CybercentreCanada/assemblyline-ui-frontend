@@ -1,6 +1,13 @@
-import type { FeatureFlagType } from 'core/feature-flag/feature-flag.models';
+import type { FeatureFlag, FeatureFlagType } from 'core/feature-flag/feature-flag.models';
 import { useAppFeatureFlagStore, useAppSetFeatureFlagStore } from 'core/feature-flag/feature-flag.providers';
 import { useCallback } from 'react';
+
+/**
+ * Returns the feature flags from the store.
+ *
+ * @returns Current feature flags.
+ */
+export const useFeatureFlags = (): FeatureFlag[] => useAppFeatureFlagStore(store => store.flags);
 
 /**
  * Hook that checks if the specified feature flag is enabled.
