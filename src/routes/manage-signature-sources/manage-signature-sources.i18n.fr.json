@@ -3,6 +3,8 @@
   "add.success": "La source de signature a été ajoutée avec succès.",
   "add_source": "Ajouter une source de signature pour ce service",
   "adding_source": "Ajouter une source de signature",
+  "app_route.manage_signature_sources.fullname": "Gestion des Sources de mise à jour",
+  "app_route.manage_signature_sources.shortname": "Sources de mise à jour",
   "ca": "Autorité de certificat (CA)",
   "ca_used": "Une autorité de certificat (CA) sera utilisée pour se connecter à la source",
   "caption": "Services autorisés à générer des signatures",

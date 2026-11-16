@@ -1,5 +1,7 @@
 {
   "add_safelist": "Add an item to the safelist",
+  "app_route.manage_safelists.fullname": "Manage Safelist",
+  "app_route.manage_safelists.shortname": "Safelist",
   "filter": "Filter safelisted hashes...",
   "filter.disabled.add": "Add filter query to show disabled hashes",
   "filter.disabled.remove": "Remove filter query to show disabled hashes",
