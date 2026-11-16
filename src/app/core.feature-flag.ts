@@ -4,6 +4,8 @@ export const FEATURE_FLAGS_STORAGE_KEY = 'assemblyline.featureFlags';
 
 // Assemblyline feature flags defined here
 
+// Dev note: Be sure to add the descriptionKey to the `core.i18n` translation files
+
 // EX:
 // export const FOO_FLAG: FeatureFlagType = 'foo';
 // export const FOO_FLAG_DEF: FeatureFlagDefinition = {

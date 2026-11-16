@@ -10,6 +10,7 @@ are being developed and tested.
   and saving of application flags in localStorage.
 - Frontend flags are not authorization; backend permissions must still protect
   restricted data and actions.
+- Flags can be managed under the user's settings page (`/settings`)
 
 ## Developer Guide
 
