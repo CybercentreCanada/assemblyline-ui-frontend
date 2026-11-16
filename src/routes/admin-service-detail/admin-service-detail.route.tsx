@@ -361,7 +361,7 @@ export const AdminServiceDetailRoute = createAppRoute({
 
   path: '/admin/services/:svc',
   params: s => ({
-    svc: s.string()
+    svc: s.string('')
   }),
 
   ancestor: '/admin/services',

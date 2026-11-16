@@ -52,6 +52,7 @@
   "meta.more": "Show more",
   "metadata": "Metadata",
   "none": "none",
+  "outstanding.empty": "No outstanding services are currently available. Please wait and check again shortly.",
   "outstanding.files": "Files remaining",
   "outstanding.services": "Services",
   "outstanding.title": "You are waiting on the following services to finish processing:",

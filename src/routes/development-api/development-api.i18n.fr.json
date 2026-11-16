@@ -1,4 +1,6 @@
 {
+  "app_route.development.fullname": "Développement",
+  "app_route.development.shortname": "Développement",
   "app_route.development_api.fullname": "Développement des Requêtes d'API",
   "app_route.development_api.shortname": "Requête API",
   "app_route.development_customize.fullname": "Développement de la Personnalisation",

@@ -52,6 +52,7 @@
   "meta.more": "Afficher plus",
   "metadata": "Métadonnées",
   "none": "aucun",
+  "outstanding.empty": "Aucun service en attente n'est actuellement disponible. Veuillez patienter et réessayer bientôt.",
   "outstanding.files": "Fichiers restants",
   "outstanding.services": "Services",
   "outstanding.title": "Vous attendez la fin du traitement des services suivants:",
