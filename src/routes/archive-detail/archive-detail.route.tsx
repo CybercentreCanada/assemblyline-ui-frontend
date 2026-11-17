@@ -41,7 +41,7 @@ import InformativeAlert from 'ui/InformativeAlert';
 import { emptyResult } from 'ui/ResultCard';
 import { TabContainer } from 'ui/TabContainer';
 
-const TAB_OPTIONS = [
+export const TAB_OPTIONS = [
   'details',
   'detection',
   'tags',
@@ -54,11 +54,11 @@ const TAB_OPTIONS = [
   'community'
 ] as const;
 
-type Tab = (typeof TAB_OPTIONS)[number];
+export type Tab = (typeof TAB_OPTIONS)[number];
 
-const DEFAULT_TAB: Tab = 'details';
+export const DEFAULT_TAB: Tab = 'details';
 
-type Params = {
+export type Params = {
   id?: string;
   tab?: 'details' | 'detection' | 'tags' | 'relations' | 'ascii' | 'code' | 'hex' | 'image' | 'community';
 };
