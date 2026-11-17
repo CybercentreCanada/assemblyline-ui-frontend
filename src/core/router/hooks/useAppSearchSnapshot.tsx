@@ -1,6 +1,11 @@
 import type { InferAppRouteFromPath } from 'core/router';
 import { findAppRouteFromKey, getRouteParamFromKey, useAppLocationParamStore, useAppPageKey } from 'core/router';
-import type { InferSearchParamSnapshotFromEngine } from 'features/search-params';
+import type {
+  InferSearchParamSnapshotFromEngine,
+  SearchParamBlueprintMap,
+  SearchParamEngine,
+  SearchParamValueMap
+} from 'features/search-params';
 import { useMemo } from 'react';
 
 /**
@@ -25,8 +30,8 @@ export function useAppSearchSnapshot<const Origin extends AppRoute['path']>(): I
     if (!searchEngine)
       return null as unknown as InferSearchParamSnapshotFromEngine<InferAppRouteFromPath<Origin>['search']>;
 
-    const engine = searchEngine;
-    return engine.full(searchParam) as unknown as InferSearchParamSnapshotFromEngine<
+    const engine = searchEngine as SearchParamEngine<SearchParamBlueprintMap>;
+    return engine.full(searchParam as SearchParamValueMap) as unknown as InferSearchParamSnapshotFromEngine<
       InferAppRouteFromPath<Origin>['search']
     >;
   }, [searchEngine, searchParam]);

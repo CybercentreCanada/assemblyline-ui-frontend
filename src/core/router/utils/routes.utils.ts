@@ -284,7 +284,7 @@ export const getLocationPathnameFromParam = function <const Origin extends AppRo
   if (param?.route == null) return '';
 
   if (route?.params && param?.path) {
-    return route.params.stringify(param.path);
+    return route.params.stringify(param.path as never);
   }
 
   if (param?.path) {
@@ -310,7 +310,9 @@ export const getLocationSearchFromParam = function <const Origin extends AppRout
   param: InferAppLocationFromPath<Origin>
 ): [Location['search'], SearchParamValueMap, SearchParamValueMap] {
   const search = route?.search;
-  const delta = !search ? undefined : search.delta(param.search as never);
+  const delta = !search
+    ? undefined
+    : (search as SearchParamEngine<SearchParamBlueprintMap>).delta(param.search as never);
   return !delta ? [null, null, null] : [delta.toLocationSearch(), delta.toLocationState(), delta.toLocationTransient()];
 };
 
