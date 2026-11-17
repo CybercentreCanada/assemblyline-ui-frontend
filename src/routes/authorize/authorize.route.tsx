@@ -119,6 +119,14 @@ export const AuthorizeRoute = createAppRoute({
   component: <AuthorizePage />,
 
   path: '/authorize',
+  // TODO: revise in the new version
+  search: s => ({
+    redirect_url: s.string(''),
+    client_id: s.string(''),
+    server: s.string(''),
+    scope: s.string(''),
+    roles: s.string('')
+  }),
 
   ancestor: null,
   shortname: () => ['app_route.authorize.shortname', { ns: 'authorize' }],
