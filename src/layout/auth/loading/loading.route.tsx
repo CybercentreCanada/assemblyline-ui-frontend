@@ -1,8 +1,12 @@
 import { CircularProgress } from '@mui/material';
-import useAppBannerVert from 'core/template/components/app/hooks/useAppBannerVert';
+import { useAppBannerVert } from 'core/template/components/app/hooks';
 import { memo } from 'react';
 
-const WrappedLoadingScreen = ({ showImage = true }) => {
+export type LoadingPageProps = {
+  showImage?: boolean;
+};
+
+export const LoadingPage = memo(({ showImage = true }: LoadingPageProps) => {
   const banner = useAppBannerVert();
   return (
     <div
@@ -18,7 +22,4 @@ const WrappedLoadingScreen = ({ showImage = true }) => {
       <CircularProgress variant="indeterminate" />
     </div>
   );
-};
-
-export const LoadingScreen = memo(WrappedLoadingScreen);
-export default LoadingScreen;
+});
