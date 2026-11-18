@@ -2,9 +2,10 @@ import LinkOffIcon from '@mui/icons-material/LinkOff';
 import { useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import PageCenter from 'core/template/components/pages/PageCenter';
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-const NotFoundPage = () => {
+export const NotFoundPage = memo(() => {
   const { t } = useTranslation(['error404']);
   const theme = useTheme();
   return (
@@ -20,6 +21,4 @@ const NotFoundPage = () => {
       </div>
     </PageCenter>
   );
-};
-
-export default NotFoundPage;
+});
