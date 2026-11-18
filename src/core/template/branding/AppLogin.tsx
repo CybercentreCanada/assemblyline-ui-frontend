@@ -71,6 +71,7 @@ const UserLoginForm = () => {
         is_admin: true,
         name: 'Default User',
         password: '',
+        has_password: false,
         roles: ['administration'],
         security_tokens: [],
         submission_quota: 0,
