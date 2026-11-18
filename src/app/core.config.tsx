@@ -50,6 +50,7 @@ const DEFAULT_USER: CustomUser = {
   is_active: false,
   name: '',
   password: '',
+  has_password: false,
   roles: [],
   security_tokens: [],
   submission_quota: 0,

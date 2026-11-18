@@ -6,6 +6,7 @@ import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from 'ui/buttons/Button';
+import ConfirmationDialog from 'ui/ConfirmationDialog';
 import { Tooltip } from 'ui/Tooltip';
 
 export type ChangePasswordProps = {
@@ -18,7 +19,7 @@ export const ChangePassword = memo(({ user, onCancel, onSave }: ChangePasswordPr
   const { t } = useTranslation(['user']);
   const theme = useTheme();
   const { apiCall } = useMyAPI();
-  const { showSuccessMessage } = useMySnackbar();
+  const { showSuccessMessage, showErrorMessage } = useMySnackbar();
 
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -28,6 +29,9 @@ export const ChangePassword = memo(({ user, onCancel, onSave }: ChangePasswordPr
 
   const [showPasswordError, setShowPasswordError] = useState(false);
   const [passwordValidationError, setPasswordValidationError] = useState<string | null>(null);
+
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     const newPasswordLength = newPassword.length;
@@ -48,7 +52,7 @@ export const ChangePassword = memo(({ user, onCancel, onSave }: ChangePasswordPr
       setShowPasswordError(true);
       return;
     }
-    const userToSave = { ...user, new_pass: newPassword, new_pass_confirm: newPassword };
+    const userToSave = { ...user, new_pass: newPassword, new_pass_confirm: newPassword, has_password: true };
 
     apiCall({
       url: `/api/v4/user/${user.uname}/`,
@@ -65,6 +69,24 @@ export const ChangePassword = memo(({ user, onCancel, onSave }: ChangePasswordPr
       },
       onEnter: () => setLoading(true),
       onExit: () => setLoading(false)
+    });
+  };
+
+  const deletePassword = () => {
+    setShowDeleteDialog(false);
+
+    apiCall({
+      url: `/api/v4/user/password/${user.uname}/`,
+      method: 'DELETE',
+      onSuccess: () => {
+        showSuccessMessage(t('password.deleted'));
+        onSave({ ...user, has_password: false });
+      },
+      onFailure(api_data) {
+        showErrorMessage(api_data.api_error_message);
+      },
+      onEnter: () => setDeleting(true),
+      onExit: () => setDeleting(false)
     });
   };
 
@@ -129,26 +151,52 @@ export const ChangePassword = memo(({ user, onCancel, onSave }: ChangePasswordPr
         )}
       </div>
 
-      <div style={{ marginTop: theme.spacing(1), textAlign: 'end' }}>
-        <Button
-          disabled={loading}
-          style={{ marginRight: theme.spacing(2) }}
-          variant="outlined"
-          onClick={() => onCancel()}
-        >
-          {t('cancel')}
-        </Button>
+      <div style={{ marginTop: theme.spacing(1), display: 'flex', justifyContent: 'space-between' }}>
+        {user.has_password ? (
+          <Button
+            disabled={deleting || loading}
+            progress={deleting}
+            variant="contained"
+            color="error"
+            onClick={() => setShowDeleteDialog(true)}
+          >
+            {t('password.remove.label')}
+          </Button>
+        ) : (
+          <div>{/* Empty div to right-justify buttons */}</div>
+        )}
 
-        <Button
-          disabled={loading}
-          progress={loading}
-          variant="contained"
-          color="primary"
-          onClick={() => updatePassword()}
-        >
-          {t('update')}
-        </Button>
+        <div style={{}}>
+          <Button
+            disabled={deleting || loading}
+            style={{ marginRight: theme.spacing(2) }}
+            variant="outlined"
+            onClick={() => onCancel()}
+          >
+            {t('cancel')}
+          </Button>
+
+          <Button
+            disabled={deleting || loading}
+            progress={loading}
+            variant="contained"
+            color="primary"
+            onClick={() => updatePassword()}
+          >
+            {t('update')}
+          </Button>
+        </div>
       </div>
+
+      <ConfirmationDialog
+        open={showDeleteDialog}
+        handleClose={() => setShowDeleteDialog(false)}
+        handleAccept={() => deletePassword()}
+        title={t('password.remove.title')}
+        text={t('password.remove.description')}
+        cancelText={t('cancel')}
+        acceptText={t('password.remove.label')}
+      />
     </div>
   );
 });
