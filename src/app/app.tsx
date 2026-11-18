@@ -21,7 +21,7 @@ import { useAppLayout } from 'core/template/components/app/hooks';
 import { useAppSwitcher } from 'core/template/components/app/hooks/useAppSwitcher';
 import useMyTheme from 'core/template/useMyTheme';
 import useMyUser from 'layout/auth/auth.hooks';
-import LoadingScreen from 'layout/auth/loading/loading';
+import { LoadingPage } from 'layout/auth/loading/loading.route';
 import LockedPage from 'layout/auth/locked/locked.route';
 import LoginScreen from 'layout/auth/log-in/login';
 import Tos from 'layout/auth/terms-of-service/terms-of-service.route';
@@ -87,7 +87,7 @@ const MyAppMain = () => {
   setMomentFRLocale();
 
   return {
-    load: <LoadingScreen />,
+    load: <LoadingPage />,
     locked: <LockedPage />,
     login: loginParams ? (
       <LoginScreen
@@ -97,7 +97,7 @@ const MyAppMain = () => {
         allowSAML={loginParams.allow_saml_login}
       />
     ) : (
-      <LoadingScreen />
+      <LoadingPage />
     ),
     routes: <Routes />,
     tos: <Tos />,

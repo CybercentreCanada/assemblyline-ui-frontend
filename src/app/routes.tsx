@@ -6,7 +6,7 @@ import { CrashPage } from 'core/error/error.route';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import NotFoundPage from 'core/template/branding/AppBanner';
 import RedirectSubmission from 'core/template/components/utils/RedirectSubmission';
-import LoadingScreen from 'layout/auth/loading/loading';
+import { LoadingPage } from 'layout/auth/loading/loading.route';
 import Logout from 'layout/auth/log-out/log-out.route';
 import Tos from 'layout/auth/terms-of-service/terms-of-service.route';
 import useDrawer from 'layout/drawer/drawer.hooks';
@@ -130,7 +130,7 @@ const WrappedRoutes = () => {
   const { configuration } = useALContext();
 
   return (
-    <Suspense fallback={<LoadingScreen showImage={false} />}>
+    <Suspense fallback={<LoadingPage showImage={false} />}>
       <RouteActions />
       <Routes>
         <Route path="/" element={<Submit />} />
