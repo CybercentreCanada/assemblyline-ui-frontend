@@ -1,12 +1,12 @@
 import useALContext from 'core/config/useALContext';
-import React from 'react';
+import { memo } from 'react';
 import { Navigate, useParams } from 'react-router';
 
 type ParamProps = {
   id: string;
 };
 
-export const RedirectSubmission: React.FC = () => {
+export const SubmissionRedirectPage = memo(() => {
   const { id } = useParams<ParamProps>();
 
   const { settings } = useALContext();
@@ -16,6 +16,4 @@ export const RedirectSubmission: React.FC = () => {
   ) : (
     <Navigate to={`/submission/report/${id}`} replace />
   );
-};
-
-export default RedirectSubmission;
+});
