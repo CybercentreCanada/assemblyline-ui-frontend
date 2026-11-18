@@ -23,13 +23,6 @@ export type ObjectParamShape = ObjectParamPrimitive | ObjectParamShape[] | { [ke
 export type ObjectParamValue = Record<string, ObjectParamShape> | ObjectParamShape[];
 
 //*****************************************************************************************
-// Search Param Blueprint Introspection
-//*****************************************************************************************
-
-/** Identifies which blueprint variant produced a search parameter. */
-export type SearchParamBlueprintKind = 'boolean' | 'number' | 'string' | 'enum' | 'filters' | 'object';
-
-//*****************************************************************************************
 // Search Param Blueprints
 //*****************************************************************************************
 
