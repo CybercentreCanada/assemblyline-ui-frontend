@@ -5,7 +5,7 @@ import useMyAPI from 'core/api/hooks/useMyAPI';
 import { useAppUser } from 'core/template/components/app/hooks';
 import type { CustomUser } from 'models/api/user';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import ForbiddenPage from 'routes/forbidden/forbidden.route';
+import { ForbiddenPage } from 'routes/forbidden/forbidden.route';
 
 const MIN = 100;
 const MAX = 3000;

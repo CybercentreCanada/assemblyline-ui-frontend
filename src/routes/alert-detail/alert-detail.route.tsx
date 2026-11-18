@@ -46,7 +46,7 @@ import {
   SkeletonInline
 } from 'routes/alerts/components/Components';
 import { SearchParamsProvider } from 'routes/alerts/contexts/SearchParamsContext';
-import ForbiddenPage from 'routes/forbidden/forbidden.route';
+import { ForbiddenPage } from 'routes/forbidden/forbidden.route';
 import { verdictToColor } from 'shared/utils/utils';
 import { ActionableChipList } from 'ui/ActionableChipList';
 import ActionableText from 'ui/ActionableText';

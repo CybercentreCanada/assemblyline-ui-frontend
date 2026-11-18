@@ -60,7 +60,7 @@ import { useLocation, useNavigate, useParams } from 'react-router';
 import { Link } from 'react-router-dom';
 import Detection from 'routes/file-detail/components/detection';
 import FileDetail from 'routes/file-detail/file-detail.route';
-import ForbiddenPage from 'routes/forbidden/forbidden.route';
+import { ForbiddenPage } from 'routes/forbidden/forbidden.route';
 import HeuristicDetail from 'routes/manage-heuristic-detail/manage-heuristic-detail.route';
 import AISummarySection from 'routes/submission-detail/components/ai_summary';
 import AttackSection from 'routes/submission-detail/components/attack';

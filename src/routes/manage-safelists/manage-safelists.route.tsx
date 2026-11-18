@@ -16,7 +16,7 @@ import type { Safelist } from 'models/base/safelist';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
-import ForbiddenPage from 'routes/forbidden/forbidden.route';
+import { ForbiddenPage } from 'routes/forbidden/forbidden.route';
 import SafelistNew from 'routes/manage-safelist-add/manage-safelist-add.route';
 import SafelistDetail from 'routes/manage-safelist-detail/manage-safelist-detail.route';
 import SafelistTable from 'routes/search/components/safelist';

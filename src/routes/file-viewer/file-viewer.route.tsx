@@ -44,7 +44,7 @@ import { HexSection } from 'routes/file-viewer/components/hex';
 import { ImageSection } from 'routes/file-viewer/components/image';
 import { StringsSection } from 'routes/file-viewer/components/strings';
 import SelectionProvider, { useSelection } from 'routes/file-viewer/file-viewer.providers';
-import ForbiddenPage from 'routes/forbidden/forbidden.route';
+import { ForbiddenPage } from 'routes/forbidden/forbidden.route';
 import { FileDownloader } from 'ui/buttons/FileDownloader';
 import { IconButton } from 'ui/buttons/IconButton';
 import { TabContainer } from 'ui/TabContainer';
