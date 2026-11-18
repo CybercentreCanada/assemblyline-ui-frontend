@@ -6,6 +6,7 @@ import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from 'ui/buttons/Button';
+import { Tooltip } from 'ui/Tooltip';
 
 export type ChangePasswordProps = {
   user: CustomUser;
@@ -33,12 +34,12 @@ export const ChangePassword = memo(({ user, onCancel, onSave }: ChangePasswordPr
     const confirmPasswordLength = confirmPassword.length;
 
     if (newPasswordLength === 0 || confirmPasswordLength === 0) {
-      setPasswordValidationError(t('password_empty'));
+      setPasswordValidationError(t('password.empty'));
       return;
     }
 
     const match = newPassword === confirmPassword;
-    setPasswordValidationError(match ? null : t('passwords_dont_match'));
+    setPasswordValidationError(match ? null : t('password.inputs_dont_match'));
     setShowPasswordError(newPasswordLength > 0 && confirmPasswordLength > 0);
   }, [newPassword, confirmPassword]);
 
@@ -54,7 +55,7 @@ export const ChangePassword = memo(({ user, onCancel, onSave }: ChangePasswordPr
       method: 'POST',
       body: userToSave,
       onSuccess: () => {
-        showSuccessMessage(t('password_updated'));
+        showSuccessMessage(t('password.updated'));
         setShowPasswordError(false);
         onSave(userToSave);
       },
@@ -72,19 +73,22 @@ export const ChangePassword = memo(({ user, onCancel, onSave }: ChangePasswordPr
       <Typography variant="h4" gutterBottom>
         {t('change_password')}
       </Typography>
+
       <TextField
         autoFocus
         type={showPassword ? 'text' : 'password'}
         margin="normal"
         variant="outlined"
-        label={t('new_password')}
+        label={t('password.new')}
         slotProps={{
           input: {
             endAdornment: (
               <InputAdornment position="end">
-                <IconButton edge="end" onClick={() => setShowPassword(!showPassword)}>
-                  {showPassword ? <VisibilityOff /> : <Visibility />}
-                </IconButton>
+                <Tooltip title={showPassword ? t('password.hide') : t('password.show')}>
+                  <IconButton edge="end" onClick={() => setShowPassword(!showPassword)}>
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </Tooltip>
               </InputAdornment>
             )
           }
@@ -96,14 +100,20 @@ export const ChangePassword = memo(({ user, onCancel, onSave }: ChangePasswordPr
         type={showPassword ? 'text' : 'password'}
         margin="normal"
         variant="outlined"
-        label={t('confirm_password')}
+        label={t('password.confirm')}
         slotProps={{
           input: {
             endAdornment: (
               <InputAdornment position="end">
-                <IconButton edge="end" onClick={() => setShowPassword(!showPassword)}>
-                  {showPassword ? <VisibilityOff /> : <Visibility />}
-                </IconButton>
+                <Tooltip title={showPassword ? t('password.hide') : t('password.show')}>
+                  <IconButton
+                    edge="end"
+                    title={showPassword ? t('password.hide') : t('password.show')}
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </Tooltip>
               </InputAdornment>
             )
           }
