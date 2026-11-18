@@ -3,9 +3,10 @@ import BlockOutlinedIcon from '@mui/icons-material/BlockOutlined';
 import { useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import PageCenter from 'core/template/components/pages/PageCenter';
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-const QuotaExceeded = () => {
+export const QuotaPage = memo(() => {
   const { t } = useTranslation();
   const theme = useTheme();
   return (
@@ -24,6 +25,4 @@ const QuotaExceeded = () => {
       </div>
     </PageCenter>
   );
-};
-
-export default QuotaExceeded;
+});
