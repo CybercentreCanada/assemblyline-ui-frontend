@@ -11,20 +11,20 @@ import { SecurityTokenLogin } from 'layout/auth/log-in/components/SecurityToken'
 import { SignUp } from 'layout/auth/log-in/components/signup';
 import { SSOLogin } from 'layout/auth/log-in/components/sso';
 import { UserPassLogin } from 'layout/auth/log-in/components/userpass';
-import { useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 import { getProvider, getSAMLData } from 'shared/utils/utils';
 import TextDivider from 'ui/TextDivider';
 
-type LoginScreenProps = {
+export type LoginPageProps = {
   allowUserPass: boolean;
   allowSAML: boolean;
   allowSignup: boolean;
   oAuthProviders?: string[];
 };
 
-export default function LoginScreen({ allowUserPass, allowSAML, allowSignup, oAuthProviders }: LoginScreenProps) {
+export const LoginPage = memo(({ allowUserPass, allowSAML, allowSignup, oAuthProviders }: LoginPageProps) => {
   const theme = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
@@ -344,4 +344,4 @@ export default function LoginScreen({ allowUserPass, allowSAML, allowSignup, oAu
       }
     </PageCardCentered>
   );
-}
+});
