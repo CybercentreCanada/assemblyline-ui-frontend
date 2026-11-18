@@ -30,7 +30,7 @@ import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router';
 import { Link } from 'react-router-dom';
 import FileDetail from 'routes/file-detail/file-detail.route';
-import ForbiddenPage from 'routes/forbidden/forbidden.route';
+import { ForbiddenPage } from 'routes/forbidden/forbidden.route';
 import NotFoundPage from 'routes/not-found/not-found.route';
 import RetrohuntErrors from 'routes/retrohunt-detail/components/errors';
 import { RetrohuntRepeat } from 'routes/retrohunt-detail/components/repeat';

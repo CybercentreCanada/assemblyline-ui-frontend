@@ -17,7 +17,7 @@ import { memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router';
 import { Link } from 'react-router-dom';
-import ForbiddenPage from 'routes/forbidden/forbidden.route';
+import { ForbiddenPage } from 'routes/forbidden/forbidden.route';
 import AISummarySection from 'routes/submission-detail/components/ai_summary';
 import Attack from 'routes/submission-report/components/attack';
 import AttributionBanner from 'routes/submission-report/components/attribution_banner';
