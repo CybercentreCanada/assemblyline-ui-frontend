@@ -20,6 +20,16 @@ jobs:
   - job: run_tests
     timeoutInMinutes: 15
 
+    strategy:
+      maxParallel: 3
+      matrix:
+        typecheck:
+          COMMAND: typecheck
+        test:
+          COMMAND: test:ci
+        lint:
+          COMMAND: lint:ci
+
     steps:
       - checkout: self
         displayName: 'Checkout repository'
@@ -44,30 +54,20 @@ jobs:
 
       - script: |
           set -xv  # Echo commands before they are run
-          pnpm run typecheck
-        displayName: 'TypeScript check'
-
-      - script: |
-          set -xv  # Echo commands before they are run
-          pnpm run test:ci
-        displayName: 'Run tests with coverage'
-
-      - script: |
-          set -xv  # Echo commands before they are run
-          pnpm run lint:ci
-        displayName: 'ESLint'
+          pnpm run $(COMMAND)
+        displayName: 'Run $(COMMAND)'
 
       - task: PublishTestResults@2
         inputs:
           testResultsFormat: JUnit
           testResultsFiles: $(System.DefaultWorkingDirectory)/test-results/vitest.xml
           testRunTitle: 'Vitest unit tests'
-        condition: succeededOrFailed()
+        condition: and(succeededOrFailed(), eq(variables['COMMAND'], 'test:ci'))
         displayName: 'Publish unit test results'
 
       - task: PublishCodeCoverageResults@2
         inputs:
           codeCoverageTool: Cobertura
           summaryFileLocation: $(System.DefaultWorkingDirectory)/coverage/cobertura-coverage.xml
-        condition: succeededOrFailed()
+        condition: and(succeededOrFailed(), eq(variables['COMMAND'], 'test:ci'))
         displayName: 'Publish code coverage results'
