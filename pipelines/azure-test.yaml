@@ -15,7 +15,6 @@ pool:
 variables:
   NODE_VERSION: '22.x'
   PNPM_VERSION: '10.34.9'
-  PNPM_STORE_PATH: '$(Pipeline.Workspace)/.pnpm-store'
 
 jobs:
   - job: run_tests
@@ -43,16 +42,7 @@ jobs:
       - script: |
           npm i -g pnpm@$(PNPM_VERSION)
           pnpm --version
-          pnpm config set store-dir "$(PNPM_STORE_PATH)"
         displayName: 'Install PNPM'
-
-      - task: Cache@2
-        inputs:
-          key: '"pnpm" | "$(Agent.OS)" | "$(NODE_VERSION)" | "$(PNPM_VERSION)" | pnpm-lock.yaml'
-          restoreKeys: |
-            "pnpm" | "$(Agent.OS)" | "$(NODE_VERSION)" | "$(PNPM_VERSION)"
-          path: $(PNPM_STORE_PATH)
-        displayName: 'Cache pnpm store'
 
       - script: |
           # Try to checkout the matching branch, if the command fails, don't care.
