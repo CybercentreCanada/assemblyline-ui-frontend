@@ -171,6 +171,9 @@ export type User = AppUser & {
   /** BCrypt hash of the user's password */
   password: string;
 
+  /** If the user has a password */
+  has_password: boolean;
+
   /** Maximum number of concurrent async submission (0: No Quota) */
   submission_async_quota?: number;
 
