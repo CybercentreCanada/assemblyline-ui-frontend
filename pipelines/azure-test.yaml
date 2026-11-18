@@ -57,6 +57,14 @@ jobs:
           pnpm run lint:ci
         displayName: 'ESLint'
 
+      - task: PublishTestResults@2
+        inputs:
+          testResultsFormat: JUnit
+          testResultsFiles: $(System.DefaultWorkingDirectory)/test-results/vitest.xml
+          testRunTitle: 'Vitest unit tests'
+        condition: succeededOrFailed()
+        displayName: 'Publish unit test results'
+
       - task: PublishCodeCoverageResults@2
         inputs:
           codeCoverageTool: Cobertura

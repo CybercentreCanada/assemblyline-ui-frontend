@@ -13,8 +13,7 @@ import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
 const defaultConfig = {
-  files: ['src/**/*.{js,mjs,cjs,ts,jsx,tsx}'],
-  ignores: ['node_modules/**/*', 'coverage/**/*', 'build/**/*', 'dist/**/*', 'docker/**/*', 'public/**/*']
+  files: ['src/**/*.{js,mjs,cjs,ts,jsx,tsx}']
 };
 
 const typescriptRules = {
@@ -78,6 +77,18 @@ const typescriptRules = {
 };
 
 export default tseslint.config(
+  {
+    ignores: [
+      '**/node_modules/**',
+      'coverage/**',
+      'build/**',
+      'dist/**',
+      'docker/**',
+      'public/**',
+      'playwright-report/**',
+      'test-results/**'
+    ]
+  },
   // ESLint rules
   { ...eslint.configs.recommended, ...defaultConfig },
   // {
