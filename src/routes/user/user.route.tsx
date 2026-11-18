@@ -34,6 +34,7 @@ import type { User } from 'models/base/user';
 import React, { memo, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useLocation, useNavigate, useParams } from 'react-router';
+import { ChangePassword } from 'routes/user/components/ChangePassword';
 import APIKeys from 'routes/user/components/api_keys';
 import Apps from 'routes/user/components/apps';
 import DisableOTP from 'routes/user/components/disable_otp';
@@ -43,21 +44,6 @@ import Classification from 'ui/Classification';
 import ConfirmationDialog from 'ui/ConfirmationDialog';
 import CustomChip from 'ui/CustomChip';
 import { RouterPrompt } from 'ui/RouterPrompt';
-
-type ParsedUser = Omit<
-  User,
-  'api_daily_quota' | 'api_quota' | 'submission_async_quota' | 'submission_daily_quota' | 'submission_quota'
-> & {
-  '2fa_enabled'?: boolean;
-  api_daily_quota?: User['api_daily_quota'] | string;
-  api_quota?: User['api_quota'] | string;
-  identity_id?: string;
-  new_pass_confirm?: string;
-  new_pass?: string;
-  submission_async_quota?: User['submission_async_quota'] | string;
-  submission_daily_quota?: User['submission_daily_quota'] | string;
-  submission_quota?: User['submission_quota'] | string;
-};
 
 type UserProps = {
   username?: string | null;
@@ -195,15 +181,10 @@ function User({ username = null }: UserProps) {
     setUser({ ...user, classification: value });
   }
 
-  function setConfirmPassword(value) {
-    setModified(true);
-    setUser({ ...user, new_pass_confirm: value });
-  }
-
-  function setNewPassword(value) {
-    setModified(true);
-    setUser({ ...user, new_pass: value });
-  }
+  const handlePasswordChange = updatedUser => {
+    setUser(updatedUser);
+    setDrawerOpen(false);
+  };
 
   function setAPIQuota(value) {
     setModified(true);
@@ -371,26 +352,7 @@ function User({ username = null }: UserProps) {
                     </>
                   ),
                   change_password: (
-                    <>
-                      <Typography variant="h4" gutterBottom>
-                        {t('change_password')}
-                      </Typography>
-                      <TextField
-                        autoFocus
-                        type="password"
-                        margin="normal"
-                        variant="outlined"
-                        label={t('new_password')}
-                        onChange={event => setNewPassword(event.target.value)}
-                      />
-                      <TextField
-                        type="password"
-                        margin="normal"
-                        variant="outlined"
-                        label={t('confirm_password')}
-                        onChange={event => setConfirmPassword(event.target.value)}
-                      />
-                    </>
+                    <ChangePassword user={user} onCancel={() => setDrawerOpen(false)} onSave={handlePasswordChange} />
                   ),
                   groups: (
                     <>
