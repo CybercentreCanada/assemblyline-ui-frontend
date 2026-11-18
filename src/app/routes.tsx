@@ -2,7 +2,7 @@ import type { SnackbarEvents } from '@cccsaurora/clue-ui';
 import { SNACKBAR_EVENT_ID } from '@cccsaurora/clue-ui';
 import { Typography } from '@mui/material';
 import useALContext from 'core/config/useALContext';
-import CrashTest from 'core/error/error.route';
+import { CrashPage } from 'core/error/error.route';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import NotFoundPage from 'core/template/branding/AppBanner';
 import RedirectSubmission from 'core/template/components/utils/RedirectSubmission';
@@ -156,7 +156,7 @@ const WrappedRoutes = () => {
         <Route path="/archive/:id" element={<ArchiveDetail />} />
         <Route path="/archive/:id/:tab" element={<ArchiveDetail />} />
         <Route path="/authorize" element={<AppRegistration />} />
-        <Route path="/crash" element={<CrashTest />} />
+        <Route path="/crash" element={<CrashPage />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/development/api" element={<DevelopmentAPI />} />
         <Route path="/development/customize" element={<DevelopmentCustomize />} />
