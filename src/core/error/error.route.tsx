@@ -2,7 +2,12 @@ import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
 import { createAppRoute } from 'core/router';
 import { memo, useEffect } from 'react';
 
+//*****************************************************************************************
+// Crash Page
+//*****************************************************************************************
+
 export type CrashPageProps = {
+  /** Optional error message to throw when the crash page mounts. */
   message?: string;
 };
 
@@ -29,5 +34,3 @@ export const CrashRoute = createAppRoute({
   disabled: () => false,
   forbidden: () => false
 });
-
-export default CrashPage;

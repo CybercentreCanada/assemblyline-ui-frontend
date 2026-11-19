@@ -1,8 +1,14 @@
 import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined';
+import LinkOffIcon from '@mui/icons-material/LinkOff';
 import { Typography, useMediaQuery, useTheme } from '@mui/material';
+import { createAppRoute } from 'core/router';
 import PageCenter from 'core/template/components/pages/PageCenter';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
+
+//*****************************************************************************************
+// Missing Node Page
+//*****************************************************************************************
 
 export const MissingNodePage = memo(() => {
   const { t } = useTranslation(['missingNode']);
@@ -25,3 +31,22 @@ export const MissingNodePage = memo(() => {
 });
 
 MissingNodePage.displayName = 'MissingNodePage';
+
+//*****************************************************************************************
+// Missing Node Route
+//*****************************************************************************************
+
+export const MissingNodeRoute = createAppRoute({
+  component: MissingNodePage,
+
+  path: '/missing-node',
+
+  ancestor: null,
+  shortname: () => ['app_route.missing_node.shortname', { ns: 'missingNode' }],
+  fullname: () => ['app_route.missing_node.fullname', { ns: 'missingNode' }],
+  shorticon: () => <LinkOffIcon />,
+  fullicon: () => <LinkOffIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
+});

@@ -1,4 +1,6 @@
 {
+  "app_route.missing_node.fullname": "Nœud manquant",
+  "app_route.missing_node.shortname": "Nœud manquant",
   "description": "Le panneau n'a pas de nœud de rendu assigné. Essayez de naviguer vers une autre page.",
   "title": "La mise en page a oublié son nœud"
 }

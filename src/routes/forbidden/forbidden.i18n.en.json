@@ -1,4 +1,8 @@
 {
+  "app_route.disabled.fullname": "Disabled",
+  "app_route.disabled.shortname": "Disabled",
+  "app_route.forbidden.fullname": "Forbidden",
+  "app_route.forbidden.shortname": "Forbidden",
   "disabled": "Your account has been disabled...",
   "not_allowed": "You are not allowed to view this page...",
   "title": "403: Forbidden"
