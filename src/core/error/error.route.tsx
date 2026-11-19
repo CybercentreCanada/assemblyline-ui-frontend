@@ -1,16 +1,14 @@
-import React, { useEffect } from 'react';
+import { memo, useEffect } from 'react';
 
-type CrashTestProps = {
+export type CrashPageProps = {
   message?: string;
 };
 
-const CrashTest: React.FC<CrashTestProps> = ({ message = null }) => {
+export const CrashPage = memo(({ message = null }: CrashPageProps) => {
   // This page makes the UI crash so we can test the frontend exception handling
   useEffect(() => {
     throw new Error(message || 'This is a test crash !');
   }, [message]);
 
   return <div />;
-};
-
-export default CrashTest;
+});
