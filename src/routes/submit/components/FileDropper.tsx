@@ -78,7 +78,7 @@ const FileDropper = ({ file, setFile, disabled }: FileDropperProps) => {
   }, [isDropping, file, canSubmit, t]);
 
   return (
-    <DropZone {...getRootProps()} enter={isDropping} hover={!disabled}>
+    <DropZone {...getRootProps()} data-testid="submit-file-dropzone" enter={isDropping} hover={!disabled}>
       <input id="file_dropper" {...getInputProps()} />
 
       {canSubmit ? <AiOutlineSecurityScan style={{ fontSize: '140px' }} /> : <BlockIcon sx={{ fontSize: '140px' }} />}

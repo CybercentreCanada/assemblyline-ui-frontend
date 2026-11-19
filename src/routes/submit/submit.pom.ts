@@ -19,7 +19,7 @@ const SUBMISSION_PROFILES = [
 ] as const;
 
 export class SubmitPage extends PageObjectModel {
-  private readonly bannerImage: Locator;
+  private readonly fileDropZone: Locator;
   private readonly fileDropper: Locator;
   private readonly cancelButton: Locator;
   private readonly submitButton: Locator;
@@ -32,7 +32,7 @@ export class SubmitPage extends PageObjectModel {
 
   constructor(page: Page) {
     super(page, 'Submit page', '/submit');
-    this.bannerImage = this.page.locator('img[src="/images/banner.svg"], img[src="/images/banner_dark.svg"]');
+    this.fileDropZone = this.page.getByTestId('submit-file-dropzone');
     this.fileDropper = this.page.locator('#file_dropper');
     this.cancelButton = this.page.locator('button#cancel');
     this.submitButton = this.page.locator('button#submit');
@@ -45,11 +45,11 @@ export class SubmitPage extends PageObjectModel {
   }
 
   locators(): Locator[] {
-    return [this.fileDropper];
+    return [this.fileDropZone];
   }
 
   async waitForPage({ state = 'visible', timeout = 0 }: WaitForOptions = {}) {
-    await this.fileDropper.waitFor({ state, timeout });
+    await this.fileDropZone.waitFor({ state, timeout });
   }
 
   async switchTab(tabLabel: 'File' | 'Hash/URL') {
