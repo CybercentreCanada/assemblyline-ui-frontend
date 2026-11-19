@@ -33,6 +33,8 @@ import adminServiceReviewEN from 'routes/admin-service-review/admin-service-revi
 import adminServiceReviewFR from 'routes/admin-service-review/admin-service-review.i18n.fr.json';
 import adminServicesEN from 'routes/admin-services/admin-services.i18n.en.json';
 import adminServicesFR from 'routes/admin-services/admin-services.i18n.fr.json';
+import adminCommunityServicesEN from 'routes/admin-services/components/adminCommunityServices.i18n.en.json';
+import adminCommunityServicesFR from 'routes/admin-services/components/adminCommunityServices.i18n.fr.json';
 import adminSiteMapEN from 'routes/admin-sitemap/admin-sitemap.i18n.en.json';
 import adminSiteMapFR from 'routes/admin-sitemap/admin-sitemap.i18n.fr.json';
 import adminTagSafelistEN from 'routes/admin-tag-safelist/admin-tag-safelist.i18n.en.json';
@@ -130,6 +132,7 @@ const resources = {
   en: {
     adminActions: adminActionsEN,
     adminAPIkeys: adminAPIkeysEN,
+    adminCommunityServices: adminCommunityServicesEN,
     adminErrorViewer: adminErrorViewerEN,
     adminIdentify: adminIdentifyEN,
     adminServiceReview: adminServiceReviewEN,
@@ -196,6 +199,7 @@ const resources = {
   fr: {
     adminActions: adminActionsFR,
     adminAPIkeys: adminAPIkeysFR,
+    adminCommunityServices: adminCommunityServicesFR,
     adminErrorViewer: adminErrorViewerFR,
     adminIdentify: adminIdentifyFR,
     adminServiceReview: adminServiceReviewFR,
