@@ -4,7 +4,7 @@ import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import PageCenter from 'core/template/components/pages/PageCenter';
 import { PRIORITIES, STATUSES, type Workflow } from 'models/base/workflow';
-import React, { useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
 import { ForbiddenPage } from 'routes/forbidden/forbidden.route';
@@ -29,12 +29,12 @@ type Params = {
   id: string;
 };
 
-type Props = {
+export type ManageWorkflowDetailPageProps = {
   id?: string;
   onClose?: () => void;
 };
 
-const WrappedWorkflowDetail = ({ id: propID = null, onClose = null }: Props) => {
+export const ManageWorkflowDetailPage = memo(({ id: propID = null, onClose = null }: ManageWorkflowDetailPageProps) => {
   const { t } = useTranslation(['manageWorkflowDetail']);
   const { id: paramID } = useParams<Params>();
   const theme = useTheme();
@@ -231,7 +231,4 @@ const WrappedWorkflowDetail = ({ id: propID = null, onClose = null }: Props) => 
         </div>
       </PageCenter>
     );
-};
-
-export const WorkflowDetail = React.memo(WrappedWorkflowDetail);
-export default WorkflowDetail;
+});

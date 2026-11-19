@@ -9,7 +9,7 @@ import PageFullSize from 'core/template/branding/AppPageCenter';
 import type { ApiDocumentation } from 'models/api';
 import type { Method } from 'models/utils/request';
 import type { editor } from 'monaco-editor';
-import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate } from 'react-router';
 import AutoSizer from 'react-virtualized-auto-sizer';
@@ -26,7 +26,7 @@ import { PageHeader } from 'ui/layouts/PageHeader';
 
 loader.config({ paths: { vs: '/cdn/monaco_0.35.0/vs' } });
 
-export const DevelopmentAPI = () => {
+export const DevelopmentAPIPage = memo(() => {
   const { t } = useTranslation(['developmentAPI', 'user']);
   const theme = useTheme();
   const { user: currentUser, configuration } = useALContext();
@@ -381,6 +381,4 @@ export const DevelopmentAPI = () => {
         </div>
       </PageFullSize>
     );
-};
-
-export default DevelopmentAPI;
+});

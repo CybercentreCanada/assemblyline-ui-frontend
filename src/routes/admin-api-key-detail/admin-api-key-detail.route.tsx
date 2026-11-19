@@ -16,7 +16,7 @@ import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import PageCenter from 'core/template/components/pages/PageCenter';
 import { type ApiKey } from 'models/base/user';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router';
 import { ForbiddenPage } from 'routes/forbidden/forbidden.route';
@@ -33,12 +33,12 @@ type ParamProps = {
   id: string;
 };
 
-type ApikeyDetailProps = {
+export type AdminAPIKeyDetailPageProps = {
   key_id?: string;
   onClose?: () => void;
 };
 
-const ApikeyDetail = ({ key_id = null, onClose = () => null }: ApikeyDetailProps) => {
+export const AdminAPIKeyDetailPage = memo(({ key_id = null, onClose = () => null }: AdminAPIKeyDetailPageProps) => {
   const { t } = useTranslation(['adminAPIkeys']);
   const navigate = useNavigate();
   const theme = useTheme();
@@ -356,6 +356,4 @@ const ApikeyDetail = ({ key_id = null, onClose = () => null }: ApikeyDetailProps
   ) : (
     <ForbiddenPage />
   );
-};
-
-export default ApikeyDetail;
+});

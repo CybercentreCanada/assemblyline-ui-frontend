@@ -9,7 +9,7 @@ import { createSearchParams, SearchParamsProvider, useSearchParams } from 'featu
 import type { SearchResult } from 'models/api/search';
 import type { IndexDefinition } from 'models/api/user';
 import type { UserIndexed } from 'models/base/user';
-import React, { useCallback, useEffect, useState } from 'react';
+import { memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate } from 'react-router';
 import { AddUserPage } from 'routes/admin-users/components/users_add';
@@ -30,7 +30,7 @@ const USERS_PARAMS = createSearchParams(p => ({
 
 type UsersParams = typeof USERS_PARAMS;
 
-const UsersSearch = () => {
+export const AdminUsersContent = memo(() => {
   const { t } = useTranslation(['adminUsers']);
   const theme = useTheme();
   const { apiCall } = useMyAPI();
@@ -156,13 +156,10 @@ const UsersSearch = () => {
       </div>
     </PageFullWidth>
   );
-};
+});
 
-const WrappedUsersPage = () => (
+export const AdminUsersPage = memo(() => (
   <SearchParamsProvider params={USERS_PARAMS}>
-    <UsersSearch />
+    <AdminUsersContent />
   </SearchParamsProvider>
-);
-
-export const Users = React.memo(WrappedUsersPage);
-export default Users;
+));

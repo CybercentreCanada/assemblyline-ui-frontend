@@ -3,12 +3,12 @@ import Skeleton from '@mui/material/Skeleton';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
-import { useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import CustomChip from 'ui/CustomChip';
 import { PageHeader } from 'ui/layouts/PageHeader';
 
-export default function Configuration() {
+export const HelpConfigurationPage = memo(() => {
   const { apiCall } = useMyAPI();
   const [configuration, setConfiguration] = useState(null);
   const [constants, setConstants] = useState(null);
@@ -241,4 +241,4 @@ export default function Configuration() {
       </div>
     </PageFullWidth>
   );
-}
+});

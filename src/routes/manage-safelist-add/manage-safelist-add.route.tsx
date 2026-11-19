@@ -25,7 +25,7 @@ import {
   DEFAULT_SAFELIST_SIGNATURE,
   DEFAULT_SAFELIST_TAG
 } from 'models/base/safelist';
-import { useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router';
 import { ForbiddenPage } from 'routes/forbidden/forbidden.route';
@@ -38,13 +38,13 @@ type ParamProps = {
   id: string;
 };
 
-type Props = {
+export type ManageSafelistAddPageProps = {
   safelist_id?: string;
   close?: () => void;
 };
 
 // eslint-disable-next-line no-empty-pattern
-const SafelistNew = ({}: Props) => {
+export const ManageSafelistAddPage = memo(({}: ManageSafelistAddPageProps) => {
   const { t } = useTranslation(['manageSafelistAdd']);
   const { id } = useParams<ParamProps>();
   const theme = useTheme();
@@ -438,6 +438,4 @@ const SafelistNew = ({}: Props) => {
   ) : (
     <ForbiddenPage />
   );
-};
-
-export default SafelistNew;
+});

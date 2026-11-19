@@ -127,7 +127,7 @@ const StyledCard = memo(
   }))
 );
 
-export default function Search() {
+export const HelpSearchPage = memo(() => {
   const { t } = useTranslation(['helpSearch']);
   const theme = useTheme();
   const { indexes } = useALContext();
@@ -511,4 +511,4 @@ export default function Search() {
       </ContentWithTOC>
     </PageCenter>
   );
-}
+});

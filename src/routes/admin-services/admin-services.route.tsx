@@ -30,10 +30,10 @@ import { useNotificationFeed } from 'layout/notifications/notifications.hooks';
 import type { CustomUser } from 'models/api/user';
 import type { ServiceIndexed, ServiceUpdateData, ServiceUpdates } from 'models/base/service';
 import type { ChangeEvent } from 'react';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useLocation, useNavigate } from 'react-router';
-import ServiceDetail from 'routes/admin-service-detail/admin-service-detail.route';
+import { AdminServiceDetailPage } from 'routes/admin-service-detail/admin-service-detail.route';
 import CommunityServiceTable from 'routes/admin-services/components/CommunityServiceTable';
 import NewServiceTable from 'routes/admin-services/components/NewServiceTable';
 import ServiceTable from 'routes/search/components/service';
@@ -41,7 +41,7 @@ import { FileDownloader } from 'ui/buttons/FileDownloader';
 import ConfirmationDialog from 'ui/ConfirmationDialog';
 import { PageHeader } from 'ui/layouts/PageHeader';
 
-export default function Services() {
+export const AdminServicesPage = memo(() => {
   const { t } = useTranslation(['adminServices']);
   const theme = useTheme();
   const location = useLocation();
@@ -249,7 +249,9 @@ export default function Services() {
 
   useEffect(() => {
     if (location.hash) {
-      setGlobalDrawer(<ServiceDetail name={location.hash.slice(1)} onDeleted={onDeleted} onUpdated={onUpdated} />);
+      setGlobalDrawer(
+        <AdminServiceDetailPage name={location.hash.slice(1)} onDeleted={onDeleted} onUpdated={onUpdated} />
+      );
     } else {
       closeGlobalDrawer();
     }
@@ -546,4 +548,4 @@ export default function Services() {
   ) : (
     <Navigate to="/forbidden" replace />
   );
-}
+});

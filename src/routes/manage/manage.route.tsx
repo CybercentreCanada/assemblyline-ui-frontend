@@ -1,10 +1,11 @@
 import useALContext from 'core/config/useALContext';
 import { useAppConfigs } from 'core/template/components/app/hooks';
 import PageCenter from 'core/template/components/pages/PageCenter';
+import { memo } from 'react';
 import { ForbiddenPage } from 'routes/forbidden/forbidden.route';
 import LinkGrid from 'ui/linkgrid';
 
-export default function Manage() {
+export const ManagePage = memo(() => {
   const { preferences: layout } = useAppConfigs();
   const { validateProps } = useALContext();
 
@@ -26,4 +27,4 @@ export default function Manage() {
   ) : (
     <ForbiddenPage />
   );
-}
+});

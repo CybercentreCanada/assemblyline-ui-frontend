@@ -4,9 +4,10 @@ import PageCardCentered from 'core/template/branding/AppPageCardCentered';
 import { useAppLayout } from 'core/template/components/app/hooks';
 import useAppBannerVert from 'core/template/components/app/hooks/useAppBannerVert';
 import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-function Logout() {
+export const LogoutPage = memo(() => {
   const { t } = useTranslation(['logout']);
   const theme = useTheme();
   const { apiCall } = useMyAPI();
@@ -37,6 +38,4 @@ function Logout() {
       </div>
     </PageCardCentered>
   );
-}
-
-export default Logout;
+});

@@ -11,10 +11,10 @@ import useDrawer from 'layout/drawer/drawer.hooks';
 import type { FacetResult, HistogramResult, SearchResult } from 'models/api/search';
 import type { CustomUser, IndexDefinition } from 'models/api/user';
 import type { Error } from 'models/base/error';
-import React, { useCallback, useEffect, useState } from 'react';
+import { memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useLocation, useNavigate } from 'react-router';
-import { ErrorDetail } from 'routes/admin-error-detail/admin-error-detail.route';
+import { AdminErrorDetailPage } from 'routes/admin-error-detail/admin-error-detail.route';
 import ErrorsTable from 'routes/search/components/errors';
 import { safeFieldValue } from 'shared/utils/utils';
 import { DateTimeRangePicker } from 'ui/DateTime/DateTimeRangePicker';
@@ -42,7 +42,7 @@ const ERROR_VIEWER_PARAMS = createSearchParams(p => ({
 
 type ErrorViewerParams = typeof ERROR_VIEWER_PARAMS;
 
-const ErrorViewer = () => {
+const AdminErrorViewerContent = memo(() => {
   const { t, i18n } = useTranslation(['adminErrorViewer']);
   const theme = useTheme();
   const location = useLocation();
@@ -169,7 +169,7 @@ const ErrorViewer = () => {
   }, [globalDrawerOpened]);
 
   useEffect(() => {
-    if (location.hash) setGlobalDrawer(<ErrorDetail error_key={location.hash.substr(1)} />);
+    if (location.hash) setGlobalDrawer(<AdminErrorDetailPage error_key={location.hash.substr(1)} />);
     else closeGlobalDrawer();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.hash]);
@@ -301,13 +301,10 @@ const ErrorViewer = () => {
   ) : (
     <Navigate to="/forbidden" replace />
   );
-};
+});
 
-const WrappedErrorViewerPage = () => (
+export const AdminErrorViewerPage = memo(() => (
   <SearchParamsProvider params={ERROR_VIEWER_PARAMS}>
-    <ErrorViewer />
+    <AdminErrorViewerContent />
   </SearchParamsProvider>
-);
-
-export const ErrorViewerPage = React.memo(WrappedErrorViewerPage);
-export default ErrorViewerPage;
+));

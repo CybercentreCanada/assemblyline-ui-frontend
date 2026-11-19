@@ -10,7 +10,7 @@ import PageFullWidth from 'core/template/components/pages/PageFullWidth';
 import { createSearchParams, SearchParamsProvider, useSearchParams } from 'features/search-params';
 import type { IndexDefinition } from 'models/api/user';
 import type { SubmissionIndexed } from 'models/base/submission';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ForbiddenPage } from 'routes/forbidden/forbidden.route';
 import SubmissionsTable from 'routes/search/components/submissions';
@@ -36,7 +36,7 @@ export const SUBMISSION_PARAMS = createSearchParams(p => ({
 
 export type SubmissionParams = typeof SUBMISSION_PARAMS;
 
-const SubmissionSearch = () => {
+export const SubmissionsContent = memo(() => {
   const { t } = useTranslation(['submissions']);
   const theme = useTheme();
   const { apiCall } = useMyAPI();
@@ -161,13 +161,10 @@ const SubmissionSearch = () => {
   ) : (
     <ForbiddenPage />
   );
-};
+});
 
-const WrappedSubmissionPage = () => (
+export const SubmissionsPage = memo(() => (
   <SearchParamsProvider params={SUBMISSION_PARAMS}>
-    <SubmissionSearch />
+    <SubmissionsContent />
   </SearchParamsProvider>
-);
-
-export const SubmissionPage = React.memo(WrappedSubmissionPage);
-export default SubmissionPage;
+));

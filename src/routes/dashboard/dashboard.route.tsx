@@ -21,7 +21,7 @@ import type { ScalerMessage } from 'models/messages/scaler_heartbeat';
 import type { ScalerStatusMessage } from 'models/messages/scaler_status_heartbeat';
 import type { ServiceMessage } from 'models/messages/service_heartbeat';
 import type { AnyActionArg, CSSProperties, ReactNode } from 'react';
-import React, { useEffect, useMemo, useReducer, useState } from 'react';
+import React, { memo, useEffect, useMemo, useReducer, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { bytesToSize, humanSeconds, sumValues } from 'shared/utils/utils';
 import io from 'socket.io-client';
@@ -1510,7 +1510,7 @@ const DEFAULT_RETROHUNT = {
   initialized: false
 } as RetrohuntMessage['msg'];
 
-const Dashboard = () => {
+export const DashboardPage = memo(() => {
   const { t } = useTranslation(['dashboard']);
   const { apiCall } = useMyAPI();
   const { configuration } = useALContext();
@@ -1759,6 +1759,4 @@ const Dashboard = () => {
       </Grid>
     </PageFullWidth>
   );
-};
-
-export default Dashboard;
+});

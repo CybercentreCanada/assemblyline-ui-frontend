@@ -1,11 +1,12 @@
 import { Skeleton, Typography, useTheme } from '@mui/material';
 import useALContext from 'core/config/useALContext';
-import NotFoundPage from 'core/template/branding/AppBanner';
 import PageCenter from 'core/template/components/pages/PageCenter';
+import { memo } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
+import { NotFoundPage } from 'routes/not-found/not-found.route';
 import Classification from 'ui/Classification';
 
-export default function HelpClassification() {
+export const HelpClassificationPage = memo(() => {
   const { t } = useTranslation(['helpClassification']);
   const { c12nDef } = useALContext();
   const theme = useTheme();
@@ -278,4 +279,4 @@ export default function HelpClassification() {
   ) : (
     <NotFoundPage />
   );
-}
+});

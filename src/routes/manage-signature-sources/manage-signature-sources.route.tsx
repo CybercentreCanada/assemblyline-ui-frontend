@@ -628,7 +628,7 @@ const ServiceDetail = ({
   );
 };
 
-export default function SignatureSources() {
+export const ManageSignatureSourcesPage = memo(() => {
   const { t } = useTranslation(['manageSignatureSources']);
   const theme = useTheme();
   const { apiCall } = useMyAPI();
@@ -699,4 +699,4 @@ export default function SignatureSources() {
   ) : (
     <ForbiddenPage />
   );
-}
+});

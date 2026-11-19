@@ -7,7 +7,7 @@ import PageCenter from 'core/template/components/pages/PageCenter';
 import useAssistant from 'layout/assistant/assistant.hooks';
 import type { File } from 'models/api/file';
 import type { Section } from 'models/base/result';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useLocation, useNavigate, useParams } from 'react-router';
 import { ArchiveBanner } from 'routes/archive-detail/components/banner';
@@ -32,7 +32,7 @@ import { HexSection } from 'routes/file-viewer/components/hex';
 import { ImageSection } from 'routes/file-viewer/components/image';
 import { StringsSection } from 'routes/file-viewer/components/strings';
 import { ForbiddenPage } from 'routes/forbidden/forbidden.route';
-import NotFoundPage from 'routes/not-found/not-found.route';
+import { NotFoundPage } from 'routes/not-found/not-found.route';
 import AISummarySection from 'routes/submission-detail/components/ai_summary';
 import Classification from 'ui/Classification';
 import InformativeAlert from 'ui/InformativeAlert';
@@ -44,13 +44,13 @@ type Params = {
   tab?: 'details' | 'detection' | 'tags' | 'relations' | 'ascii' | 'code' | 'hex' | 'image' | 'community';
 };
 
-type Props = {
+export type ArchiveDetailPageProps = {
   sha256?: string;
   sid?: string;
   force?: boolean;
 };
 
-const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = false }) => {
+export const ArchiveDetailPage = memo(({ sha256: propSha256, force = false }: ArchiveDetailPageProps) => {
   const { t } = useTranslation(['archive']);
   const theme = useTheme();
   const location = useLocation();
@@ -308,8 +308,4 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
         />
       </Layout>
     );
-};
-
-export const ArchiveDetail = React.memo(WrappedArchiveDetail);
-
-export default ArchiveDetail;
+});

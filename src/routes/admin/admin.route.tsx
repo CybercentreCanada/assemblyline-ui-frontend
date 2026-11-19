@@ -1,10 +1,11 @@
 import { useAppConfigs, useAppUser } from 'core/template/components/app/hooks';
 import PageCenter from 'core/template/components/pages/PageCenter';
 import type { CustomUser } from 'models/api/user';
+import { memo } from 'react';
 import { Navigate } from 'react-router';
 import LinkGrid from 'ui/linkgrid';
 
-export default function Admin() {
+export const AdminPage = memo(() => {
   const { preferences: layout } = useAppConfigs();
   const { user: currentUser, validateProps } = useAppUser<CustomUser>();
   const items = [];
@@ -25,4 +26,4 @@ export default function Admin() {
   ) : (
     <Navigate to="/forbidden" replace />
   );
-}
+});

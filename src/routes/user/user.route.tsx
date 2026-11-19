@@ -28,8 +28,10 @@ import { red } from '@mui/material/colors';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
+import { useAppUser } from 'core/template/components/app/hooks';
 import PageCenter from 'core/template/components/pages/PageCenter';
 import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
+import type { CustomUser } from 'models/api/user';
 import type { User } from 'models/base/user';
 import React, { memo, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -59,7 +61,7 @@ type ParsedUser = Omit<
   submission_quota?: User['submission_quota'] | string;
 };
 
-type UserProps = {
+export type UserPageProps = {
   username?: string | null;
 };
 
@@ -91,7 +93,7 @@ const ClickRow = ({ children, enabled, onClick, chevron = false, ...other }) => 
   </TableRow>
 );
 
-function User({ username = null }: UserProps) {
+export const UserPage = memo(({ username = null }: UserPageProps) => {
   const { t } = useTranslation(['user']);
   const theme = useTheme();
   const { id } = useParams<ParamProps>();
@@ -1072,6 +1074,9 @@ function User({ username = null }: UserProps) {
       </Grid>
     </PageCenter>
   );
-}
+});
 
-export default memo(User);
+export const AccountPage = memo(() => {
+  const { user: currentUser } = useAppUser<CustomUser>();
+  return <UserPage username={currentUser.username} />;
+});

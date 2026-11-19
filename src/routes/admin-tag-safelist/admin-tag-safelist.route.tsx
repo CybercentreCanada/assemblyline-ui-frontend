@@ -6,7 +6,7 @@ import PageFullSize from 'core/template/branding/AppPageCenter';
 import { useAppTheme, useAppUser } from 'core/template/components/app/hooks';
 import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
 import type { CustomUser } from 'models/api/user';
-import { useRef, useState } from 'react';
+import { memo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ReactResizeDetector from 'react-resize-detector';
 import { Navigate } from 'react-router';
@@ -16,7 +16,7 @@ import { RouterPrompt } from 'ui/RouterPrompt';
 
 loader.config({ paths: { vs: '/cdn/monaco_0.35.0/vs' } });
 
-export default function AdminTagSafelist() {
+export const AdminTagSafelistPage = memo(() => {
   const { t, i18n } = useTranslation(['adminTagSafelist']);
   const theme = useTheme();
   const { apiCall } = useMyAPI();
@@ -184,4 +184,4 @@ export default function AdminTagSafelist() {
   ) : (
     <Navigate to="/forbidden" replace />
   );
-}
+});
