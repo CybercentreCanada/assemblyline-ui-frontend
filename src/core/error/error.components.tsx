@@ -222,9 +222,13 @@ export const ErrorFallback = memo(
               component="pre"
               sx={{ paddingTop: theme.spacing(1), whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}
             />
-            <Button onClick={handleExpandToggle} sx={{ margin: theme.spacing(1), color: theme.palette.primary.main }}>
+            <Button
+              aria-expanded={expanded}
+              onClick={handleExpandToggle}
+              sx={{ margin: theme.spacing(1), color: theme.palette.primary.main }}
+            >
               {expanded ? t('error.hideStack') : t('error.showStack')}
-              <ExpandMore expand={expanded} aria-expanded={expanded} aria-label="show more">
+              <ExpandMore expand={expanded}>
                 <ExpandMoreIcon />
               </ExpandMore>
             </Button>
