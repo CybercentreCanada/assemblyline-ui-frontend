@@ -2,7 +2,9 @@ import clueEN from '@cccsaurora/clue-ui/en/translation.json';
 import clueFR from '@cccsaurora/clue-ui/fr/translation.json';
 import translationEN from 'app/core.i18n.en.json';
 import translationFR from 'app/core.i18n.fr.json';
-import { default as i18n } from 'i18next';
+import errorEN from 'core/error/error.i18n.en.json';
+import errorFR from 'core/error/error.i18n.fr.json';
+import i18n from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import assistantEN from 'layout/assistant/assistant.i18n.en.json';
 import assistantFR from 'layout/assistant/assistant.i18n.fr.json';
@@ -145,6 +147,7 @@ const resources = {
     dashboard: dashboardEN,
     dateTime: dateTimeEN,
     developmentAPI: developmentAPIEN,
+    error: errorEN,
     error403: error403EN,
     error404: error404EN,
     favorites: favoritesEN,
@@ -208,6 +211,7 @@ const resources = {
     dashboard: dashboardFR,
     dateTime: dateTimeFR,
     developmentAPI: developmentAPIFR,
+    error: errorFR,
     error403: error403FR,
     error404: error404FR,
     favorites: favoritesFR,
