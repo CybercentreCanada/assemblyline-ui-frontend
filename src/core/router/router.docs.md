@@ -93,7 +93,7 @@ const SubmitPage = memo(() => <div>Submit</div>);
 SubmitPage.displayName = 'SubmitPage';
 
 export const SubmitRoute = createAppRoute({
-  component: <SubmitPage />,
+  component: SubmitPage,
   path: '/submit',
   ancestor: null,
   shortname: () => ['app_route.submit.shortname'],
@@ -109,7 +109,7 @@ A parameterized route can define path and search codecs:
 
 ```tsx
 export const AlertRoute = createAppRoute({
-  component: <AlertDetailPage />,
+  component: AlertDetailPage,
   path: '/alert/:id',
   params: blueprints => ({ id: blueprints.string() }),
   search: blueprints => ({ tab: blueprints.enum(['details', 'history'], 'details') }),

@@ -51,7 +51,7 @@ LockedPage.displayName = 'LockedPage';
 //*****************************************************************************************
 
 export const LockedRoute = createAppRoute({
-  component: <LockedPage />,
+  component: LockedPage,
 
   path: '/locked',
 
