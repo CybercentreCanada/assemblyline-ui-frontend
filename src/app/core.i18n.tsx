@@ -95,8 +95,6 @@ import manageWorkflowDetailEN from 'routes/manage-workflow-detail/manage-workflo
 import manageWorkflowDetailFR from 'routes/manage-workflow-detail/manage-workflow-detail.i18n.fr.json';
 import manageWorkflowsEN from 'routes/manage-workflows/manage-workflows.i18n.en.json';
 import manageWorkflowsFR from 'routes/manage-workflows/manage-workflows.i18n.fr.json';
-import missingNodeEN from 'routes/missing-node/missing-node.i18n.en.json';
-import missingNodeFR from 'routes/missing-node/missing-node.i18n.fr.json';
 import notFoundEN from 'routes/not-found/not-found.i18n.en.json';
 import notFoundFR from 'routes/not-found/not-found.i18n.fr.json';
 import retrohuntEN from 'routes/retrohunt/retrohunt.i18n.en.json';
@@ -180,7 +178,6 @@ const resources = {
     manageSignatureSources: manageSignatureSourcesEN,
     manageWorkflowDetail: manageWorkflowDetailEN,
     manageWorkflows: manageWorkflowsEN,
-    missingNode: missingNodeEN,
     notification: notificationEN,
     retrohunt: retrohuntEN,
     sandboxResult: sandboxResultEN,
@@ -247,7 +244,6 @@ const resources = {
     manageSignatureSources: manageSignatureSourcesFR,
     manageWorkflowDetail: manageWorkflowDetailFR,
     manageWorkflows: manageWorkflowsFR,
-    missingNode: missingNodeFR,
     notification: notificationFR,
     retrohunt: retrohuntFR,
     sandboxResult: sandboxResultFR,
