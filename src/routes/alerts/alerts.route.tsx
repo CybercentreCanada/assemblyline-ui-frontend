@@ -9,11 +9,11 @@ import useDrawer from 'layout/drawer/drawer.hooks';
 import type { CustomUser, IndexDefinition } from 'models/api/user';
 import type { Alert, AlertIndexed, AlertItem } from 'models/base/alert';
 import type { Workflow } from 'models/base/workflow';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
 import { useLocation, useNavigate } from 'react-router';
-import AlertDetail from 'routes/alert-detail/alert-detail.route';
+import { AlertDetailPage } from 'routes/alert-detail/alert-detail.route';
 import AlertActions from 'routes/alerts/components/Actions';
 import AlertDefaultSearchParameters from 'routes/alerts/components/DefaultSearchParameters';
 import AlertFavorites from 'routes/alerts/components/Favorites';
@@ -27,7 +27,7 @@ import { SearchParamsProvider, useSearchParams } from 'routes/alerts/contexts/Se
 import type { SearchParams } from 'routes/alerts/utils/SearchParams';
 import type { SearchResult } from 'routes/alerts/utils/SearchParser';
 import { ForbiddenPage } from 'routes/forbidden/forbidden.route';
-import { WorkflowCreate } from 'routes/manage-workflow-create/manage-workflow-create.route';
+import { ManageWorkflowCreatePage } from 'routes/manage-workflow-create/manage-workflow-create.route';
 import { IconButton } from 'ui/buttons/IconButton';
 import InformativeAlert from 'ui/InformativeAlert';
 import { PageHeader } from 'ui/layouts/PageHeader';
@@ -71,7 +71,7 @@ export const ALERT_DEFAULT_PARAMS = {
 
 export type AlertSearchParams = SearchParams<typeof ALERT_DEFAULT_PARAMS>;
 
-const WrappedAlertsContent = () => {
+export const AlertsContent = memo(() => {
   const { t } = useTranslation('alerts');
   const theme = useTheme();
   const location = useLocation();
@@ -184,9 +184,11 @@ const WrappedAlertsContent = () => {
     if (url.pathname.startsWith('/alert/')) {
       const id = url.pathname.slice('/alert/'.length);
       const alert = alerts.find(item => item.alert_id === id);
-      setGlobalDrawer(<AlertDetail id={id} alert={alert} inDrawer />, { hasMaximize: true });
+      setGlobalDrawer(<AlertDetailPage id={id} alert={alert} inDrawer />, { hasMaximize: true });
     } else if (url.pathname.startsWith('/workflow/')) {
-      setGlobalDrawer(<WorkflowCreate id={url.pathname.slice('/workflow/'.length)} onClose={closeGlobalDrawer} />);
+      setGlobalDrawer(
+        <ManageWorkflowCreatePage id={url.pathname.slice('/workflow/'.length)} onClose={closeGlobalDrawer} />
+      );
     } else {
       closeGlobalDrawer();
     }
@@ -305,11 +307,9 @@ const WrappedAlertsContent = () => {
         </SimpleList>
       </PageFullWidth>
     );
-};
+});
 
-export const AlertsContent = React.memo(WrappedAlertsContent);
-
-const WrappedAlertsPage = () => (
+export const AlertsPage = memo(() => (
   <SearchParamsProvider
     defaultValue={ALERT_DEFAULT_PARAMS}
     hidden={['rows', 'offset', 'tc_start', 'track_total_hits']}
@@ -319,7 +319,4 @@ const WrappedAlertsPage = () => (
       <AlertsContent />
     </AlertsProvider>
   </SearchParamsProvider>
-);
-
-export const AlertsPage = React.memo(WrappedAlertsPage);
-export default AlertsPage;
+));

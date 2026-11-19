@@ -3,7 +3,7 @@ import Skeleton from '@mui/material/Skeleton';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
 import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
-import { useState } from 'react';
+import { memo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Classification from 'ui/Classification';
 import CustomChip from 'ui/CustomChip';
@@ -77,7 +77,7 @@ function ServiceCard({ service }) {
   );
 }
 
-export default function Services() {
+export const HelpServicesPage = memo(() => {
   const { apiCall } = useMyAPI();
   const { t } = useTranslation(['helpServices']);
   const theme = useTheme();
@@ -123,4 +123,4 @@ export default function Services() {
       )}
     </PageFullWidth>
   );
-}
+});

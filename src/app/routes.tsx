@@ -4,72 +4,83 @@ import { Typography } from '@mui/material';
 import useALContext from 'core/config/useALContext';
 import { CrashPage } from 'core/error/error.route';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
-import NotFoundPage from 'core/template/branding/AppBanner';
-import RedirectSubmission from 'core/template/components/utils/RedirectSubmission';
 import { LoadingPage } from 'layout/auth/loading/loading.route';
-import Logout from 'layout/auth/log-out/log-out.route';
-import Tos from 'layout/auth/terms-of-service/terms-of-service.route';
+import { LogoutPage } from 'layout/auth/log-out/log-out.route';
+import { ToSPage } from 'layout/auth/terms-of-service/terms-of-service.route';
 import useDrawer from 'layout/drawer/drawer.hooks';
 import { lazy, memo, Suspense, useEffect, useState } from 'react';
 import { matchPath, Navigate, Route, Routes, useLocation } from 'react-router';
-import Account from 'routes/account/account.route';
-import AdminActions from 'routes/admin-actions/admin-actions.route';
-import AdminApikeysDetail from 'routes/admin-api-key-detail/admin-api-key-detail.route';
-import AdminApikeys from 'routes/admin-api-keys/admin-api-keys.route';
-import AdminErrorDetail from 'routes/admin-error-detail/admin-error-detail.route';
-import AdminErrorViewer from 'routes/admin-error-viewer/admin-error-viewer.route';
-import AdminIdentify from 'routes/admin-identify/admin-identify.route';
-import Service from 'routes/admin-service-detail/admin-service-detail.route';
-import ServiceReview from 'routes/admin-service-review/admin-service-review.route';
-import AdminServices from 'routes/admin-services/admin-services.route';
-import AdminSiteMap from 'routes/admin-sitemap/admin-sitemap.route';
-import AdminTagSafelist from 'routes/admin-tag-safelist/admin-tag-safelist.route';
-import AdminUsers from 'routes/admin-users/admin-users.route';
-import Admin from 'routes/admin/admin.route';
-import AlertDetails from 'routes/alert-detail/alert-detail.route';
-import AlertsRedirect from 'routes/alert-redirect/alert-redirect.route';
-import Alerts from 'routes/alerts/alerts.route';
-import ArchiveDetail from 'routes/archive-detail/archive-detail.route';
-import MalwareArchive from 'routes/archives/archives.route';
-import AppRegistration from 'routes/authorize/authorize.route';
-import Dashboard from 'routes/dashboard/dashboard.route';
-import FileFullDetail from 'routes/file-detail/detail';
-import FileViewer from 'routes/file-viewer/file-viewer.route';
-import ForbiddenPage from 'routes/forbidden/forbidden.route';
-import HelpApiDoc from 'routes/help-api/help-api.route';
-import HelpClassification from 'routes/help-classification/help-classification.route';
-import HelpConfiguration from 'routes/help-configuration/help-configuration.route';
-import HelpSearch from 'routes/help-search/help-search.route';
-import HelpServices from 'routes/help-services/help-services.route';
-import Help from 'routes/help/help.route';
-import BadlistDetail from 'routes/manage-badlist-detail/manage-badlist-detail.route';
-import ManageBadlist from 'routes/manage-badlists/manage-badlists.route';
-import HeuristicDetail from 'routes/manage-heuristic-detail/manage-heuristic-detail.route';
-import ManageHeuristics from 'routes/manage-heuristics/manage-heuristics.route';
-import SafelistDetail from 'routes/manage-safelist-detail/manage-safelist-detail.route';
-import ManageSafelist from 'routes/manage-safelists/manage-safelists.route';
-import SignatureDetail from 'routes/manage-signature-detail/manage-signature-detail.route';
-import ManageSignatureSources from 'routes/manage-signature-sources/manage-signature-sources.route';
-import ManageSignatures from 'routes/manage-signatures/manage-signatures.route';
-import WorkflowCreate from 'routes/manage-workflow-create/manage-workflow-create.route';
-import WorkflowDetail from 'routes/manage-workflow-detail/manage-workflow-detail.route';
-import ManageWorkflows from 'routes/manage-workflows/manage-workflows.route';
-import Manage from 'routes/manage/manage.route';
-import RetroHuntDetail from 'routes/retrohunt-detail/retrohunt-detail.route';
-import RetroHunt from 'routes/retrohunt/retrohunt.route';
-import Search from 'routes/search/search.route';
-import Settings from 'routes/settings/settings';
-import SubmissionDetail from 'routes/submission-detail/submission-detail.route';
-import SubmissionReport from 'routes/submission-report/submission-report.route';
-import Submissions from 'routes/submissions/submissions.route';
-import Submit from 'routes/submit/submit';
-import User from 'routes/user/user.route';
+import { AdminActionsPage } from 'routes/admin-actions/admin-actions.route';
+import { AdminAPIKeyDetailPage } from 'routes/admin-api-key-detail/admin-api-key-detail.route';
+import { AdminAPIKeysPage } from 'routes/admin-api-keys/admin-api-keys.route';
+import { AdminErrorDetailPage } from 'routes/admin-error-detail/admin-error-detail.route';
+import { AdminErrorViewerPage } from 'routes/admin-error-viewer/admin-error-viewer.route';
+import { AdminIdentifyPage } from 'routes/admin-identify/admin-identify.route';
+import { AdminServiceDetailPage } from 'routes/admin-service-detail/admin-service-detail.route';
+import { AdminServiceReviewPage } from 'routes/admin-service-review/admin-service-review.route';
+import { AdminServicesPage } from 'routes/admin-services/admin-services.route';
+import { AdminSiteMapPage } from 'routes/admin-sitemap/admin-sitemap.route';
+import { AdminTagSafelistPage } from 'routes/admin-tag-safelist/admin-tag-safelist.route';
+import { AdminUsersPage } from 'routes/admin-users/admin-users.route';
+import { AdminPage } from 'routes/admin/admin.route';
+import { AlertDetailPage } from 'routes/alert-detail/alert-detail.route';
+import { AlertRedirectPage } from 'routes/alert-redirect/alert-redirect.route';
+import { AlertsPage } from 'routes/alerts/alerts.route';
+import { ArchiveDetailPage } from 'routes/archive-detail/archive-detail.route';
+import { ArchivesPage } from 'routes/archives/archives.route';
+import { AuthorizePage } from 'routes/authorize/authorize.route';
+import { DashboardPage } from 'routes/dashboard/dashboard.route';
+import { FileDetailPage } from 'routes/file-detail/file-detail.route';
+import { FileViewerPage } from 'routes/file-viewer/file-viewer.route';
+import { ForbiddenPage } from 'routes/forbidden/forbidden.route';
+import { HelpAPIPage } from 'routes/help-api/help-api.route';
+import { HelpClassificationPage } from 'routes/help-classification/help-classification.route';
+import { HelpConfigurationPage } from 'routes/help-configuration/help-configuration.route';
+import { HelpSearchPage } from 'routes/help-search/help-search.route';
+import { HelpServicesPage } from 'routes/help-services/help-services.route';
+import { HelpPage } from 'routes/help/help.route';
+import { ManageBadlistDetailPage } from 'routes/manage-badlist-detail/manage-badlist-detail.route';
+import { ManageBadlistsPage } from 'routes/manage-badlists/manage-badlists.route';
+import { ManageHeuristicDetailPage } from 'routes/manage-heuristic-detail/manage-heuristic-detail.route';
+import { ManageHeuristicsPage } from 'routes/manage-heuristics/manage-heuristics.route';
+import { ManageSafelistDetailPage } from 'routes/manage-safelist-detail/manage-safelist-detail.route';
+import { ManageSafelistsPage } from 'routes/manage-safelists/manage-safelists.route';
+import { ManageSignatureDetailPage } from 'routes/manage-signature-detail/manage-signature-detail.route';
+import { ManageSignatureSourcesPage } from 'routes/manage-signature-sources/manage-signature-sources.route';
+import { ManageSignaturesPage } from 'routes/manage-signatures/manage-signatures.route';
+import { ManageWorkflowCreatePage } from 'routes/manage-workflow-create/manage-workflow-create.route';
+import { ManageWorkflowDetailPage } from 'routes/manage-workflow-detail/manage-workflow-detail.route';
+import { ManageWorkflowsPage } from 'routes/manage-workflows/manage-workflows.route';
+import { ManagePage } from 'routes/manage/manage.route';
+import { NotFoundPage } from 'routes/not-found/not-found.route';
+import { RetrohuntDetailPage } from 'routes/retrohunt-detail/retrohunt-detail.route';
+import { RetrohuntPage } from 'routes/retrohunt/retrohunt.route';
+import { SearchPage } from 'routes/search/search.route';
+import { SettingsPage } from 'routes/settings/settings.route';
+import { SubmissionDetailPage } from 'routes/submission-detail/submission-detail.route';
+import { SubmissionRedirectPage } from 'routes/submission-redirect/submission-redirect.route';
+import { SubmissionReportPage } from 'routes/submission-report/submission-report.route';
+import { SubmissionsPage } from 'routes/submissions/submissions.route';
+import { SubmitPage } from 'routes/submit/submit.route';
+import { AccountPage, UserPage } from 'routes/user/user.route';
 import { resetFavicon } from 'shared/utils/utils';
 
-const DevelopmentAPI = lazy(() => import('routes/development-api/development-api.route.tsx'));
-const DevelopmentCustomize = lazy(() => import('routes/development-customize/customize'));
-const DevelopmentLibrary = lazy(() => import('routes/development-library/development-library.route'));
-const DevelopmentTheme = lazy(() => import('routes/development-theme/development-theme.route'));
+const DevelopmentAPIPage = lazy(() =>
+  import('routes/development-api/development-api.route').then(module => ({ default: module.DevelopmentAPIPage }))
+);
+const DevelopmentCustomizePage = lazy(() =>
+  import('routes/development-customize/development-customize.route').then(module => ({
+    default: module.DevelopmentCustomizePage
+  }))
+);
+const DevelopmentLibraryPage = lazy(() =>
+  import('routes/development-library/development-library.route').then(module => ({
+    default: module.DevelopmentLibraryPage
+  }))
+);
+const DevelopmentThemePage = lazy(() =>
+  import('routes/development-theme/development-theme.route').then(module => ({ default: module.DevelopmentThemePage }))
+);
 
 const APP_NAME = 'AL4';
 
@@ -133,74 +144,74 @@ const WrappedRoutes = () => {
     <Suspense fallback={<LoadingPage showImage={false} />}>
       <RouteActions />
       <Routes>
-        <Route path="/" element={<Submit />} />
-        <Route path="/account" element={<Account />} />
-        <Route path="/admin" element={<Admin />} />
-        <Route path="/admin/actions" element={<AdminActions />} />
-        <Route path="/admin/apikeys" element={<AdminApikeys />} />
-        <Route path="/admin/apikeys/:id" element={<AdminApikeysDetail />} />
-        <Route path="/admin/errors" element={<AdminErrorViewer />} />
-        <Route path="/admin/errors/:key" element={<AdminErrorDetail />} />
-        <Route path="/admin/identify" element={<AdminIdentify />} />
-        <Route path="/admin/service_review" element={<ServiceReview />} />
-        <Route path="/admin/services" element={<AdminServices />} />
-        <Route path="/admin/services/:svc" element={<Service />} />
-        <Route path="/admin/sitemap" element={<AdminSiteMap />} />
-        <Route path="/admin/tag_safelist" element={<AdminTagSafelist />} />
-        <Route path="/admin/users" element={<AdminUsers />} />
-        <Route path="/admin/users/:id" element={<User />} />
-        <Route path="/alerts_redirect" element={<AlertsRedirect />} />
-        <Route path="/alerts" element={<Alerts />} />
-        <Route path="/alerts/:id" element={<AlertDetails />} />
-        <Route path="/archive" element={<MalwareArchive />} />
-        <Route path="/archive/:id" element={<ArchiveDetail />} />
-        <Route path="/archive/:id/:tab" element={<ArchiveDetail />} />
-        <Route path="/authorize" element={<AppRegistration />} />
+        <Route path="/" element={<SubmitPage />} />
+        <Route path="/account" element={<AccountPage />} />
+        <Route path="/admin" element={<AdminPage />} />
+        <Route path="/admin/actions" element={<AdminActionsPage />} />
+        <Route path="/admin/apikeys" element={<AdminAPIKeysPage />} />
+        <Route path="/admin/apikeys/:id" element={<AdminAPIKeyDetailPage />} />
+        <Route path="/admin/errors" element={<AdminErrorViewerPage />} />
+        <Route path="/admin/errors/:key" element={<AdminErrorDetailPage />} />
+        <Route path="/admin/identify" element={<AdminIdentifyPage />} />
+        <Route path="/admin/service_review" element={<AdminServiceReviewPage />} />
+        <Route path="/admin/services" element={<AdminServicesPage />} />
+        <Route path="/admin/services/:svc" element={<AdminServiceDetailPage />} />
+        <Route path="/admin/sitemap" element={<AdminSiteMapPage />} />
+        <Route path="/admin/tag_safelist" element={<AdminTagSafelistPage />} />
+        <Route path="/admin/users" element={<AdminUsersPage />} />
+        <Route path="/admin/users/:id" element={<UserPage />} />
+        <Route path="/alerts_redirect" element={<AlertRedirectPage />} />
+        <Route path="/alerts" element={<AlertsPage />} />
+        <Route path="/alerts/:id" element={<AlertDetailPage />} />
+        <Route path="/archive" element={<ArchivesPage />} />
+        <Route path="/archive/:id" element={<ArchiveDetailPage />} />
+        <Route path="/archive/:id/:tab" element={<ArchiveDetailPage />} />
+        <Route path="/authorize" element={<AuthorizePage />} />
         <Route path="/crash" element={<CrashPage />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/development/api" element={<DevelopmentAPI />} />
-        <Route path="/development/customize" element={<DevelopmentCustomize />} />
-        <Route path="/development/library" element={<DevelopmentLibrary />} />
-        <Route path="/development/theme" element={<DevelopmentTheme />} />
-        <Route path="/file/detail/:id" element={<FileFullDetail />} />
-        <Route path="/file/viewer/:id" element={<FileViewer />} />
-        <Route path="/file/viewer/:id/:tab" element={<FileViewer />} />
+        <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/development/api" element={<DevelopmentAPIPage />} />
+        <Route path="/development/customize" element={<DevelopmentCustomizePage />} />
+        <Route path="/development/library" element={<DevelopmentLibraryPage />} />
+        <Route path="/development/theme" element={<DevelopmentThemePage />} />
+        <Route path="/file/detail/:id" element={<FileDetailPage />} />
+        <Route path="/file/viewer/:id" element={<FileViewerPage />} />
+        <Route path="/file/viewer/:id/:tab" element={<FileViewerPage />} />
         <Route path="/forbidden" element={<ForbiddenPage />} />
-        <Route path="/help" element={<Help />} />
-        <Route path="/help/api" element={<HelpApiDoc />} />
-        <Route path="/help/classification" element={<HelpClassification />} />
-        <Route path="/help/configuration" element={<HelpConfiguration />} />
-        <Route path="/help/search" element={<HelpSearch />} />
-        <Route path="/help/services" element={<HelpServices />} />
-        <Route path="/logout" element={<Logout />} />
-        <Route path="/manage" element={<Manage />} />
-        <Route path="/manage/badlist" element={<ManageBadlist />} />
-        <Route path="/manage/badlist/:id" element={<BadlistDetail />} />
-        <Route path="/manage/heuristic/:id" element={<HeuristicDetail />} />
-        <Route path="/manage/heuristics" element={<ManageHeuristics />} />
-        <Route path="/manage/safelist" element={<ManageSafelist />} />
-        <Route path="/manage/safelist/:id" element={<SafelistDetail />} />
-        <Route path="/manage/signature/:id" element={<SignatureDetail />} />
-        <Route path="/manage/signature/:type/:source/:name" element={<SignatureDetail />} />
-        <Route path="/manage/signatures" element={<ManageSignatures />} />
-        <Route path="/manage/sources" element={<ManageSignatureSources />} />
-        <Route path="/manage/workflow/create/:id" element={<WorkflowCreate />} />
-        <Route path="/manage/workflow/detail/:id" element={<WorkflowDetail />} />
-        <Route path="/manage/workflows" element={<ManageWorkflows />} />
+        <Route path="/help" element={<HelpPage />} />
+        <Route path="/help/api" element={<HelpAPIPage />} />
+        <Route path="/help/classification" element={<HelpClassificationPage />} />
+        <Route path="/help/configuration" element={<HelpConfigurationPage />} />
+        <Route path="/help/search" element={<HelpSearchPage />} />
+        <Route path="/help/services" element={<HelpServicesPage />} />
+        <Route path="/logout" element={<LogoutPage />} />
+        <Route path="/manage" element={<ManagePage />} />
+        <Route path="/manage/badlist" element={<ManageBadlistsPage />} />
+        <Route path="/manage/badlist/:id" element={<ManageBadlistDetailPage />} />
+        <Route path="/manage/heuristic/:id" element={<ManageHeuristicDetailPage />} />
+        <Route path="/manage/heuristics" element={<ManageHeuristicsPage />} />
+        <Route path="/manage/safelist" element={<ManageSafelistsPage />} />
+        <Route path="/manage/safelist/:id" element={<ManageSafelistDetailPage />} />
+        <Route path="/manage/signature/:id" element={<ManageSignatureDetailPage />} />
+        <Route path="/manage/signature/:type/:source/:name" element={<ManageSignatureDetailPage />} />
+        <Route path="/manage/signatures" element={<ManageSignaturesPage />} />
+        <Route path="/manage/sources" element={<ManageSignatureSourcesPage />} />
+        <Route path="/manage/workflow/create/:id" element={<ManageWorkflowCreatePage />} />
+        <Route path="/manage/workflow/detail/:id" element={<ManageWorkflowDetailPage />} />
+        <Route path="/manage/workflows" element={<ManageWorkflowsPage />} />
         <Route path="/notfound" element={<NotFoundPage />} />
-        <Route path="/retrohunt" element={<RetroHunt />} />
-        <Route path="/retrohunt/:key" element={<RetroHuntDetail />} />
-        <Route path="/search" element={<Search />} />
-        <Route path="/search/:id" element={<Search />} />
-        <Route path="/settings" element={<Settings />} />
-        <Route path="/settings/:tab" element={<Settings />} />
-        <Route path="/submission/:id" element={<RedirectSubmission />} />
-        <Route path="/submission/detail/:id" element={<SubmissionDetail />} />
-        <Route path="/submission/detail/:id/:fid" element={<SubmissionDetail />} />
-        <Route path="/submission/report/:id" element={<SubmissionReport />} />
-        <Route path="/submissions" element={<Submissions />} />
-        <Route path="/submit" element={<Submit />} />
-        <Route path="/tos" element={<Tos />} />
+        <Route path="/retrohunt" element={<RetrohuntPage />} />
+        <Route path="/retrohunt/:key" element={<RetrohuntDetailPage />} />
+        <Route path="/search" element={<SearchPage />} />
+        <Route path="/search/:id" element={<SearchPage />} />
+        <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/settings/:tab" element={<SettingsPage />} />
+        <Route path="/submission/:id" element={<SubmissionRedirectPage />} />
+        <Route path="/submission/detail/:id" element={<SubmissionDetailPage />} />
+        <Route path="/submission/detail/:id/:fid" element={<SubmissionDetailPage />} />
+        <Route path="/submission/report/:id" element={<SubmissionReportPage />} />
+        <Route path="/submissions" element={<SubmissionsPage />} />
+        <Route path="/submit" element={<SubmitPage />} />
+        <Route path="/tos" element={<ToSPage />} />
         <Route path="*" element={<Navigate to="/notfound" replace />} />
       </Routes>
       {configuration.system && configuration.system.type !== 'production' && (

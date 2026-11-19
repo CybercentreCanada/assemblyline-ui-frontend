@@ -41,7 +41,7 @@ const NoPrintTooltip = memo(
   }))
 );
 
-export default function SubmissionReportPage() {
+export const SubmissionReportPage = memo(() => {
   const { t } = useTranslation(['submissionReport']);
   const { id } = useParams<ParamProps>();
   const { user: currentUser, c12nDef, configuration, settings } = useALContext();
@@ -323,4 +323,4 @@ export default function SubmissionReportPage() {
   ) : (
     <ForbiddenPage />
   );
-}
+});

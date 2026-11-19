@@ -12,7 +12,7 @@ import useClipboard from 'layout/clipboard/clipboard.hooks';
 import type { CustomUser } from 'models/api/user';
 import type { Error as ErrorModel } from 'models/base/error';
 import type { ReactElement } from 'react';
-import { useEffect, useMemo, useState } from 'react';
+import { memo, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BsClipboard } from 'react-icons/bs';
 import { Navigate, useLocation, useParams } from 'react-router';
@@ -40,11 +40,11 @@ type ParamProps = {
   name?: string;
 };
 
-type ErrorDetailProps = {
+export type AdminErrorDetailPageProps = {
   error_key?: string;
 };
 
-export const ErrorDetail = ({ error_key = null }: ErrorDetailProps) => {
+export const AdminErrorDetailPage = memo(({ error_key = null }: AdminErrorDetailPageProps) => {
   const { t } = useTranslation(['adminErrorViewer']);
   const theme = useTheme();
   const { copy } = useClipboard();
@@ -210,6 +210,4 @@ export const ErrorDetail = ({ error_key = null }: ErrorDetailProps) => {
   ) : (
     <Navigate to="/forbidden" replace />
   );
-};
-
-export default ErrorDetail;
+});

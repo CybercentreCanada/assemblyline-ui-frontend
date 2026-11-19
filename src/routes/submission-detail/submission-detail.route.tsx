@@ -54,14 +54,14 @@ import type { Result } from 'models/base/result';
 import type { ParsedSubmission, Submission } from 'models/base/submission';
 import type { Attack, Tag } from 'models/base/tagging';
 import moment from 'moment';
-import React, { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router';
 import { Link } from 'react-router-dom';
 import Detection from 'routes/file-detail/components/detection';
-import FileDetail from 'routes/file-detail/file-detail.route';
+import { FileDetailContent } from 'routes/file-detail/file-detail.route';
 import { ForbiddenPage } from 'routes/forbidden/forbidden.route';
-import HeuristicDetail from 'routes/manage-heuristic-detail/manage-heuristic-detail.route';
+import { ManageHeuristicDetailPage } from 'routes/manage-heuristic-detail/manage-heuristic-detail.route';
 import AISummarySection from 'routes/submission-detail/components/ai_summary';
 import AttackSection from 'routes/submission-detail/components/attack';
 import ErrorSection from 'routes/submission-detail/components/errors';
@@ -115,7 +115,7 @@ const incrementReducer = (old: number, increment: number) => {
   return old + increment;
 };
 
-function WrappedSubmissionDetail() {
+export const SubmissionDetailPage = memo(() => {
   const { t, i18n } = useTranslation(['submissionDetail']);
   const theme = useTheme();
   const location = useLocation();
@@ -891,7 +891,7 @@ function WrappedSubmissionDetail() {
           }
         });
         setGlobalDrawer(
-          <FileDetail
+          <FileDetailContent
             sha256={fid}
             sid={id}
             metadata={submission?.metadata}
@@ -904,7 +904,7 @@ function WrappedSubmissionDetail() {
         );
       } else {
         setGlobalDrawer(
-          <FileDetail
+          <FileDetailContent
             sha256={fid}
             sid={id}
             metadata={submission?.metadata}
@@ -922,7 +922,7 @@ function WrappedSubmissionDetail() {
 
   useEffect(() => {
     if (!fid && location.hash) {
-      setGlobalDrawer(<HeuristicDetail heur_id={location.hash.slice(1)} />);
+      setGlobalDrawer(<ManageHeuristicDetailPage heur_id={location.hash.slice(1)} />);
     }
   }, [fid, location.hash, setGlobalDrawer]);
 
@@ -1545,7 +1545,4 @@ function WrappedSubmissionDetail() {
   ) : (
     <ForbiddenPage />
   );
-}
-
-const SubmissionDetail = React.memo(WrappedSubmissionDetail);
-export default SubmissionDetail;
+});

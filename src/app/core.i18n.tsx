@@ -25,8 +25,6 @@ import adminActionsEN from 'routes/admin-actions/admin-actions.i18n.en.json';
 import adminActionsFR from 'routes/admin-actions/admin-actions.i18n.fr.json';
 import adminAPIkeysEN from 'routes/admin-api-keys/admin-api-keys.i18n.en.json';
 import adminAPIkeysFR from 'routes/admin-api-keys/admin-api-keys.i18n.fr.json';
-import adminCommunityServicesEN from 'routes/admin-community-services/admin-community-services.i18n.en.json';
-import adminCommunityServicesFR from 'routes/admin-community-services/admin-community-services.i18n.fr.json';
 import adminErrorViewerEN from 'routes/admin-error-viewer/admin-error-viewer.i18n.en.json';
 import adminErrorViewerFR from 'routes/admin-error-viewer/admin-error-viewer.i18n.fr.json';
 import adminIdentifyEN from 'routes/admin-identify/admin-identify.i18n.en.json';
@@ -45,8 +43,8 @@ import alertsEN from 'routes/alerts/alerts.i18n.en.json';
 import alertsFR from 'routes/alerts/alerts.i18n.fr.json';
 import favoritesEN from 'routes/alerts/components/favorites.i18n.en.json';
 import favoritesFR from 'routes/alerts/components/favorites.i18n.fr.json';
-import archiveEN from 'routes/archives/archives.i18n.en.json';
-import archiveFR from 'routes/archives/archives.i18n.fr.json';
+import archivesEN from 'routes/archives/archives.i18n.en.json';
+import archivesFR from 'routes/archives/archives.i18n.fr.json';
 import authorizeEN from 'routes/authorize/authorize.i18n.en.json';
 import authorizeFR from 'routes/authorize/authorize.i18n.fr.json';
 import dashboardEN from 'routes/dashboard/dashboard.i18n.en.json';
@@ -57,8 +55,8 @@ import fileDetailEN from 'routes/file-detail/file-detail.i18n.en.json';
 import fileDetailFR from 'routes/file-detail/file-detail.i18n.fr.json';
 import fileViewerEN from 'routes/file-viewer/file-viewer.i18n.en.json';
 import fileViewerFR from 'routes/file-viewer/file-viewer.i18n.fr.json';
-import error403EN from 'routes/forbidden/forbidden.i18n.en.json';
-import error403FR from 'routes/forbidden/forbidden.i18n.fr.json';
+import forbiddenEN from 'routes/forbidden/forbidden.i18n.en.json';
+import forbiddenFR from 'routes/forbidden/forbidden.i18n.fr.json';
 import helpAPIEN from 'routes/help-api/help-api.i18n.en.json';
 import helpAPIFR from 'routes/help-api/help-api.i18n.fr.json';
 import helpClassificationEN from 'routes/help-classification/help-classification.i18n.en.json';
@@ -73,8 +71,8 @@ import manageBadlistAddEN from 'routes/manage-badlist-add/manage-badlist-add.i18
 import manageBadlistAddFR from 'routes/manage-badlist-add/manage-badlist-add.i18n.fr.json';
 import manageBadlistDetailEN from 'routes/manage-badlist-detail/manage-badlist-detail.i18n.en.json';
 import manageBadlistDetailFR from 'routes/manage-badlist-detail/manage-badlist-detail.i18n.fr.json';
-import manageBadlistEN from 'routes/manage-badlists/manage-badlists.i18n.en.json';
-import manageBadlistFR from 'routes/manage-badlists/manage-badlists.i18n.fr.json';
+import manageBadlistsEN from 'routes/manage-badlists/manage-badlists.i18n.en.json';
+import manageBadlistsFR from 'routes/manage-badlists/manage-badlists.i18n.fr.json';
 import manageHeuristicDetailEN from 'routes/manage-heuristic-detail/manage-heuristic-detail.i18n.en.json';
 import manageHeuristicDetailFR from 'routes/manage-heuristic-detail/manage-heuristic-detail.i18n.fr.json';
 import manageHeuristicsEN from 'routes/manage-heuristics/manage-heuristics.i18n.en.json';
@@ -83,8 +81,8 @@ import manageSafelistAddEN from 'routes/manage-safelist-add/manage-safelist-add.
 import manageSafelistAddFR from 'routes/manage-safelist-add/manage-safelist-add.i18n.fr.json';
 import manageSafelistDetailEN from 'routes/manage-safelist-detail/manage-safelist-detail.i18n.en.json';
 import manageSafelistDetailFR from 'routes/manage-safelist-detail/manage-safelist-detail.i18n.fr.json';
-import manageSafelistEN from 'routes/manage-safelists/manage-safelists.i18n.en.json';
-import manageSafelistFR from 'routes/manage-safelists/manage-safelists.i18n.fr.json';
+import manageSafelistsEN from 'routes/manage-safelists/manage-safelists.i18n.en.json';
+import manageSafelistsFR from 'routes/manage-safelists/manage-safelists.i18n.fr.json';
 import manageSignatureDetailEN from 'routes/manage-signature-detail/manage-signature-detail.i18n.en.json';
 import manageSignatureDetailFR from 'routes/manage-signature-detail/manage-signature-detail.i18n.fr.json';
 import manageSignatureSourcesEN from 'routes/manage-signature-sources/manage-signature-sources.i18n.en.json';
@@ -95,8 +93,10 @@ import manageWorkflowDetailEN from 'routes/manage-workflow-detail/manage-workflo
 import manageWorkflowDetailFR from 'routes/manage-workflow-detail/manage-workflow-detail.i18n.fr.json';
 import manageWorkflowsEN from 'routes/manage-workflows/manage-workflows.i18n.en.json';
 import manageWorkflowsFR from 'routes/manage-workflows/manage-workflows.i18n.fr.json';
-import error404EN from 'routes/not-found/not-found.i18n.en.json';
-import error404FR from 'routes/not-found/not-found.i18n.fr.json';
+import missingNodeEN from 'routes/missing-node/missing-node.i18n.en.json';
+import missingNodeFR from 'routes/missing-node/missing-node.i18n.fr.json';
+import notFoundEN from 'routes/not-found/not-found.i18n.en.json';
+import notFoundFR from 'routes/not-found/not-found.i18n.fr.json';
 import retrohuntEN from 'routes/retrohunt/retrohunt.i18n.en.json';
 import retrohuntFR from 'routes/retrohunt/retrohunt.i18n.fr.json';
 import searchEN from 'routes/search/search.i18n.en.json';
@@ -130,7 +130,6 @@ const resources = {
   en: {
     adminActions: adminActionsEN,
     adminAPIkeys: adminAPIkeysEN,
-    adminCommunityServices: adminCommunityServicesEN,
     adminErrorViewer: adminErrorViewerEN,
     adminIdentify: adminIdentifyEN,
     adminServiceReview: adminServiceReviewEN,
@@ -139,7 +138,7 @@ const resources = {
     adminTagSafelist: adminTagSafelistEN,
     adminUsers: adminUsersEN,
     alerts: alertsEN,
-    archive: archiveEN,
+    archive: archivesEN,
     assistant: assistantEN,
     authorize: authorizeEN,
     carousel: carouselEN,
@@ -148,8 +147,8 @@ const resources = {
     dateTime: dateTimeEN,
     developmentAPI: developmentAPIEN,
     error: errorEN,
-    error403: error403EN,
-    error404: error404EN,
+    error403: forbiddenEN,
+    error404: notFoundEN,
     favorites: favoritesEN,
     fileDetail: fileDetailEN,
     fileViewer: fileViewerEN,
@@ -163,19 +162,22 @@ const resources = {
     locked: lockedEN,
     login: loginEN,
     logout: logoutEN,
-    manageBadlist: manageBadlistEN,
+    manageBadlist: manageBadlistsEN,
     manageBadlistAdd: manageBadlistAddEN,
     manageBadlistDetail: manageBadlistDetailEN,
+    manageBadlists: manageBadlistsEN,
     manageHeuristicDetail: manageHeuristicDetailEN,
     manageHeuristics: manageHeuristicsEN,
-    manageSafelist: manageSafelistEN,
+    manageSafelist: manageSafelistsEN,
     manageSafelistAdd: manageSafelistAddEN,
     manageSafelistDetail: manageSafelistDetailEN,
+    manageSafelists: manageSafelistsEN,
     manageSignatureDetail: manageSignatureDetailEN,
     manageSignatures: manageSignaturesEN,
     manageSignatureSources: manageSignatureSourcesEN,
     manageWorkflowDetail: manageWorkflowDetailEN,
     manageWorkflows: manageWorkflowsEN,
+    missingNode: missingNodeEN,
     notification: notificationEN,
     retrohunt: retrohuntEN,
     sandboxResult: sandboxResultEN,
@@ -194,7 +196,6 @@ const resources = {
   fr: {
     adminActions: adminActionsFR,
     adminAPIkeys: adminAPIkeysFR,
-    adminCommunityServices: adminCommunityServicesFR,
     adminErrorViewer: adminErrorViewerFR,
     adminIdentify: adminIdentifyFR,
     adminServiceReview: adminServiceReviewFR,
@@ -203,7 +204,7 @@ const resources = {
     adminTagSafelist: adminTagSafelistFR,
     adminUsers: adminUsersFR,
     alerts: alertsFR,
-    archive: archiveFR,
+    archive: archivesFR,
     assistant: assistantFR,
     authorize: authorizeFR,
     carousel: carouselFR,
@@ -212,8 +213,8 @@ const resources = {
     dateTime: dateTimeFR,
     developmentAPI: developmentAPIFR,
     error: errorFR,
-    error403: error403FR,
-    error404: error404FR,
+    error403: forbiddenFR,
+    error404: notFoundFR,
     favorites: favoritesFR,
     fileDetail: fileDetailFR,
     fileViewer: fileViewerFR,
@@ -227,19 +228,22 @@ const resources = {
     locked: lockedFR,
     login: loginFR,
     logout: logoutFR,
-    manageBadlist: manageBadlistFR,
+    manageBadlist: manageBadlistsFR,
     manageBadlistAdd: manageBadlistAddFR,
     manageBadlistDetail: manageBadlistDetailFR,
+    manageBadlists: manageBadlistsFR,
     manageHeuristicDetail: manageHeuristicDetailFR,
     manageHeuristics: manageHeuristicsFR,
-    manageSafelist: manageSafelistFR,
+    manageSafelist: manageSafelistsFR,
     manageSafelistAdd: manageSafelistAddFR,
     manageSafelistDetail: manageSafelistDetailFR,
+    manageSafelists: manageSafelistsFR,
     manageSignatureDetail: manageSignatureDetailFR,
     manageSignatures: manageSignaturesFR,
     manageSignatureSources: manageSignatureSourcesFR,
     manageWorkflowDetail: manageWorkflowDetailFR,
     manageWorkflows: manageWorkflowsFR,
+    missingNode: missingNodeFR,
     notification: notificationFR,
     retrohunt: retrohuntFR,
     sandboxResult: sandboxResultFR,

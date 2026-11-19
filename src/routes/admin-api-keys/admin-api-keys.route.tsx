@@ -10,10 +10,10 @@ import useDrawer from 'layout/drawer/drawer.hooks';
 import type { SearchResult } from 'models/api/search';
 import type { IndexDefinition } from 'models/api/user';
 import type { ApiKey } from 'models/base/user';
-import React, { useCallback, useEffect, useState } from 'react';
+import { memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useLocation, useNavigate } from 'react-router';
-import ApikeyDetail from 'routes/admin-api-key-detail/admin-api-key-detail.route';
+import { AdminAPIKeyDetailPage } from 'routes/admin-api-key-detail/admin-api-key-detail.route';
 import ApikeysTable from 'routes/search/components/apikeys';
 import { safeFieldValue } from 'shared/utils/utils';
 import SearchHeader from 'ui/SearchBar/SearchHeader';
@@ -31,7 +31,7 @@ const API_KEYS_PARAMS = createSearchParams(p => ({
 
 export type APIKeysParams = typeof API_KEYS_PARAMS;
 
-const APIKeysSearch = () => {
+const AdminAPIKeysContent = memo(() => {
   const { t } = useTranslation(['adminAPIkeys']);
   const location = useLocation();
   const navigate = useNavigate();
@@ -99,7 +99,7 @@ const APIKeysSearch = () => {
     if (!location.hash) closeGlobalDrawer();
     else {
       setGlobalDrawer(
-        <ApikeyDetail
+        <AdminAPIKeyDetailPage
           key_id={location.hash.slice(1)}
           onClose={() => navigate(`${location.pathname}${location.search}`)}
         />
@@ -177,13 +177,10 @@ const APIKeysSearch = () => {
   ) : (
     <Navigate to="/forbidden" replace />
   );
-};
+});
 
-const WrappedAPIKeysPage = () => (
+export const AdminAPIKeysPage = memo(() => (
   <SearchParamsProvider params={API_KEYS_PARAMS}>
-    <APIKeysSearch />
+    <AdminAPIKeysContent />
   </SearchParamsProvider>
-);
-
-export const APIKeysPage = React.memo(WrappedAPIKeysPage);
-export default APIKeysPage;
+));

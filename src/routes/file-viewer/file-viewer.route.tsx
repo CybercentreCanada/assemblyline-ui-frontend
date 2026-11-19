@@ -34,7 +34,7 @@ import useAssistant from 'layout/assistant/assistant.hooks';
 import type { CustomUser } from 'models/api/user';
 import type { File } from 'models/base/file';
 import type { Submission } from 'models/base/submission';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router';
 import { Link } from 'react-router-dom';
@@ -69,7 +69,7 @@ type ParamProps = {
   tab: Tab;
 };
 
-const WrappedFileViewer = () => {
+export const FileViewerContent = memo(() => {
   const { t } = useTranslation(['fileViewer']);
   const theme = useTheme();
   const location = useLocation();
@@ -458,12 +458,10 @@ const WrappedFileViewer = () => {
   ) : (
     <ForbiddenPage />
   );
-};
+});
 
-export const FileViewer = React.memo(props => (
+export const FileViewerPage = memo(() => (
   <SelectionProvider>
-    <WrappedFileViewer {...props} />
+    <FileViewerContent />
   </SelectionProvider>
 ));
-
-export default FileViewer;

@@ -12,15 +12,16 @@ import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import { useAppUser } from 'core/template/components/app/hooks';
+import PageCenter from 'core/template/components/pages/PageCenter';
 import useAssistant from 'layout/assistant/assistant.hooks';
 import useDrawer from 'layout/drawer/drawer.hooks';
 import type { File } from 'models/api/file';
 import type { CustomUser } from 'models/api/user';
 import type { Error } from 'models/base/error';
 import type { Submission } from 'models/base/submission';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router';
+import { useLocation, useNavigate, useParams } from 'react-router';
 import { Link } from 'react-router-dom';
 import AttackSection from 'routes/file-detail/components/attacks';
 import ChildrenSection from 'routes/file-detail/components/childrens';
@@ -36,8 +37,8 @@ import TagSection from 'routes/file-detail/components/tags';
 import URIIdentificationSection from 'routes/file-detail/components/uriIdent';
 import { DEFAULT_TAB, TAB_OPTIONS } from 'routes/file-viewer/file-viewer.route';
 import { ForbiddenPage } from 'routes/forbidden/forbidden.route';
-import HeuristicDetail from 'routes/manage-heuristic-detail/manage-heuristic-detail.route';
-import SignatureDetail from 'routes/manage-signature-detail/manage-signature-detail.route';
+import { ManageHeuristicDetailPage } from 'routes/manage-heuristic-detail/manage-heuristic-detail.route';
+import { ManageSignatureDetailPage } from 'routes/manage-signature-detail/manage-signature-detail.route';
 import AISummarySection from 'routes/submission-detail/components/ai_summary';
 import { FileDownloader } from 'ui/buttons/FileDownloader';
 import { IconButton } from 'ui/buttons/IconButton';
@@ -46,7 +47,7 @@ import InputDialog from 'ui/InputDialog';
 import { PageHeader } from 'ui/layouts/PageHeader';
 import { emptyResult } from 'ui/ResultCard';
 
-type Props = {
+export type FileDetailPageProps = {
   sha256: string;
   sid?: string;
   metadata?: Record<string, string>;
@@ -56,7 +57,7 @@ type Props = {
   filetype_override?: string;
 };
 
-const WrappedFileDetail: React.FC<Props> = ({
+export const FileDetailContent = ({
   sha256,
   sid = null,
   metadata = null,
@@ -64,7 +65,7 @@ const WrappedFileDetail: React.FC<Props> = ({
   liveErrors = null,
   force = false,
   filetype_override = null
-}) => {
+}: FileDetailPageProps) => {
   const { t } = useTranslation(['fileDetail']);
   const theme = useTheme();
   const location = useLocation();
@@ -329,9 +330,9 @@ const WrappedFileDetail: React.FC<Props> = ({
         // Set the drawer content based on the hash
         const id = location.hash.slice(1);
         if (heuristics.includes(id)) {
-          setGlobalDrawer(<HeuristicDetail heur_id={id} />);
+          setGlobalDrawer(<ManageHeuristicDetailPage heur_id={id} />);
         } else {
-          setGlobalDrawer(<SignatureDetail signature_id={id} />);
+          setGlobalDrawer(<ManageSignatureDetailPage signature_id={id} />);
         }
       }
     }
@@ -557,6 +558,19 @@ const WrappedFileDetail: React.FC<Props> = ({
   );
 };
 
-const FileDetail = React.memo(WrappedFileDetail);
+type ParamProps = {
+  id: string;
+};
 
-export default FileDetail;
+export const FileDetailPage = memo(() => {
+  const { id } = useParams<ParamProps>();
+  const { user: currentUser } = useAppUser<CustomUser>();
+
+  return currentUser.roles.includes('submission_view') ? (
+    <PageCenter margin={4} width="100%">
+      <FileDetailContent sha256={id} />
+    </PageCenter>
+  ) : (
+    <ForbiddenPage />
+  );
+});

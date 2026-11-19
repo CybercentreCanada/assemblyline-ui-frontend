@@ -35,11 +35,11 @@ type ParamProps = {
   id: string;
 };
 
-type HeuristicDetailProps = {
+export type ManageHeuristicDetailPageProps = {
   heur_id?: string;
 };
 
-const HeuristicDetail = ({ heur_id = null }: HeuristicDetailProps) => {
+export const ManageHeuristicDetailPage = memo(({ heur_id = null }: ManageHeuristicDetailPageProps) => {
   const { t, i18n } = useTranslation(['manageHeuristicDetail']);
   const { id } = useParams<ParamProps>();
   const theme = useTheme();
@@ -283,6 +283,4 @@ const HeuristicDetail = ({ heur_id = null }: HeuristicDetailProps) => {
   ) : (
     <ForbiddenPage />
   );
-};
-
-export default HeuristicDetail;
+});

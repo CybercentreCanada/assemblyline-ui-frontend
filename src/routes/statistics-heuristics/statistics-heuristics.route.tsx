@@ -4,13 +4,13 @@ import useALContext from 'core/config/useALContext';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
 import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
 import useDrawer from 'layout/drawer/drawer.hooks';
-import { useCallback, useState } from 'react';
+import { memo, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import HeuristicDetail from 'routes/manage-heuristic-detail/manage-heuristic-detail.route';
+import { ManageHeuristicDetailPage } from 'routes/manage-heuristic-detail/manage-heuristic-detail.route';
 import type { Cell } from 'ui/Table/enhanced_table';
 import EnhancedTable from 'ui/Table/enhanced_table';
 
-export default function StatisticsSignatures() {
+export const StatisticsHeuristicsPage = memo(() => {
   const { t } = useTranslation(['statisticsHeuristics']);
   const { apiCall } = useMyAPI();
   const theme = useTheme();
@@ -19,7 +19,7 @@ export default function StatisticsSignatures() {
   const [signatureStats, setSignatureStats] = useState(null);
 
   const handleRowClick = useCallback(row => {
-    setGlobalDrawer(<HeuristicDetail heur_id={row.heur_id} />);
+    setGlobalDrawer(<ManageHeuristicDetailPage heur_id={row.heur_id} />);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -72,4 +72,4 @@ export default function StatisticsSignatures() {
       )}
     </PageFullWidth>
   );
-}
+});

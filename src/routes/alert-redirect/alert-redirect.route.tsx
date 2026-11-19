@@ -1,11 +1,11 @@
 import { CircularProgress } from '@mui/material';
-import React, { useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import { Navigate } from 'react-router';
 import type { AlertSearchParams } from 'routes/alerts/alerts.route';
 import { ALERT_DEFAULT_PARAMS, ALERT_STORAGE_KEY } from 'routes/alerts/alerts.route';
 import { SearchParser } from 'routes/alerts/utils/SearchParser';
 
-export const WrappedAlertsRedirect: React.FC = () => {
+export const AlertRedirectPage = memo(() => {
   const parser = useMemo(() => new SearchParser<AlertSearchParams>(ALERT_DEFAULT_PARAMS, { enforced: ['rows'] }), []);
   const storageData = useMemo(() => new URLSearchParams(localStorage.getItem(ALERT_STORAGE_KEY) || ''), []);
   const search = useMemo(() => parser.deltaParams(storageData), [parser, storageData]);
@@ -25,7 +25,4 @@ export const WrappedAlertsRedirect: React.FC = () => {
       </div>
     );
   else return <Navigate to={`/alerts?${search.toString()}`} replace />;
-};
-
-export const AlertsRedirect = React.memo(WrappedAlertsRedirect);
-export default AlertsRedirect;
+});

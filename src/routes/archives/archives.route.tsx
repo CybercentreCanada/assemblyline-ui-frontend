@@ -12,10 +12,10 @@ import useDrawer from 'layout/drawer/drawer.hooks';
 import type { FacetResult, HistogramResult, SearchResult } from 'models/api/search';
 import type { IndexDefinition } from 'models/api/user';
 import type { FileIndexed } from 'models/base/file';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useLocation, useNavigate } from 'react-router';
-import ArchiveDetail from 'routes/archive-detail/archive-detail.route';
+import { ArchiveDetailPage } from 'routes/archive-detail/archive-detail.route';
 import ArchivesTable from 'routes/search/components/archives';
 import { safeFieldValue } from 'shared/utils/utils';
 import { ChipList } from 'ui/ChipList';
@@ -68,7 +68,7 @@ const DEFAULT_QUERY: string = Object.keys(DEFAULT_PARAMS)
   .map(k => `${k}=${DEFAULT_PARAMS[k]}`)
   .join('&');
 
-export default function MalwareArchive() {
+export const ArchivesPage = memo(() => {
   const { t } = useTranslation(['archive']);
   const theme = useTheme();
   const location = useLocation();
@@ -227,7 +227,7 @@ export default function MalwareArchive() {
 
   useEffect(() => {
     if (location.hash) {
-      setGlobalDrawer(<ArchiveDetail sha256={location.hash.substr(1)} />, { hasMaximize: true });
+      setGlobalDrawer(<ArchiveDetailPage sha256={location.hash.substr(1)} />, { hasMaximize: true });
     } else {
       closeGlobalDrawer();
     }
@@ -471,4 +471,4 @@ export default function MalwareArchive() {
         </div>
       </PageFullWidth>
     );
-}
+});

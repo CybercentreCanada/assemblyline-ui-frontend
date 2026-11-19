@@ -5,7 +5,7 @@ import PageCenter from 'core/template/components/pages/PageCenter';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-type ForbiddenPageProps = {
+export type ForbiddenPageProps = {
   disabled?: boolean;
 };
 

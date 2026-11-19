@@ -4,7 +4,7 @@ import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import { useAppBanner } from 'core/template/components/app/hooks';
 import PageCenter from 'core/template/components/pages/PageCenter';
 import type { Metadata } from 'models/base/submission';
-import React, { useCallback, useEffect } from 'react';
+import { memo, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router';
 import { initializeSettings, loadDefaultProfile, loadSubmissionProfile } from 'routes/settings/settings.utils';
@@ -29,7 +29,7 @@ import {
 import { SubmissionMetadata } from 'routes/submit/components/SubmissionMetadata';
 import { SubmissionOptions } from 'routes/submit/components/SubmissionOptions';
 import type { SubmitState, SubmitStore } from 'routes/submit/submit.form';
-import { FLOW, useForm } from 'routes/submit/submit.form';
+import { FLOW, FormProvider, useForm } from 'routes/submit/submit.form';
 import {
   calculateFileHash,
   getDefaultExternalSources,
@@ -109,7 +109,7 @@ const RightPanel = styled('div')<AdjustProps>(({ theme, adjust }) => ({
   }
 }));
 
-const WrappedSubmitRoute = () => {
+export const SubmitContent = memo(() => {
   const { t, i18n } = useTranslation(['submit']);
   const theme = useTheme();
   const downMD = useMediaQuery(theme.breakpoints.down('md'));
@@ -399,6 +399,10 @@ const WrappedSubmitRoute = () => {
       <div style={{ height: '200px' }} />
     </PageCenter>
   );
-};
+});
 
-export const SubmitRoute = React.memo(WrappedSubmitRoute);
+export const SubmitPage = memo(() => (
+  <FormProvider>
+    <SubmitContent />
+  </FormProvider>
+));

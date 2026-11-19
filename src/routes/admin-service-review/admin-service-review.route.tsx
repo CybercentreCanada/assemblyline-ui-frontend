@@ -12,7 +12,7 @@ import type { ServiceStats as ServiceStatsData } from 'models/api/service';
 import type { CustomUser } from 'models/api/user';
 import type { Service as ServiceData } from 'models/base/service';
 import type { Dispatch, SetStateAction } from 'react';
-import { useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useLocation } from 'react-router';
 import { Link } from 'react-router-dom';
@@ -190,7 +190,7 @@ function VersionSelector({ possibleVersions, selectedService, version, setVersio
   );
 }
 
-export default function ServiceReview() {
+export const AdminServiceReviewPage = memo(() => {
   const { t } = useTranslation(['adminServiceReview']);
   const theme = useTheme();
 
@@ -352,4 +352,4 @@ export default function ServiceReview() {
   ) : (
     <Navigate to="/forbidden" replace />
   );
-}
+});

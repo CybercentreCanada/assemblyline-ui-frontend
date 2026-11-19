@@ -1,7 +1,9 @@
 import { Box, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, styled, useTheme } from '@mui/material';
+import useALContext from 'core/config/useALContext';
 import { memo, Profiler, useEffect } from 'react';
+import { Navigate } from 'react-router';
 import type { CustomizeMethod } from 'routes/development-customize/development-customize.form';
-import { CUSTOMIZE_METHODS, useForm } from 'routes/development-customize/development-customize.form';
+import { CUSTOMIZE_METHODS, FormProvider, useForm } from 'routes/development-customize/development-customize.form';
 import 'routes/development-customize/development-customize.styles.css';
 import { PageHeader } from 'ui/layouts/PageHeader';
 import { PageLayout } from 'ui/layouts/PageLayout';
@@ -64,7 +66,7 @@ const StyledBox2 = styled(Box)(({ theme }) => ({
   }
 }));
 
-export const CustomizeRoute = memo(() => {
+export const DevelopmentCustomizeContent = memo(() => {
   const theme = useTheme();
   const form = useForm();
 
@@ -214,4 +216,17 @@ export const CustomizeRoute = memo(() => {
       </div>
     </PageLayout>
   );
+});
+
+export const DevelopmentCustomizePage = memo(() => {
+  const { user: currentUser, configuration } = useALContext();
+
+  if (!currentUser.is_admin || !['development', 'staging'].includes(configuration.system.type))
+    return <Navigate to="/forbidden" replace />;
+  else
+    return (
+      <FormProvider>
+        <DevelopmentCustomizeContent />
+      </FormProvider>
+    );
 });
