@@ -13,12 +13,12 @@ import useDrawer from 'layout/drawer/drawer.hooks';
 import type { SearchResult } from 'models/api/search';
 import type { CustomUser, IndexDefinition } from 'models/api/user';
 import type { Safelist } from 'models/base/safelist';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
-import ForbiddenPage from 'routes/forbidden/forbidden.route';
-import SafelistNew from 'routes/manage-safelist-add/manage-safelist-add.route';
-import SafelistDetail from 'routes/manage-safelist-detail/manage-safelist-detail.route';
+import { ForbiddenPage } from 'routes/forbidden/forbidden.page';
+import { ManageSafelistAddPage } from 'routes/manage-safelist-add/manage-safelist-add.route';
+import { ManageSafelistDetailPage } from 'routes/manage-safelist-detail/manage-safelist-detail.route';
 import SafelistTable from 'routes/search/components/safelist';
 import { IconButton } from 'ui/buttons/IconButton';
 import { PageHeader } from 'ui/layouts/PageHeader';
@@ -37,7 +37,7 @@ const SAFELIST_PARAMS = createSearchParams(p => ({
 
 type SafelistParams = typeof SAFELIST_PARAMS;
 
-const SafelistSearch = () => {
+export const ManageSafelistsContent = memo(() => {
   const { t } = useTranslation(['manageSafelist']);
   const theme = useTheme();
   const location = useLocation();
@@ -101,8 +101,8 @@ const SafelistSearch = () => {
 
   useEffect(() => {
     if (!location.hash) closeGlobalDrawer();
-    else if (location.hash === '#new') setGlobalDrawer(<SafelistNew close={closeGlobalDrawer} />);
-    else setGlobalDrawer(<SafelistDetail safelist_id={location.hash.slice(1)} close={closeGlobalDrawer} />);
+    else if (location.hash === '#new') setGlobalDrawer(<ManageSafelistAddPage close={closeGlobalDrawer} />);
+    else setGlobalDrawer(<ManageSafelistDetailPage safelist_id={location.hash.slice(1)} close={closeGlobalDrawer} />);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.hash]);
 
@@ -197,13 +197,10 @@ const SafelistSearch = () => {
   ) : (
     <ForbiddenPage />
   );
-};
+});
 
-const WrappedSafelistPage = () => (
+export const ManageSafelistsPage = memo(() => (
   <SearchParamsProvider params={SAFELIST_PARAMS}>
-    <SafelistSearch />
+    <ManageSafelistsContent />
   </SearchParamsProvider>
-);
-
-export const SafelistPage = React.memo(WrappedSafelistPage);
-export default SafelistPage;
+));

@@ -17,7 +17,7 @@ import { memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router';
 import { Link } from 'react-router-dom';
-import ForbiddenPage from 'routes/forbidden/forbidden.route';
+import { ForbiddenPage } from 'routes/forbidden/forbidden.page';
 import AISummarySection from 'routes/submission-detail/components/ai_summary';
 import Attack from 'routes/submission-report/components/attack';
 import AttributionBanner from 'routes/submission-report/components/attribution_banner';
@@ -41,7 +41,7 @@ const NoPrintTooltip = memo(
   }))
 );
 
-export default function SubmissionReportPage() {
+export const SubmissionReportPage = memo(() => {
   const { t } = useTranslation(['submissionReport']);
   const { id } = useParams<ParamProps>();
   const { user: currentUser, c12nDef, configuration, settings } = useALContext();
@@ -323,4 +323,4 @@ export default function SubmissionReportPage() {
   ) : (
     <ForbiddenPage />
   );
-}
+});

@@ -1,9 +1,10 @@
 import { useAppConfigs, useAppUser } from 'core/template/components/app/hooks';
 import PageCenter from 'core/template/components/pages/PageCenter';
 import type { CustomUser } from 'models/api/user';
+import { memo } from 'react';
 import LinkGrid from 'ui/linkgrid';
 
-export default function Help() {
+export const HelpPage = memo(() => {
   const { preferences: layout } = useAppConfigs();
   const { validateProps } = useAppUser<CustomUser>();
   let items = [];
@@ -18,4 +19,4 @@ export default function Help() {
       <LinkGrid items={items} />
     </PageCenter>
   );
-}
+});

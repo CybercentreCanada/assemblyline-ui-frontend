@@ -6,7 +6,7 @@ import type { CustomUser } from 'models/api/user';
 import type { editor } from 'monaco-editor';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import ForbiddenPage from 'routes/forbidden/forbidden.route';
+import { ForbiddenPage } from 'routes/forbidden/forbidden.page';
 import MonacoEditor, { LANGUAGE_SELECTOR } from 'ui/MonacoEditor';
 
 type Props = {

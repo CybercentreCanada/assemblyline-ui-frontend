@@ -21,10 +21,10 @@ import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import { useAppUser } from 'core/template/components/app/hooks';
 import type { CustomUser } from 'models/api/user';
 import type { Retrohunt } from 'models/base/retrohunt';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import ForbiddenPage from 'routes/forbidden/forbidden.route';
-import NotFoundPage from 'routes/not-found/not-found.route';
+import { ForbiddenPage } from 'routes/forbidden/forbidden.page';
+import { NotFoundPage } from 'routes/not-found/not-found.route';
 import Classification from 'ui/Classification';
 
 type RetrohuntData = Pick<Retrohunt, 'key' | 'search_classification' | 'ttl'>;
@@ -34,7 +34,7 @@ type Props = {
   onRepeat: (value: Retrohunt) => void;
 };
 
-function WrappedRetrohuntRepeat({ retrohunt = null, onRepeat = () => null }: Props) {
+export const RetrohuntRepeat = memo(({ retrohunt = null, onRepeat = () => null }: Props) => {
   const { t } = useTranslation(['retrohunt']);
   const theme = useTheme();
   const { apiCall } = useMyAPI();
@@ -176,7 +176,4 @@ function WrappedRetrohuntRepeat({ retrohunt = null, onRepeat = () => null }: Pro
         </Dialog>
       </>
     );
-}
-
-export const RetrohuntRepeat = React.memo(WrappedRetrohuntRepeat);
-export default WrappedRetrohuntRepeat;
+});

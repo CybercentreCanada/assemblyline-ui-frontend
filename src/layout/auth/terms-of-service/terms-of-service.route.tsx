@@ -2,15 +2,15 @@ import { Box, Button, CircularProgress, Link, Typography, useTheme } from '@mui/
 import Skeleton from '@mui/material/Skeleton';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
-import NotFoundPage from 'core/template/branding/AppBanner';
 import { useAppBanner } from 'core/template/components/app/hooks';
 import PageCenter from 'core/template/components/pages/PageCenter';
 import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
-import { useState } from 'react';
+import { memo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Markdown from 'react-markdown';
+import { NotFoundPage } from 'routes/not-found/not-found.route';
 
-export default function Tos() {
+export const ToSPage = memo(() => {
   const { t } = useTranslation(['tos']);
   const theme = useTheme();
   const banner = useAppBanner();
@@ -122,4 +122,4 @@ export default function Tos() {
   ) : (
     <NotFoundPage />
   );
-}
+});

@@ -5,7 +5,7 @@ import PageFullSize from 'core/template/branding/AppPageCenter';
 import { useAppUser } from 'core/template/components/app/hooks';
 import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
 import type { CustomUser } from 'models/api/user';
-import { useState } from 'react';
+import { memo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate } from 'react-router';
 import LibMagic from 'routes/admin-identify/components/libmagic';
@@ -23,7 +23,7 @@ const TabContent = styled('div')(({ theme }) => ({
   paddingTop: theme.spacing(2)
 }));
 
-export default function AdminIdentify() {
+export const AdminIdentifyPage = memo(() => {
   const { t, i18n } = useTranslation(['adminIdentify']);
   const theme = useTheme();
   const { user: currentUser } = useAppUser<CustomUser>();
@@ -187,4 +187,4 @@ export default function AdminIdentify() {
   ) : (
     <Navigate to="/forbidden" replace />
   );
-}
+});

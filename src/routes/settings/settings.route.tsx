@@ -1,8 +1,9 @@
 import useALContext from 'core/config/useALContext';
+import { TableOfContentLayout } from 'features/table-of-content';
 import { useTableOfContent } from 'features/table-of-content/table-of-content.providers';
-import React, { useCallback, useEffect } from 'react';
+import { memo, useCallback, useEffect } from 'react';
 import { useParams } from 'react-router';
-import ForbiddenPage from 'routes/forbidden/forbidden.route';
+import { ForbiddenPage } from 'routes/forbidden/forbidden.page';
 import { DefaultMetadataSection } from 'routes/settings/components/DefaultMetadata';
 import { ExternalSourcesSection } from 'routes/settings/components/ExternalSources';
 import { HeaderSection } from 'routes/settings/components/Header';
@@ -12,7 +13,7 @@ import { RightNav } from 'routes/settings/components/RightNav';
 import { ServicesSection } from 'routes/settings/components/Services';
 import { SubmissionOptionsSection, SubmissionProfileDescription } from 'routes/settings/components/Submission';
 import type { SettingsStore } from 'routes/settings/settings.form';
-import { useForm } from 'routes/settings/settings.form';
+import { FormProvider, useForm } from 'routes/settings/settings.form';
 import { initializeSettings, loadDefaultProfile, loadSubmissionProfile } from 'routes/settings/settings.utils';
 import { PageLayout } from 'ui/layouts/PageLayout';
 
@@ -20,7 +21,7 @@ type Params = {
   tab: SettingsStore['state']['tab'];
 };
 
-const WrappedSettingsRoute = () => {
+export const SettingsContent = memo(() => {
   const form = useForm();
   const { rootRef, headerRef } = useTableOfContent();
   const { tab: tabParam } = useParams<Params>();
@@ -86,6 +87,12 @@ const WrappedSettingsRoute = () => {
         )}
       />
     );
-};
+});
 
-export const SettingsRoute = React.memo(WrappedSettingsRoute);
+export const SettingsPage = memo(() => (
+  <TableOfContentLayout>
+    <FormProvider>
+      <SettingsContent />
+    </FormProvider>
+  </TableOfContentLayout>
+));

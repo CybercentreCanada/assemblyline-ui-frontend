@@ -1,6 +1,6 @@
 import useALContext from 'core/config/useALContext';
 import { TableOfContentLayout, useTableOfContent } from 'features/table-of-content/table-of-content.providers';
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { memo, useCallback, useEffect, useMemo } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router';
 import type { LibraryFormStore } from 'routes/development-library/contexts/form';
 import { FormProvider, useForm } from 'routes/development-library/contexts/form';
@@ -26,7 +26,7 @@ type LibraryPageContentInnerProps = {
   components: ComponentsState;
 };
 
-const LibraryPageContentInnerComponent: React.FC<LibraryPageContentInnerProps> = ({ tab, components }) => {
+const LibraryPageContentInner = memo(({ tab, components }: LibraryPageContentInnerProps) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { rootRef, headerRef, Anchors, ActiveAnchor, scrollTo } = useTableOfContent();
@@ -107,11 +107,9 @@ const LibraryPageContentInnerComponent: React.FC<LibraryPageContentInnerProps> =
       {SectionComponent}
     </PageLayout>
   );
-};
+});
 
-const LibraryPageContentInner = React.memo(LibraryPageContentInnerComponent);
-
-const LibraryContent: React.FC = () => {
+export const DevelopmentLibraryContent = memo(() => {
   const form = useForm();
   const location = useLocation();
   const { user: currentUser, configuration } = useALContext();
@@ -135,15 +133,12 @@ const LibraryContent: React.FC = () => {
       {props => <LibraryPageContentInner {...props} />}
     </form.Subscribe>
   );
-};
+});
 
-const WrappedLibraryPage: React.FC = () => (
+export const DevelopmentLibraryPage = memo(() => (
   <TableOfContentLayout>
     <FormProvider>
-      <LibraryContent />
+      <DevelopmentLibraryContent />
     </FormProvider>
   </TableOfContentLayout>
-);
-
-export const LibraryPage = React.memo(WrappedLibraryPage);
-export default LibraryPage;
+));

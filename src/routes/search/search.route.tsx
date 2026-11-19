@@ -17,11 +17,11 @@ import type { SignatureIndexed } from 'models/base/signature';
 import type { SubmissionIndexed } from 'models/base/submission';
 import type { Role } from 'models/base/user';
 import type { Dispatch, SetStateAction } from 'react';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router';
 import { Link } from 'react-router-dom';
-import ForbiddenPage from 'routes/forbidden/forbidden.route';
+import { ForbiddenPage } from 'routes/forbidden/forbidden.page';
 import AlertsTable from 'routes/search/components/alerts';
 import FilesTable from 'routes/search/components/files';
 import ResultsTable from 'routes/search/components/results';
@@ -40,7 +40,7 @@ const PAGE_SIZE = 25;
 
 type SearchIndexes = Pick<Indexes, 'submission' | 'file' | 'result' | 'signature' | 'alert' | 'retrohunt'>;
 
-type Props = {
+export type SearchPageProps = {
   index?: string | null;
 };
 
@@ -48,7 +48,7 @@ type Params = {
   id: string;
 };
 
-function Search({ index = null }: Props) {
+export const SearchPage = memo(({ index = null }: SearchPageProps) => {
   const { id } = useParams<Params>();
   const { t } = useTranslation(['search']);
   const [pageSize] = useState<number>(PAGE_SIZE);
@@ -442,6 +442,4 @@ function Search({ index = null }: Props) {
       </div>
     </PageFullWidth>
   );
-}
-
-export default Search;
+});

@@ -1,6 +1,4 @@
 {
-  "app_route.error.fullname": "Plantage",
-  "app_route.error.shortname": "Plantage",
   "error": "erreur",
   "error.button": "Réessayer",
   "error.chunk": "Rechargement de l'application pour corriger une erreur de chargement...",

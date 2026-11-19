@@ -4,13 +4,13 @@ import useALContext from 'core/config/useALContext';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
 import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
 import useDrawer from 'layout/drawer/drawer.hooks';
-import { useCallback, useState } from 'react';
+import { memo, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import SignatureDetail from 'routes/manage-signature-detail/manage-signature-detail.route';
+import { ManageSignatureDetailPage } from 'routes/manage-signature-detail/manage-signature-detail.route';
 import type { Cell } from 'ui/Table/enhanced_table';
 import EnhancedTable from 'ui/Table/enhanced_table';
 
-export default function StatisticsSignatures() {
+export const StatisticsSignaturesPage = memo(() => {
   const { t } = useTranslation(['statisticsSignatures']);
   const { apiCall } = useMyAPI();
   const theme = useTheme();
@@ -24,7 +24,9 @@ export default function StatisticsSignatures() {
   };
 
   const handleRowClick = useCallback(row => {
-    setGlobalDrawer(<SignatureDetail signature_id={row.id} onUpdated={() => {}} onDeleted={handleSignatureDelete} />);
+    setGlobalDrawer(
+      <ManageSignatureDetailPage signature_id={row.id} onUpdated={() => {}} onDeleted={handleSignatureDelete} />
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -78,4 +80,4 @@ export default function StatisticsSignatures() {
       )}
     </PageFullWidth>
   );
-}
+});

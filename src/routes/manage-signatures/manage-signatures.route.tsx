@@ -11,11 +11,11 @@ import useDrawer from 'layout/drawer/drawer.hooks';
 import type { SearchResult } from 'models/api/search';
 import type { CustomUser, IndexDefinition } from 'models/api/user';
 import type { Signature } from 'models/base/signature';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
-import ForbiddenPage from 'routes/forbidden/forbidden.route';
-import SignatureDetail from 'routes/manage-signature-detail/manage-signature-detail.route';
+import { ForbiddenPage } from 'routes/forbidden/forbidden.page';
+import { ManageSignatureDetailPage } from 'routes/manage-signature-detail/manage-signature-detail.route';
 import SignaturesTable from 'routes/search/components/signatures';
 import { FileDownloader } from 'ui/buttons/FileDownloader';
 import { PageHeader } from 'ui/layouts/PageHeader';
@@ -34,7 +34,7 @@ export const SIGNATURES_PARAMS = createSearchParams(p => ({
 
 export type SignaturesParams = typeof SIGNATURES_PARAMS;
 
-const SignaturesSearch = () => {
+export const ManageSignaturesContent = memo(() => {
   const { t } = useTranslation(['manageSignatures']);
   const theme = useTheme();
   const location = useLocation();
@@ -120,7 +120,7 @@ const SignaturesSearch = () => {
   useEffect(() => {
     if (location.hash) {
       setGlobalDrawer(
-        <SignatureDetail
+        <ManageSignatureDetailPage
           signature_id={location.hash.substr(1)}
           onUpdated={handleSignatureUpdated}
           onDeleted={handleSignatureDeleted}
@@ -213,13 +213,10 @@ const SignaturesSearch = () => {
   ) : (
     <ForbiddenPage />
   );
-};
+});
 
-const WrappedSignaturesPage = () => (
+export const ManageSignaturesPage = memo(() => (
   <SearchParamsProvider params={SIGNATURES_PARAMS}>
-    <SignaturesSearch />
+    <ManageSignaturesContent />
   </SearchParamsProvider>
-);
-
-export const SignaturesPage = React.memo(WrappedSignaturesPage);
-export default SignaturesPage;
+));

@@ -13,7 +13,6 @@ import { AppConfigStoreProvider } from 'core/config';
 import useALContext from 'core/config/useALContext';
 import { AppInterfaceStoreProvider } from 'core/interface';
 import { AppPreferenceProvider, AppPreferenceStoreProvider } from 'core/preference';
-import QuotaExceeded from 'core/template/branding/AppVerticalBanner';
 import type { AppPreferenceConfigs, AppSiteMapConfigs, AppTheme } from 'core/template/components/app/AppConfigs';
 import AppProvider from 'core/template/components/app/AppProvider';
 import type { AppUserService } from 'core/template/components/app/AppUserService';
@@ -21,10 +20,11 @@ import { useAppLayout } from 'core/template/components/app/hooks';
 import { useAppSwitcher } from 'core/template/components/app/hooks/useAppSwitcher';
 import useMyTheme from 'core/template/useMyTheme';
 import useMyUser from 'layout/auth/auth.hooks';
-import LoadingScreen from 'layout/auth/loading/loading';
-import LockedPage from 'layout/auth/locked/locked.route';
-import LoginScreen from 'layout/auth/log-in/login';
-import Tos from 'layout/auth/terms-of-service/terms-of-service.route';
+import { LoadingPage } from 'layout/auth/loading/loading.route';
+import { LockedPage } from 'layout/auth/locked/locked.route';
+import { LoginPage } from 'layout/auth/log-in/log-in.route';
+import { QuotaPage } from 'layout/auth/quota/quota.route';
+import { ToSPage } from 'layout/auth/terms-of-service/terms-of-service.route';
 import QuotaProvider from 'layout/quota/quota.providers';
 import SafeResultsProvider from 'layout/safe-results/safe-results.providers';
 import type { CustomUser } from 'models/api/user';
@@ -87,21 +87,21 @@ const MyAppMain = () => {
   setMomentFRLocale();
 
   return {
-    load: <LoadingScreen />,
+    load: <LoadingPage />,
     locked: <LockedPage />,
     login: loginParams ? (
-      <LoginScreen
+      <LoginPage
         oAuthProviders={loginParams.oauth_providers}
         allowUserPass={loginParams.allow_userpass_login}
         allowSignup={loginParams.allow_signup}
         allowSAML={loginParams.allow_saml_login}
       />
     ) : (
-      <LoadingScreen />
+      <LoadingPage />
     ),
     routes: <Routes />,
-    tos: <Tos />,
-    quota: <QuotaExceeded />
+    tos: <ToSPage />,
+    quota: <QuotaPage />
   }[renderedApp];
 };
 

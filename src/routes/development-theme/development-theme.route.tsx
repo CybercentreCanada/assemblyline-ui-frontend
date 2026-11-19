@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import AddPhotoAlternateOutlinedIcon from '@mui/icons-material/AddPhotoAlternateOutlined';
 import FileOpenIcon from '@mui/icons-material/FileOpen';
 import { Button, IconButton, Stack, Switch, useTheme } from '@mui/material';
@@ -16,7 +17,7 @@ import Tag from 'ui/Tag';
 import TextVerdict from 'ui/TextVerdict';
 import Verdict from 'ui/Verdict';
 
-const Theme = () => {
+export const DevelopmentThemePage = memo(() => {
   const theme = useTheme();
   const { user: currentUser, configuration } = useALContext();
 
@@ -316,6 +317,4 @@ const Theme = () => {
         </Stack>
       </PageCenter>
     );
-};
-
-export default Theme;
+});

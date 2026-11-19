@@ -11,12 +11,12 @@ import { createSearchParams, SearchParamsProvider, useSearchParams } from 'featu
 import useDrawer from 'layout/drawer/drawer.hooks';
 import type { CustomUser, IndexDefinition } from 'models/api/user';
 import type { WorkflowIndexed } from 'models/base/workflow';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
-import ForbiddenPage from 'routes/forbidden/forbidden.route';
-import WorkflowCreate from 'routes/manage-workflow-create/manage-workflow-create.route';
-import WorkflowDetail from 'routes/manage-workflow-detail/manage-workflow-detail.route';
+import { ForbiddenPage } from 'routes/forbidden/forbidden.page';
+import { ManageWorkflowCreatePage } from 'routes/manage-workflow-create/manage-workflow-create.route';
+import { ManageWorkflowDetailPage } from 'routes/manage-workflow-detail/manage-workflow-detail.route';
 import WorkflowTable from 'routes/search/components/workflow';
 import { PageHeader } from 'ui/layouts/PageHeader';
 import { DEFAULT_SUGGESTION } from 'ui/SearchBar/search-textfield';
@@ -41,7 +41,7 @@ const WORKFLOWS_PARAMS = createSearchParams(p => ({
 
 type WorkflowsParams = typeof WORKFLOWS_PARAMS;
 
-const WorkflowsSearch = () => {
+export const ManageWorkflowsContent = memo(() => {
   const { t } = useTranslation(['manageWorkflows']);
   const theme = useTheme();
   const location = useLocation();
@@ -106,14 +106,14 @@ const WorkflowsSearch = () => {
 
     if (url.pathname.startsWith('/detail/')) {
       setGlobalDrawer(
-        <WorkflowDetail
+        <ManageWorkflowDetailPage
           id={url.pathname.slice('/detail/'.length)}
           onClose={() => navigate(`${location.pathname}${location.search}`)}
         />
       );
     } else if (url.pathname.startsWith('/create/')) {
       setGlobalDrawer(
-        <WorkflowCreate
+        <ManageWorkflowCreatePage
           id={url.pathname.slice('/create/'.length)}
           onClose={id =>
             id
@@ -219,13 +219,10 @@ const WorkflowsSearch = () => {
   ) : (
     <ForbiddenPage />
   );
-};
+});
 
-const WrappedWorkflowsPage = () => (
+export const ManageWorkflowsPage = memo(() => (
   <SearchParamsProvider params={WORKFLOWS_PARAMS}>
-    <WorkflowsSearch />
+    <ManageWorkflowsContent />
   </SearchParamsProvider>
-);
-
-export const WorkflowsPage = React.memo(WrappedWorkflowsPage);
-export default WorkflowsPage;
+));

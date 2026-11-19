@@ -43,7 +43,7 @@ const StyledTableCell = memo(
   }))
 );
 
-export default function SiteMapPage() {
+export const AdminSiteMapPage = memo(() => {
   const { t } = useTranslation(['adminSiteMap']);
   const theme = useTheme();
   const { configuration } = useALContext();
@@ -173,4 +173,4 @@ export default function SiteMapPage() {
   ) : (
     <Navigate to="/forbidden" replace />
   );
-}
+});

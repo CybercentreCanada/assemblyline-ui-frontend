@@ -27,7 +27,7 @@ const Expand = memo(
   }))
 );
 
-export default function ApiDoc() {
+export const HelpAPIPage = memo(() => {
   const { apiCall } = useMyAPI();
   const [apiSelected, setApiSelected] = useState<string | null>(null);
   const [apiDefinition, setApiDefinition] = useState(null);
@@ -387,4 +387,4 @@ export default function ApiDoc() {
       </div>
     </PageFullWidth>
   );
-}
+});

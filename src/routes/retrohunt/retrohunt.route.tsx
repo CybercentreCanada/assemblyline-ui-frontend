@@ -10,11 +10,11 @@ import useDrawer from 'layout/drawer/drawer.hooks';
 import type { SearchResult } from 'models/api/search';
 import type { IndexDefinition } from 'models/api/user';
 import type { Retrohunt, RetrohuntIndexed, RetrohuntProgress } from 'models/base/retrohunt';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useLocation, useNavigate } from 'react-router';
-import { RetrohuntCreate } from 'routes/retrohunt-create/retrohunt-create.route';
-import RetrohuntDetail from 'routes/retrohunt-detail/retrohunt-detail.route';
+import { RetrohuntCreatePage } from 'routes/retrohunt-create/retrohunt-create.route';
+import { RetrohuntDetailPage } from 'routes/retrohunt-detail/retrohunt-detail.route';
 import RetrohuntTable from 'routes/search/components/retrohunt';
 import type { Socket } from 'socket.io-client';
 import { io } from 'socket.io-client';
@@ -42,7 +42,7 @@ const DEFAULT_QUERY: string = Object.keys(DEFAULT_PARAMS)
   .map(k => `${k}=${DEFAULT_PARAMS[k]}`)
   .join('&');
 
-export default function RetrohuntPage() {
+export const RetrohuntPage = memo(() => {
   const { t } = useTranslation(['retrohunt']);
   const theme = useTheme();
   const location = useLocation();
@@ -147,7 +147,9 @@ export default function RetrohuntPage() {
 
   const handleOpenCreatePage = useCallback(() => {
     if (currentUser.roles.includes('retrohunt_run') && configuration?.retrohunt?.enabled) {
-      setGlobalDrawer(<RetrohuntCreate isDrawer onCreateRetrohunt={handleCreateRetrohunt} />, { hasMaximize: true });
+      setGlobalDrawer(<RetrohuntCreatePage isDrawer onCreateRetrohunt={handleCreateRetrohunt} />, {
+        hasMaximize: true
+      });
       navigate(`${location.pathname}?${query.getDeltaString()}`);
     }
   }, [
@@ -195,7 +197,7 @@ export default function RetrohuntPage() {
 
   useEffect(() => {
     if (location.hash) {
-      setGlobalDrawer(<RetrohuntDetail search_key={location.hash.substr(1)} isDrawer />, { hasMaximize: true });
+      setGlobalDrawer(<RetrohuntDetailPage search_key={location.hash.substr(1)} isDrawer />, { hasMaximize: true });
     }
   }, [location.hash, setGlobalDrawer]);
 
@@ -407,4 +409,4 @@ export default function RetrohuntPage() {
         </div>
       </PageFullWidth>
     );
-}
+});

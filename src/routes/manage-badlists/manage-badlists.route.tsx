@@ -11,12 +11,12 @@ import PageFullWidth from 'core/template/components/pages/PageFullWidth';
 import { createSearchParams, SearchParamsProvider, useSearchParams } from 'features/search-params';
 import useDrawer from 'layout/drawer/drawer.hooks';
 import type { CustomUser, IndexDefinition } from 'models/api/user';
-import React, { useCallback, useEffect, useMemo } from 'react';
+import { memo, useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
-import ForbiddenPage from 'routes/forbidden/forbidden.route';
-import BadlistNew from 'routes/manage-badlist-add/manage-badlist-add.route';
-import BadlistDetail from 'routes/manage-badlist-detail/manage-badlist-detail.route';
+import { ForbiddenPage } from 'routes/forbidden/forbidden.page';
+import { ManageBadlistAddPage } from 'routes/manage-badlist-add/manage-badlist-add.route';
+import { ManageBadlistDetailPage } from 'routes/manage-badlist-detail/manage-badlist-detail.route';
 import BadlistTable from 'routes/search/components/badlist';
 import { IconButton } from 'ui/buttons/IconButton';
 import { PageHeader } from 'ui/layouts/PageHeader';
@@ -35,7 +35,7 @@ const BADLIST_PARAMS = createSearchParams(p => ({
 
 export type BadlistParams = typeof BADLIST_PARAMS;
 
-const BadlistSearch = () => {
+export const ManageBadlistsContent = memo(() => {
   const { t } = useTranslation(['manageBadlist']);
   const theme = useTheme();
   const location = useLocation();
@@ -78,8 +78,8 @@ const BadlistSearch = () => {
 
   useEffect(() => {
     if (!location.hash) closeGlobalDrawer();
-    else if (location.hash === '#new') setGlobalDrawer(<BadlistNew close={closeGlobalDrawer} />);
-    else setGlobalDrawer(<BadlistDetail badlist_id={location.hash.slice(1)} close={closeGlobalDrawer} />);
+    else if (location.hash === '#new') setGlobalDrawer(<ManageBadlistAddPage close={closeGlobalDrawer} />);
+    else setGlobalDrawer(<ManageBadlistDetailPage badlist_id={location.hash.slice(1)} close={closeGlobalDrawer} />);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.hash]);
 
@@ -169,13 +169,10 @@ const BadlistSearch = () => {
   ) : (
     <ForbiddenPage />
   );
-};
+});
 
-const WrappedBadlistPage = () => (
+export const ManageBadlistsPage = memo(() => (
   <SearchParamsProvider params={BADLIST_PARAMS}>
-    <BadlistSearch />
+    <ManageBadlistsContent />
   </SearchParamsProvider>
-);
-
-export const BadlistPage = React.memo(WrappedBadlistPage);
-export default BadlistPage;
+));

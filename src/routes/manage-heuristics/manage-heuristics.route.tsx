@@ -10,11 +10,11 @@ import useDrawer from 'layout/drawer/drawer.hooks';
 import type { SearchResult } from 'models/api/search';
 import type { CustomUser, IndexDefinition } from 'models/api/user';
 import type { Heuristic } from 'models/base/heuristic';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
-import ForbiddenPage from 'routes/forbidden/forbidden.route';
-import HeuristicDetail from 'routes/manage-heuristic-detail/manage-heuristic-detail.route';
+import { ForbiddenPage } from 'routes/forbidden/forbidden.page';
+import { ManageHeuristicDetailPage } from 'routes/manage-heuristic-detail/manage-heuristic-detail.route';
 import HeuristicsTable from 'routes/search/components/heuristics';
 import SearchHeader from 'ui/SearchBar/SearchHeader';
 import { DEFAULT_SUGGESTION } from 'ui/SearchBar/search-textfield';
@@ -30,7 +30,7 @@ const HEURISTICS_PARAMS = createSearchParams(p => ({
 
 type HeuristicsParams = typeof HEURISTICS_PARAMS;
 
-const HeuristicsSearch = () => {
+export const ManageHeuristicsContent = memo(() => {
   const { t } = useTranslation(['manageHeuristics']);
   const theme = useTheme();
   const location = useLocation();
@@ -80,7 +80,7 @@ const HeuristicsSearch = () => {
   }, [globalDrawerOpened]);
 
   useEffect(() => {
-    if (location.hash) setGlobalDrawer(<HeuristicDetail heur_id={location.hash.substr(1)} />);
+    if (location.hash) setGlobalDrawer(<ManageHeuristicDetailPage heur_id={location.hash.substr(1)} />);
     else closeGlobalDrawer();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.hash]);
@@ -121,13 +121,10 @@ const HeuristicsSearch = () => {
   ) : (
     <ForbiddenPage />
   );
-};
+});
 
-const WrappedHeuristicsPage = () => (
+export const ManageHeuristicsPage = memo(() => (
   <SearchParamsProvider params={HEURISTICS_PARAMS}>
-    <HeuristicsSearch />
+    <ManageHeuristicsContent />
   </SearchParamsProvider>
-);
-
-export const HeuristicsPage = React.memo(WrappedHeuristicsPage);
-export default HeuristicsPage;
+));

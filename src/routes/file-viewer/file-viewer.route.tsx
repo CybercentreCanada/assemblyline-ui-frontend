@@ -34,7 +34,7 @@ import useAssistant from 'layout/assistant/assistant.hooks';
 import type { CustomUser } from 'models/api/user';
 import type { File } from 'models/base/file';
 import type { Submission } from 'models/base/submission';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router';
 import { Link } from 'react-router-dom';
@@ -44,7 +44,7 @@ import { HexSection } from 'routes/file-viewer/components/hex';
 import { ImageSection } from 'routes/file-viewer/components/image';
 import { StringsSection } from 'routes/file-viewer/components/strings';
 import SelectionProvider, { useSelection } from 'routes/file-viewer/file-viewer.providers';
-import ForbiddenPage from 'routes/forbidden/forbidden.route';
+import { ForbiddenPage } from 'routes/forbidden/forbidden.page';
 import { FileDownloader } from 'ui/buttons/FileDownloader';
 import { IconButton } from 'ui/buttons/IconButton';
 import { TabContainer } from 'ui/TabContainer';
@@ -69,7 +69,7 @@ type ParamProps = {
   tab: Tab;
 };
 
-const WrappedFileViewer = () => {
+export const FileViewerContent = memo(() => {
   const { t } = useTranslation(['fileViewer']);
   const theme = useTheme();
   const location = useLocation();
@@ -458,12 +458,10 @@ const WrappedFileViewer = () => {
   ) : (
     <ForbiddenPage />
   );
-};
+});
 
-export const FileViewer = React.memo(props => (
+export const FileViewerPage = memo(() => (
   <SelectionProvider>
-    <WrappedFileViewer {...props} />
+    <FileViewerContent />
   </SelectionProvider>
 ));
-
-export default FileViewer;

@@ -6,13 +6,14 @@ import useAppBannerVert from 'core/template/components/app/hooks/useAppBannerVer
 import type { CustomUser } from 'models/api/user';
 import type { Role, Scope } from 'models/base/user';
 import { SCOPES } from 'models/base/user';
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 import getXSRFCookie from 'shared/utils/xsrf';
 
 const VALID_SCOPES: Omit<Scope, 'c'>[] = SCOPES.filter(s => s !== 'c');
 
-export default function AppRegistration() {
+export const AuthorizePage = memo(() => {
   const location = useLocation();
   const navigate = useNavigate();
   const { t } = useTranslation(['authorize']);
@@ -110,4 +111,4 @@ export default function AppRegistration() {
       </PageCardCentered>
     </Backdrop>
   );
-}
+});

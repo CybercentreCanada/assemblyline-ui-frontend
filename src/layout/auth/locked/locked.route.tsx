@@ -3,10 +3,11 @@ import { useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import useALContext from 'core/config/useALContext';
 import PageCenter from 'core/template/components/pages/PageCenter';
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
-import ForbiddenPage from 'routes/forbidden/forbidden.route';
+import { ForbiddenPage } from 'routes/forbidden/forbidden.page';
 
-const LockedPage = () => {
+export const LockedPage = memo(() => {
   const { t } = useTranslation(['locked']);
   const { configuration } = useALContext();
   const theme = useTheme();
@@ -36,6 +37,4 @@ const LockedPage = () => {
       )}
     </>
   );
-};
-
-export default LockedPage;
+});
