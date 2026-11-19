@@ -35,3 +35,5 @@ export const ForbiddenPage = memo(({ disabled = false }: ForbiddenPageProps) => 
     </PageCenter>
   );
 });
+
+ForbiddenPage.displayName = 'ForbiddenPage';

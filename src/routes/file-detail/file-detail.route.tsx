@@ -36,7 +36,7 @@ import ResultSection from 'routes/file-detail/components/results';
 import TagSection from 'routes/file-detail/components/tags';
 import URIIdentificationSection from 'routes/file-detail/components/uriIdent';
 import { DEFAULT_TAB, TAB_OPTIONS } from 'routes/file-viewer/file-viewer.route';
-import { ForbiddenPage } from 'routes/forbidden/forbidden.route';
+import { ForbiddenPage } from 'routes/forbidden/forbidden.page';
 import { ManageHeuristicDetailPage } from 'routes/manage-heuristic-detail/manage-heuristic-detail.route';
 import { ManageSignatureDetailPage } from 'routes/manage-signature-detail/manage-signature-detail.route';
 import AISummarySection from 'routes/submission-detail/components/ai_summary';

@@ -32,7 +32,7 @@ import { AuthorizePage } from 'routes/authorize/authorize.route';
 import { DashboardPage } from 'routes/dashboard/dashboard.route';
 import { FileDetailPage } from 'routes/file-detail/file-detail.route';
 import { FileViewerPage } from 'routes/file-viewer/file-viewer.route';
-import { ForbiddenPage } from 'routes/forbidden/forbidden.route';
+import { ForbiddenPage } from 'routes/forbidden/forbidden.page';
 import { HelpAPIPage } from 'routes/help-api/help-api.route';
 import { HelpClassificationPage } from 'routes/help-classification/help-classification.route';
 import { HelpConfigurationPage } from 'routes/help-configuration/help-configuration.route';

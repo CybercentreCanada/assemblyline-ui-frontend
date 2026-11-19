@@ -13,7 +13,7 @@ import type { Heuristic } from 'models/base/heuristic';
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
-import { ForbiddenPage } from 'routes/forbidden/forbidden.route';
+import { ForbiddenPage } from 'routes/forbidden/forbidden.page';
 import { ManageHeuristicDetailPage } from 'routes/manage-heuristic-detail/manage-heuristic-detail.route';
 import HeuristicsTable from 'routes/search/components/heuristics';
 import SearchHeader from 'ui/SearchBar/SearchHeader';

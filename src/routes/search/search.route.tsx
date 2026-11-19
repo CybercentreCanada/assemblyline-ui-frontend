@@ -21,7 +21,7 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router';
 import { Link } from 'react-router-dom';
-import { ForbiddenPage } from 'routes/forbidden/forbidden.route';
+import { ForbiddenPage } from 'routes/forbidden/forbidden.page';
 import AlertsTable from 'routes/search/components/alerts';
 import FilesTable from 'routes/search/components/files';
 import ResultsTable from 'routes/search/components/results';

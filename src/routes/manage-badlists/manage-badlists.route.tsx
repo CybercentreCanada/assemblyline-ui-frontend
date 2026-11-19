@@ -14,7 +14,7 @@ import type { CustomUser, IndexDefinition } from 'models/api/user';
 import { memo, useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
-import { ForbiddenPage } from 'routes/forbidden/forbidden.route';
+import { ForbiddenPage } from 'routes/forbidden/forbidden.page';
 import { ManageBadlistAddPage } from 'routes/manage-badlist-add/manage-badlist-add.route';
 import { ManageBadlistDetailPage } from 'routes/manage-badlist-detail/manage-badlist-detail.route';
 import BadlistTable from 'routes/search/components/badlist';

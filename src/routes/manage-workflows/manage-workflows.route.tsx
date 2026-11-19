@@ -14,7 +14,7 @@ import type { WorkflowIndexed } from 'models/base/workflow';
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
-import { ForbiddenPage } from 'routes/forbidden/forbidden.route';
+import { ForbiddenPage } from 'routes/forbidden/forbidden.page';
 import { ManageWorkflowCreatePage } from 'routes/manage-workflow-create/manage-workflow-create.route';
 import { ManageWorkflowDetailPage } from 'routes/manage-workflow-detail/manage-workflow-detail.route';
 import WorkflowTable from 'routes/search/components/workflow';

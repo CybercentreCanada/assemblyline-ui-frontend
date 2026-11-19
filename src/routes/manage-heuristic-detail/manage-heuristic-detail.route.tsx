@@ -11,7 +11,7 @@ import { DEFAULT_STATS, type Statistic } from 'models/base/statistic';
 import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
-import { ForbiddenPage } from 'routes/forbidden/forbidden.route';
+import { ForbiddenPage } from 'routes/forbidden/forbidden.page';
 import ResultsTable from 'routes/search/components/results';
 import { safeFieldValueURI } from 'shared/utils/utils';
 import { IconButton } from 'ui/buttons/IconButton';

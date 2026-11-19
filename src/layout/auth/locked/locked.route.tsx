@@ -5,7 +5,7 @@ import useALContext from 'core/config/useALContext';
 import PageCenter from 'core/template/components/pages/PageCenter';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ForbiddenPage } from 'routes/forbidden/forbidden.route';
+import { ForbiddenPage } from 'routes/forbidden/forbidden.page';
 
 export const LockedPage = memo(() => {
   const { t } = useTranslation(['locked']);

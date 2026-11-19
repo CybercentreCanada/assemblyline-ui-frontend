@@ -2,7 +2,7 @@ import useALContext from 'core/config/useALContext';
 import type { Role } from 'models/base/user';
 import React from 'react';
 import { Navigate } from 'react-router';
-import { ForbiddenPage } from 'routes/forbidden/forbidden.route';
+import { ForbiddenPage } from 'routes/forbidden/forbidden.page';
 
 export type ForbiddenRedirectProps = {
   children?: React.ReactNode;

@@ -31,7 +31,7 @@ import CodeSection from 'routes/file-viewer/components/code_summary';
 import { HexSection } from 'routes/file-viewer/components/hex';
 import { ImageSection } from 'routes/file-viewer/components/image';
 import { StringsSection } from 'routes/file-viewer/components/strings';
-import { ForbiddenPage } from 'routes/forbidden/forbidden.route';
+import { ForbiddenPage } from 'routes/forbidden/forbidden.page';
 import { NotFoundPage } from 'routes/not-found/not-found.route';
 import AISummarySection from 'routes/submission-detail/components/ai_summary';
 import Classification from 'ui/Classification';

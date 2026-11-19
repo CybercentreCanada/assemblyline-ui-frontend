@@ -2,7 +2,7 @@ import useALContext from 'core/config/useALContext';
 import { useAppConfigs } from 'core/template/components/app/hooks';
 import PageCenter from 'core/template/components/pages/PageCenter';
 import { memo } from 'react';
-import { ForbiddenPage } from 'routes/forbidden/forbidden.route';
+import { ForbiddenPage } from 'routes/forbidden/forbidden.page';
 import LinkGrid from 'ui/linkgrid';
 
 export const ManagePage = memo(() => {

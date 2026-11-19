@@ -30,7 +30,7 @@ import React, { memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TbUserX } from 'react-icons/tb';
 import { useNavigate, useParams } from 'react-router';
-import { ForbiddenPage } from 'routes/forbidden/forbidden.route';
+import { ForbiddenPage } from 'routes/forbidden/forbidden.page';
 import ResultsTable from 'routes/search/components/results';
 import { suricataConfig, suricataDef } from 'shared/utils/suricata';
 import { safeFieldValue, safeFieldValueURI } from 'shared/utils/utils';

@@ -23,7 +23,7 @@ import type { CustomUser } from 'models/api/user';
 import type { Retrohunt } from 'models/base/retrohunt';
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ForbiddenPage } from 'routes/forbidden/forbidden.route';
+import { ForbiddenPage } from 'routes/forbidden/forbidden.page';
 import { NotFoundPage } from 'routes/not-found/not-found.route';
 import Classification from 'ui/Classification';
 

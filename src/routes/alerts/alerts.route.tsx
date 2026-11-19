@@ -26,7 +26,7 @@ import { AlertsProvider } from 'routes/alerts/contexts/AlertsContext';
 import { SearchParamsProvider, useSearchParams } from 'routes/alerts/contexts/SearchParamsContext';
 import type { SearchParams } from 'routes/alerts/utils/SearchParams';
 import type { SearchResult } from 'routes/alerts/utils/SearchParser';
-import { ForbiddenPage } from 'routes/forbidden/forbidden.route';
+import { ForbiddenPage } from 'routes/forbidden/forbidden.page';
 import { ManageWorkflowCreatePage } from 'routes/manage-workflow-create/manage-workflow-create.route';
 import { IconButton } from 'ui/buttons/IconButton';
 import InformativeAlert from 'ui/InformativeAlert';

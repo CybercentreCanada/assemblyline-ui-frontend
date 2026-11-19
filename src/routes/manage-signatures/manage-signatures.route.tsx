@@ -14,7 +14,7 @@ import type { Signature } from 'models/base/signature';
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
-import { ForbiddenPage } from 'routes/forbidden/forbidden.route';
+import { ForbiddenPage } from 'routes/forbidden/forbidden.page';
 import { ManageSignatureDetailPage } from 'routes/manage-signature-detail/manage-signature-detail.route';
 import SignaturesTable from 'routes/search/components/signatures';
 import { FileDownloader } from 'ui/buttons/FileDownloader';
