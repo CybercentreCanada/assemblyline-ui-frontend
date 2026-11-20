@@ -100,7 +100,7 @@ export const SettingsPage = memo(() => (
 ));
 
 export const SettingsRoute = createAppRoute({
-  component: <SettingsPage />,
+  component: SettingsPage,
 
   path: '/settings/:tab',
   params: s => ({
@@ -118,7 +118,7 @@ export const SettingsRoute = createAppRoute({
 });
 
 export const SettingsRootRoute = createAppRoute({
-  component: <SettingsPage />,
+  component: SettingsPage,
 
   path: '/settings',
 

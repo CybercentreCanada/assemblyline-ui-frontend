@@ -132,7 +132,7 @@ export const ManageHeuristicsPage = memo(() => (
 ));
 
 export const ManageHeuristicsRoute = createAppRoute({
-  component: <ManageHeuristicsPage />,
+  component: ManageHeuristicsPage,
 
   path: '/manage/heuristics',
   search: s => ({

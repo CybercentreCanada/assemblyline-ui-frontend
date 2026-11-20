@@ -31,7 +31,7 @@ export const AdminPage = memo(() => {
 });
 
 export const AdminRoute = createAppRoute({
-  component: <AdminPage />,
+  component: AdminPage,
 
   path: '/admin',
 

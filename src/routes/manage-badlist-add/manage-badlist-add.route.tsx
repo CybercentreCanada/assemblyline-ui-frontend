@@ -441,7 +441,7 @@ export const ManageBadlistAddPage = memo(({}: ManageBadlistAddPageProps) => {
 });
 
 export const ManageBadlistAddRoute = createAppRoute({
-  component: <ManageBadlistAddPage />,
+  component: ManageBadlistAddPage,
 
   path: '/manage/badlist/add',
 

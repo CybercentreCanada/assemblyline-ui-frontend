@@ -580,7 +580,7 @@ export const FileDetailPage = memo(() => {
 });
 
 export const FileDetailRoute = createAppRoute({
-  component: <FileDetailPage />,
+  component: FileDetailPage,
 
   path: '/file/detail/:id',
   params: s => ({

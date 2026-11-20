@@ -324,7 +324,7 @@ export const AlertsPage = memo(() => (
 ));
 
 export const AlertsRoute = createAppRoute({
-  component: <AlertsPage />,
+  component: AlertsPage,
 
   path: '/alerts',
   search: s => ({

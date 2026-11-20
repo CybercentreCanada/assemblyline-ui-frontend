@@ -236,7 +236,7 @@ export const ManageWorkflowDetailPage = memo(({ id: propID = null, onClose = nul
 });
 
 export const ManageWorkflowDetailRoute = createAppRoute({
-  component: <ManageWorkflowDetailPage />,
+  component: ManageWorkflowDetailPage,
 
   path: '/manage/workflow/detail/:id',
   params: s => ({

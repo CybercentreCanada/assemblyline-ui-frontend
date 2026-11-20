@@ -172,7 +172,7 @@ export const SubmissionsPage = memo(() => (
 ));
 
 export const SubmissionsRoute = createAppRoute({
-  component: <SubmissionsPage />,
+  component: SubmissionsPage,
 
   path: '/submissions',
   search: s => ({

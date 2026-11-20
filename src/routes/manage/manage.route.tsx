@@ -32,7 +32,7 @@ export const ManagePage = memo(() => {
 });
 
 export const ManageRoute = createAppRoute({
-  component: <ManagePage />,
+  component: ManagePage,
 
   path: '/manage',
 

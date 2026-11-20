@@ -127,7 +127,7 @@ export const ToSPage = memo(() => {
 });
 
 export const ToSRoute = createAppRoute({
-  component: <ToSPage />,
+  component: ToSPage,
 
   path: '/tos',
 

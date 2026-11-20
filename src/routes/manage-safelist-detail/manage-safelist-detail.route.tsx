@@ -545,7 +545,7 @@ export const ManageSafelistDetailPage = memo(
 );
 
 export const ManageSafelistDetailRoute = createAppRoute({
-  component: <ManageSafelistDetailPage />,
+  component: ManageSafelistDetailPage,
 
   path: '/manage/safelist/detail/:id',
   params: s => ({

@@ -208,7 +208,7 @@ export const ManageSafelistsPage = memo(() => (
 ));
 
 export const ManageSafelistsRoute = createAppRoute({
-  component: <ManageSafelistsPage />,
+  component: ManageSafelistsPage,
 
   path: '/manage/safelists',
   search: s => ({

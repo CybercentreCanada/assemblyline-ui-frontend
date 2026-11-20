@@ -180,7 +180,7 @@ export const ManageBadlistsPage = memo(() => (
 ));
 
 export const ManageBadlistsRoute = createAppRoute({
-  component: <ManageBadlistsPage />,
+  component: ManageBadlistsPage,
 
   path: '/manage/badlists',
   search: s => ({

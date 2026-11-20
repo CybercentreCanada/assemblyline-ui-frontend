@@ -167,7 +167,7 @@ export const AdminUsersPage = memo(() => (
 ));
 
 export const AdminUsersRoute = createAppRoute({
-  component: <AdminUsersPage />,
+  component: AdminUsersPage,
 
   path: '/admin/users',
   search: s => ({

@@ -357,7 +357,7 @@ export const AdminServiceDetailPage = memo(
 );
 
 export const AdminServiceDetailRoute = createAppRoute({
-  component: <AdminServiceDetailPage />,
+  component: AdminServiceDetailPage,
 
   path: '/admin/services/:svc',
   params: s => ({

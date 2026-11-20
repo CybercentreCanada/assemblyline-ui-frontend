@@ -77,7 +77,7 @@ export const StatisticsHeuristicsPage = memo(() => {
 });
 
 export const StatisticsHeuristicsRoute = createAppRoute({
-  component: <StatisticsHeuristicsPage />,
+  component: StatisticsHeuristicsPage,
 
   path: '/manage/statistics/heuristics',
 

@@ -21,7 +21,7 @@ export const SubmissionRedirectPage = memo(() => {
 });
 
 export const SubmissionRedirectRoute = createAppRoute({
-  component: <SubmissionRedirectPage />,
+  component: SubmissionRedirectPage,
 
   path: '/submission/:id',
   params: s => ({

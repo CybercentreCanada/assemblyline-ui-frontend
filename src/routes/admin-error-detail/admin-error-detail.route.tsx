@@ -215,7 +215,7 @@ export const AdminErrorDetailPage = memo(({ error_key = null }: AdminErrorDetail
 });
 
 export const AdminErrorDetailRoute = createAppRoute({
-  component: <AdminErrorDetailPage />,
+  component: AdminErrorDetailPage,
 
   path: '/admin/errors/:id',
   params: s => ({ id: s.string() }),

@@ -30,7 +30,7 @@ export const QuotaPage = memo(() => {
 });
 
 export const QuotaRoute = createAppRoute({
-  component: <QuotaPage />,
+  component: QuotaPage,
 
   path: '/quota',
 

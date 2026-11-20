@@ -128,7 +128,7 @@ export const HelpServicesPage = memo(() => {
 });
 
 export const HelpServicesRoute = createAppRoute({
-  component: <HelpServicesPage />,
+  component: HelpServicesPage,
 
   path: '/help/services',
 

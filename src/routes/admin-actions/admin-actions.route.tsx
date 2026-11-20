@@ -188,7 +188,7 @@ export const AdminActionsPage = memo(() => {
 });
 
 export const AdminActionsRoute = createAppRoute({
-  component: <AdminActionsPage />,
+  component: AdminActionsPage,
 
   path: '/admin/actions',
 

@@ -652,7 +652,7 @@ export const ManageSignatureDetailPage = memo(
 );
 
 export const ManageSignatureDetailRoute = createAppRoute({
-  component: <ManageSignatureDetailPage />,
+  component: ManageSignatureDetailPage,
 
   path: '/manage/signature/detail/:id',
   params: s => ({
@@ -676,7 +676,7 @@ export const ManageSignatureDetailRoute = createAppRoute({
 });
 
 export const ManageSignatureDetailRoute2 = createAppRoute({
-  component: <ManageSignatureDetailPage />,
+  component: ManageSignatureDetailPage,
 
   path: '/manage/signature/detail/:type/:source/:name',
   params: s => ({

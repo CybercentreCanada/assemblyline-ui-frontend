@@ -43,7 +43,7 @@ export const LogoutPage = memo(() => {
 });
 
 export const LogoutRoute = createAppRoute({
-  component: <LogoutPage />,
+  component: LogoutPage,
 
   path: '/logout',
 

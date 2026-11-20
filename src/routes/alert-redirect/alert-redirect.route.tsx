@@ -30,7 +30,7 @@ export const AlertRedirectPage = memo(() => {
 });
 
 export const AlertRedirectRoute = createAppRoute({
-  component: <AlertRedirectPage />,
+  component: AlertRedirectPage,
 
   path: '/alerts-redirect',
 

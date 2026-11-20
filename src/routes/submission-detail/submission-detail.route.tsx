@@ -1550,7 +1550,7 @@ export const SubmissionDetailPage = memo(() => {
 });
 
 export const SubmissionDetailRoute = createAppRoute({
-  component: <SubmissionDetailPage />,
+  component: SubmissionDetailPage,
 
   path: '/submission/detail/:id',
   params: s => ({

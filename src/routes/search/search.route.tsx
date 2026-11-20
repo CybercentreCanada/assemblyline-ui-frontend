@@ -452,7 +452,7 @@ export const SearchPage = memo(({ index = null }: SearchPageProps) => {
 });
 
 export const SearchRoute = createAppRoute({
-  component: <SearchPage />,
+  component: SearchPage,
 
   path: '/search/:index',
   params: s => ({
@@ -512,7 +512,7 @@ export const SearchRoute = createAppRoute({
 });
 
 export const SearchRootRoute = createAppRoute({
-  component: <SearchPage />,
+  component: SearchPage,
 
   path: '/search',
   search: s => ({

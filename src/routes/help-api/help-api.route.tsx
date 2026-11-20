@@ -392,7 +392,7 @@ export const HelpAPIPage = memo(() => {
 });
 
 export const HelpAPIRoute = createAppRoute({
-  component: <HelpAPIPage />,
+  component: HelpAPIPage,
 
   path: '/help/api',
 

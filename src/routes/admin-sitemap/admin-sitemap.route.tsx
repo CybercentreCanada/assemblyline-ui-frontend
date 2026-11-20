@@ -178,7 +178,7 @@ export const AdminSiteMapPage = memo(() => {
 });
 
 export const AdminSiteMapRoute = createAppRoute({
-  component: <AdminSiteMapPage />,
+  component: AdminSiteMapPage,
 
   path: '/admin/sitemap',
 
