@@ -1,4 +1,8 @@
 {
+  "app_route.manage_signature_detail_id.fullname": "Gestion des Détails de la signature {{id}}",
+  "app_route.manage_signature_detail_id.shortname": "{{id}}",
+  "app_route.manage_signature_detail_type_source_name.fullname": "Gestion des Détails de la signature {{type}} {{source}} {{name}}",
+  "app_route.manage_signature_detail_type_source_name.shortname": "{{name}}",
   "cancel": "Annuler",
   "change.save": "Enregistrer les modifications",
   "change.success": "L'état de la signature a été modifié avec succès",

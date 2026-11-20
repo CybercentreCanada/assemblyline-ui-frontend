@@ -1,5 +1,7 @@
 {
   "add_workflow": "Add workflow",
+  "app_route.manage_workflows.fullname": "Workflows",
+  "app_route.manage_workflows.shortname": "Workflows",
   "filter": "Filter workflows...",
   "filter.never_used.add": "Add filter query to show workflows that were never used",
   "filter.never_used.remove": "Remove filter query to show workflows that were never used",

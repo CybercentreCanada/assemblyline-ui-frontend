@@ -1,3 +1,5 @@
+import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
+import { createAppRoute } from 'core/router';
 import { useAppConfigs, useAppUser } from 'core/template/components/app/hooks';
 import PageCenter from 'core/template/components/pages/PageCenter';
 import type { CustomUser } from 'models/api/user';
@@ -19,4 +21,19 @@ export const HelpPage = memo(() => {
       <LinkGrid items={items} />
     </PageCenter>
   );
+});
+
+export const HelpRoute = createAppRoute({
+  component: HelpPage,
+
+  path: '/help',
+
+  ancestor: null,
+  shortname: () => ['app_route.help.shortname', { ns: 'helpServices' }],
+  fullname: () => ['app_route.help.fullname', { ns: 'helpServices' }],
+  shorticon: () => <HelpOutlineOutlinedIcon />,
+  fullicon: () => <HelpOutlineOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
 });

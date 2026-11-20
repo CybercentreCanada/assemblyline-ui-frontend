@@ -1,8 +1,10 @@
+import ListOutlinedIcon from '@mui/icons-material/ListOutlined';
 import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
 import type { PaperProps } from '@mui/material';
 import { Grid, Paper, Skeleton, styled, Typography, useTheme } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
+import { createAppRoute } from 'core/router';
 import { useAppUser } from 'core/template/components/app/hooks';
 import PageCenter from 'core/template/components/pages/PageCenter';
 import type { CustomUser } from 'models/api/user';
@@ -283,4 +285,28 @@ export const ManageHeuristicDetailPage = memo(({ heur_id = null }: ManageHeurist
   ) : (
     <ForbiddenPage />
   );
+});
+
+export const ManageHeuristicDetailRoute = createAppRoute({
+  component: ManageHeuristicDetailPage,
+
+  path: '/manage/heuristic/detail/:id',
+  params: s => ({
+    id: s.string()
+  }),
+
+  ancestor: '/manage/heuristics',
+  shortname: location => [
+    'app_route.manage_heuristic_detail.shortname',
+    { ns: 'manageHeuristicDetail', id: location.path.id }
+  ],
+  fullname: location => [
+    'app_route.manage_heuristic_detail.fullname',
+    { ns: 'manageHeuristicDetail', id: location.path.id }
+  ],
+  shorticon: () => <ListOutlinedIcon />,
+  fullicon: () => <ListOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.roles.includes('heuristic_view')
 });

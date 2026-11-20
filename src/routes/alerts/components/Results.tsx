@@ -3,7 +3,8 @@ import type { FC, ReactNode } from 'react';
 import React, { memo, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FiFilter } from 'react-icons/fi';
-import { ALERT_DEFAULT_PARAMS, type AlertSearchParams } from 'routes/alerts/alerts.route';
+import type { AlertSearchParams } from 'routes/alerts/alerts.route';
+import { ALERT_DEFAULT_PARAMS } from 'routes/alerts/alerts.route';
 import AlertsFiltersSelected from 'routes/alerts/components/FiltersSelected';
 import { useSearchParams } from 'routes/alerts/contexts/SearchParamsContext';
 

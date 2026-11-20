@@ -29,12 +29,12 @@ import Classification from 'ui/Classification';
 
 type RetrohuntData = Pick<Retrohunt, 'key' | 'search_classification' | 'ttl'>;
 
-type Props = {
+export type RetrohuntRepeatProps = {
   retrohunt: Retrohunt;
   onRepeat: (value: Retrohunt) => void;
 };
 
-export const RetrohuntRepeat = memo(({ retrohunt = null, onRepeat = () => null }: Props) => {
+export const RetrohuntRepeat = memo(({ retrohunt = null, onRepeat = () => null }: RetrohuntRepeatProps) => {
   const { t } = useTranslation(['retrohunt']);
   const theme = useTheme();
   const { apiCall } = useMyAPI();

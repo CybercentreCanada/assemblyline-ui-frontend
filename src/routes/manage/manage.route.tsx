@@ -1,4 +1,6 @@
+import BuildOutlinedIcon from '@mui/icons-material/BuildOutlined';
 import useALContext from 'core/config/useALContext';
+import { createAppRoute } from 'core/router';
 import { useAppConfigs } from 'core/template/components/app/hooks';
 import PageCenter from 'core/template/components/pages/PageCenter';
 import { memo } from 'react';
@@ -27,4 +29,29 @@ export const ManagePage = memo(() => {
   ) : (
     <ForbiddenPage />
   );
+});
+
+export const ManageRoute = createAppRoute({
+  component: ManagePage,
+
+  path: '/manage',
+
+  ancestor: null,
+  shortname: () => ['app_route.manage.shortname', { ns: 'manageSignatures' }],
+  fullname: () => ['app_route.manage.fullname', { ns: 'manageSignatures' }],
+  shorticon: () => <BuildOutlinedIcon />,
+  fullicon: () => <BuildOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) =>
+    !config.user.roles.some(role =>
+      [
+        'badlist_view',
+        'heuristic_view',
+        'safelist_view',
+        'signature_view',
+        'signature_manage',
+        'workflow_view'
+      ].includes(role)
+    )
 });

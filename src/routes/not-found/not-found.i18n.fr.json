@@ -1,4 +1,6 @@
 {
+  "app_route.not_found.fullname": "Introuvable",
+  "app_route.not_found.shortname": "Introuvable",
   "description": "La page que vous recherchez est introuvable ...",
   "dl.alt": "Link mort",
   "dl.description": "On dirait que ce 'Link' est mort...",
