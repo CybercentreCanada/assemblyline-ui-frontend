@@ -122,6 +122,8 @@ export const syncRouteParamsFromRouter = function (
   }
 
   for (const [pageKey, route] of Object.entries(router?.pages || {})) {
+    const previous = store.locations[pageKey];
+    if (previous) store.locations[pageKey] = { ...previous };
     store = upsertRouteParamFromPage(store, pageKey, route);
   }
 
