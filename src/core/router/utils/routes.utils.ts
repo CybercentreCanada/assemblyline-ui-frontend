@@ -284,6 +284,7 @@ export const getLocationPathnameFromParam = function <const Origin extends AppRo
   if (param?.route == null) return '';
 
   if (route?.params && param?.path) {
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
     return route.params.stringify(param.path as never);
   }
 
