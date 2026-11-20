@@ -286,6 +286,7 @@ export const setPanel = function <const Store extends AppSharedRouterStore>(
  * @name insertLeftPanel
  * @description Inserts a panel at the target index and trims overflow from the end.
  * @param store - Router store
+ * @param preferences - Preferences controlling the maximum panel count.
  * @param panelKey - Target insertion index
  * @param partialPanel - Partial panel payload
  * @returns Tuple of updated store and inserted index
@@ -309,6 +310,7 @@ export const insertLeftPanel = function <const Store extends AppSharedRouterStor
  * @name insertRightPanel
  * @description Inserts a panel to the right of source index and trims overflow from the start.
  * @param store - Router store
+ * @param preferences - Preferences controlling the maximum panel count.
  * @param sourcePanelKey - Source panel index
  * @param partialPanel - Partial panel payload
  * @returns Tuple of updated store and inserted index
@@ -336,6 +338,7 @@ export const insertRightPanel = function <const Store extends AppSharedRouterSto
  * @name upsertPanel
  * @description Updates an existing panel or inserts one when index is out of range.
  * @param store - Router store
+ * @param preferences - Preferences controlling the maximum panel count.
  * @param panelKey - Target panel index
  * @param partialPanel - Partial panel payload
  * @returns Tuple of updated store and resolved panel index

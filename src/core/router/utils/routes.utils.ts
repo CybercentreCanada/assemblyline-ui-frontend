@@ -24,7 +24,7 @@ const DEFAULT_APP_ROUTE = {
   element: null,
 
   path: null,
-  params: createPathParamsCodec(null)(() => null),
+  params: createPathParamsCodec(null)(() => null as never),
   search: new SearchParamEngine<SearchParamBlueprintMap>(null),
   hash: createHashParamCodec()(() => null),
 
@@ -284,7 +284,7 @@ export const getLocationPathnameFromParam = function <const Origin extends AppRo
   if (param?.route == null) return '';
 
   if (route?.params && param?.path) {
-    return route.params.stringify(param.path);
+    return route.params.stringify(param.path as never);
   }
 
   if (param?.path) {
@@ -309,8 +309,8 @@ export const getLocationSearchFromParam = function <const Origin extends AppRout
   route: InferAppRouteFromPath<Origin>,
   param: InferAppLocationFromPath<Origin>
 ): [Location['search'], SearchParamValueMap, SearchParamValueMap] {
-  const search = route?.search;
-  const delta = !search ? undefined : search.delta(param.search as never);
+  const search = route?.search as SearchParamEngine<SearchParamBlueprintMap> | null;
+  const delta = !search ? undefined : search.delta(param.search);
   return !delta ? [null, null, null] : [delta.toLocationSearch(), delta.toLocationState(), delta.toLocationTransient()];
 };
 
