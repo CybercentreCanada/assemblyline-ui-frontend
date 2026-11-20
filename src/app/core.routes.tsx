@@ -1,6 +1,7 @@
 import { CrashRoute } from 'core/error/error.route';
 import { LoadingRoute } from 'layout/auth/loading/loading.route';
 import { LockedRoute } from 'layout/auth/locked/locked.route';
+import { LogoutRoute } from 'layout/auth/log-out/log-out.route';
 import { QuotaRoute } from 'layout/auth/quota/quota.route';
 import { ToSRoute } from 'layout/auth/terms-of-service/terms-of-service.route';
 import { useMemo } from 'react';
@@ -116,6 +117,7 @@ const APP_ROUTES = [
   HelpServicesRoute,
   LoadingRoute,
   LockedRoute,
+  LogoutRoute,
   ManageBadlistAddRoute,
   ManageBadlistDetailRoute,
   ManageBadlistsRoute,
