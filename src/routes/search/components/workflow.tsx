@@ -6,7 +6,7 @@ import TableContainer from '@mui/material/TableContainer';
 import useALContext from 'core/config/useALContext';
 import type { SearchResult } from 'models/api/search';
 import type { WorkflowIndexed } from 'models/base/workflow';
-import { memo } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { AlertPriority, AlertStatus } from 'routes/alerts/components/Components';
@@ -28,7 +28,7 @@ type Props = {
   setWorkflowID?: (id: string) => void;
 };
 
-export const WorkflowTable = memo(({ workflowResults, setWorkflowID = null }: Props) => {
+const WrappedWorflowTable: React.FC<Props> = ({ workflowResults, setWorkflowID = null }) => {
   const { t } = useTranslation(['search']);
   const { c12nDef } = useALContext();
 
@@ -107,6 +107,7 @@ export const WorkflowTable = memo(({ workflowResults, setWorkflowID = null }: Pr
   ) : (
     <Skeleton variant="rectangular" style={{ height: '6rem', borderRadius: '4px' }} />
   );
-});
+};
 
-WorkflowTable.displayName = 'WorkflowTable';
+const WorflowTable = React.memo(WrappedWorflowTable);
+export default WorflowTable;
