@@ -1,6 +1,13 @@
+import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
+import { createAppRoute } from 'core/router';
 import { memo, useEffect } from 'react';
 
+//*****************************************************************************************
+// Crash Page
+//*****************************************************************************************
+
 export type CrashPageProps = {
+  /** Optional error message to throw when the crash page mounts. */
   message?: string;
 };
 
@@ -11,4 +18,19 @@ export const CrashPage = memo(({ message = null }: CrashPageProps) => {
   }, [message]);
 
   return <div />;
+});
+
+export const CrashRoute = createAppRoute({
+  component: CrashPage,
+
+  path: '/crash',
+
+  ancestor: null,
+  shortname: () => ['app_route.error.shortname', { ns: 'error' }],
+  fullname: () => ['app_route.error.fullname', { ns: 'error' }],
+  shorticon: () => <BugReportOutlinedIcon />,
+  fullicon: () => <BugReportOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
 });
