@@ -1,6 +1,7 @@
 import LinkOffIcon from '@mui/icons-material/LinkOff';
 import { useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
+import { createAppRoute } from 'core/router';
 import PageCenter from 'core/template/components/pages/PageCenter';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -21,4 +22,22 @@ export const NotFoundPage = memo(() => {
       </div>
     </PageCenter>
   );
+});
+
+export const NotFoundRoute = createAppRoute({
+  component: NotFoundPage,
+
+  path: '/not-found',
+  search: s => ({
+    values: s.object(null).source('transient').ephemeral().ignored().nullable()
+  }),
+
+  ancestor: null,
+  shortname: () => ['app_route.not_found.shortname', { ns: 'error404' }],
+  fullname: () => ['app_route.not_found.fullname', { ns: 'error404' }],
+  shorticon: () => <LinkOffIcon />,
+  fullicon: () => <LinkOffIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
 });
