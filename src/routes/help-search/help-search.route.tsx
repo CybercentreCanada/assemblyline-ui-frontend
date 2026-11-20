@@ -516,7 +516,7 @@ export const HelpSearchPage = memo(() => {
 });
 
 export const HelpSearchRoute = createAppRoute({
-  component: <HelpSearchPage />,
+  component: HelpSearchPage,
 
   path: '/help/search',
   hash: s => s.string(null),

@@ -476,7 +476,7 @@ export const ArchivesPage = memo(() => {
 });
 
 export const ArchivesRoute = createAppRoute({
-  component: <ArchivesPage />,
+  component: ArchivesPage,
 
   path: '/archives',
   search: s => ({

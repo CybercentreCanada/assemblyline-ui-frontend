@@ -469,7 +469,7 @@ export const FileViewerPage = memo(() => (
 ));
 
 export const FileViewerRoute = createAppRoute({
-  component: <FileViewerPage />,
+  component: FileViewerPage,
 
   path: '/file/viewer/:id/:tab',
   params: s => ({
@@ -500,7 +500,7 @@ export const FileViewerRoute = createAppRoute({
 });
 
 export const FileViewerRootRoute = createAppRoute({
-  component: <FileViewerPage />,
+  component: FileViewerPage,
 
   path: '/file/viewer/:id',
   params: s => ({

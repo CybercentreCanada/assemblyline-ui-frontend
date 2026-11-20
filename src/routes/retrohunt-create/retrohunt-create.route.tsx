@@ -309,7 +309,7 @@ export const RetrohuntCreatePage = memo(
 );
 
 export const RetrohuntCreateRoute = createAppRoute({
-  component: <RetrohuntCreatePage />,
+  component: RetrohuntCreatePage,
 
   path: '/retrohunt/create',
 

@@ -246,7 +246,7 @@ export const HelpConfigurationPage = memo(() => {
 });
 
 export const HelpConfigurationRoute = createAppRoute({
-  component: <HelpConfigurationPage />,
+  component: HelpConfigurationPage,
 
   path: '/help/configuration',
 

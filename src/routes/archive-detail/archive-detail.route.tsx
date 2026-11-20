@@ -330,7 +330,7 @@ export const ArchiveDetailPage = memo(({ sha256: propSha256, force = false }: Ar
 });
 
 export const ArchiveDetailRoute = createAppRoute({
-  component: <ArchiveDetailPage />,
+  component: ArchiveDetailPage,
 
   path: '/archive/:id/:tab',
   params: s => ({
@@ -355,7 +355,7 @@ export const ArchiveDetailRoute = createAppRoute({
 });
 
 export const ArchiveDetailRootRoute = createAppRoute({
-  component: <ArchiveDetailPage />,
+  component: ArchiveDetailPage,
 
   path: '/archive/:id',
   params: s => ({

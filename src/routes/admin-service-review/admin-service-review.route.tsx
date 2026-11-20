@@ -357,7 +357,7 @@ export const AdminServiceReviewPage = memo(() => {
 });
 
 export const AdminServiceReviewRoute = createAppRoute({
-  component: <AdminServiceReviewPage />,
+  component: AdminServiceReviewPage,
 
   path: '/admin/service_review',
   search: s => ({

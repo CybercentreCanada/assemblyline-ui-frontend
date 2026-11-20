@@ -361,7 +361,7 @@ export const AdminAPIKeyDetailPage = memo(({ key_id = null, onClose = () => null
 });
 
 export const AdminAPIKeyDetailRoute = createAppRoute({
-  component: <AdminAPIKeyDetailPage />,
+  component: AdminAPIKeyDetailPage,
 
   path: '/admin/apikeys/:id',
   params: s => ({ id: s.string(null) }),

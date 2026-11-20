@@ -386,7 +386,7 @@ export const DevelopmentAPIPage = memo(() => {
 });
 
 export const DevelopmentAPIRoute = createAppRoute({
-  component: <DevelopmentAPIPage />,
+  component: DevelopmentAPIPage,
 
   path: '/development/api',
 

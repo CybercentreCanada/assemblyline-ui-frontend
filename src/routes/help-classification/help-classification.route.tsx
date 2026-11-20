@@ -284,7 +284,7 @@ export const HelpClassificationPage = memo(() => {
 });
 
 export const HelpClassificationRoute = createAppRoute({
-  component: <HelpClassificationPage />,
+  component: HelpClassificationPage,
 
   path: '/help/classification',
 

@@ -230,7 +230,7 @@ export const ManageWorkflowsPage = memo(() => (
 ));
 
 export const ManageWorkflowsRoute = createAppRoute({
-  component: <ManageWorkflowsPage />,
+  component: ManageWorkflowsPage,
 
   path: '/manage/workflows',
   search: s => ({

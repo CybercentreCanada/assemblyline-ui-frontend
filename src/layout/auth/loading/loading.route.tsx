@@ -27,7 +27,7 @@ export const LoadingPage = memo(({ showImage = true }: LoadingPageProps) => {
 });
 
 export const LoadingRoute = createAppRoute({
-  component: <LoadingPage />,
+  component: LoadingPage,
 
   path: '/loading',
 

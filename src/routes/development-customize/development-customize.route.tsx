@@ -234,7 +234,7 @@ export const DevelopmentCustomizePage = memo(() => {
 });
 
 export const DevelopmentCustomizeRoute = createAppRoute({
-  component: <DevelopmentCustomizePage />,
+  component: DevelopmentCustomizePage,
 
   path: '/development/customize',
 

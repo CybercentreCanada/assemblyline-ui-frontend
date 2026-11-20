@@ -85,7 +85,7 @@ export const StatisticsSignaturesPage = memo(() => {
 });
 
 export const StatisticsSignaturesRoute = createAppRoute({
-  component: <StatisticsSignaturesPage />,
+  component: StatisticsSignaturesPage,
 
   path: '/manage/statistics/signatures',
 

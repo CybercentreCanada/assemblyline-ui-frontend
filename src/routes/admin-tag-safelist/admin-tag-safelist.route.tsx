@@ -189,7 +189,7 @@ export const AdminTagSafelistPage = memo(() => {
 });
 
 export const AdminTagSafelistRoute = createAppRoute({
-  component: <AdminTagSafelistPage />,
+  component: AdminTagSafelistPage,
 
   path: '/admin/tag_safelist',
 

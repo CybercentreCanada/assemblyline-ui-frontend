@@ -1041,7 +1041,7 @@ export const AlertDetailPage = memo((props: AlertDetailPageProps) => (
 ));
 
 export const AlertDetailRoute = createAppRoute({
-  component: <AlertDetailPage />,
+  component: AlertDetailPage,
 
   path: '/alert/:id',
   params: s => ({

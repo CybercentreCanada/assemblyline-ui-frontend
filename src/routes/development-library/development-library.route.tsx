@@ -146,7 +146,7 @@ export const DevelopmentLibraryPage = memo(() => (
 ));
 
 export const DevelopmentLibraryRoute = createAppRoute({
-  component: <DevelopmentLibraryPage />,
+  component: DevelopmentLibraryPage,
 
   path: '/development/library',
   search: s => ({

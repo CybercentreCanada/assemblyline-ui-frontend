@@ -443,7 +443,7 @@ export const ManageSafelistAddPage = memo(({}: ManageSafelistAddPageProps) => {
 });
 
 export const ManageSafelistAddRoute = createAppRoute({
-  component: <ManageSafelistAddPage />,
+  component: ManageSafelistAddPage,
 
   path: '/manage/safelist/add',
 

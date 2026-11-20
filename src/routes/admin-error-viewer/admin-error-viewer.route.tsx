@@ -312,7 +312,7 @@ export const AdminErrorViewerPage = memo(() => (
 ));
 
 export const AdminErrorViewerRoute = createAppRoute({
-  component: <AdminErrorViewerPage />,
+  component: AdminErrorViewerPage,
 
   path: '/admin/errors',
   search: s => ({

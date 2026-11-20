@@ -288,7 +288,7 @@ export const ManageHeuristicDetailPage = memo(({ heur_id = null }: ManageHeurist
 });
 
 export const ManageHeuristicDetailRoute = createAppRoute({
-  component: <ManageHeuristicDetailPage />,
+  component: ManageHeuristicDetailPage,
 
   path: '/manage/heuristic/detail/:id',
   params: s => ({

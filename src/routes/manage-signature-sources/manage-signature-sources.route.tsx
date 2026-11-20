@@ -696,7 +696,7 @@ export const ManageSignatureSourcesPage = memo(() => {
 });
 
 export const ManageSignatureSourcesRoute = createAppRoute({
-  component: <ManageSignatureSourcesPage />,
+  component: ManageSignatureSourcesPage,
 
   path: '/manage/sources',
 

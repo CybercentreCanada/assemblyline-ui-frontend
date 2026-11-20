@@ -553,7 +553,7 @@ export const AdminServicesPage = memo(() => {
 });
 
 export const AdminServicesRoute = createAppRoute({
-  component: <AdminServicesPage />,
+  component: AdminServicesPage,
 
   path: '/admin/services',
 

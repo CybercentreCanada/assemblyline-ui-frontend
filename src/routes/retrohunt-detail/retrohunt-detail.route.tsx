@@ -881,7 +881,7 @@ export const RetrohuntDetailPage = memo(
 );
 
 export const RetrohuntDetailRoute = createAppRoute({
-  component: <RetrohuntDetailPage />,
+  component: RetrohuntDetailPage,
 
   path: '/retrohunt/detail/:id',
   params: s => ({

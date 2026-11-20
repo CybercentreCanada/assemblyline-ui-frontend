@@ -188,7 +188,7 @@ export const AdminAPIKeysPage = memo(() => (
 ));
 
 export const AdminAPIKeysRoute = createAppRoute({
-  component: <AdminAPIKeysPage />,
+  component: AdminAPIKeysPage,
 
   path: '/admin/apikeys',
   search: s => ({

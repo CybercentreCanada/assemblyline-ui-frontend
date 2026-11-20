@@ -224,7 +224,7 @@ export const ManageSignaturesPage = memo(() => (
 ));
 
 export const ManageSignaturesRoute = createAppRoute({
-  component: <ManageSignaturesPage />,
+  component: ManageSignaturesPage,
 
   path: '/manage/signatures',
   search: s => ({

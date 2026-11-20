@@ -638,7 +638,7 @@ export const ManageBadlistDetailPage = memo(
 );
 
 export const ManageBadlistDetailRoute = createAppRoute({
-  component: <ManageBadlistDetailPage />,
+  component: ManageBadlistDetailPage,
 
   path: '/manage/badlist/detail/:id',
   params: s => ({

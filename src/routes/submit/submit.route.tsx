@@ -410,7 +410,7 @@ export const SubmitPage = memo(() => (
 ));
 
 export const SubmitRoute = createAppRoute({
-  component: <SubmitPage />,
+  component: SubmitPage,
 
   path: '/submit',
   search: s => ({
@@ -436,7 +436,7 @@ export const SubmitRoute = createAppRoute({
 });
 
 export const SubmitRootRoute = createAppRoute({
-  component: <SubmitPage />,
+  component: SubmitPage,
 
   path: '/',
   search: s => ({

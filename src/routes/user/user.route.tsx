@@ -1079,7 +1079,7 @@ export const UserPage = memo(({ username = null }: UserPageProps) => {
 });
 
 export const AdminUserDetailRoute = createAppRoute({
-  component: <UserPage />,
+  component: UserPage,
 
   path: '/admin/users/:id',
   params: s => ({
@@ -1102,7 +1102,7 @@ export const AccountPage = memo(() => {
 });
 
 export const AccountRoute = createAppRoute({
-  component: <AccountPage />,
+  component: AccountPage,
 
   path: '/account',
 

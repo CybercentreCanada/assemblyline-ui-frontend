@@ -322,7 +322,7 @@ export const DevelopmentThemePage = memo(() => {
 });
 
 export const DevelopmentThemeRoute = createAppRoute({
-  component: <DevelopmentThemePage />,
+  component: DevelopmentThemePage,
 
   path: '/development/theme',
 

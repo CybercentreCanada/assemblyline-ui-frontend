@@ -192,7 +192,7 @@ export const AdminIdentifyPage = memo(() => {
 });
 
 export const AdminIdentifyRoute = createAppRoute({
-  component: <AdminIdentifyPage />,
+  component: AdminIdentifyPage,
 
   path: '/admin/identify',
 

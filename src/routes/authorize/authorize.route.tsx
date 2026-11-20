@@ -116,7 +116,7 @@ export const AuthorizePage = memo(() => {
 });
 
 export const AuthorizeRoute = createAppRoute({
-  component: <AuthorizePage />,
+  component: AuthorizePage,
 
   path: '/authorize',
   // TODO: revise in the new version

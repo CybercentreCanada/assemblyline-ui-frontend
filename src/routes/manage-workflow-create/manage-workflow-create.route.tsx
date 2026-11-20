@@ -309,7 +309,7 @@ export const ManageWorkflowCreatePage = memo(
 );
 
 export const ManageWorkflowCreateRoute = createAppRoute({
-  component: <ManageWorkflowCreatePage />,
+  component: ManageWorkflowCreatePage,
 
   path: '/manage/workflow/create/:id',
   params: s => ({
@@ -333,7 +333,7 @@ export const ManageWorkflowCreateRoute = createAppRoute({
 });
 
 export const ManageWorkflowCreateRootRoute = createAppRoute({
-  component: <ManageWorkflowCreatePage />,
+  component: ManageWorkflowCreatePage,
 
   path: '/manage/workflow/create',
   search: s => ({

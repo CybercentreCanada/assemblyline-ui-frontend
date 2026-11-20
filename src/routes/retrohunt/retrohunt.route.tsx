@@ -414,7 +414,7 @@ export const RetrohuntPage = memo(() => {
 });
 
 export const RetrohuntRoute = createAppRoute({
-  component: <RetrohuntPage />,
+  component: RetrohuntPage,
 
   path: '/retrohunt',
   search: s => ({
