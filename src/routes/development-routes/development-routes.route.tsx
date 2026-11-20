@@ -1,7 +1,7 @@
 import AltRouteOutlinedIcon from '@mui/icons-material/AltRouteOutlined';
 import { useAppConfigStore } from 'core/config';
 import { createAppRoute, useAppLocationParamStore } from 'core/router';
-import { AppPageFullWidth } from 'core/template';
+import PageFullWidth from 'core/template/components/pages/PageFullWidth';
 import { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { DevelopmentRoutesTableRowData } from 'routes/development-routes';
@@ -22,10 +22,10 @@ export const DevelopmentRoutesPage = memo(() => {
   );
 
   return (
-    <AppPageFullWidth>
+    <PageFullWidth>
       <PageHeader primary={t('page.title')} secondary={t('page.registered_routes', { count: rows.length })} />
       <DevelopmentRoutesTable rows={rows} />
-    </AppPageFullWidth>
+    </PageFullWidth>
   );
 });
 

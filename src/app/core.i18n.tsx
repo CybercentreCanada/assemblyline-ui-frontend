@@ -57,6 +57,8 @@ import dashboardEN from 'routes/dashboard/dashboard.i18n.en.json';
 import dashboardFR from 'routes/dashboard/dashboard.i18n.fr.json';
 import developmentAPIEN from 'routes/development-api/development-api.i18n.en.json';
 import developmentAPIFR from 'routes/development-api/development-api.i18n.fr.json';
+import developmentRoutesEN from 'routes/development-routes/development-routes.i18n.en.json';
+import developmentRoutesFR from 'routes/development-routes/development-routes.i18n.fr.json';
 import fileDetailEN from 'routes/file-detail/file-detail.i18n.en.json';
 import fileDetailFR from 'routes/file-detail/file-detail.i18n.fr.json';
 import fileViewerEN from 'routes/file-viewer/file-viewer.i18n.en.json';
@@ -153,6 +155,7 @@ const resources = {
     dashboard: dashboardEN,
     dateTime: dateTimeEN,
     developmentAPI: developmentAPIEN,
+    developmentRoutes: developmentRoutesEN,
     error: errorEN,
     error403: forbiddenEN,
     error404: notFoundEN,
@@ -222,6 +225,7 @@ const resources = {
     dashboard: dashboardFR,
     dateTime: dateTimeFR,
     developmentAPI: developmentAPIFR,
+    developmentRoutes: developmentRoutesFR,
     error: errorFR,
     error403: forbiddenFR,
     error404: notFoundFR,

@@ -78,6 +78,11 @@ const DevelopmentLibraryPage = lazy(() =>
     default: module.DevelopmentLibraryPage
   }))
 );
+const DevelopmentRoutesPage = lazy(() =>
+  import('routes/development-routes/development-routes.route').then(module => ({
+    default: module.DevelopmentRoutesPage
+  }))
+);
 const DevelopmentThemePage = lazy(() =>
   import('routes/development-theme/development-theme.route').then(module => ({ default: module.DevelopmentThemePage }))
 );
@@ -172,6 +177,7 @@ const WrappedRoutes = () => {
         <Route path="/development/api" element={<DevelopmentAPIPage />} />
         <Route path="/development/customize" element={<DevelopmentCustomizePage />} />
         <Route path="/development/library" element={<DevelopmentLibraryPage />} />
+        <Route path="/development/routes" element={<DevelopmentRoutesPage />} />
         <Route path="/development/theme" element={<DevelopmentThemePage />} />
         <Route path="/file/detail/:id" element={<FileDetailPage />} />
         <Route path="/file/viewer/:id" element={<FileViewerPage />} />
