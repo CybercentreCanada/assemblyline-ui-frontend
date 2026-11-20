@@ -8,10 +8,12 @@ import {
   getLocationStateFromRouter,
   hasBlockedPages,
   reconcileRouterFromNavigation,
+  setNavigationBlockerBypass,
   setDocumentTitleFromNavigation,
   useAppLocationParamStoreApi,
   useAppNavigationStoreApi,
   useAppRouterStoreApi,
+  useAppSetNavigationStore,
   useAppSetRouterStore
 } from 'core/router';
 import { useCallback, useEffect } from 'react';
@@ -31,6 +33,7 @@ export function useSyncRouterStoreFromNavigation() {
   const locationParamStoreApi = useAppLocationParamStoreApi();
   const navigationStoreApi = useAppNavigationStoreApi();
   const routerStoreApi = useAppRouterStoreApi();
+  const setNavigationStore = useAppSetNavigationStore();
   const setRouterStore = useAppSetRouterStore();
 
   const updateRouterStoreFromNavigation = useCallback(
@@ -53,8 +56,14 @@ export function useSyncRouterStoreFromNavigation() {
       resetFavicon();
 
       setRouterStore(router => reconcileRouterFromNavigation(router, navigation));
+      if (navigation.options?.ignoreBlocker) {
+        setNavigationStore(store => {
+          if (store.id !== navigation.id) return store;
+          return setNavigationBlockerBypass(store, false);
+        });
+      }
     },
-    [configStoreApi, locationParamStoreApi, navigate, routerStoreApi, setRouterStore, t]
+    [configStoreApi, locationParamStoreApi, navigate, routerStoreApi, setNavigationStore, setRouterStore, t]
   );
 
   useEffect(() => {

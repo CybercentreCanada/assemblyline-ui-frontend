@@ -11,8 +11,10 @@ import {
   getLocationStateFromRouter,
   getNavigationStoreFromRouter,
   getTitlesFromNavigation,
+  restoreNavigationStoreFromRouter,
   reconcileRouterFromNavigation,
   resolveNavigationIntent,
+  setNavigationBlockerBypass,
   sanitizeRouterStore
 } from 'core/router';
 import { makePage, makePreferences } from 'core/router/tests/test-defaults';
@@ -309,6 +311,51 @@ describe('getNavigationStoreFromRouter', () => {
 
     const next = getNavigationStoreFromRouter(navigation, router);
     expect(next.blockedPages.r1).toBe('unsaved_changes');
+  });
+});
+
+describe('restoreNavigationStoreFromRouter', () => {
+  it('restores committed pages and retains blockers for pages that remain open', () => {
+    const router: AppRouterStore = {
+      ...getDefaultRouterStore(),
+      id: 'committed-id',
+      panels: [{ ...getDefaultRouterPanel(), pageKey: 'committed-page' }],
+      pages: { 'committed-page': makePage('/committed') }
+    };
+    const navigation: AppNavigationStore = {
+      ...getDefaultNavigationStore(),
+      id: 'staged-id',
+      panels: [{ ...getDefaultRouterPanel(), pageKey: 'staged-page' }],
+      pages: { 'staged-page': makePage('/staged') },
+      blockedPages: { 'committed-page': 'unsaved_changes' },
+      options: { ...getDefaultNavigateOptions(), ignoreBlocker: true }
+    };
+
+    const restored = restoreNavigationStoreFromRouter(navigation, router);
+
+    expect(restored.id).toBe('committed-id');
+    expect(restored.panels[0].pageKey).toBe('committed-page');
+    expect(restored.pages['committed-page'].href).toBe('/committed');
+    expect(restored.pages['staged-page']).toBeUndefined();
+    expect(restored.blockedPages['committed-page']).toBe('unsaved_changes');
+    expect(restored.options).toEqual(getDefaultNavigateOptions());
+  });
+});
+
+describe('setNavigationBlockerBypass', () => {
+  it('toggles bypass for one navigation without clearing registered blockers', () => {
+    const store: AppNavigationStore = {
+      ...getDefaultNavigationStore(),
+      blockedPages: { r1: 'unsaved_changes' }
+    };
+
+    setNavigationBlockerBypass(store, true);
+    expect(store.options.ignoreBlocker).toBe(true);
+    expect(store.blockedPages.r1).toBe('unsaved_changes');
+
+    setNavigationBlockerBypass(store, false);
+    expect(store.options.ignoreBlocker).toBe(false);
+    expect(store.blockedPages.r1).toBe('unsaved_changes');
   });
 });
 

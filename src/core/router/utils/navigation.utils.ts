@@ -226,6 +226,34 @@ export const getNavigationStoreFromRouter = (store: AppNavigationStore, router: 
   return store;
 };
 
+/**
+ * @name restoreNavigationStoreFromRouter
+ * @description Restores staged navigation to committed router state while retaining blockers for committed pages.
+ * @param store - Navigation store to restore.
+ * @param router - Committed router state to copy from.
+ * @returns Restored navigation store with default navigation options.
+ */
+export const restoreNavigationStoreFromRouter = (
+  store: AppNavigationStore,
+  router: AppRouterStore
+): AppNavigationStore => {
+  const restoredStore = getNavigationStoreFromRouter(store, router);
+  restoredStore.options = getDefaultNavigateOptions();
+  return restoredStore;
+};
+
+/**
+ * @name setNavigationBlockerBypass
+ * @description Enables or disables the one-navigation blocker bypass without removing blocker registrations.
+ * @param store - Navigation store to update.
+ * @param bypass - Whether the next navigation should bypass blockers.
+ * @returns The updated navigation store.
+ */
+export const setNavigationBlockerBypass = (store: AppNavigationStore, bypass: boolean): AppNavigationStore => {
+  store.options = { ...getDefaultNavigateOptions(store.options), ignoreBlocker: bypass };
+  return store;
+};
+
 // export const setPartialNavigationStore = (
 //   store: AppNavigationStore,
 //   next: Partial<AppNavigationStore>

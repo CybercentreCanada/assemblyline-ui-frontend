@@ -104,6 +104,8 @@ export {
   clearNavigationStore,
   getDefaultNavigateOptions,
   getNavigationStoreFromRouter,
+  restoreNavigationStoreFromRouter,
+  setNavigationBlockerBypass,
   resolveNavigationIntent
 } from './utils/navigation.utils';
 export {

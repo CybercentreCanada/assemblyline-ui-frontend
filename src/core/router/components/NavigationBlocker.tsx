@@ -1,15 +1,18 @@
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Stack } from '@mui/material';
 import { getAppConfigStateFromApi, useAppConfigStoreApi } from 'core/config';
-import type { AppNavigationStore } from 'core/router';
+import type { AppLocation, AppNavigationStore } from 'core/router';
 import {
-  clearBlockedPages,
   findAppRouteFromKey,
   getAppLocationParamStateFromApi,
   getAppNavigationStateFromApi,
   getAppRouterStateFromApi,
   getBlockedPages,
+  getHashFragmentsFromRouter,
+  getLocationStateFromRouter,
   getRouteParamFromKey,
   hasBlockedPages,
+  restoreNavigationStoreFromRouter,
+  setNavigationBlockerBypass,
   useAppLocationParamStoreApi,
   useAppNavigationStoreApi,
   useAppRouterStoreApi,
@@ -17,10 +20,13 @@ import {
 } from 'core/router';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useLocation, useNavigate } from 'react-router';
 import { Button } from 'ui/buttons/Button';
 
 export const NavigationBlocker = memo(() => {
   const { t } = useTranslation(['router']);
+  const location = useLocation() as AppLocation;
+  const navigate = useNavigate();
   const configStoreApi = useAppConfigStoreApi();
   const locationParamStoreApi = useAppLocationParamStoreApi();
   const navigationStoreApi = useAppNavigationStoreApi();
@@ -30,7 +36,8 @@ export const NavigationBlocker = memo(() => {
   const [open, setOpen] = useState<boolean>(false);
   const acceptButtonRef = useRef<HTMLButtonElement>(null);
 
-  const shouldClearBlockedPages = useRef<boolean>(false);
+  const acceptedNavigationId = useRef<string | null>(null);
+  const locationStateId = location.state?.id;
 
   const blockedPageMentions = useMemo<string[]>(() => {
     const navigationState = getAppNavigationStateFromApi(navigationStoreApi);
@@ -61,18 +68,34 @@ export const NavigationBlocker = memo(() => {
 
   const handleCancel = useCallback(() => {
     setOpen(false);
-    shouldClearBlockedPages.current = false;
-  }, []);
+    acceptedNavigationId.current = null;
+
+    const routerState = getAppRouterStateFromApi(routerStoreApi);
+    const shouldRestoreBrowserLocation = locationStateId !== routerState.id;
+    setNavigationStore(store => restoreNavigationStoreFromRouter(store, routerState));
+
+    if (shouldRestoreBrowserLocation) {
+      const restoredNavigation = getAppNavigationStateFromApi(navigationStoreApi);
+      const fragments = getHashFragmentsFromRouter(restoredNavigation);
+      void navigate(!fragments.length ? '/v1' : `/v1#${fragments.join('#')}`, {
+        state: getLocationStateFromRouter(restoredNavigation),
+        replace: true
+      });
+    }
+  }, [locationStateId, navigate, navigationStoreApi, routerStoreApi, setNavigationStore]);
 
   const handleAccept = useCallback(() => {
     setOpen(false);
-    shouldClearBlockedPages.current = true;
-  }, []);
+    acceptedNavigationId.current = getAppNavigationStateFromApi(navigationStoreApi).id;
+  }, [navigationStoreApi]);
 
   const handleDialogExited = useCallback(() => {
-    if (!shouldClearBlockedPages.current) return;
-    shouldClearBlockedPages.current = false;
-    setNavigationStore(clearBlockedPages);
+    const navigationId = acceptedNavigationId.current;
+    acceptedNavigationId.current = null;
+    if (!navigationId) return;
+    setNavigationStore(store => {
+      return store.id !== navigationId ? store : setNavigationBlockerBypass(store, true);
+    });
   }, [setNavigationStore]);
 
   const handleDialogEntered = useCallback(() => {
@@ -95,12 +118,11 @@ export const NavigationBlocker = memo(() => {
   const handleBeforeUnload = useCallback(
     (event: BeforeUnloadEvent) => {
       const navigationState = getAppNavigationStateFromApi(navigationStoreApi);
-      const routerState = getAppRouterStateFromApi(routerStoreApi);
-      if (!hasBlockedPages(navigationState, routerState)) return;
+      if (!getBlockedPages(navigationState).length) return;
       event.preventDefault();
       event.returnValue = '';
     },
-    [navigationStoreApi, routerStoreApi]
+    [navigationStoreApi]
   );
 
   useEffect(() => {
