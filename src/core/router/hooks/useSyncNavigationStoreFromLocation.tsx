@@ -90,13 +90,7 @@ export function useSyncNavigationStoreFromLocation() {
         let panelKey: number = -1;
 
         for (const [i, fragment] of hashFragment.split('#/').entries()) {
-          let href: string;
-          try {
-            href = decodeURIComponent(i === 0 ? fragment : `/${fragment}`);
-          } catch {
-            continue;
-          }
-
+          const href = i === 0 ? fragment : `/${fragment}`;
           const nextPageInput = sanitizePage(locationState, getDefaultRouterPage({ href }));
           const context = { operation: 'sync-location-hash', panelKey: i };
           const nextPage = resolveNotFoundPage(nextPageInput, { href }, context);
@@ -197,7 +191,8 @@ export function useSyncNavigationStoreFromLocation() {
     if (location?.state?.id && location.state.id === routerState.id) return;
 
     try {
-      if (!!location.state) return getNavigationFromLocationState();
+      if (location.state?.id && Array.isArray(location.state.panels) && location.state.pages)
+        return getNavigationFromLocationState();
       else if (location?.pathname === '/v1') return getNavigationFromLocationHash();
       else return getNavigationFromLegacyLocation();
     } catch (e) {

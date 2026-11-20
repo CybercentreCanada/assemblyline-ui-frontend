@@ -179,7 +179,7 @@ Use `useAppLocation` when selecting a route location or targeting another panel.
 ### Blockers
 
 ```tsx
-useAppBlocker('unsaved_changes', [isDirty]);
+useAppBlocker(() => (isDirty ? 'unsaved_changes' : null), [isDirty]);
 ```
 
 Supported reasons are `unsaved_changes`, `data_loss_on_leave`, and `external_leave_risk`. `useAppBlockNavigation` observes staged navigation while blockers differ from the committed router state.

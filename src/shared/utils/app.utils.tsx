@@ -342,11 +342,15 @@ export function deepReconcile<T extends Record<string, unknown>>(
  * @param initial - Initial baseline state used for restoration
  * @returns A reconciled object following deep-reconcile fallback precedence
  */
-export const toElement = (value: ReactNode | MemoExoticComponent<ComponentType<unknown>>) => {
-  if (React.isValidElement(value)) {
-    return value;
+export const toElement = (value: ReactNode | MemoExoticComponent<ComponentType<unknown>>): ReactNode => {
+  if (React.isValidElement(value)) return value;
+  if (
+    typeof value === 'function' ||
+    (value !== null && typeof value === 'object' && '$$typeof' in value && value.$$typeof === Symbol.for('react.memo'))
+  ) {
+    const Component = value as ComponentType<unknown>;
+    return <Component />;
   }
 
-  const Component = value as ComponentType<unknown>;
-  return <Component />;
+  return value as ReactNode;
 };

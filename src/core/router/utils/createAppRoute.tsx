@@ -83,7 +83,7 @@ export const createAppRoute = <
 
   const hashCodec = !hash ? createHashParamCodec<never>()(() => null) : createHashParamCodec<Hash>()(hash);
 
-  (Component as unknown as FC).displayName = path;
+  if (typeof Component === 'function') (Component as unknown as FC).displayName = path;
 
   return {
     path,

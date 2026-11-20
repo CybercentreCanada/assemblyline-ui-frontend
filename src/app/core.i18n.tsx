@@ -4,6 +4,8 @@ import translationEN from 'app/core.i18n.en.json';
 import translationFR from 'app/core.i18n.fr.json';
 import errorEN from 'core/error/error.i18n.en.json';
 import errorFR from 'core/error/error.i18n.fr.json';
+import routerEN from 'core/router/router.i18n.en.json';
+import routerFR from 'core/router/router.i18n.fr.json';
 import i18n from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import assistantEN from 'layout/assistant/assistant.i18n.en.json';
@@ -183,6 +185,7 @@ const resources = {
     missingNode: missingNodeEN,
     notification: notificationEN,
     retrohunt: retrohuntEN,
+    router: routerEN,
     sandboxResult: sandboxResultEN,
     search: searchEN,
     settings: settingsEN,
@@ -250,6 +253,7 @@ const resources = {
     missingNode: missingNodeFR,
     notification: notificationFR,
     retrohunt: retrohuntFR,
+    router: routerFR,
     sandboxResult: sandboxResultFR,
     search: searchFR,
     settings: settingsFR,

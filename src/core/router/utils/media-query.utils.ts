@@ -21,14 +21,14 @@ export function parseMediaQuery(query: string): MediaQueryCondition[] {
 
   return conditionStrings.map(condition => {
     const result: MediaQueryCondition = {};
-    const minWidthMatch = condition.match(/min-width:\s*(\d+)px/);
-    const maxWidthMatch = condition.match(/max-width:\s*(\d+)px/);
+    const minWidthMatch = condition.match(/min-width:\s*(\d+(?:\.\d+)?)px/);
+    const maxWidthMatch = condition.match(/max-width:\s*(\d+(?:\.\d+)?)px/);
 
     if (minWidthMatch?.[1]) {
-      result.minWidth = parseInt(minWidthMatch[1], 10);
+      result.minWidth = parseFloat(minWidthMatch[1]);
     }
     if (maxWidthMatch?.[1]) {
-      result.maxWidth = parseInt(maxWidthMatch[1], 10);
+      result.maxWidth = parseFloat(maxWidthMatch[1]);
     }
 
     return result;

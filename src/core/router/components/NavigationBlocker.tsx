@@ -134,7 +134,7 @@ export const NavigationBlocker = memo(() => {
           {blockedPageMentions.flatMap((mention, i) => (
             <DialogContentText key={`${mention}-${i}`}>{mention}</DialogContentText>
           ))}
-          <DialogContentText>{t('router_prompt_text')}</DialogContentText>
+          <DialogContentText id="app-navigate-blocker-description">{t('router_prompt_text')}</DialogContentText>
         </Stack>
       </DialogContent>
       <DialogActions>

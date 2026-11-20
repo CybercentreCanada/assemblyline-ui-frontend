@@ -56,9 +56,9 @@ export const useAppLocation = function <const Origin extends AppRoute['path']>(
     return getPanel(s, nextPanelKey)?.pageKey ?? null;
   });
 
-  const param = useAppLocationParamStore(s =>
-    !targetRouteKey ? getDefaultRouteParam<Origin>() : getRouteParamFromKey<Origin>(s, targetRouteKey)
-  );
+  const param = useAppLocationParamStore(s => ({
+    ...(!targetRouteKey ? getDefaultRouteParam<Origin>() : getRouteParamFromKey<Origin>(s, targetRouteKey))
+  }));
 
   return function <Selected = InferAppLocationFromPath<Origin>>(
     selector: (location: InferAppLocationFromPath<Origin>) => Selected = param => param as Selected

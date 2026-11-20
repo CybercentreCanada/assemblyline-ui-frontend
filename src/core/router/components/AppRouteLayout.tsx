@@ -53,9 +53,9 @@ export const AppRouteLayout = memo(({ pageKey, children }: AppRouteLayoutProps) 
           ? document.getElementById('drawer-scrollct')
           : null;
 
-    if (!scrollContainer || !hashFragment) return;
+    if (!scrollContainer || hashFragment == null || hashFragment === '') return;
 
-    const targetElement = scrollContainer.querySelector(`#${hashFragment}`);
+    const targetElement = scrollContainer.querySelector(`#${CSS.escape(String(hashFragment))}`);
     if (!targetElement) return;
 
     const elementRect = targetElement.getBoundingClientRect();
