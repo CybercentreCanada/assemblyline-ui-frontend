@@ -3,7 +3,8 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { IconButton, InputAdornment, TextField, Typography, useTheme } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
-import { memo, useEffect, useState } from 'react';
+import type { ChangeEvent } from 'react';
+import { memo, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from 'ui/buttons/Button';
 import { Tooltip } from 'ui/Tooltip';
@@ -20,34 +21,46 @@ export const ChangePassword = memo(({ user, onCancel, onSave }: ChangePasswordPr
   const { apiCall } = useMyAPI();
   const { showSuccessMessage } = useMySnackbar();
 
-  const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
 
   const [newPassword, setNewPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
 
-  const [showPasswordError, setShowPasswordError] = useState(false);
-  const [passwordValidationError, setPasswordValidationError] = useState<string | null>(null);
+  const [submitAttempted, setSubmitAttempted] = useState<boolean>(false);
+  const [serverError, setServerError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const newPasswordLength = newPassword.length;
-    const confirmPasswordLength = confirmPassword.length;
-
-    if (newPasswordLength === 0 || confirmPasswordLength === 0) {
-      setPasswordValidationError(t('password.empty'));
-      return;
+  const validationError = useMemo<string | null>(() => {
+    if (!newPassword || !confirmPassword) {
+      return t('password.empty');
     }
 
-    const match = newPassword === confirmPassword;
-    setPasswordValidationError(match ? null : t('password.inputs_dont_match'));
-    setShowPasswordError(newPasswordLength > 0 && confirmPasswordLength > 0);
-  }, [newPassword, confirmPassword]);
+    return newPassword === confirmPassword ? null : t('password.inputs_dont_match');
+  }, [newPassword, confirmPassword, t]);
 
-  const updatePassword = () => {
-    if (passwordValidationError) {
-      setShowPasswordError(true);
+  const showValidationError = submitAttempted || (newPassword.length > 0 && confirmPassword.length > 0);
+  const displayedError = serverError ?? (showValidationError ? validationError : null);
+
+  const handleNewPasswordChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
+    setNewPassword(event.target.value);
+    setServerError(null);
+  }, []);
+
+  const handleConfirmPasswordChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
+    setConfirmPassword(event.target.value);
+    setServerError(null);
+  }, []);
+
+  const handleTogglePasswordVisibility = useCallback(() => {
+    setShowPassword(previous => !previous);
+  }, []);
+
+  const handleUpdatePassword = useCallback(() => {
+    setSubmitAttempted(true);
+    if (validationError) {
       return;
     }
+    setServerError(null);
     const userToSave = { ...user, new_pass: newPassword, new_pass_confirm: newPassword };
 
     apiCall({
@@ -56,17 +69,17 @@ export const ChangePassword = memo(({ user, onCancel, onSave }: ChangePasswordPr
       body: userToSave,
       onSuccess: () => {
         showSuccessMessage(t('password.updated'));
-        setShowPasswordError(false);
+        setServerError(null);
+        setSubmitAttempted(false);
         onSave(userToSave);
       },
       onFailure(api_data) {
-        setPasswordValidationError(api_data.api_error_message);
-        setShowPasswordError(true);
+        setServerError(api_data.api_error_message);
       },
       onEnter: () => setLoading(true),
       onExit: () => setLoading(false)
     });
-  };
+  }, [validationError, user, newPassword, apiCall, showSuccessMessage, t, onSave]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -85,7 +98,11 @@ export const ChangePassword = memo(({ user, onCancel, onSave }: ChangePasswordPr
             endAdornment: (
               <InputAdornment position="end">
                 <Tooltip title={showPassword ? t('password.hide') : t('password.show')}>
-                  <IconButton edge="end" onClick={() => setShowPassword(!showPassword)}>
+                  <IconButton
+                    edge="end"
+                    aria-label={showPassword ? t('password.hide') : t('password.show')}
+                    onClick={handleTogglePasswordVisibility}
+                  >
                     {showPassword ? <VisibilityOff /> : <Visibility />}
                   </IconButton>
                 </Tooltip>
@@ -93,7 +110,7 @@ export const ChangePassword = memo(({ user, onCancel, onSave }: ChangePasswordPr
             )
           }
         }}
-        onChange={event => setNewPassword(event.target.value)}
+        onChange={handleNewPasswordChange}
       />
 
       <TextField
@@ -108,8 +125,9 @@ export const ChangePassword = memo(({ user, onCancel, onSave }: ChangePasswordPr
                 <Tooltip title={showPassword ? t('password.hide') : t('password.show')}>
                   <IconButton
                     edge="end"
+                    aria-label={showPassword ? t('password.hide') : t('password.show')}
                     title={showPassword ? t('password.hide') : t('password.show')}
-                    onClick={() => setShowPassword(!showPassword)}
+                    onClick={handleTogglePasswordVisibility}
                   >
                     {showPassword ? <VisibilityOff /> : <Visibility />}
                   </IconButton>
@@ -118,24 +136,19 @@ export const ChangePassword = memo(({ user, onCancel, onSave }: ChangePasswordPr
             )
           }
         }}
-        onChange={event => setConfirmPassword(event.target.value)}
+        onChange={handleConfirmPasswordChange}
       />
 
-      <div style={{ minHeight: theme.spacing(3), marginTop: theme.spacing(2) }}>
-        {showPasswordError && (
+      <div aria-live="polite" style={{ minHeight: theme.spacing(3), marginTop: theme.spacing(2) }}>
+        {displayedError && (
           <Typography color="error" variant="subtitle2">
-            {passwordValidationError}
+            {displayedError}
           </Typography>
         )}
       </div>
 
       <div style={{ marginTop: theme.spacing(1), textAlign: 'end' }}>
-        <Button
-          disabled={loading}
-          style={{ marginRight: theme.spacing(2) }}
-          variant="outlined"
-          onClick={() => onCancel()}
-        >
+        <Button disabled={loading} sx={{ mr: 2 }} variant="outlined" onClick={onCancel}>
           {t('cancel')}
         </Button>
 
@@ -144,7 +157,7 @@ export const ChangePassword = memo(({ user, onCancel, onSave }: ChangePasswordPr
           progress={loading}
           variant="contained"
           color="primary"
-          onClick={() => updatePassword()}
+          onClick={handleUpdatePassword}
         >
           {t('update')}
         </Button>
@@ -152,3 +165,5 @@ export const ChangePassword = memo(({ user, onCancel, onSave }: ChangePasswordPr
     </div>
   );
 });
+
+ChangePassword.displayName = 'ChangePassword';
