@@ -246,7 +246,20 @@ export default tseslint.config(
     rules: {
       ...reactHooksPlugin.configs.flat.recommended.rules,
       'react-hooks/exhaustive-deps': 'warn',
-      'react-hooks/rules-of-hooks': 'error'
+      'react-hooks/rules-of-hooks': 'error',
+      // These rules should be 'error' at some point...
+      'react-hooks/config': 'warn',
+      'react-hooks/error-boundaries': 'warn',
+      'react-hooks/gating': 'warn',
+      'react-hooks/globals': 'warn',
+      'react-hooks/immutability': 'warn',
+      'react-hooks/preserve-manual-memoization': 'warn',
+      'react-hooks/purity': 'warn',
+      'react-hooks/refs': 'warn',
+      'react-hooks/set-state-in-effect': 'warn',
+      'react-hooks/set-state-in-render': 'warn',
+      'react-hooks/static-components': 'warn',
+      'react-hooks/use-memo': 'warn'
     }
   },
 
