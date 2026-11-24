@@ -5,12 +5,13 @@ import { defineConfig, loadEnv } from 'vite';
 import mkcert from 'vite-plugin-mkcert';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import { configDefaults } from 'vitest/config';
+import { createReactCompilerBabelOptions } from './react-compiler.config.mjs';
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
 
   return {
-    plugins: [react(), tsconfigPaths(), mkcert()],
+    plugins: [react({ babel: createReactCompilerBabelOptions(env) }), tsconfigPaths(), mkcert()],
     resolve: {
       extensions: ['.tsx', '.ts', '.js', '.jsx', '.json', '.mjs', '.mts']
     },

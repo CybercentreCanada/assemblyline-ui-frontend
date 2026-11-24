@@ -145,6 +145,7 @@
     "@vitest/coverage-v8": "^4.1.11",
     "@vitest/ui": "^4.1.11",
     "@vitest/web-worker": "^4.1.11",
+    "babel-plugin-react-compiler": "1.0.0",
     "dotenv": "^17.2.1",
     "eslint": "^9.24.0",
     "eslint-config-prettier": "^10.1.2",

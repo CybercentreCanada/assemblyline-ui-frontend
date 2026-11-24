@@ -10,32 +10,32 @@ const setup = (props: Partial<TextInputProps> = {}) => {
 };
 
 describe('<TextInput />', () => {
-  it.skip('applies custom id to input', () => {
+  it('applies custom id to input', () => {
     const { input } = setup({ id: 'custom-id' });
     expect(input).toHaveAttribute('id', 'custom-id');
   });
 
-  it.skip('renders with label', () => {
+  it('renders with label', () => {
     setup({ label: 'This is a test' });
     expect(screen.getByText(/This is a test/i)).toBeInTheDocument();
   });
 
-  it.skip('applies value when provided', () => {
+  it('applies value when provided', () => {
     const { input } = setup({ value: 'hello' });
     expect(input).toHaveValue('hello');
   });
 
-  it.skip('does not render when preventRender is true', () => {
+  it('does not render when preventRender is true', () => {
     const { input } = setup({ preventRender: true });
     expect(input).not.toBeInTheDocument();
   });
 
-  it.skip('respects disabled prop', () => {
+  it('respects disabled prop', () => {
     const { input } = setup({ disabled: true });
     expect(input).toBeDisabled();
   });
 
-  it.skip('respects loading prop (renders skeleton)', () => {
+  it('respects loading prop (renders skeleton)', () => {
     const { container } = setup({ loading: true });
     expect(container.querySelector('.MuiSkeleton-root')).toBeInTheDocument();
   });
@@ -84,7 +84,7 @@ describe('<TextInput />', () => {
     expect(screen.getByText("Value cannot be 'asd'")).toBeVisible();
   });
 
-  it.skip('respects readOnly prop', () => {
+  it('respects readOnly prop', () => {
     const { input } = setup({ readOnly: true });
     expect(input).toHaveAttribute('readonly');
   });
@@ -119,7 +119,7 @@ describe('<TextInput />', () => {
     expect(document.querySelector('.MuiBadge-badge')).toBeVisible();
   });
 
-  it.skip('triggers onChange callback', () => {
+  it('triggers onChange callback', () => {
     const onChange = vi.fn();
     const { input } = setup({ onChange });
     fireEvent.change(input, { target: { value: 'new text' } });
@@ -127,7 +127,7 @@ describe('<TextInput />', () => {
     expect(input).toHaveValue('new text');
   });
 
-  it.skip('triggers onFocus and onBlur callbacks', () => {
+  it('triggers onFocus and onBlur callbacks', () => {
     const onFocus = vi.fn();
     const onBlur = vi.fn();
     const { input } = setup({ onFocus, onBlur });
@@ -135,5 +135,32 @@ describe('<TextInput />', () => {
     fireEvent.blur(input);
     expect(onFocus).toHaveBeenCalled();
     expect(onBlur).toHaveBeenCalled();
+  });
+
+  it('updates controlled props, switches loading state, and unmounts cleanly', () => {
+    const { rerender, unmount } = render(<TextInput label="Compiler pilot" value="first" />);
+    const input = screen.getByRole('combobox');
+
+    expect(input).toHaveValue('first');
+
+    rerender(<TextInput label="Compiler pilot" value="second" disabled readOnly />);
+
+    expect(screen.getByRole('combobox')).toBe(input);
+    expect(input).toHaveValue('second');
+    expect(input).toBeDisabled();
+    expect(input).toHaveAttribute('readonly');
+
+    rerender(<TextInput label="Compiler pilot" value="third" loading />);
+
+    expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
+
+    rerender(<TextInput label="Compiler pilot" value="third" />);
+
+    expect(screen.getByRole('combobox')).toHaveValue('third');
+    expect(screen.getByRole('combobox')).not.toBeDisabled();
+
+    unmount();
+
+    expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
   });
 });

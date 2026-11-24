@@ -77,6 +77,8 @@ const WrappedTextInput = () => {
 };
 
 export const TextInput = ({ preventRender = false, value, ...props }: TextInputProps) => {
+  'use memo';
+
   const { status: validationStatus, message: validationMessage } = useInputValidation<string>({
     value: value ?? '',
     ...props
