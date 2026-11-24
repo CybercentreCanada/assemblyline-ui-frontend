@@ -61,7 +61,8 @@ export const createMockRouteLocation = (route: AppRoute): Record<string, unknown
   }
 
   const search = route?.search?.getDefaultValues?.().values ?? {};
-  const hash = route?.hash?.type ? route.hash.type : null;
+  const hashBlueprint = route?.hash?.blueprint as InferHashParamBlueprintFromValue | undefined;
+  const hash = hashBlueprint?.parse(undefined) ?? null;
 
   return {
     path,
@@ -208,16 +209,15 @@ export const formatSearchParams = (route: AppRoute): DevelopmentRoutesSearchPara
 /**
  * @name formatHashParam
  * @description Builds a display-ready spec for a route's hash param blueprint. A route without a configured hash
- * falls back to the default no-op blueprint (`kind: 'string'`, empty default); that sentinel is treated as "no hash".
+ * falls back to the no-op blueprint (`kind: 'none'`), which is treated as "no hash".
  * @param route - Route to read the hash param blueprint from.
  * @returns The hash param spec, or `null` when the route has no hash configured.
  */
 export const formatHashParam = (route: AppRoute): DevelopmentRoutesHashParamSpec | null => {
   const blueprint = route?.hash?.blueprint as InferHashParamBlueprintFromValue | undefined;
-  if (!blueprint) return null;
+  if (!blueprint || blueprint.kind === 'none') return null;
 
-  const defaultValueLabel = formatValue(blueprint.type);
-  if (blueprint.kind === 'string' && defaultValueLabel === '—') return null;
+  const defaultValueLabel = formatValue(blueprint.parse(undefined));
 
   return {
     kind: blueprint.kind,

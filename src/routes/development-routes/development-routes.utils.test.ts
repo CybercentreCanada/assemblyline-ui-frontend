@@ -1,3 +1,4 @@
+import { createHashParamCodec } from 'features/hash-params';
 import {
   createMockRouteLocation,
   formatFunctionText,
@@ -6,6 +7,7 @@ import {
   formatRouteName,
   formatSearchParams,
   formatValue,
+  isDevelopmentRoutesAllowed,
   renderIcon,
   toRouteTableRow
 } from 'routes/development-routes';
@@ -40,6 +42,31 @@ describe('createMockRouteLocation', () => {
     } as AppRoute;
 
     expect(createMockRouteLocation(route).path).toEqual({});
+  });
+
+  it('uses the hash blueprint default for route metadata callbacks', () => {
+    const route = {
+      path: '/help/search',
+      hash: createHashParamCodec()(blueprints => blueprints.enum(['overview', 'query'], 'query'))
+    } as AppRoute;
+
+    expect(createMockRouteLocation(route).hash).toBe('query');
+  });
+});
+
+//*****************************************************************************************
+// isDevelopmentRoutesAllowed
+//*****************************************************************************************
+
+describe('isDevelopmentRoutesAllowed', () => {
+  it('allows administrators in development and staging', () => {
+    expect(isDevelopmentRoutesAllowed(true, 'development')).toBe(true);
+    expect(isDevelopmentRoutesAllowed(true, 'staging')).toBe(true);
+  });
+
+  it('denies non-admin users and production systems', () => {
+    expect(isDevelopmentRoutesAllowed(false, 'development')).toBe(false);
+    expect(isDevelopmentRoutesAllowed(true, 'production')).toBe(false);
   });
 });
 
@@ -287,39 +314,48 @@ describe('formatHashParam', () => {
     expect(formatHashParam(route)).toBeNull();
   });
 
-  it('returns null for the default no-op string blueprint (unconfigured hash)', () => {
+  it('returns null for the default no-op blueprint (unconfigured hash)', () => {
     const route = {
       path: '/development/routes',
-      hash: { blueprint: { type: '', kind: 'string' } }
+      hash: createHashParamCodec()(() => null)
     } as unknown as AppRoute;
 
     expect(formatHashParam(route)).toBeNull();
   });
 
-  it('returns a spec for a configured enum hash blueprint', () => {
+  it('uses the configured enum default instead of its representative type value', () => {
     const route = {
       path: '/file/detail/:id',
-      hash: { blueprint: { type: 'overview', kind: 'enum', options: ['overview', 'detail'] } }
-    } as unknown as AppRoute;
+      hash: createHashParamCodec()(blueprints => blueprints.enum(['overview', 'detail'], 'detail'))
+    } as AppRoute;
 
     expect(formatHashParam(route)).toEqual({
       kind: 'enum',
-      defaultValueLabel: 'overview',
+      defaultValueLabel: 'detail',
       options: ['overview', 'detail']
     });
   });
 
-  it('returns a spec for a configured non-empty string blueprint', () => {
+  it('preserves a configured string hash even when its default is empty', () => {
     const route = {
       path: '/file/detail/:id',
-      hash: { blueprint: { type: 'section', kind: 'string' } }
-    } as unknown as AppRoute;
+      hash: createHashParamCodec()(blueprints => blueprints.string())
+    } as AppRoute;
 
     expect(formatHashParam(route)).toEqual({
       kind: 'string',
-      defaultValueLabel: 'section',
+      defaultValueLabel: '—',
       options: undefined
     });
+  });
+
+  it('formats a configured string hash default from its parser', () => {
+    const route = {
+      path: '/file/detail/:id',
+      hash: createHashParamCodec()(blueprints => blueprints.string('section'))
+    } as AppRoute;
+
+    expect(formatHashParam(route)?.defaultValueLabel).toBe('section');
   });
 });
 

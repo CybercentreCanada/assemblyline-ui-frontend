@@ -1,6 +1,7 @@
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined';
 import ApiIcon from '@mui/icons-material/Api';
+import AltRouteOutlinedIcon from '@mui/icons-material/AltRouteOutlined';
 import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
 import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import BallotOutlinedIcon from '@mui/icons-material/BallotOutlined';
@@ -343,6 +344,12 @@ export default function useMySitemap() {
         path: '/development/library',
         title: t('drawer.development.library'),
         icon: <LibraryBooksIcon />,
+        breadcrumbs: ['/development']
+      },
+      {
+        path: '/development/routes',
+        title: t('drawer.development.routes'),
+        icon: <AltRouteOutlinedIcon />,
         breadcrumbs: ['/development']
       },
       {

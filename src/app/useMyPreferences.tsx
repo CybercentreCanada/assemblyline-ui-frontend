@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined';
+import AltRouteOutlinedIcon from '@mui/icons-material/AltRouteOutlined';
 import ApiIcon from '@mui/icons-material/Api';
 import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
 import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
@@ -486,6 +487,18 @@ const useMyPreferences = () => {
               ],
               icon: <LibraryBooksIcon />,
               route: '/development/library',
+              nested: true
+            },
+            {
+              id: 'development.routes',
+              i18nKey: 'drawer.development.routes',
+              userPropValidators: [
+                { prop: 'user.is_admin', value: true, enforce: true },
+                { prop: 'configuration.system.type', value: 'development' },
+                { prop: 'configuration.system.type', value: 'staging' }
+              ],
+              icon: <AltRouteOutlinedIcon />,
+              route: '/development/routes',
               nested: true
             },
             {

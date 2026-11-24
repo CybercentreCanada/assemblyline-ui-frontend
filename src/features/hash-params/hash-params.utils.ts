@@ -18,7 +18,7 @@ export const HASH_PARAM_BLUEPRINTS = {
    * String blueprint that accepts any hash fragment string.
    * Returns the provided default value when the hash is missing.
    */
-  string: (defaultValue = ''): InferHashParamBlueprintFromValue<string> => ({
+  string: (defaultValue = ''): InferHashParamBlueprintFromValue<string, 'string'> => ({
     type: '',
     kind: 'string',
     parse: value => (value == null || value === '' ? defaultValue : value),
@@ -35,7 +35,7 @@ export const HASH_PARAM_BLUEPRINTS = {
   enum: <const Values extends readonly [HashParamValue, ...HashParamValue[]]>(
     values: Values,
     defaultValue?: Values[number]
-  ): InferHashParamBlueprintFromValue<Values[number]> => {
+  ): InferHashParamBlueprintFromValue<Values[number], 'enum'> => {
     const optionByString = new Map<string, Values[number]>();
 
     for (const option of values) {
@@ -76,10 +76,10 @@ export const HASH_PARAM_BLUEPRINTS = {
  */
 export const getDefaultHashParamBlueprint = <
   const Value extends HashParamValue = HashParamValue
->(): InferHashParamBlueprintFromValue<Value> => {
+>(): InferHashParamBlueprintFromValue<Value, 'none'> => {
   return {
     type: '' as unknown as Value,
-    kind: 'string',
+    kind: 'none',
     parse: () => undefined,
     stringify: () => ''
   };
