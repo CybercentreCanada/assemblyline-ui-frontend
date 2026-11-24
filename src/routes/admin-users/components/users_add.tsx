@@ -340,3 +340,5 @@ export const AddUserPage = memo(() => {
     </>
   );
 });
+
+AddUserPage.displayName = 'AddUserPage';

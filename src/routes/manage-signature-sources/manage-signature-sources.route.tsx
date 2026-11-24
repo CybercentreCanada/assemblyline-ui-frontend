@@ -266,6 +266,8 @@ export const SourceDetailDrawer = memo(
   }
 );
 
+SourceDetailDrawer.displayName = 'SourceDetailDrawer';
+
 type SourceCardProps = {
   service: string;
   source: UpdateSource;
@@ -470,6 +472,8 @@ export const SourceCard = memo(
   }
 );
 
+SourceCard.displayName = 'SourceCard';
+
 export type ServiceDetailProps = {
   service: string;
   sources: UpdateConfig['sources'];
@@ -621,6 +625,8 @@ export const ServiceDetail = memo(
     );
   }
 );
+
+ServiceDetail.displayName = 'ServiceDetail';
 
 export const ManageSignatureSourcesPage = memo(() => {
   const { t } = useTranslation(['manageSignatureSources']);

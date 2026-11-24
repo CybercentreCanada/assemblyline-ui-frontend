@@ -60,7 +60,7 @@ export const DEFAULT_TAB: Tab = 'details';
 
 export type Params = {
   id?: string;
-  tab?: 'details' | 'detection' | 'tags' | 'relations' | 'ascii' | 'code' | 'hex' | 'image' | 'community';
+  tab?: Tab;
 };
 
 export type ArchiveDetailPageProps = {

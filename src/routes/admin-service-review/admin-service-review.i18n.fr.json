@@ -1,5 +1,5 @@
 {
-  "app_route.admin_service_review.fullname": "Administration des Examen des services",
+  "app_route.admin_service_review.fullname": "Administration de l'examen des services",
   "app_route.admin_service_review.shortname": "Examen des services",
   "error": "Répartition des erreurs",
   "errors": "Afficher les erreurs dans le Visualiseur d'Erreurs",

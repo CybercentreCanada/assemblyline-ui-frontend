@@ -1,5 +1,5 @@
 {
-  "app_route.manage_safelist_detail.fullname": "Gestion du Détails de la Liste sûre {{id}}",
+  "app_route.manage_safelist_detail.fullname": "Gestion des détails de la liste sûre {{id}}",
   "app_route.manage_safelist_detail.shortname": "{{id}}",
   "chart.title": "Nombre de fois vue au cours des 30 derniers jours",
   "classification.update.success": "La classification de la source à été modifié avec success",

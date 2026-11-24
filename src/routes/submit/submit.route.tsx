@@ -419,7 +419,7 @@ export const SubmitRoute = createAppRoute({
     filetypeOverride: s.string(null).source('transient'),
     hash: s.string(null),
     metadata: s.object(null).source('transient'),
-    priority: s.number(null).source('transient'),
+    priority: s.enum(null, [500, 1000, 1500]).source('transient').nullable(),
     profile: s.string(null).source('transient'),
     raw: s.string('').source('transient'),
     ttl: s.number(null).source('transient')

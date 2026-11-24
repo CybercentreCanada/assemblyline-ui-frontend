@@ -675,7 +675,7 @@ export const ManageSignatureDetailRoute = createAppRoute({
   forbidden: (_location, config) => !config.user.roles.includes('signature_view')
 });
 
-export const ManageSignatureDetailRoute2 = createAppRoute({
+export const ManageSignatureDetailByNameRoute = createAppRoute({
   component: ManageSignatureDetailPage,
 
   path: '/manage/signature/detail/:type/:source/:name',
