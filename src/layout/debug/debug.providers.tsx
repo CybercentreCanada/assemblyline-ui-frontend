@@ -1,4 +1,4 @@
-import { QUERY_CLIENT } from 'core/api/api.providers';
+import { queryClient } from 'core/api/api.providers';
 import { useAppInterfaceStore } from 'core/interface';
 import { AppDebugStores } from 'layout/debug';
 import type { PropsWithChildren } from 'react';
@@ -28,7 +28,7 @@ export const AppDebugLayout = memo(({ children }: AppDebugLayoutProps) => {
           <Panel defaultSize="40%" minSize="2%" maxSize="100%">
             {debugMode === 'api' && (
               <Suspense fallback={null}>
-                <ReactQueryDevtoolsPanel client={QUERY_CLIENT} style={{ height: '100%', width: '100%' }} />
+                <ReactQueryDevtoolsPanel client={queryClient} style={{ height: '100%', width: '100%' }} />
               </Suspense>
             )}
             {debugMode === 'store' && <AppDebugStores />}

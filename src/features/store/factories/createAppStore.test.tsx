@@ -1,11 +1,13 @@
-import { render, screen } from '@testing-library/react';
+import { act, render, renderHook, screen, waitFor } from '@testing-library/react';
 import { createAppStore } from 'features/store';
-import { useEffect } from 'react';
+import { useEffect, type ReactNode } from 'react';
 import { describe, expect, test, vi } from 'vitest';
 
 type TestStore = { count: number };
 
-const { StoreProvider, useSetStore, useStore } = createAppStore<TestStore>({ count: 0 });
+const { StoreProvider, useSetStore, useStore, useStoreApi, useSubscriberCount } = createAppStore<TestStore>({
+  count: 0
+});
 
 const Counter = () => {
   const count = useStore(s => s.count);
@@ -61,5 +63,22 @@ describe('createAppStore StoreProvider', () => {
 
     expect(updater).toHaveBeenCalledTimes(1);
     expect(screen.getByTestId('count').textContent).toBe('3');
+  });
+
+  test('tracks active store subscribers and removes them after unsubscribe', async () => {
+    const wrapper = ({ children }: { children: ReactNode }) => <StoreProvider>{children}</StoreProvider>;
+    const { result } = renderHook(() => ({ count: useSubscriberCount(), store: useStoreApi() }), { wrapper });
+
+    let unsubscribe: () => void = () => undefined;
+
+    act(() => {
+      unsubscribe = result.current.store.subscribe(() => undefined);
+    });
+
+    await waitFor(() => expect(result.current.count).toBe(1));
+
+    act(() => unsubscribe());
+
+    await waitFor(() => expect(result.current.count).toBe(0));
   });
 });

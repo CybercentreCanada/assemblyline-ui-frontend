@@ -31,7 +31,8 @@ export const {
   StoreProvider: AppNavigationStoreProvider,
   useStore: useAppNavigationStore,
   useSetStore: useAppSetNavigationStore,
-  useStoreApi: useAppNavigationStoreApi
+  useStoreApi: useAppNavigationStoreApi,
+  useSubscriberCount: useAppNavigationStoreSubscriberCount
 } = createAppStore<AppNavigationStore>(getDefaultNavigationStore());
 
 AppNavigationStoreProvider.displayName = 'AppNavigationStoreProvider';

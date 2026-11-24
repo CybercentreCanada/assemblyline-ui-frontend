@@ -13,7 +13,8 @@ export const {
   StoreProvider: AppPreferenceStoreProvider,
   useStore: useAppPreferenceStore,
   useSetStore: useAppSetPreferenceStore,
-  useStoreApi: useAppPreferenceStoreApi
+  useStoreApi: useAppPreferenceStoreApi,
+  useSubscriberCount: useAppPreferenceStoreSubscriberCount
 } = createAppStore<AppPreferenceStore>(null);
 
 export const getAppPreferenceStateFromApi = (api: StoreApi<AppPreferenceStore>): AppPreferenceStore => {
