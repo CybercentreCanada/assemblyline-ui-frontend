@@ -14,7 +14,8 @@ export const {
   StoreProvider: AppRouterStoreProvider,
   useStore: useAppRouterStore,
   useSetStore: useAppSetRouterStore,
-  useStoreApi: useAppRouterStoreApi
+  useStoreApi: useAppRouterStoreApi,
+  useSubscriberCount: useAppRouterStoreSubscriberCount
 } = createAppStore<AppRouterStore>(getDefaultRouterStore());
 
 AppRouterStoreProvider.displayName = 'AppRouterStoreProvider';

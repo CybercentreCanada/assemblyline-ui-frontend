@@ -23,6 +23,7 @@ import { AppThemesContext, AppThemesProvider } from 'core/template/components/ap
 import AppUserProvider from 'core/template/components/app/providers/AppUserProvider';
 import AssistantProvider from 'layout/assistant/assistant.providers';
 import CarouselProvider from 'layout/carousel/carousel.providers';
+import { AppDebugLayout } from 'layout/debug';
 import DrawerProvider from 'layout/drawer/drawer.providers';
 import { ExternalLookupProvider } from 'layout/external-lookup/external-lookup.providers';
 import HighlightProvider from 'layout/highlighter/highlighter.providers';
@@ -133,21 +134,23 @@ export const AppProviderInner = <U extends AppUser>({
                   <AssistantProvider>
                     <HighlightProvider>
                       <ExternalLookupProvider>
-                        <CarouselProvider>
-                          <AppDrawerProvider>
-                            <DrawerProvider>
-                              <AppBarProvider search={search}>
-                                <AppBreadcrumbsProvider>
-                                  <AppLeftNavProvider>
-                                    <AppDrawerContainer>
-                                      <AppLayoutProvider>{children}</AppLayoutProvider>
-                                    </AppDrawerContainer>
-                                  </AppLeftNavProvider>
-                                </AppBreadcrumbsProvider>
-                              </AppBarProvider>
-                            </DrawerProvider>
-                          </AppDrawerProvider>
-                        </CarouselProvider>
+                        <AppDebugLayout>
+                          <CarouselProvider>
+                            <AppDrawerProvider>
+                              <DrawerProvider>
+                                <AppBarProvider search={search}>
+                                  <AppBreadcrumbsProvider>
+                                    <AppLeftNavProvider>
+                                      <AppDrawerContainer>
+                                        <AppLayoutProvider>{children}</AppLayoutProvider>
+                                      </AppDrawerContainer>
+                                    </AppLeftNavProvider>
+                                  </AppBreadcrumbsProvider>
+                                </AppBarProvider>
+                              </DrawerProvider>
+                            </AppDrawerProvider>
+                          </CarouselProvider>
+                        </AppDebugLayout>
                       </ExternalLookupProvider>
                     </HighlightProvider>
                   </AssistantProvider>

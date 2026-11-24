@@ -12,14 +12,18 @@ import {
   ListItemIcon,
   ListItemText,
   ListSubheader,
+  MenuItem,
   Paper,
   Popper,
+  Select,
   styled,
   Tooltip,
   Typography,
   useTheme
 } from '@mui/material';
+import type { SelectChangeEvent } from '@mui/material/Select';
 import useALContext from 'core/config/useALContext';
+import { useAppInterfaceStore, useAppSetInterfaceStore } from 'core/interface';
 import type { AppBarUserMenuElement } from 'core/template/components/app/AppConfigs';
 import { useAppConfigs, useAppLayout } from 'core/template/components/app/hooks';
 import AppAvatar from 'core/template/components/display/AppAvatar';
@@ -49,8 +53,20 @@ const UserProfile = () => {
   const { t } = useTranslation();
   const { apiQuotaRemaining, submissionQuotaRemaining } = useQuota();
   const [open, setOpen] = useState<boolean>(false);
+  const debugMode = useAppInterfaceStore(state => state.debug.mode);
+  const setInterfaceStore = useAppSetInterfaceStore();
   const onProfileClick = useCallback(() => setOpen(_open => !_open), []);
   const onClickAway = useCallback(() => setOpen(false), []);
+  const handleDebugModeChange = useCallback(
+    (event: SelectChangeEvent<string>) => {
+      setInterfaceStore(s => {
+        s.debug.mode = (event.target.value || null) as AppInterfaceStore['debug']['mode'];
+        return s;
+      });
+      setOpen(false);
+    },
+    [setInterfaceStore]
+  );
   const renderThemeSelection = useCallback(
     (enabled: boolean) => {
       if (
@@ -287,6 +303,25 @@ const UserProfile = () => {
                     configs.preferences.topnav.adminMenuI18nKey
                   )}
                 {renderThemeSelection(configs.preferences.topnav.themeSelectionMode === 'profile')}
+                {user.is_admin && ['development', 'staging'].includes(configuration.system.type) && (
+                  <>
+                    <Divider />
+                    <List dense subheader={<ListSubheader disableSticky>{t('debug')}</ListSubheader>}>
+                      <ListItem
+                        sx={{ justifyContent: 'space-between' }}
+                        secondaryAction={
+                          <Select displayEmpty size="small" value={debugMode ?? ''} onChange={handleDebugModeChange}>
+                            <MenuItem value="">{t('personalization.debug.menu.none')}</MenuItem>
+                            <MenuItem value="api">{t('personalization.debug.menu.api')}</MenuItem>
+                            <MenuItem value="store">{t('personalization.debug.menu.store')}</MenuItem>
+                          </Select>
+                        }
+                      >
+                        <ListItemText primary={t('personalization.debug.menu')} />
+                      </ListItem>
+                    </List>
+                  </>
+                )}
               </Paper>
             </Fade>
           )}
