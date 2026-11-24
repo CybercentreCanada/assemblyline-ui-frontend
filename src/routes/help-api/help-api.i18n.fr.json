@@ -1,4 +1,6 @@
 {
+  "app_route.help_api.fullname": "Aide à la Documentation de l'API",
+  "app_route.help_api.shortname": "Documentation de l'API",
   "complete": "Entièrement documenté",
   "description": "Description",
   "function": "Fonction interne",

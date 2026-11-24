@@ -1,6 +1,10 @@
 {
   "ai_summary": "Résumé exécutif",
   "analysing_report": "Demander aux robots de résumer le rapport...",
+  "app_route.submission_detail.fullname": "Détails de la soumission {{id}}",
+  "app_route.submission_detail.shortname": "{{id}}",
+  "app_route.submission_redirect.fullname": "Redirection de la soumission {{id}}",
+  "app_route.submission_redirect.shortname": "{{id}}",
   "archive": "Copiez la soumission dans l'archive des logiciels malveillants",
   "archive.acceptText": "Oui, archivez-le!",
   "archive.alternate_expiry": "Quand cette soumission doit-elle être supprimée de l'archives de logiciels malveillants?",
@@ -48,6 +52,7 @@
   "meta.more": "Afficher plus",
   "metadata": "Métadonnées",
   "none": "aucun",
+  "outstanding.empty": "Aucun service en attente n'est actuellement disponible. Veuillez patienter et réessayer bientôt.",
   "outstanding.files": "Fichiers restants",
   "outstanding.services": "Services",
   "outstanding.title": "Vous attendez la fin du traitement des services suivants:",

@@ -1,5 +1,7 @@
+import KeyOutlinedIcon from '@mui/icons-material/KeyOutlined';
 import { Backdrop, Button, Typography, useTheme } from '@mui/material';
 import useALContext from 'core/config/useALContext';
+import { createAppRoute } from 'core/router';
 import PageCardCentered from 'core/template/branding/AppPageCardCentered';
 import { useAppUser } from 'core/template/components/app/hooks';
 import useAppBannerVert from 'core/template/components/app/hooks/useAppBannerVert';
@@ -111,4 +113,27 @@ export const AuthorizePage = memo(() => {
       </PageCardCentered>
     </Backdrop>
   );
+});
+
+export const AuthorizeRoute = createAppRoute({
+  component: AuthorizePage,
+
+  path: '/authorize',
+  // TODO: revise in the new version
+  search: s => ({
+    redirect_url: s.string(''),
+    client_id: s.string(''),
+    server: s.string(''),
+    scope: s.string(''),
+    roles: s.string('')
+  }),
+
+  ancestor: null,
+  shortname: () => ['app_route.authorize.shortname', { ns: 'authorize' }],
+  fullname: () => ['app_route.authorize.fullname', { ns: 'authorize' }],
+  shorticon: () => <KeyOutlinedIcon />,
+  fullicon: () => <KeyOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
 });

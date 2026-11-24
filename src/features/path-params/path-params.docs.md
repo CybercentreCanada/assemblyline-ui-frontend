@@ -65,7 +65,7 @@ String, number, and boolean blueprints serialize `null` and `undefined` as empty
 import { createPathParamsCodec } from 'features/path-params';
 
 const codec = createPathParamsCodec('/alerts/:id/:tab')(blueprints => ({
-  id: blueprints.string(),
+  id: blueprints.string(''),
   tab: blueprints.enum(['overview', 'history'] as const, 'overview')
 }));
 ```

@@ -1,10 +1,12 @@
-import { memo } from 'react';
 import AddPhotoAlternateOutlinedIcon from '@mui/icons-material/AddPhotoAlternateOutlined';
 import FileOpenIcon from '@mui/icons-material/FileOpen';
+import PaletteIcon from '@mui/icons-material/Palette';
 import { Button, IconButton, Stack, Switch, useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import useALContext from 'core/config/useALContext';
+import { createAppRoute } from 'core/router';
 import PageCenter from 'core/template/components/pages/PageCenter';
+import { memo } from 'react';
 import { Navigate } from 'react-router';
 import { AlertExtendedScan, AlertPriority, AlertStatus } from 'routes/alerts/components/Components';
 import Classification from 'ui/Classification';
@@ -317,4 +319,20 @@ export const DevelopmentThemePage = memo(() => {
         </Stack>
       </PageCenter>
     );
+});
+
+export const DevelopmentThemeRoute = createAppRoute({
+  component: DevelopmentThemePage,
+
+  path: '/development/theme',
+
+  ancestor: '/development',
+  shortname: () => ['app_route.development_theme.shortname', { ns: 'developmentAPI' }],
+  fullname: () => ['app_route.development_theme.fullname', { ns: 'developmentAPI' }],
+  shorticon: () => <PaletteIcon />,
+  fullicon: () => <PaletteIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) =>
+    !config.user.is_admin || !['development', 'staging'].includes(config.configuration.system.type)
 });

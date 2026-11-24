@@ -1,6 +1,8 @@
+import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import { AlertTitle, useMediaQuery, useTheme } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
+import { createAppRoute } from 'core/router';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import PageFullSize from 'core/template/branding/AppPageCenter';
 import PageCenter from 'core/template/components/pages/PageCenter';
@@ -39,9 +41,26 @@ import InformativeAlert from 'ui/InformativeAlert';
 import { emptyResult } from 'ui/ResultCard';
 import { TabContainer } from 'ui/TabContainer';
 
-type Params = {
+export const TAB_OPTIONS = [
+  'details',
+  'detection',
+  'tags',
+  'relations',
+  'ascii',
+  'code',
+  'strings',
+  'hex',
+  'image',
+  'community'
+] as const;
+
+export type Tab = (typeof TAB_OPTIONS)[number];
+
+export const DEFAULT_TAB: Tab = 'details';
+
+export type Params = {
   id?: string;
-  tab?: 'details' | 'detection' | 'tags' | 'relations' | 'ascii' | 'code' | 'hex' | 'image' | 'community';
+  tab?: Tab;
 };
 
 export type ArchiveDetailPageProps = {
@@ -308,4 +327,50 @@ export const ArchiveDetailPage = memo(({ sha256: propSha256, force = false }: Ar
         />
       </Layout>
     );
+});
+
+export const ArchiveDetailRoute = createAppRoute({
+  component: ArchiveDetailPage,
+
+  path: '/archive/:id/:tab',
+  params: s => ({
+    id: s.string(''),
+    tab: s.enum(TAB_OPTIONS, DEFAULT_TAB)
+  }),
+  search: s => ({
+    name: s.string(null).nullable()
+  }),
+
+  ancestor: '/archives',
+  shortname: location => ['app_route.archive_detail_id_tab.shortname', { ns: 'archive', id: location.path.id }],
+  fullname: location => [
+    'app_route.archive_detail_id_tab.fullname',
+    { ns: 'archive', id: location.path.id, tab: location.path.tab }
+  ],
+  shorticon: () => <DescriptionOutlinedIcon />,
+  fullicon: () => <DescriptionOutlinedIcon />,
+
+  disabled: (_location, config) => !config.configuration?.datastore?.archive?.enabled,
+  forbidden: (_location, config) => !config.user.roles.includes('archive_view')
+});
+
+export const ArchiveDetailRootRoute = createAppRoute({
+  component: ArchiveDetailPage,
+
+  path: '/archive/:id',
+  params: s => ({
+    id: s.string('')
+  }),
+  search: s => ({
+    name: s.string(null).nullable()
+  }),
+
+  ancestor: '/archives',
+  shortname: location => ['app_route.archive_detail_id.shortname', { ns: 'archive', id: location.path.id }],
+  fullname: location => ['app_route.archive_detail_id.fullname', { ns: 'archive', id: location.path.id }],
+  shorticon: () => <DescriptionOutlinedIcon />,
+  fullicon: () => <DescriptionOutlinedIcon />,
+
+  disabled: (_location, config) => !config.configuration?.datastore?.archive?.enabled,
+  forbidden: (_location, config) => !config.user.roles.includes('archive_view')
 });

@@ -17,7 +17,7 @@ import Typography from '@mui/material/Typography';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { memo, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Classification from 'ui/Classification';
 import CustomChip from 'ui/CustomChip';
@@ -41,7 +41,7 @@ type User = {
   roles?: string[];
 };
 
-const WrappedAddUserPage = () => {
+export const AddUserPage = memo(() => {
   const { t } = useTranslation(['adminUsers']);
   const theme = useTheme();
   const { apiCall } = useMyAPI();
@@ -339,7 +339,6 @@ const WrappedAddUserPage = () => {
       </Drawer>
     </>
   );
-};
+});
 
-export const AddUserPage = React.memo(WrappedAddUserPage);
-export default AddUserPage;
+AddUserPage.displayName = 'AddUserPage';

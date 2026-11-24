@@ -1,3 +1,4 @@
+import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import CloudDownloadOutlinedIcon from '@mui/icons-material/CloudDownloadOutlined';
 import RestoreOutlinedIcon from '@mui/icons-material/RestoreOutlined';
@@ -20,6 +21,7 @@ import {
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import { invalidateAPIQuery } from 'core/api/utils/invalidateApiQuery';
 import useALContext from 'core/config/useALContext';
+import { createAppRoute } from 'core/router';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import { useAppUser } from 'core/template/components/app/hooks';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
@@ -548,4 +550,19 @@ export const AdminServicesPage = memo(() => {
   ) : (
     <Navigate to="/forbidden" replace />
   );
+});
+
+export const AdminServicesRoute = createAppRoute({
+  component: AdminServicesPage,
+
+  path: '/admin/services',
+
+  ancestor: '/admin',
+  shortname: () => ['app_route.admin_services.shortname', { ns: 'adminServices' }],
+  fullname: () => ['app_route.admin_services.fullname', { ns: 'adminServices' }],
+  shorticon: () => <AccountTreeOutlinedIcon />,
+  fullicon: () => <AccountTreeOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.is_admin
 });

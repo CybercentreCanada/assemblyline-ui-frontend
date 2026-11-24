@@ -1,7 +1,9 @@
+import ReceiptOutlinedIcon from '@mui/icons-material/ReceiptOutlined';
 import { Box, Button, CircularProgress, Link, Typography, useTheme } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
+import { createAppRoute } from 'core/router';
 import { useAppBanner } from 'core/template/components/app/hooks';
 import PageCenter from 'core/template/components/pages/PageCenter';
 import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
@@ -122,4 +124,19 @@ export const ToSPage = memo(() => {
   ) : (
     <NotFoundPage />
   );
+});
+
+export const ToSRoute = createAppRoute({
+  component: ToSPage,
+
+  path: '/tos',
+
+  ancestor: null,
+  shortname: () => ['app_route.terms_of_service.shortname', { ns: 'tos' }],
+  fullname: () => ['app_route.terms_of_service.fullname', { ns: 'tos' }],
+  shorticon: () => <ReceiptOutlinedIcon />,
+  fullicon: () => <ReceiptOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
 });

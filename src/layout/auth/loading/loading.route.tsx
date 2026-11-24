@@ -1,4 +1,6 @@
+import PendingOutlinedIcon from '@mui/icons-material/PendingOutlined';
 import { CircularProgress } from '@mui/material';
+import { createAppRoute } from 'core/router';
 import { useAppBannerVert } from 'core/template/components/app/hooks';
 import { memo } from 'react';
 
@@ -22,4 +24,19 @@ export const LoadingPage = memo(({ showImage = true }: LoadingPageProps) => {
       <CircularProgress variant="indeterminate" />
     </div>
   );
+});
+
+export const LoadingRoute = createAppRoute({
+  component: LoadingPage,
+
+  path: '/loading',
+
+  ancestor: null,
+  shortname: () => ['app_route.loading.shortname', { ns: 'alerts' }],
+  fullname: () => ['app_route.loading.fullname', { ns: 'alerts' }],
+  shorticon: () => <PendingOutlinedIcon />,
+  fullicon: () => <PendingOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
 });

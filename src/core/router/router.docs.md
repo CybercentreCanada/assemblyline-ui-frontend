@@ -111,7 +111,7 @@ A parameterized route can define path and search codecs:
 export const AlertRoute = createAppRoute({
   component: AlertDetailPage,
   path: '/alert/:id',
-  params: blueprints => ({ id: blueprints.string() }),
+  params: blueprints => ({ id: blueprints.string('') }),
   search: blueprints => ({ tab: blueprints.enum(['details', 'history'], 'details') }),
   ancestor: '/alerts',
   shortname: location => ['app_route.alert.shortname', { id: location.path.id }],

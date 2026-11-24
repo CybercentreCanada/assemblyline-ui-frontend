@@ -16,7 +16,8 @@ import {
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ALERT_DEFAULT_PARAMS, ALERT_STORAGE_KEY, type AlertSearchParams } from 'routes/alerts/alerts.route';
+import type { AlertSearchParams } from 'routes/alerts/alerts.route';
+import { ALERT_DEFAULT_PARAMS, ALERT_STORAGE_KEY } from 'routes/alerts/alerts.route';
 import AlertFiltersSelected from 'routes/alerts/components/FiltersSelected';
 import { useSearchParams } from 'routes/alerts/contexts/SearchParamsContext';
 import { SearchParser, type SearchResult } from 'routes/alerts/utils/SearchParser';

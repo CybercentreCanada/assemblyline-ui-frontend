@@ -16,6 +16,8 @@ import loginEN from 'layout/auth/log-in/log-in.i18n.en.json';
 import loginFR from 'layout/auth/log-in/log-in.i18n.fr.json';
 import logoutEN from 'layout/auth/log-out/log-out.i18n.en.json';
 import logoutFR from 'layout/auth/log-out/log-out.i18n.fr.json';
+import quotaEN from 'layout/auth/quota/quota.i18n.en.json';
+import quotaFR from 'layout/auth/quota/quota.i18n.fr.json';
 import tosEN from 'layout/auth/terms-of-service/terms-of-service.i18n.en.json';
 import tosFR from 'layout/auth/terms-of-service/terms-of-service.i18n.fr.json';
 import carouselEN from 'layout/carousel/carousel.i18n.en.json';
@@ -184,6 +186,7 @@ const resources = {
     manageWorkflows: manageWorkflowsEN,
     missingNode: missingNodeEN,
     notification: notificationEN,
+    quota: quotaEN,
     retrohunt: retrohuntEN,
     router: routerEN,
     sandboxResult: sandboxResultEN,
@@ -252,6 +255,7 @@ const resources = {
     manageWorkflows: manageWorkflowsFR,
     missingNode: missingNodeFR,
     notification: notificationFR,
+    quota: quotaFR,
     retrohunt: retrohuntFR,
     router: routerFR,
     sandboxResult: sandboxResultFR,

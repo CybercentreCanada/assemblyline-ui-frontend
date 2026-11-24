@@ -1,4 +1,6 @@
 {
+  "app_route.not_found.fullname": "Not Found",
+  "app_route.not_found.shortname": "Not Found",
   "description": "The page you are looking for cannot be found...",
   "dl.alt": "Dead Link",
   "dl.description": "Looks like this 'Link' is dead...",

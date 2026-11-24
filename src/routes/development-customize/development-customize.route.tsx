@@ -1,5 +1,7 @@
+import DataObjectOutlinedIcon from '@mui/icons-material/DataObjectOutlined';
 import { Box, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, styled, useTheme } from '@mui/material';
 import useALContext from 'core/config/useALContext';
+import { createAppRoute } from 'core/router';
 import { memo, Profiler, useEffect } from 'react';
 import { Navigate } from 'react-router';
 import type { CustomizeMethod } from 'routes/development-customize/development-customize.form';
@@ -229,4 +231,20 @@ export const DevelopmentCustomizePage = memo(() => {
         <DevelopmentCustomizeContent />
       </FormProvider>
     );
+});
+
+export const DevelopmentCustomizeRoute = createAppRoute({
+  component: DevelopmentCustomizePage,
+
+  path: '/development/customize',
+
+  ancestor: '/development',
+  shortname: () => ['app_route.development_customize.shortname', { ns: 'developmentAPI' }],
+  fullname: () => ['app_route.development_customize.fullname', { ns: 'developmentAPI' }],
+  shorticon: () => <DataObjectOutlinedIcon />,
+  fullicon: () => <DataObjectOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) =>
+    !config.user.is_admin || !['development', 'staging'].includes(config.configuration.system.type)
 });

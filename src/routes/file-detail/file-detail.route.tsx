@@ -1,4 +1,5 @@
 import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
+import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import OndemandVideoOutlinedIcon from '@mui/icons-material/OndemandVideoOutlined';
@@ -10,6 +11,7 @@ import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
 import { List, ListItemButton, ListItemIcon, ListItemText, Popover, useTheme } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
+import { createAppRoute } from 'core/router';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import { useAppUser } from 'core/template/components/app/hooks';
 import PageCenter from 'core/template/components/pages/PageCenter';
@@ -575,4 +577,31 @@ export const FileDetailPage = memo(() => {
   ) : (
     <ForbiddenPage />
   );
+});
+
+export const FileDetailRoute = createAppRoute({
+  component: FileDetailPage,
+
+  path: '/file/detail/:id',
+  params: s => ({
+    id: s.string('')
+  }),
+  search: s => ({
+    filetypeOverride: s.string(null).source('transient'),
+    force: s.boolean(false).source('transient'),
+    liveErrors: s.object(null).source('transient'),
+    liveResultKeys: s.object(null).source('transient'),
+    metadata: s.object(null).source('transient'),
+    name: s.string(null),
+    sid: s.string(null).source('transient')
+  }),
+
+  ancestor: null,
+  shortname: location => ['app_route.file_detail.shortname', { ns: 'fileDetail', id: location.path.id }],
+  fullname: location => ['app_route.file_detail.fullname', { ns: 'fileDetail', id: location.path.id }],
+  shorticon: () => <DescriptionOutlinedIcon />,
+  fullicon: () => <DescriptionOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.roles.includes('submission_view')
 });

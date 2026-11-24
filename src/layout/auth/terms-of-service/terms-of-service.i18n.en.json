@@ -1,5 +1,7 @@
 {
   "agreed": "You've already agreed to the terms of service...",
+  "app_route.terms_of_service.fullname": "Terms of Service",
+  "app_route.terms_of_service.shortname": "Terms of Service",
   "button": "Accept terms",
   "logout": "Logout",
   "title": "Terms of Service"

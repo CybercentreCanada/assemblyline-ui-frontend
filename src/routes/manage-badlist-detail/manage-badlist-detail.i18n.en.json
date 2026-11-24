@@ -7,6 +7,8 @@
   "add.attribution.success": "The attribution was successfully added to the badlist item",
   "add.attribution.text": "What attribution label do you want to add to this item and in which category?",
   "add.attribution.title": "Adding Attribution",
+  "app_route.manage_badlist_detail.fullname": "Manage Badlist Detail {{id}}",
+  "app_route.manage_badlist_detail.shortname": "{{id}}",
   "attribution.actor": "Actors",
   "attribution.campaign": "Campaigns",
   "attribution.category": "Categories",
