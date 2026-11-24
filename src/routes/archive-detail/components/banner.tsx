@@ -26,14 +26,13 @@ import {
 } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
+import { AppLink, useAppNavigate, useAppSearchSnapshot } from 'core/router';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import type { File } from 'models/api/file';
 import type { LabelCategories } from 'models/base/file';
 import type { CSSProperties } from 'react';
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router';
-import { Link } from 'react-router-dom';
 import { bytesToSize } from 'shared/utils/utils';
 import { FileDownloader } from 'ui/buttons/FileDownloader';
 import Classification from 'ui/Classification';
@@ -152,8 +151,8 @@ type Props = {
 const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid = null, force = false }) => {
   const { t } = useTranslation(['fileDetail', 'archive']);
   const theme = useTheme();
-  const location = useLocation();
-  const navigate = useNavigate();
+  const navigate = useAppNavigate();
+  const search = useAppSearchSnapshot<'/archive/:id' | '/archive/:id/:tab'>();
   const { apiCall } = useMyAPI();
   const { showSuccessMessage } = useMySnackbar();
   const { user: currentUser, scoreToVerdict } = useALContext();
@@ -167,8 +166,7 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
   const [showMoreLabels, setShowMoreLabels] = useState<boolean>(false);
   const [collapseLabels, setCollapseLabels] = useState<boolean>(false);
 
-  const params = new URLSearchParams(location.search);
-  const fileName = file ? params.get('name') || sha256 : null;
+  const fileName = file ? search.get('name') || sha256 : null;
   const popoverOpen = Boolean(resubmitAnchor);
 
   const ref = useRef<HTMLDivElement>(null);
@@ -214,7 +212,7 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
       onSuccess: api_data => {
         showSuccessMessage(t('resubmit.success'));
         setTimeout(() => {
-          navigate(`/submission/detail/${api_data.api_response.sid}`);
+          navigate.to().create({ route: '/submission/detail/:id', path: { id: api_data.api_response.sid } });
         }, 500);
       }
     });
@@ -485,8 +483,18 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
               <>
                 <Tooltip title={t('related')}>
                   <IconButton
-                    component={Link}
-                    to={`/search/submission?query=files.sha256:${file.file_info.sha256} OR results:${file.file_info.sha256}* OR errors:${file.file_info.sha256}*&use_archive`}
+                    component={AppLink}
+                    nav={nav =>
+                      nav.to().create({
+                        route: '/search/:index',
+                        path: { index: 'submission' },
+                        search: {
+                          query: `files.sha256:${file.file_info.sha256} OR results:${file.file_info.sha256}* OR errors:${file.file_info.sha256}*`,
+                          use_archive: true
+                        }
+                      })
+                    }
+                    navDeps={[file.file_info.sha256]}
                     size="large"
                   >
                     <ViewCarouselOutlinedIcon />
@@ -528,8 +536,9 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
                     >
                       <List disablePadding>
                         <ListItemButton
-                          component={Link}
-                          to={`/submit?hash=${file.file_info.sha256}`}
+                          component={AppLink}
+                          nav={nav => nav.to().create({ route: '/submit', search: { hash: file.file_info.sha256 } })}
+                          navDeps={[file.file_info.sha256]}
                           state={{
                             c12n: file.file_info.classification
                           }}

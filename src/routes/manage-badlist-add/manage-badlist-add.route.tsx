@@ -16,7 +16,7 @@ import {
 import Autocomplete from '@mui/material/Autocomplete';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
-import { createAppRoute } from 'core/router';
+import { createAppRoute, useAppNavigate } from 'core/router';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
 import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
@@ -30,16 +30,11 @@ import {
 } from 'models/base/badlist';
 import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router';
 import { ForbiddenPage } from 'routes/forbidden/forbidden.page';
 import { HASH_MAP, MD5_REGEX, SHA1_REGEX, SHA256_REGEX, SSDEEP_REGEX, TLSH_REGEX } from 'shared/utils/constants';
 import Classification from 'ui/Classification';
 import DatePicker from 'ui/DatePicker';
 import { RouterPrompt } from 'ui/RouterPrompt';
-
-type ParamProps = {
-  id: string;
-};
 
 export type ManageBadlistAddPageProps = {
   badlist_id?: string;
@@ -49,7 +44,6 @@ export type ManageBadlistAddPageProps = {
 // eslint-disable-next-line no-empty-pattern
 export const ManageBadlistAddPage = memo(({}: ManageBadlistAddPageProps) => {
   const { t } = useTranslation(['manageBadlistAdd']);
-  const { id } = useParams<ParamProps>();
   const theme = useTheme();
   const [badlist, setBadlist] = useState<Badlist>(DEFAULT_BADLIST);
   const [waiting, setWaiting] = useState<boolean>(false);
@@ -61,7 +55,7 @@ export const ManageBadlistAddPage = memo(({}: ManageBadlistAddPageProps) => {
   const { user: currentUser, c12nDef, indexes } = useALContext();
   const { showSuccessMessage } = useMySnackbar();
   const { apiCall } = useMyAPI();
-  const navigate = useNavigate();
+  const navigate = useAppNavigate();
 
   useEffectOnce(() => {
     const tempTags = Object.keys(indexes.result)
@@ -186,7 +180,7 @@ export const ManageBadlistAddPage = memo(({}: ManageBadlistAddPageProps) => {
         setModified(false);
         showSuccessMessage(t('add.success'));
         setTimeout(() => {
-          navigate(`/manage/badlist#${resp.api_response.hash}`);
+          navigate.here().create({ route: '/manage/badlist/detail/:id', path: { id: resp.api_response.hash } });
           window.dispatchEvent(new CustomEvent('reloadBadlist'));
         }, 1000);
       },
@@ -201,7 +195,7 @@ export const ManageBadlistAddPage = memo(({}: ManageBadlistAddPageProps) => {
   };
 
   return currentUser.roles.includes('badlist_view') ? (
-    <PageFullWidth margin={!id ? 2 : 4}>
+    <PageFullWidth margin={2}>
       <RouterPrompt when={modified} />
       <div
         style={{

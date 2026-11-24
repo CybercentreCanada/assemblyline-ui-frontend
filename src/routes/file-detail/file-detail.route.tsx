@@ -11,20 +11,17 @@ import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
 import { List, ListItemButton, ListItemIcon, ListItemText, Popover, useTheme } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
-import { createAppRoute } from 'core/router';
+import { AppLink, createAppRoute, useAppNavigate, useAppPathParams, useAppSearchSnapshot } from 'core/router';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import { useAppUser } from 'core/template/components/app/hooks';
 import PageCenter from 'core/template/components/pages/PageCenter';
 import useAssistant from 'layout/assistant/assistant.hooks';
-import useDrawer from 'layout/drawer/drawer.hooks';
 import type { File } from 'models/api/file';
 import type { CustomUser } from 'models/api/user';
 import type { Error } from 'models/base/error';
 import type { Submission } from 'models/base/submission';
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate, useParams } from 'react-router';
-import { Link } from 'react-router-dom';
 import AttackSection from 'routes/file-detail/components/attacks';
 import ChildrenSection from 'routes/file-detail/components/childrens';
 import Detection from 'routes/file-detail/components/detection';
@@ -37,10 +34,8 @@ import ParentSection from 'routes/file-detail/components/parents';
 import ResultSection from 'routes/file-detail/components/results';
 import TagSection from 'routes/file-detail/components/tags';
 import URIIdentificationSection from 'routes/file-detail/components/uriIdent';
-import { DEFAULT_TAB, TAB_OPTIONS } from 'routes/file-viewer/file-viewer.route';
+import { DEFAULT_TAB } from 'routes/file-viewer/file-viewer.route';
 import { ForbiddenPage } from 'routes/forbidden/forbidden.page';
-import { ManageHeuristicDetailPage } from 'routes/manage-heuristic-detail/manage-heuristic-detail.route';
-import { ManageSignatureDetailPage } from 'routes/manage-signature-detail/manage-signature-detail.route';
 import AISummarySection from 'routes/submission-detail/components/ai_summary';
 import { FileDownloader } from 'ui/buttons/FileDownloader';
 import { IconButton } from 'ui/buttons/IconButton';
@@ -51,6 +46,7 @@ import { emptyResult } from 'ui/ResultCard';
 
 export type FileDetailPageProps = {
   sha256: string;
+  name?: string;
   sid?: string;
   metadata?: Record<string, string>;
   liveResultKeys?: string[];
@@ -62,6 +58,7 @@ export type FileDetailPageProps = {
 export const FileDetailContent = memo(
   ({
     sha256,
+    name = null,
     sid = null,
     metadata = null,
     liveResultKeys = null,
@@ -71,14 +68,12 @@ export const FileDetailContent = memo(
   }: FileDetailPageProps) => {
     const { t } = useTranslation(['fileDetail']);
     const theme = useTheme();
-    const location = useLocation();
-    const navigate = useNavigate();
+    const navigate = useAppNavigate();
     const { apiCall } = useMyAPI();
     const { c12nDef, configuration, settings } = useALContext();
     const { user: currentUser } = useAppUser<CustomUser>();
     const { showSuccessMessage } = useMySnackbar();
     const { addInsight, removeInsight } = useAssistant();
-    const { setGlobalDrawer, globalDrawerOpened } = useDrawer();
 
     const [file, setFile] = useState<File | null>(null);
     const [safelistDialog, setSafelistDialog] = useState<boolean>(false);
@@ -88,12 +83,6 @@ export const FileDetailContent = memo(
     const [waitingDialog, setWaitingDialog] = useState<boolean>(false);
     const [resubmitAnchor, setResubmitAnchor] = useState(null);
     const [promotedSections, setPromotedSections] = useState([]);
-    const [insideDrawer, setInsideDrawer] = useState<boolean>(null);
-    const [loaded, setLoaded] = useState<boolean>(false);
-    const [heuristics, setHeuristics] = useState<string[]>([]);
-
-    const ref = useRef(null);
-
     const sp2 = useMemo(() => theme.spacing(2), [theme]);
     const sp4 = useMemo(() => theme.spacing(4), [theme]);
 
@@ -107,15 +96,7 @@ export const FileDetailContent = memo(
       return profileMap;
     }, [configuration]);
 
-    const params = useMemo(() => new URLSearchParams(location.search), [location.search]);
-    const fileName = useMemo(() => (file ? params.get('name') || sha256 : null), [file, params, sha256]);
-
-    const fileViewerPath = useMemo<string>(() => {
-      const tab = TAB_OPTIONS.find(option => location.pathname.indexOf(option) >= 0);
-      if (!location.pathname.startsWith('/file/viewer') || !tab)
-        return `/file/viewer/${file?.file_info?.sha256}/${DEFAULT_TAB}/${location.search}${location.hash}`;
-      else return `/file/viewer/${file?.file_info?.sha256}/${tab}/${location.search}${location.hash}`;
-    }, [file?.file_info?.sha256, location.hash, location.pathname, location.search]);
+    const fileName = useMemo(() => (file ? name || sha256 : null), [file, name, sha256]);
 
     const patchFileDetails = (data: File) => {
       const newData = { ...data };
@@ -124,14 +105,6 @@ export const FileDetailContent = memo(
       newData.results = data.results.filter(result => !emptyResult(result));
       newData.errors = liveErrors ? [...data.errors, ...liveErrors] : data.errors;
 
-      // Compile a simplified list of heuristics for later reference
-      const heurs = [];
-      Object.values(newData?.heuristics || {}).map(hs => {
-        hs.map(h => {
-          heurs.push(h[0]);
-        });
-      });
-      setHeuristics(heurs);
       return newData;
     };
 
@@ -143,7 +116,10 @@ export const FileDetailContent = memo(
           onSuccess: api_data => {
             showSuccessMessage(t('resubmit.success'));
             setTimeout(() => {
-              navigate(`/submission/detail/${api_data.api_response.sid}`);
+              navigate.here().update({
+                route: '/submission/detail/:id',
+                path: { id: api_data.api_response.sid }
+              });
             }, 500);
           }
         });
@@ -320,36 +296,8 @@ export const FileDetailContent = memo(
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [file]);
 
-    useEffect(() => {
-      setInsideDrawer(document.getElementById('drawerContent')?.contains(ref.current) || false);
-    }, [file]);
-
-    useEffect(() => {
-      if (insideDrawer === false) {
-        setLoaded(true);
-        if (!location.hash) {
-          setGlobalDrawer(null);
-        } else if (file) {
-          // Set the drawer content based on the hash
-          const id = location.hash.slice(1);
-          if (heuristics.includes(id)) {
-            setGlobalDrawer(<ManageHeuristicDetailPage heur_id={id} />);
-          } else {
-            setGlobalDrawer(<ManageSignatureDetailPage signature_id={id} />);
-          }
-        }
-      }
-    }, [insideDrawer, location.hash, setGlobalDrawer, file]);
-
-    useEffect(() => {
-      if (loaded && insideDrawer === false && !globalDrawerOpened && location.hash) {
-        navigate(`${location.pathname}${location.search ? location.search : ''}`);
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [insideDrawer, globalDrawerOpened]);
-
     return currentUser.roles.includes('submission_view') ? (
-      <div id="fileDetailTop" ref={ref} style={{ textAlign: 'left' }}>
+      <div id="fileDetailTop" style={{ textAlign: 'left' }}>
         <InputDialog
           open={safelistDialog}
           handleClose={() => setSafelistDialog(false)}
@@ -404,14 +352,22 @@ export const FileDetailContent = memo(
           actions={
             <>
               <IconButton
-                component={Link}
+                component={AppLink}
                 loading={!file}
                 size="large"
-                to={
+                nav={
                   !file
                     ? null
-                    : `/search/submission?query=files.sha256:${file.file_info.sha256} OR results:${file.file_info.sha256}* OR errors:${file.file_info.sha256}*`
+                    : nav =>
+                        nav.to().create({
+                          route: '/search/:index',
+                          path: { index: 'submission' },
+                          search: {
+                            query: `files.sha256:${file.file_info.sha256} OR results:${file.file_info.sha256}* OR errors:${file.file_info.sha256}*`
+                          }
+                        })
                 }
+                navDeps={[file?.file_info?.sha256]}
                 tooltip={t('related')}
               >
                 <ViewCarouselOutlinedIcon />
@@ -427,10 +383,19 @@ export const FileDetailContent = memo(
                 tooltip={t('download')}
               />
               <IconButton
-                component={Link}
+                component={AppLink}
                 loading={!file}
                 size="large"
-                to={fileViewerPath}
+                nav={
+                  !file
+                    ? null
+                    : nav =>
+                        nav.to().create({
+                          route: '/file/viewer/:id/:tab',
+                          path: { id: file.file_info.sha256, tab: DEFAULT_TAB }
+                        })
+                }
+                navDeps={[file?.file_info?.sha256]}
                 tooltip={t('file_viewer')}
                 preventRender={
                   !currentUser.roles.includes('file_detail') ||
@@ -469,15 +434,19 @@ export const FileDetailContent = memo(
                 >
                   <List disablePadding>
                     <ListItemButton
-                      component={Link}
-                      to={`/submit?hash=${file.file_info.sha256}`}
-                      state={{
-                        c12n: file.file_info.classification,
-                        metadata: metadata,
-                        params: {
-                          filetype_override: filetype_override
-                        }
-                      }}
+                      component={AppLink}
+                      nav={nav =>
+                        nav.to().create({
+                          route: '/submit',
+                          search: {
+                            hash: file.file_info.sha256,
+                            classification: file.file_info.classification,
+                            metadata,
+                            filetypeOverride: filetype_override
+                          }
+                        })
+                      }
+                      navDeps={[file.file_info.sha256, file.file_info.classification, metadata, filetype_override]}
                       dense
                       onClick={() => setResubmitAnchor(null)}
                     >
@@ -567,12 +536,22 @@ type ParamProps = {
 };
 
 export const FileDetailPage = memo(() => {
-  const { id } = useParams<ParamProps>();
+  const { id } = useAppPathParams<'/file/detail/:id'>();
+  const search = useAppSearchSnapshot<'/file/detail/:id'>();
   const { user: currentUser } = useAppUser<CustomUser>();
 
   return currentUser.roles.includes('submission_view') ? (
     <PageCenter margin={4} width="100%">
-      <FileDetailContent sha256={id} />
+      <FileDetailContent
+        sha256={id}
+        name={search?.get('name')}
+        sid={search?.get('sid')}
+        metadata={search?.get('metadata')}
+        liveResultKeys={search?.get('liveResultKeys')}
+        liveErrors={search?.get('liveErrors')}
+        force={search?.get('force')}
+        filetype_override={search?.get('filetypeOverride')}
+      />
     </PageCenter>
   ) : (
     <ForbiddenPage />

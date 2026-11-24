@@ -13,7 +13,6 @@ import PageContainer from 'core/template/branding/AppPageContainer';
 import Throttler from 'deprecated/components/utils/throttler';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
 import Classification from 'ui/Classification';
 import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow, LinkRow } from 'ui/DivTable';
 
@@ -335,8 +334,7 @@ const WrappedEnhancedTableBody: React.FC<EnhancedTableBodyProps> = ({
                     <LinkRow
                       key={index}
                       hover
-                      component={Link}
-                      to={`${linkPrefix}${row[linkField]}`}
+                      nav={nav => nav.to().create(`${linkPrefix}${row[linkField]}`)}
                       onClick={
                         onClick
                           ? event => {

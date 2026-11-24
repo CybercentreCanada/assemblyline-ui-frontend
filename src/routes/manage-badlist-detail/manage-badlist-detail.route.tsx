@@ -11,14 +11,13 @@ import { useALQuery } from 'core/api/hooks/useAppQuery';
 import { invalidateALQuery } from 'core/api/utils/invalidateAppQuery';
 import { updateALQuery } from 'core/api/utils/updateAppQuery';
 import useALContext from 'core/config/useALContext';
-import { createAppRoute } from 'core/router';
+import { createAppRoute, useAppNavigate, useAppPathParams } from 'core/router';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import PageCenter from 'core/template/components/pages/PageCenter';
 import type { Badlist } from 'models/base/badlist';
 import { ATTRIBUTION_TYPES, DEFAULT_TEMP_ATTRIBUTION } from 'models/base/badlist';
 import { memo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router';
 import { ForbiddenPage } from 'routes/forbidden/forbidden.page';
 import { bytesToSize, safeFieldValue, safeFieldValueURI } from 'shared/utils/utils';
 import { IconButton } from 'ui/buttons/IconButton';
@@ -44,8 +43,8 @@ export const ManageBadlistDetailPage = memo(
   ({ badlist_id = null, close = () => null }: ManageBadlistDetailPageProps) => {
     const { t } = useTranslation(['manageBadlistDetail']);
     const theme = useTheme();
-    const navigate = useNavigate();
-    const { id } = useParams<ParamProps>();
+    const navigate = useAppNavigate<'/manage/badlist/detail/:id'>();
+    const { id } = useAppPathParams<'/manage/badlist/detail/:id'>();
     const { showSuccessMessage } = useMySnackbar();
     const { user: currentUser, c12nDef } = useALContext();
 
@@ -90,7 +89,7 @@ export const ManageBadlistDetailPage = memo(
         setDeleteDialog(false);
         showSuccessMessage(t('delete.success'));
         invalidateALQuery({ url: '/api/v4/search/badlist/' }, 1000);
-        if (id) setTimeout(() => navigate('/manage/badlist'), 1000);
+        if (id) setTimeout(() => navigate.here().closePanel({ route: '/manage/badlists' }), 1000);
         close();
       }
     }));

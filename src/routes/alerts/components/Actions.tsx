@@ -25,17 +25,16 @@ import {
   useTheme
 } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
+import type { InferAppNavigationPropsFromPath } from 'core/router';
+import { AppLink, useAppSearchSnapshot } from 'core/router';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import { useAppUser } from 'core/template/components/app/hooks';
-import type { To } from 'history';
 import type { CustomUser } from 'models/api/user';
 import type { AlertItem } from 'models/base/alert';
 import type { CSSProperties } from 'react';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
-import { useLocation } from 'react-router';
-import { Link } from 'react-router-dom';
 import type { AlertSearchParams } from 'routes/alerts/alerts.route';
 import { AlertEventsTable } from 'routes/alerts/components/Components';
 import AlertFiltersSelected from 'routes/alerts/components/FiltersSelected';
@@ -45,7 +44,7 @@ import type { SearchResult } from 'routes/alerts/utils/SearchParser';
 import { getValueFromPath } from 'shared/utils/utils';
 import ConfirmationDialog from 'ui/ConfirmationDialog';
 
-type AlertActionButtonProps = {
+type AlertActionButtonProps = InferAppNavigationPropsFromPath<AppRoute['path']> & {
   authorized?: boolean;
   color?: CSSProperties['color'];
   disabled?: boolean;
@@ -55,7 +54,6 @@ type AlertActionButtonProps = {
   permanent?: boolean;
   showSkeleton?: boolean;
   speedDial?: boolean;
-  to?: To;
   tooltipTitle?: string;
   vertical?: boolean;
   onClick?: React.MouseEventHandler;
@@ -72,15 +70,23 @@ const AlertActionButton: React.FC<AlertActionButtonProps> = React.memo(
     permanent = false,
     showSkeleton = false,
     speedDial = false,
-    to = null,
+    nav: navProp = null,
+    navDeps: navDepsProp = null,
     tooltipTitle = '',
     vertical = false,
     onClick = () => null
   }: AlertActionButtonProps) => {
     const theme = useTheme();
 
-    const Wrapper = useCallback<React.FC<{ children: React.ReactNode; href: To }>>(
-      ({ children, href }) => (href ? <Link to={href}>{children}</Link> : <div>{children}</div>),
+    const Wrapper = useCallback<React.FC<React.PropsWithChildren<InferAppNavigationPropsFromPath<AppRoute['path']>>>>(
+      ({ children, nav, navDeps }) =>
+        nav ? (
+          <AppLink nav={nav} navDeps={navDeps}>
+            {children}
+          </AppLink>
+        ) : (
+          <div>{children}</div>
+        ),
       []
     );
 
@@ -89,7 +95,7 @@ const AlertActionButton: React.FC<AlertActionButtonProps> = React.memo(
     else if (!authorized) return null;
     else if (speedDial)
       return (
-        <Wrapper href={to}>
+        <Wrapper {...(!navProp ? null : { nav: navProp, navDeps: navDepsProp })}>
           <SpeedDialAction
             icon={
               <>
@@ -119,7 +125,8 @@ const AlertActionButton: React.FC<AlertActionButtonProps> = React.memo(
         <Tooltip title={tooltipTitle}>
           <span>
             <IconButton
-              href={!to ? null : typeof to === 'string' ? to : `${to.pathname}${to.search}${to.hash}`}
+              nav={navProp}
+              navDeps={navDepsProp}
               disabled={disabled || loading}
               size="large"
               onClick={disabled || loading ? null : onClick}
@@ -391,7 +398,8 @@ export const AlertSubmission: React.FC<AlertActionProps> = React.memo(
     return (
       <AlertActionButton
         tooltipTitle={t('submission')}
-        to={`/submission/${alert?.sid}`}
+        nav={nav => nav.to().create({ route: '/submission/:id', path: { id: alert.sid } })}
+        navDeps={[alert?.sid]}
         open={open}
         vertical={vertical}
         permanent={permanent}
@@ -636,7 +644,7 @@ type Props = {
 const WrappedAlertActions = ({ alert, inDrawer = false }: Props) => {
   const { t } = useTranslation('alerts');
   const theme = useTheme();
-  const location = useLocation();
+  const search = useAppSearchSnapshot<'/alerts'>();
   const { user: currentUser } = useAppUser<CustomUser>();
 
   const [open, setOpen] = useState<boolean>(false);
@@ -658,11 +666,11 @@ const WrappedAlertActions = ({ alert, inDrawer = false }: Props) => {
   }, []);
 
   useEffect(() => {
-    if (location.search !== prevSearch.current) {
+    if (search.toString() !== prevSearch.current) {
       setOpen(false);
-      prevSearch.current = location.search;
+      prevSearch.current = search.toString();
     }
-  }, [location.search]);
+  }, [search?.toString()]);
 
   if (
     !currentUser.roles.includes('submission_view') &&

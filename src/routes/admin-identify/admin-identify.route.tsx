@@ -2,14 +2,13 @@ import { loader } from '@monaco-editor/react';
 import FindInPageOutlinedIcon from '@mui/icons-material/FindInPageOutlined';
 import { Alert, Box, Grid, Paper, styled, Tab, Tabs, Typography, useTheme } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
-import { createAppRoute } from 'core/router';
+import { AppNavigate, createAppRoute } from 'core/router';
 import PageFullSize from 'core/template/branding/AppPageCenter';
 import { useAppUser } from 'core/template/components/app/hooks';
 import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
 import type { CustomUser } from 'models/api/user';
 import { memo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate } from 'react-router';
 import LibMagic from 'routes/admin-identify/components/libmagic';
 import Mimes from 'routes/admin-identify/components/mimes';
 import Patterns from 'routes/admin-identify/components/patterns';
@@ -187,7 +186,7 @@ export const AdminIdentifyPage = memo(() => {
       </div>
     </PageFullSize>
   ) : (
-    <Navigate to="/forbidden" replace />
+    <AppNavigate nav={nav => nav.here<'/forbidden'>({ replace: true }).update({ route: '/forbidden' })} />
   );
 });
 

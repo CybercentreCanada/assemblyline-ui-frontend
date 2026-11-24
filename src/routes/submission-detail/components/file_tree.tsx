@@ -4,13 +4,12 @@ import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { Box, Button, Collapse, Divider, IconButton, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
+import { AppLink } from 'core/router';
 import useHighlighter from 'layout/highlighter/highlighter.hooks';
 import useSafeResults from 'layout/safe-results/safe-results.hooks';
 import type { SubmissionTree, Tree } from 'models/api/submission';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
-import { Link } from 'react-router-dom';
 import Verdict from 'ui/Verdict';
 
 const MAX_FILE_COUNT = 500;
@@ -113,7 +112,6 @@ const WrappedFileTree: React.FC<FileTreeProps> = ({
 }) => {
   const { t } = useTranslation(['submissionDetail']);
   const theme = useTheme();
-  const navigate = useNavigate();
   const { isHighlighted } = useHighlighter();
   const { showSafeResults } = useSafeResults();
 
@@ -171,13 +169,17 @@ const WrappedFileTree: React.FC<FileTreeProps> = ({
               <span style={{ marginLeft: theme.spacing(3) }} />
             )}
             <Box
-              component={item.sha256 ? Link : 'span'}
-              to={`/file/detail/${item.sha256}`}
-              onClick={e => {
-                e.preventDefault();
-                if (item.sha256)
-                  navigate(`/submission/detail/${sid}/${item.sha256}?name=${encodeURIComponent(item.name[0])}`);
-              }}
+              {...(!item?.sha256
+                ? { component: 'span' }
+                : {
+                    component: AppLink,
+                    nav: nav =>
+                      nav.to().create({
+                        route: '/file/detail/:id',
+                        path: { id: item.sha256 },
+                        search: { name: item.name[0] }
+                      })
+                  })}
               sx={{
                 cursor: 'pointer',
                 flexGrow: 1,

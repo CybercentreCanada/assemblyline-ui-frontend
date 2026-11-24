@@ -1,10 +1,9 @@
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import useALContext from 'core/config/useALContext';
-import { createAppRoute } from 'core/router';
+import { createAppRoute, useAppPathParams } from 'core/router';
 import { TableOfContentLayout } from 'features/table-of-content';
 import { useTableOfContent } from 'features/table-of-content/table-of-content.providers';
 import { memo, useCallback, useEffect } from 'react';
-import { useParams } from 'react-router';
 import { ForbiddenPage } from 'routes/forbidden/forbidden.page';
 import { DefaultMetadataSection } from 'routes/settings/components/DefaultMetadata';
 import { ExternalSourcesSection } from 'routes/settings/components/ExternalSources';
@@ -26,7 +25,7 @@ type Params = {
 export const SettingsContent = memo(() => {
   const form = useForm();
   const { rootRef, headerRef } = useTableOfContent();
-  const { tab: tabParam } = useParams<Params>();
+  const { tab: tabParam } = useAppPathParams<'/settings/:tab'>();
   const { user: currentUser, configuration, settings } = useALContext();
 
   const handleProfileChange = useCallback(() => {

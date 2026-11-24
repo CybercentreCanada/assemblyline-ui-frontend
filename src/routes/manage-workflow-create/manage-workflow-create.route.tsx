@@ -5,7 +5,7 @@ import { Grid, useTheme } from '@mui/material';
 import { useAPIMutation } from 'core/api/hooks/useApiMutation';
 import { useAPIQuery } from 'core/api/hooks/useApiQuery';
 import useALContext from 'core/config/useALContext';
-import { createAppRoute } from 'core/router';
+import { createAppRoute, useAppPathParams } from 'core/router';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import PageCenter from 'core/template/components/pages/PageCenter';
 import _ from 'lodash';
@@ -15,7 +15,6 @@ import type { Priority, Status, Workflow } from 'models/base/workflow';
 import { LABELS, PRIORITIES, STATUSES } from 'models/base/workflow';
 import { memo, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useParams } from 'react-router';
 import { ForbiddenPage } from 'routes/forbidden/forbidden.page';
 import { IconButton } from 'ui/buttons/IconButton';
 import Classification from 'ui/Classification';
@@ -38,9 +37,8 @@ export type ManageWorkflowCreatePageProps = {
 export const ManageWorkflowCreatePage = memo(
   ({ id: propID = null, onClose = () => null }: ManageWorkflowCreatePageProps) => {
     const { t } = useTranslation(['manageWorkflowDetail']);
-    const { id: paramID } = useParams<Params>();
+    const paramID = useAppPathParams<'/manage/workflow/create/:id' | '/manage/workflow/create'>()?.id;
     const theme = useTheme();
-    const location = useLocation();
     const { c12nDef, configuration, user: currentUser } = useALContext();
     const { showSuccessMessage, showErrorMessage } = useMySnackbar();
 

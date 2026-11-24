@@ -244,7 +244,6 @@ export const toRouteTableRow = (route: AppRoute, configuration: Configuration): 
   const mockLocation = createMockRouteLocation(route) as never;
 
   return {
-    route,
     path: route.path,
     ancestor: route.ancestor ?? '—',
     shortNameEN: formatRouteName(route.shortname?.(mockLocation, configuration as never), 'en'),

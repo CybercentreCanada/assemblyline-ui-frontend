@@ -1,7 +1,7 @@
 import KeyOutlinedIcon from '@mui/icons-material/KeyOutlined';
 import { Backdrop, Button, Typography, useTheme } from '@mui/material';
 import useALContext from 'core/config/useALContext';
-import { createAppRoute } from 'core/router';
+import { createAppRoute, useAppNavigate, useAppSearchSnapshot } from 'core/router';
 import PageCardCentered from 'core/template/branding/AppPageCardCentered';
 import { useAppUser } from 'core/template/components/app/hooks';
 import useAppBannerVert from 'core/template/components/app/hooks/useAppBannerVert';
@@ -10,21 +10,20 @@ import type { Role, Scope } from 'models/base/user';
 import { SCOPES } from 'models/base/user';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router';
 import getXSRFCookie from 'shared/utils/xsrf';
 
 const VALID_SCOPES: Omit<Scope, 'c'>[] = SCOPES.filter(s => s !== 'c');
 
 export const AuthorizePage = memo(() => {
-  const location = useLocation();
-  const navigate = useNavigate();
+  const navigate = useAppNavigate<'/authorize'>();
+  const search = useAppSearchSnapshot<'/authorize'>();
   const { t } = useTranslation(['authorize']);
   const theme = useTheme();
   const banner = useAppBannerVert();
   const { user: currentUser } = useAppUser<CustomUser>();
   const { configuration } = useALContext();
 
-  const params = new URLSearchParams(location.search);
+  const params = search.toParams();
   const rUrl = params.get('redirect_url');
   const clientID = params.get('client_id');
   const scope = params.get('scope');
@@ -44,14 +43,14 @@ export const AuthorizePage = memo(() => {
           {!currentUser.roles.includes('obo_access') ? (
             <>
               <Typography style={{ marginBottom: '3rem' }}>{t('forbidden')}</Typography>
-              <Button variant="contained" color="primary" onClick={() => navigate(-1)}>
+              <Button variant="contained" color="primary" onClick={() => navigate.here().closePanel({ route: '/' })}>
                 {t('button.back')}
               </Button>
             </>
           ) : !rUrl || !clientID || (!scope && !roles) || !server || (scope && VALID_SCOPES.indexOf(scope) === -1) ? (
             <>
               <div style={{ marginBottom: '3rem' }}>{t('invalid')}</div>
-              <Button variant="contained" color="primary" onClick={() => navigate(-1)}>
+              <Button variant="contained" color="primary" onClick={() => navigate.here().closePanel({ route: '/' })}>
                 {t('button.back')}
               </Button>
             </>
@@ -102,7 +101,7 @@ export const AuthorizePage = memo(() => {
                 <Button
                   variant="contained"
                   color="primary"
-                  href={`/api/v4/auth/obo_token/?XSRF_TOKEN=${getXSRFCookie()}&${location.search.substring(1)}`}
+                  href={`/api/v4/auth/obo_token/?XSRF_TOKEN=${getXSRFCookie()}&${search.toParams().toString()}`}
                 >
                   {t('button.allow')}
                 </Button>

@@ -14,13 +14,12 @@ import {
 } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
-import { createAppRoute } from 'core/router';
+import { createAppRoute, useAppNavigate, useAppPathParams } from 'core/router';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import PageCenter from 'core/template/components/pages/PageCenter';
 import { type ApiKey } from 'models/base/user';
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router';
 import { ForbiddenPage } from 'routes/forbidden/forbidden.page';
 import { useAPIKeyUtilities } from 'routes/user/components/api_keys';
 import { IconButton } from 'ui/buttons/IconButton';
@@ -42,12 +41,12 @@ export type AdminAPIKeyDetailPageProps = {
 
 export const AdminAPIKeyDetailPage = memo(({ key_id = null, onClose = () => null }: AdminAPIKeyDetailPageProps) => {
   const { t } = useTranslation(['adminAPIkeys']);
-  const navigate = useNavigate();
+  const navigate = useAppNavigate<'/admin/apikeys/:id'>();
   const theme = useTheme();
   const { apiCall } = useMyAPI();
   const { configuration, user: currentUser } = useALContext();
   const { selectACL, toggleRole } = useAPIKeyUtilities();
-  const { id } = useParams<ParamProps>();
+  const { id } = useAppPathParams<'/admin/apikeys/:id'>();
   const { showSuccessMessage } = useMySnackbar();
 
   const [apiKey, setApiKey] = useState<ApiKey>(null);
@@ -78,7 +77,7 @@ export const AdminAPIKeyDetailPage = memo(({ key_id = null, onClose = () => null
       onSuccess: () => {
         setDeleteDialog(false);
         showSuccessMessage(t('delete.success'));
-        if (id || key_id) setTimeout(() => navigate('/admin/apikeys'), 1000);
+        if (id || key_id) setTimeout(() => navigate.here().closePanel({ route: '/admin/apikeys' }), 1000);
         onClose();
       },
       onEnter: () => {

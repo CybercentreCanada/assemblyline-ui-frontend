@@ -3,6 +3,7 @@ import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import SelectAllOutlinedIcon from '@mui/icons-material/SelectAllOutlined';
 import { Menu, MenuItem } from '@mui/material';
 import useALContext from 'core/config/useALContext';
+import { AppLink } from 'core/router';
 import { useAppUser } from 'core/template/components/app/hooks';
 import useClipboard from 'layout/clipboard/clipboard.hooks';
 import useHighlighter from 'layout/highlighter/highlighter.hooks';
@@ -10,9 +11,8 @@ import useSafeResults from 'layout/safe-results/safe-results.hooks';
 import type { CustomUser } from 'models/api/user';
 import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
 import type { PossibleColor } from 'shared/utils/colors';
-import { safeFieldValueURI } from 'shared/utils/utils';
+import { safeFieldValue } from 'shared/utils/utils';
 import CustomChip from 'ui/CustomChip';
 
 const STYLE = { height: 'auto', minHeight: '20px' };
@@ -100,10 +100,17 @@ const WrappedAttack: React.FC<AttackProps> = ({
         </MenuItem>
         {currentUser.roles.includes('submission_view') && (
           <MenuItem
-            component={Link}
+            component={AppLink}
             dense
             onClick={handleClose}
-            to={`/search/result?query=result.sections.heuristic.attack.pattern:${safeFieldValueURI(text)}`}
+            nav={nav =>
+              nav.to().create({
+                route: '/search/:index',
+                path: { index: 'result' },
+                search: { query: `result.sections.heuristic.attack.pattern:${safeFieldValue(text)}` }
+              })
+            }
+            navDeps={[text]}
           >
             {SEARCH_ICON}
             {t('related')}

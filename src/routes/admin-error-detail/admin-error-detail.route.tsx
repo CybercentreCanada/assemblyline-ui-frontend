@@ -7,7 +7,7 @@ import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined
 import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
 import { Card, Grid, IconButton, styled, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
-import { createAppRoute } from 'core/router';
+import { AppLink, AppNavigate, createAppRoute, useAppPathParams } from 'core/router';
 import { useAppUser } from 'core/template/components/app/hooks';
 import PageCenter from 'core/template/components/pages/PageCenter';
 import useClipboard from 'layout/clipboard/clipboard.hooks';
@@ -17,9 +17,7 @@ import type { ReactElement } from 'react';
 import { memo, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BsClipboard } from 'react-icons/bs';
-import { Navigate, useLocation, useParams } from 'react-router';
-import { Link } from 'react-router-dom';
-import { DEFAULT_TAB, TAB_OPTIONS } from 'routes/file-viewer/file-viewer.route';
+import { DEFAULT_TAB } from 'routes/file-viewer/file-viewer.route';
 import { FileDownloader } from 'ui/buttons/FileDownloader';
 import Moment from 'ui/Moment';
 
@@ -35,13 +33,6 @@ interface Error extends ErrorModel {
   key: string;
 }
 
-type ParamProps = {
-  key?: string;
-  type?: string;
-  source?: string;
-  name?: string;
-};
-
 export type AdminErrorDetailPageProps = {
   error_key?: string;
 };
@@ -52,8 +43,7 @@ export const AdminErrorDetailPage = memo(({ error_key = null }: AdminErrorDetail
   const { copy } = useClipboard();
   const [error, setError] = useState<Error>(null);
   const { apiCall } = useMyAPI();
-  const location = useLocation();
-  const { key, type, source, name } = useParams<ParamProps>();
+  const key = error_key || useAppPathParams<'/admin/errors/:id'>()?.id;
   const { user: currentUser } = useAppUser<CustomUser>();
   const downSM = useMediaQuery(theme.breakpoints.down('md'));
 
@@ -77,27 +67,20 @@ export const AdminErrorDetailPage = memo(({ error_key = null }: AdminErrorDetail
     };
   }, [error?.severity, theme.palette.action.active, theme.palette.error.main, theme.palette.warning.main]);
 
-  const fileViewerPath = useMemo<string>(() => {
-    const tab = TAB_OPTIONS.find(option => location.pathname.indexOf(option) >= 0);
-    if (!location.pathname.startsWith('/file/viewer') || !tab)
-      return `/file/viewer/${error?.sha256}/${DEFAULT_TAB}/${location.search}${location.hash}`;
-    else return `/file/viewer/${error?.sha256}/${tab}/${location.search}${location.hash}`;
-  }, [error?.sha256, location.hash, location.pathname, location.search]);
-
   useEffect(() => {
-    if ((error_key || key) && currentUser.is_admin) {
+    if (key && currentUser.is_admin) {
       apiCall<Error>({
-        url: `/api/v4/error/${encodeURIComponent(error_key || key)}/`,
+        url: `/api/v4/error/${encodeURIComponent(key)}/`,
         onSuccess: api_data => {
-          setError({ key: error_key || key, ...api_data.api_response });
+          setError({ key, ...api_data.api_response });
         }
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [error_key, key]);
+  }, [key]);
 
   return currentUser.is_admin ? (
-    <PageCenter margin={!key && !type && !name && !source ? 2 : 4} width="100%">
+    <PageCenter margin={!key ? 2 : 4} width="100%">
       {error && (
         <div
           style={{
@@ -148,15 +131,29 @@ export const AdminErrorDetailPage = memo(({ error_key = null }: AdminErrorDetail
               <div style={{ display: 'flex', marginBottom: theme.spacing(1), justifyContent: 'flex-end' }}>
                 <Tooltip title={t('related')}>
                   <IconButton
-                    component={Link}
-                    to={`/search/submission?query=files.sha256:${error.sha256} OR results:${error.sha256}* OR errors:${error.sha256}*`}
+                    component={AppLink}
+                    nav={nav =>
+                      nav.to().create({
+                        route: '/search/:index',
+                        path: { index: 'submission' },
+                        search: {
+                          query: `files.sha256:${error.sha256} OR results:${error.sha256}* OR errors:${error.sha256}*`
+                        }
+                      })
+                    }
+                    navDeps={[error.sha256]}
                     size="large"
                   >
                     <ViewCarouselOutlinedIcon />
                   </IconButton>
                 </Tooltip>
                 <Tooltip title={t('detail')}>
-                  <IconButton component={Link} to={`/file/detail/${error.sha256}`} size="large">
+                  <IconButton
+                    component={AppLink}
+                    nav={nav => nav.to().create({ route: '/file/detail/:id', path: { id: error.sha256 } })}
+                    navDeps={[error.sha256]}
+                    size="large"
+                  >
                     <DescriptionOutlinedIcon />
                   </IconButton>
                 </Tooltip>
@@ -165,7 +162,14 @@ export const AdminErrorDetailPage = memo(({ error_key = null }: AdminErrorDetail
                   tooltip={t('download')}
                 />
                 <Tooltip title={t('file_viewer')}>
-                  <IconButton component={Link} to={fileViewerPath} size="large">
+                  <IconButton
+                    component={AppLink}
+                    nav={nav =>
+                      nav.to().create({ route: '/file/viewer/:id/:tab', path: { id: error.sha256, tab: DEFAULT_TAB } })
+                    }
+                    navDeps={[error.sha256]}
+                    size="large"
+                  >
                     <PageviewOutlinedIcon />
                   </IconButton>
                 </Tooltip>
@@ -210,7 +214,7 @@ export const AdminErrorDetailPage = memo(({ error_key = null }: AdminErrorDetail
       )}
     </PageCenter>
   ) : (
-    <Navigate to="/forbidden" replace />
+    <AppNavigate nav={nav => nav.here<'/forbidden'>({ replace: true }).update({ route: '/forbidden' })} />
   );
 });
 

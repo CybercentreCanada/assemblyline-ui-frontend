@@ -6,7 +6,7 @@ import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { Button, CircularProgress, Paper, Skeleton, Tab, useTheme } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
-import { createAppRoute } from 'core/router';
+import { AppNavigate, createAppRoute, useAppNavigate, useAppPathParams } from 'core/router';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import PageCenter from 'core/template/components/pages/PageCenter';
 import type { JSONFeedItem } from 'layout/notifications/notifications.hooks';
@@ -14,7 +14,6 @@ import { useNotificationFeed } from 'layout/notifications/notifications.hooks';
 import type { ServiceConstants, Service as ServiceData } from 'models/base/service';
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate, useNavigate, useParams } from 'react-router';
 import ServiceContainer from 'routes/admin-service-detail/components/container';
 import ServiceGeneral from 'routes/admin-service-detail/components/general';
 import ServiceParams from 'routes/admin-service-detail/components/parameters';
@@ -43,8 +42,8 @@ export const AdminServiceDetailPage = memo(
   ({ name = null, onDeleted = () => null, onUpdated = () => null }: AdminServiceDetailPageProps) => {
     const { t } = useTranslation(['adminServices']);
     const theme = useTheme();
-    const navigate = useNavigate();
-    const { svc } = useParams<ParamProps>();
+    const navigate = useAppNavigate<'/admin/services/:svc'>();
+    const { svc } = useAppPathParams<'/admin/services/:svc'>();
     const { apiCall } = useMyAPI();
     const { user: currentUser, configuration } = useALContext();
     const { showSuccessMessage } = useMySnackbar();
@@ -109,7 +108,7 @@ export const AdminServiceDetailPage = memo(
         method: 'DELETE',
         onSuccess: () => {
           showSuccessMessage(t('delete.success'));
-          if (svc) setTimeout(() => navigate('/admin/services'), 1000);
+          if (svc) setTimeout(() => navigate.here().closePanel({ route: '/admin/services' }), 1000);
           onDeleted();
         },
         onEnter: () => setButtonLoading(true),
@@ -190,7 +189,7 @@ export const AdminServiceDetailPage = memo(
     }, [configuration?.ui?.services_feed, fetchJSONNotifications, setServiceFeeds]);
 
     return !currentUser.is_admin ? (
-      <Navigate to="/forbidden" replace />
+      <AppNavigate nav={nav => nav.here<'/forbidden'>({ replace: true }).update({ route: '/forbidden' })} />
     ) : (
       <PageCenter margin={!svc ? 2 : 4} width="100%" textAlign="left">
         <ConfirmationDialog

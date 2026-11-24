@@ -4,19 +4,16 @@ import PanToolOutlinedIcon from '@mui/icons-material/PanToolOutlined';
 import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
 import { Grid, Typography, useTheme } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
-import { createAppRoute } from 'core/router';
+import { AppNavigate, createAppRoute } from 'core/router';
 import PageContainer from 'core/template/branding/AppPageContainer';
 import { useAppUser } from 'core/template/components/app/hooks';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
 import { createSearchParams, SearchParamsProvider, useSearchParams } from 'features/search-params';
-import useDrawer from 'layout/drawer/drawer.hooks';
 import type { FacetResult, HistogramResult, SearchResult } from 'models/api/search';
 import type { CustomUser, IndexDefinition } from 'models/api/user';
 import type { Error } from 'models/base/error';
 import { memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate, useLocation, useNavigate } from 'react-router';
-import { AdminErrorDetailPage } from 'routes/admin-error-detail/admin-error-detail.route';
 import ErrorsTable from 'routes/search/components/errors';
 import { safeFieldValue } from 'shared/utils/utils';
 import { DateTimeRangePicker } from 'ui/DateTime/DateTimeRangePicker';
@@ -47,11 +44,8 @@ type ErrorViewerParams = typeof ERROR_VIEWER_PARAMS;
 const AdminErrorViewerContent = memo(() => {
   const { t, i18n } = useTranslation(['adminErrorViewer']);
   const theme = useTheme();
-  const location = useLocation();
-  const navigate = useNavigate();
   const { apiCall } = useMyAPI();
   const { user: currentUser } = useAppUser<CustomUser>();
-  const { globalDrawerOpened, setGlobalDrawer, closeGlobalDrawer } = useDrawer();
   const { search, setSearchParams, setSearchObject } = useSearchParams<ErrorViewerParams>();
 
   const [errorResults, setErrorResults] = useState<SearchResult<Error>>(null);
@@ -60,12 +54,6 @@ const AdminErrorViewerContent = memo(() => {
   const [names, setNames] = useState<FacetResult>(null);
   const [searching, setSearching] = useState<boolean>(false);
   const [suggestions, setSuggestions] = useState<IndexDefinition>(DEFAULT_SUGGESTION);
-
-  const setErrorKey = useCallback(
-    (error_key: string) => navigate(`${location.pathname}${location.search || ''}#${error_key}`),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [location.search]
-  );
 
   const handleToggleFilter = useCallback(
     (filter: string) => {
@@ -163,18 +151,6 @@ const AdminErrorViewerContent = memo(() => {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  useEffect(() => {
-    if (!location.hash || globalDrawerOpened || !errorResults) return;
-    navigate(`${location.pathname}${location.search || ''}`);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [globalDrawerOpened]);
-
-  useEffect(() => {
-    if (location.hash) setGlobalDrawer(<AdminErrorDetailPage error_key={location.hash.substr(1)} />);
-    else closeGlobalDrawer();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location.hash]);
 
   return currentUser.is_admin ? (
     <PageFullWidth margin={4}>
@@ -297,11 +273,11 @@ const AdminErrorViewerContent = memo(() => {
       )}
 
       <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
-        <ErrorsTable errorResults={errorResults} setErrorKey={setErrorKey} />
+        <ErrorsTable errorResults={errorResults} />
       </div>
     </PageFullWidth>
   ) : (
-    <Navigate to="/forbidden" replace />
+    <AppNavigate nav={nav => nav.here<'/forbidden'>({ replace: true }).update({ route: '/forbidden' })} />
   );
 });
 

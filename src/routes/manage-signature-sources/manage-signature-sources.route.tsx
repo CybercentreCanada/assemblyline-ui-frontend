@@ -26,7 +26,7 @@ import {
 } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
-import { createAppRoute } from 'core/router';
+import { AppLink, createAppRoute } from 'core/router';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import { useAppUser } from 'core/template/components/app/hooks';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
@@ -37,7 +37,6 @@ import { DEFAULT_SOURCE } from 'models/base/service';
 import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DiGitBranch } from 'react-icons/di';
-import { Link } from 'react-router-dom';
 import { ForbiddenPage } from 'routes/forbidden/forbidden.page';
 import { SourceDetail } from 'routes/manage-signature-source-detail/manage-signature-source-detail.route';
 import Classification from 'ui/Classification';
@@ -189,10 +188,14 @@ export const SourceDetailDrawer = memo(
                       style={{
                         color: theme.palette.mode === 'dark' ? '#F' : '#0'
                       }}
-                      component={Link}
-                      to={`/manage/signatures/?query=${encodeURIComponent(
-                        `type:${service.toLowerCase()} AND source:${source.name}`
-                      )}`}
+                      component={AppLink}
+                      nav={nav =>
+                        nav.to().create({
+                          route: '/manage/signatures',
+                          search: { query: `type:${service.toLowerCase()} AND source:${source.name}` }
+                        })
+                      }
+                      navDeps={[service, source.name]}
                       size="large"
                     >
                       <FingerprintOutlinedIcon />
@@ -374,10 +377,14 @@ export const SourceCard = memo(
                   {generatesSignatures && (
                     <Tooltip title={t('view_signatures')}>
                       <IconButton
-                        component={Link}
-                        to={`/manage/signatures/?query=${encodeURIComponent(
-                          `type:${service.toLowerCase()} AND source:${source.name}`
-                        )}`}
+                        component={AppLink}
+                        nav={nav =>
+                          nav.to().create({
+                            route: '/manage/signatures',
+                            search: { query: `type:${service.toLowerCase()} AND source:${source.name}` }
+                          })
+                        }
+                        navDeps={[service, source.name]}
                         style={{
                           color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#000000'
                         }}
@@ -568,8 +575,14 @@ export const ServiceDetail = memo(
               {generatesSignatures && (
                 <Tooltip title={t('view_signatures')}>
                   <IconButton
-                    component={Link}
-                    to={`/manage/signatures/?query=${encodeURIComponent(`type:${service.toLowerCase()}`)}`}
+                    component={AppLink}
+                    nav={nav =>
+                      nav.to().create({
+                        route: '/manage/signatures',
+                        search: { query: `type:${service.toLowerCase()}` }
+                      })
+                    }
+                    navDeps={[service]}
                     style={{
                       color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#000000'
                     }}

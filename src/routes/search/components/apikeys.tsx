@@ -6,7 +6,6 @@ import type { SearchResult } from 'models/api/search';
 import type { ApiKey, Role } from 'models/base/user';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
 import CustomChip from 'ui/CustomChip';
 import {
   DivTable,
@@ -57,10 +56,9 @@ const RolesCustomChips = ({ roles }: RolesChipProps) => {
 
 type ApiTableProps = {
   apikeySearchResults: SearchResult<ApiKey>;
-  setApikeyID?: (id: string) => void;
 };
 
-const WrappedUsersApiTable: React.FC<ApiTableProps> = ({ apikeySearchResults, setApikeyID = null }) => {
+const WrappedUsersApiTable: React.FC<ApiTableProps> = ({ apikeySearchResults }) => {
   const { t } = useTranslation(['adminAPIkeys']);
 
   return !apikeySearchResults ? (
@@ -92,14 +90,8 @@ const WrappedUsersApiTable: React.FC<ApiTableProps> = ({ apikeySearchResults, se
             <LinkRow
               key={`${userApikey.id}-${i}`}
               hover
-              component={Link}
-              to={`/admin/apikeys/${userApikey.id}`}
-              onClick={event => {
-                if (setApikeyID) {
-                  event.preventDefault();
-                  setApikeyID(userApikey.id);
-                }
-              }}
+              nav={nav => nav.to().create({ route: '/admin/apikeys/:id', path: { id: userApikey.id } })}
+              navDeps={[userApikey.id]}
               sx={{ textDecoration: 'none' }}
             >
               <DivTableCell>{userApikey.uname}</DivTableCell>

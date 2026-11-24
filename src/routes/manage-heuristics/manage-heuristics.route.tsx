@@ -3,45 +3,28 @@ import { useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
-import { createAppRoute } from 'core/router';
+import { createAppRoute, useAppNavigate, useAppSearchSnapshot } from 'core/router';
 import PageContainer from 'core/template/branding/AppPageContainer';
 import { useAppUser } from 'core/template/components/app/hooks';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
-import { createSearchParams, SearchParamsProvider, useSearchParams } from 'features/search-params';
-import useDrawer from 'layout/drawer/drawer.hooks';
 import type { SearchResult } from 'models/api/search';
 import type { CustomUser, IndexDefinition } from 'models/api/user';
 import type { Heuristic } from 'models/base/heuristic';
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router';
 import { ForbiddenPage } from 'routes/forbidden/forbidden.page';
-import { ManageHeuristicDetailPage } from 'routes/manage-heuristic-detail/manage-heuristic-detail.route';
 import HeuristicsTable from 'routes/search/components/heuristics';
 import SearchHeader from 'ui/SearchBar/SearchHeader';
 import { DEFAULT_SUGGESTION } from 'ui/SearchBar/search-textfield';
 
-const HEURISTICS_PARAMS = createSearchParams(p => ({
-  query: p.string(''),
-  offset: p.number(0).min(0).source('transient').ephemeral(),
-  rows: p.number(25).locked().source('transient').ephemeral(),
-  sort: p.string('heur_id asc').ephemeral(),
-  filters: p.filters([]),
-  track_total_hits: p.number(10000).nullable().ephemeral()
-}));
-
-type HeuristicsParams = typeof HEURISTICS_PARAMS;
-
 export const ManageHeuristicsContent = memo(() => {
   const { t } = useTranslation(['manageHeuristics']);
   const theme = useTheme();
-  const location = useLocation();
-  const navigate = useNavigate();
+  const navigate = useAppNavigate<'/manage/heuristics'>();
+  const search = useAppSearchSnapshot<'/manage/heuristics'>();
   const { apiCall } = useMyAPI();
   const { indexes } = useALContext();
   const { user: currentUser } = useAppUser<CustomUser>();
-  const { globalDrawerOpened, setGlobalDrawer, closeGlobalDrawer } = useDrawer();
-  const { search, setSearchParams } = useSearchParams<HeuristicsParams>();
 
   const [heuristicResults, setHeuristicResults] = useState<SearchResult<Heuristic>>(null);
   const [searching, setSearching] = useState<boolean>(false);
@@ -68,25 +51,6 @@ export const ManageHeuristicsContent = memo(() => {
     [currentUser.roles]
   );
 
-  const setHeuristicID = useCallback(
-    (heur_id: string) => {
-      navigate(`${location.pathname}${location.search || ''}#${heur_id}`);
-    },
-    [location.pathname, location.search, navigate]
-  );
-
-  useEffect(() => {
-    if (!location.hash || globalDrawerOpened || !heuristicResults) return;
-    navigate(`${location.pathname}${location.search ? location.search : ''}`);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [globalDrawerOpened]);
-
-  useEffect(() => {
-    if (location.hash) setGlobalDrawer(<ManageHeuristicDetailPage heur_id={location.hash.substr(1)} />);
-    else closeGlobalDrawer();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location.hash]);
-
   useEffect(() => {
     handleReload(search);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -109,7 +73,12 @@ export const ManageHeuristicsContent = memo(() => {
                 ? t(`filtered${heuristicResults?.total === 1 ? '' : 's'}`)
                 : t(`total${heuristicResults?.total === 1 ? '' : 's'}`)
             }
-            onChange={v => setSearchParams(v)}
+            onChange={values =>
+              navigate.here().update(s => ({
+                ...s,
+                search: { ...s.search, ...ManageHeuristicsRoute.search.full(values).toObject() }
+              }))
+            }
             paramDefaults={search.defaults().toObject()}
             searchInputProps={{ placeholder: t('filter'), options: suggestions }}
           />
@@ -117,7 +86,7 @@ export const ManageHeuristicsContent = memo(() => {
       </PageContainer>
 
       <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
-        <HeuristicsTable heuristicResults={heuristicResults} setHeuristicID={setHeuristicID} />
+        <HeuristicsTable heuristicResults={heuristicResults} />
       </div>
     </PageFullWidth>
   ) : (
@@ -125,11 +94,8 @@ export const ManageHeuristicsContent = memo(() => {
   );
 });
 
-export const ManageHeuristicsPage = memo(() => (
-  <SearchParamsProvider params={HEURISTICS_PARAMS}>
-    <ManageHeuristicsContent />
-  </SearchParamsProvider>
-));
+export const ManageHeuristicsPage = memo(() => <ManageHeuristicsContent />);
+ManageHeuristicsPage.displayName = 'ManageHeuristicsPage';
 
 export const ManageHeuristicsRoute = createAppRoute({
   component: ManageHeuristicsPage,

@@ -2,7 +2,7 @@ import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import { AlertTitle, useMediaQuery, useTheme } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
-import { createAppRoute } from 'core/router';
+import { AppNavigate, createAppRoute, useAppNavigate, useAppPathParams } from 'core/router';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import PageFullSize from 'core/template/branding/AppPageCenter';
 import PageCenter from 'core/template/components/pages/PageCenter';
@@ -11,7 +11,6 @@ import type { File } from 'models/api/file';
 import type { Section } from 'models/base/result';
 import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate, useLocation, useNavigate, useParams } from 'react-router';
 import { ArchiveBanner } from 'routes/archive-detail/components/banner';
 import { CommentSection } from 'routes/archive-detail/components/comments';
 import { LabelSection } from 'routes/archive-detail/components/labels';
@@ -72,9 +71,8 @@ export type ArchiveDetailPageProps = {
 export const ArchiveDetailPage = memo(({ sha256: propSha256, force = false }: ArchiveDetailPageProps) => {
   const { t } = useTranslation(['archive']);
   const theme = useTheme();
-  const location = useLocation();
-  const navigate = useNavigate();
-  const { id: paramSha256, tab: paramTab } = useParams<Params>();
+  const navigate = useAppNavigate<'/archive/:id/:tab'>();
+  const { id: paramSha256, tab: paramTab } = useAppPathParams<'/archive/:id/:tab'>();
 
   const { apiCall } = useMyAPI();
   const { showErrorMessage } = useMySnackbar();
@@ -171,9 +169,17 @@ export const ArchiveDetailPage = memo(({ sha256: propSha256, force = false }: Ar
   }, [codeAllowed]);
 
   if (!configuration?.datastore?.archive?.enabled)
-    return inDrawer ? <NotFoundPage /> : <Navigate to="/notfound" replace />;
+    return inDrawer ? (
+      <NotFoundPage />
+    ) : (
+      <AppNavigate nav={nav => nav.here<'/not-found'>({ replace: true }).update({ route: '/not-found' })} />
+    );
   else if (!currentUser.roles.includes('archive_view'))
-    return inDrawer ? <ForbiddenPage /> : <Navigate to="/forbidden" replace />;
+    return inDrawer ? (
+      <ForbiddenPage />
+    ) : (
+      <AppNavigate nav={nav => nav.here<'/forbidden'>({ replace: true }).update({ route: '/forbidden' })} />
+    );
   else
     return (
       <Layout>
@@ -195,7 +201,7 @@ export const ArchiveDetailPage = memo(({ sha256: propSha256, force = false }: Ar
             inDrawer
               ? null
               : (_event, value) =>
-                  navigate(`/archive/${sha256}/${value}${location.search}${location.hash}`, { replace: true })
+                  navigate.here({ replace: true }).update(s => ({ ...s, path: { id: sha256, tab: value } }))
           }
           tabs={{
             details: {

@@ -2,22 +2,20 @@ import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
 import AssignmentLateOutlinedIcon from '@mui/icons-material/AssignmentLateOutlined';
 import ClassOutlinedIcon from '@mui/icons-material/ClassOutlined';
 import FileOpenOutlinedIcon from '@mui/icons-material/FileOpenOutlined';
-import { Chip, Grid, MenuItem, Select, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
+import { Chip, Grid, MenuItem, Pagination, Select, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
-import { createAppRoute } from 'core/router';
+import { AppNavigate, createAppRoute, useAppNavigate, useAppSearchSnapshot } from 'core/router';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import PageContainer from 'core/template/branding/AppPageContainer';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
-import useDrawer from 'layout/drawer/drawer.hooks';
+import type { InferSearchParamValueMapFromEngine } from 'features/search-params';
 import type { FacetResult, HistogramResult, SearchResult } from 'models/api/search';
 import type { IndexDefinition } from 'models/api/user';
 import type { FileIndexed } from 'models/base/file';
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate, useLocation, useNavigate } from 'react-router';
-import { ArchiveDetailPage } from 'routes/archive-detail/archive-detail.route';
 import ArchivesTable from 'routes/search/components/archives';
 import { safeFieldValue } from 'shared/utils/utils';
 import { ChipList } from 'ui/ChipList';
@@ -25,8 +23,6 @@ import Histogram from 'ui/Histogram';
 import LineGraph from 'ui/LineGraph';
 import SearchBar from 'ui/SearchBar/search-bar';
 import { DEFAULT_SUGGESTION } from 'ui/SearchBar/search-textfield';
-import SimpleSearchQuery from 'ui/SearchBar/simple-search-query';
-import SearchPager from 'ui/SearchPager';
 import SearchResultCount from 'ui/SearchResultCount';
 
 const PAGE_SIZE = 25;
@@ -56,212 +52,149 @@ const GAP_MAP = {
   '1y': '15d'
 };
 
-const DEFAULT_PARAMS: object = {
-  query: '*',
-  offset: 0,
-  rows: PAGE_SIZE,
-  archive_only: true,
-  is_supplementary: false,
-  tc: DEFAULT_TC,
-  sort: 'archive_ts desc'
-};
-
-const DEFAULT_QUERY: string = Object.keys(DEFAULT_PARAMS)
-  .map(k => `${k}=${DEFAULT_PARAMS[k]}`)
-  .join('&');
-
 export const ArchivesPage = memo(() => {
   const { t } = useTranslation(['archive']);
   const theme = useTheme();
-  const location = useLocation();
   const downSM = useMediaQuery(theme.breakpoints.down('md'));
 
-  const navigate = useNavigate();
+  const search = useAppSearchSnapshot<'/archives'>();
+  const navigate = useAppNavigate<'/archives'>();
   const { apiCall } = useMyAPI();
-  const { user: currentUser, configuration } = useALContext();
+  const { user: currentUser, configuration, indexes } = useALContext();
   const { showErrorMessage } = useMySnackbar();
-  const { closeGlobalDrawer, setGlobalDrawer, globalDrawerOpened } = useDrawer();
 
   const [fileResults, setFileResults] = useState<SearchResult<FileIndexed>>(null);
-  const [query, setQuery] = useState<SimpleSearchQuery>(null);
-  const [parsedQuery, setParsedQuery] = useState<SimpleSearchQuery>(null);
   const [histogram, setHistogram] = useState<HistogramResult>(null);
   const [types, setTypes] = useState<Record<string, number>>(null);
   const [labels, setLabels] = useState<Record<string, number>>(null);
   const [searching, setSearching] = useState<boolean>(false);
-  const [suggestions, setSuggestions] = useState<IndexDefinition>();
+  const suggestions = useMemo<IndexDefinition>(() => ({ ...indexes.file, ...DEFAULT_SUGGESTION }), [indexes.file]);
+  const queryValue = useRef<string>('');
 
-  const filterValue = useRef<string>('');
-
-  const hasFilter = useCallback((filter: string) => query?.getAll('filters')?.includes(filter), [query]);
+  const hasFilter = useCallback((filter: string) => search.get('filters')?.includes(filter), [search?.toString()]);
 
   const handleToggleFilter = useCallback(
-    (filter: string) => {
-      if (query?.getAll('filters')?.includes(filter)) query.remove('filters', filter);
-      else query.add('filters', filter);
-
-      navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-    },
-    [location.hash, location.pathname, navigate, query]
+    (filter: string) =>
+      navigate.here().update(s => ({
+        ...s,
+        search: {
+          ...s.search,
+          offset: 0,
+          filters: s.search.filters.includes(filter)
+            ? s.search.filters.filter(value => value !== filter)
+            : [...s.search.filters, filter]
+        }
+      })),
+    [navigate]
   );
 
   const handleClear = useCallback(() => {
-    if (query?.getAll('filters').length !== 0) {
-      query.delete('query');
-      navigate(`${location.pathname}?${query.getDeltaString()}${location.hash ? location.hash : ''}`);
-    } else {
-      navigate(`${location.pathname}${location.hash ? location.hash : ''}`);
-    }
-  }, [location.hash, location.pathname, navigate, query]);
+    navigate.here().update(s => ({ ...s, search: { ...s.search, query: '', offset: 0 } }));
+  }, [navigate]);
 
-  const handleSearch = useCallback(() => {
-    if (query.get('query') === filterValue.current) return;
-    if (filterValue.current !== '') {
-      query.set('query', filterValue.current);
-      navigate(`${location.pathname}?${query.getDeltaString()}${location.hash ? location.hash : ''}`);
-    } else {
-      handleClear();
-    }
-  }, [query, navigate, location.pathname, location.hash, handleClear]);
-
-  const handleFilterValueChange = useCallback((inputValue: string) => {
-    filterValue.current = inputValue;
-  }, []);
-
-  const handleFileChange = useCallback(
-    (file_id: string) => {
-      navigate(`${location.pathname}${location.search ? location.search : ''}#${file_id}`);
+  const handleSearch = useCallback(
+    (value: string) => {
+      if (value) navigate.here().update(s => ({ ...s, search: { ...s.search, query: value, offset: 0 } }));
+      else handleClear();
     },
-    [location.pathname, location.search, navigate]
+    [handleClear, navigate]
   );
 
   const handleLabelClick = useCallback(
     (_event: React.MouseEvent<HTMLDivElement, MouseEvent>, label: string) => {
-      if (!searching) {
-        query.add('filters', `labels:${safeFieldValue(label)}`);
-        navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-      }
+      if (!searching) handleToggleFilter(`labels:${safeFieldValue(label)}`);
     },
-    [location.hash, location.pathname, navigate, query, searching]
+    [handleToggleFilter, searching]
   );
 
-  const handleReload = useCallback(
-    (q: SimpleSearchQuery) => {
-      if (q && currentUser.roles.includes('archive_view')) {
-        const tc = q.pop('tc') || DEFAULT_TC;
-        if (tc !== '1y') {
-          q.add('filters', TC_MAP[tc]);
-        }
+  const buildRequestBody = useCallback(() => {
+    const tc = search.get('tc') || DEFAULT_TC;
+    const filters = [...search.get('filters')];
+    if (tc !== '1y') filters.push(TC_MAP[tc as keyof typeof TC_MAP]);
+    if (!search.get('supplementary')) filters.push('NOT is_supplementary:true');
 
-        apiCall<SearchResult<FileIndexed>>({
-          url: `/api/v4/search/file/?${q.toString()}`,
-          onSuccess: api_data => setFileResults(api_data.api_response),
-          onFailure: api_data => showErrorMessage(api_data.api_error_message),
-          onEnter: () => setSearching(true),
-          onFinalize: () => setSearching(false)
-        });
+    return {
+      ...search
+        .omit(['tc', 'supplementary'])
+        .set(s => ({ ...s, query: s.query || '*' }))
+        .toObject(),
+      filters
+    };
+  }, [search?.toString()]);
 
-        apiCall<HistogramResult>({
-          url: `/api/v4/search/histogram/file/seen.last/?start=${START_MAP[tc]}&end=now&gap=${
-            GAP_MAP[tc]
-          }&mincount=0&${q.toString(['rows', 'offset', 'sort', 'track_total_hits'])}`,
-          onSuccess: api_data => setHistogram(api_data.api_response)
-        });
-
-        apiCall<FacetResult>({
-          url: `/api/v4/search/facet/file/labels/?${q.toString(['rows', 'offset', 'sort', 'track_total_hits'])}`,
-          onSuccess: ({ api_response }) =>
-            setLabels(
-              Object.fromEntries(
-                Object.keys(api_response)
-                  .sort((a, b) => api_response[b] - api_response[a])
-                  .map(k => [k, api_response[k]])
-              )
-            )
-        });
-
-        apiCall<FacetResult>({
-          url: `/api/v4/search/facet/file/type/?${q.toString(['rows', 'offset', 'sort', 'track_total_hits'])}`,
-          onSuccess: ({ api_response }) =>
-            setTypes(
-              Object.fromEntries(
-                Object.keys(api_response)
-                  .sort((a, b) => api_response[b] - api_response[a])
-                  .map(k => [k, api_response[k]])
-              )
-            )
-        });
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  );
-
-  useEffect(() => {
-    setSearching(true);
-    const newSearchQuery = new SimpleSearchQuery(location.search, DEFAULT_QUERY);
-    filterValue.current = newSearchQuery.get('query');
-    newSearchQuery.set('query', filterValue.current || '*');
-    setQuery(newSearchQuery);
-  }, [location.pathname, location.search]);
-
-  useEffect(() => {
-    if (!query) return;
-    const curQuery = new SimpleSearchQuery(query.toString(), DEFAULT_QUERY);
-    curQuery.set('rows', PAGE_SIZE);
-    curQuery.set('offset', 0);
-    curQuery.set('archive_only', true);
-
-    const supp = curQuery.pop('supplementary') || false;
-    if (!supp) {
-      curQuery.add('filters', 'NOT is_supplementary:true');
-    }
-
-    setParsedQuery(new SimpleSearchQuery(curQuery.toString()));
-  }, [query]);
-
-  useEffect(() => {
-    if (fileResults !== null && !globalDrawerOpened && location.hash) {
-      navigate(`${location.pathname}${location.search ? location.search : ''}`);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [globalDrawerOpened]);
-
-  useEffect(() => {
-    if (location.hash) {
-      setGlobalDrawer(<ArchiveDetailPage sha256={location.hash.substr(1)} />, { hasMaximize: true });
-    } else {
-      closeGlobalDrawer();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location.hash]);
-
-  useEffect(() => {
-    apiCall<IndexDefinition>({
-      url: '/api/v4/search/fields/file/',
-      onSuccess: ({ api_response }) => setSuggestions({ ...api_response, ...DEFAULT_SUGGESTION })
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  const buildFacetParams = useCallback((body: InferSearchParamValueMapFromEngine<typeof ArchivesRoute.search>) => {
+    const params = new URLSearchParams();
+    params.set('query', body.query);
+    for (const filter of (body.filters as string[]) ?? []) params.append('filters', filter);
+    params.set('archive_only', `${body.archive_only}`);
+    return params;
   }, []);
 
+  const handleReload = useCallback(() => {
+    if (!currentUser.roles.includes('archive_view')) return;
+
+    const tc = search.get('tc') || DEFAULT_TC;
+    const body = buildRequestBody();
+    const facetParams = buildFacetParams(body);
+    apiCall<SearchResult<FileIndexed>>({
+      method: 'POST',
+      url: '/api/v4/search/file/',
+      body,
+      onSuccess: api_data => setFileResults(api_data.api_response),
+      onFailure: api_data => showErrorMessage(api_data.api_error_message),
+      onEnter: () => setSearching(true),
+      onExit: () => setSearching(false)
+    });
+    apiCall<HistogramResult>({
+      url: `/api/v4/search/histogram/file/seen.last/?start=${START_MAP[tc]}&end=now&gap=${GAP_MAP[tc]}&mincount=0&${facetParams.toString()}`,
+      onSuccess: api_data => setHistogram(api_data.api_response)
+    });
+    apiCall<FacetResult>({
+      url: `/api/v4/search/facet/file/labels/?${facetParams.toString()}`,
+      onSuccess: ({ api_response }) =>
+        setLabels(
+          Object.fromEntries(
+            Object.keys(api_response)
+              .sort((a, b) => api_response[b] - api_response[a])
+              .map(k => [k, api_response[k]])
+          )
+        )
+    });
+    apiCall<FacetResult>({
+      url: `/api/v4/search/facet/file/type/?${facetParams.toString()}`,
+      onSuccess: ({ api_response }) =>
+        setTypes(
+          Object.fromEntries(
+            Object.keys(api_response)
+              .sort((a, b) => api_response[b] - api_response[a])
+              .map(k => [k, api_response[k]])
+          )
+        )
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentUser.roles, buildRequestBody, buildFacetParams]);
+
   useEffect(() => {
-    handleReload(parsedQuery);
-  }, [handleReload, parsedQuery]);
+    handleReload();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [handleReload, search?.toString()]);
 
   useEffect(() => {
     function reload() {
-      handleReload(parsedQuery);
+      handleReload();
     }
 
     window.addEventListener('reloadArchive', reload);
     return () => {
       window.removeEventListener('reloadArchive', reload);
     };
-  }, [handleReload, parsedQuery]);
+  }, [handleReload]);
 
-  if (!configuration?.datastore?.archive?.enabled) return <Navigate to="/notfound" replace />;
-  else if (!currentUser.roles.includes('archive_view')) return <Navigate to="/forbidden" replace />;
-  else
+  if (!configuration?.datastore?.archive?.enabled) {
+    return <AppNavigate nav={nav => nav.here<'/not-found'>({ replace: true }).update({ route: '/not-found' })} />;
+  } else if (!currentUser.roles.includes('archive_view')) {
+    return <AppNavigate nav={nav => nav.here<'/forbidden'>({ replace: true }).update({ route: '/forbidden' })} />;
+  } else
     return (
       <PageFullWidth margin={4}>
         <Grid container spacing={2} style={{ paddingBottom: theme.spacing(2) }}>
@@ -279,12 +212,11 @@ export const ArchivesPage = memo(() => {
             <FormControl size="small" fullWidth>
               <Select
                 disabled={searching}
-                value={query ? query.get('tc') || DEFAULT_TC : DEFAULT_TC}
+                value={search.get('tc') || DEFAULT_TC}
                 variant="outlined"
-                onChange={event => {
-                  query.set('tc', event.target.value);
-                  navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-                }}
+                onChange={event =>
+                  navigate.here().update(s => ({ ...s, search: { ...s.search, tc: event.target.value } }))
+                }
                 fullWidth
               >
                 <MenuItem value="24h">{t('tc.24h')}</MenuItem>
@@ -300,13 +232,15 @@ export const ArchivesPage = memo(() => {
         <PageContainer isSticky>
           <div style={{ paddingTop: theme.spacing(1) }}>
             <SearchBar
-              initValue={query && query.get('query') !== '*' ? query.get('query', '') : ''}
+              initValue={search.get('query')}
               placeholder={t('filter')}
               searching={searching}
               suggestions={suggestions}
-              onValueChange={handleFilterValueChange}
+              onValueChange={(inputValue: string) => {
+                queryValue.current = inputValue;
+              }}
               onClear={handleClear}
-              onSearch={handleSearch}
+              onSearch={() => handleSearch(queryValue.current)}
               buttons={[
                 {
                   icon: <AssignmentLateOutlinedIcon fontSize={downSM ? 'small' : 'medium'} />,
@@ -328,15 +262,13 @@ export const ArchivesPage = memo(() => {
                 },
                 {
                   icon: <FileOpenOutlinedIcon fontSize={downSM ? 'small' : 'medium'} />,
-                  tooltip: query?.has('supplementary') ? t('supplementary.exclude') : t('supplementary.include'),
+                  tooltip: search.get('supplementary') ? t('supplementary.exclude') : t('supplementary.include'),
                   props: {
-                    color: query?.has('supplementary') ? 'primary' : 'default',
-                    onClick: () => {
-                      if (query?.has('supplementary')) query.delete('supplementary');
-                      else query.set('supplementary', true);
-
-                      navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-                    }
+                    color: search.get('supplementary') ? 'primary' : 'default',
+                    onClick: () =>
+                      navigate
+                        .here()
+                        .update(s => ({ ...s, search: { ...s.search, supplementary: !s.search.supplementary } }))
                   }
                 }
               ]}
@@ -359,7 +291,7 @@ export const ArchivesPage = memo(() => {
                       ) : (
                         <span>
                           <SearchResultCount count={fileResults.total} />
-                          {query.get('query')
+                          {search.get('query')
                             ? t(`filtered${fileResults.total === 1 ? '' : 's'}`)
                             : t(`total${fileResults.total === 1 ? '' : 's'}`)}
                         </span>
@@ -367,41 +299,52 @@ export const ArchivesPage = memo(() => {
                     </Typography>
                   )}
 
-                  <SearchPager
-                    index="file"
-                    method="GET"
-                    pageSize={PAGE_SIZE}
-                    query={parsedQuery}
-                    total={fileResults.total}
-                    setResults={data => setFileResults(data as SearchResult<FileIndexed>)}
-                    setSearching={setSearching}
-                  />
+                  {fileResults.total > search.get('rows') && (
+                    <Pagination
+                      page={(search.get('offset') ?? 0) / search.get('rows') + 1}
+                      count={Math.ceil(Math.min(fileResults.total, 10000) / search.get('rows'))}
+                      shape="rounded"
+                      size="small"
+                      onChange={(_event, page) =>
+                        navigate
+                          .here()
+                          .update(s => ({ ...s, search: { ...s.search, offset: (page - 1) * s.search.rows } }))
+                      }
+                    />
+                  )}
                 </div>
               )}
 
-              {query && (
-                <div>
-                  <ChipList
-                    items={query.getAll('filters', []).map(v => ({
-                      variant: 'outlined',
-                      label: `${v}`,
-                      color: v.indexOf('NOT ') === 0 ? 'error' : null,
-                      onClick: () => {
-                        query.replace(
-                          'filters',
-                          v,
-                          v.indexOf('NOT ') === 0 ? v.substring(5, v.length - 1) : `NOT (${v})`
-                        );
-                        navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-                      },
-                      onDelete: () => {
-                        query.remove('filters', v);
-                        navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-                      }
-                    }))}
-                  />
-                </div>
-              )}
+              <div>
+                <ChipList
+                  items={search.get('filters').map(v => ({
+                    variant: 'outlined',
+                    label: `${v}`,
+                    color: v.indexOf('NOT ') === 0 ? 'error' : null,
+                    onClick: () =>
+                      navigate.here().update(s => ({
+                        ...s,
+                        search: {
+                          ...s.search,
+                          filters: s.search.filters.map(filter =>
+                            filter !== v
+                              ? filter
+                              : v.indexOf('NOT ') === 0
+                                ? v.substring(5, v.length - 1)
+                                : `NOT (${v})`
+                          )
+                        }
+                      })),
+                    onDelete: () =>
+                      navigate
+                        .here()
+                        .update(s => ({
+                          ...s,
+                          search: { ...s.search, filters: s.search.filters.filter(f => f !== v) }
+                        }))
+                  }))}
+                />
+              </div>
             </SearchBar>
           </div>
         </PageContainer>
@@ -412,7 +355,7 @@ export const ArchivesPage = memo(() => {
               <Histogram
                 dataset={histogram}
                 height="200px"
-                title={t(`graph.histogram.title.${query ? query.get('tc') || DEFAULT_TC : DEFAULT_TC}`)}
+                title={t(`graph.histogram.title.${search.get('tc') || DEFAULT_TC}`)}
                 datatype={t('graph.datatype')}
                 isDate
                 verticalLine
@@ -420,11 +363,9 @@ export const ArchivesPage = memo(() => {
                   if (!searching && element.length > 0) {
                     const ind = element[0].index;
                     const keys = Object.keys(histogram);
-                    query.add(
-                      'filters',
+                    handleToggleFilter(
                       `archive_ts:[${keys[ind]} TO ${keys.length - 1 === ind ? 'now' : keys[ind + 1]}]`
                     );
-                    navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
                   }
                 }}
               />
@@ -438,8 +379,7 @@ export const ArchivesPage = memo(() => {
                 onClick={(_evt, element) => {
                   if (!searching && element.length > 0) {
                     const ind = element[0].index;
-                    query.add('filters', `labels:${safeFieldValue(Object.keys(labels)[ind])}`);
-                    navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
+                    handleToggleFilter(`labels:${safeFieldValue(Object.keys(labels)[ind])}`);
                   }
                 }}
               />
@@ -453,8 +393,7 @@ export const ArchivesPage = memo(() => {
                 onClick={(_evt, element) => {
                   if (!searching && element.length > 0) {
                     const ind = element[0].index;
-                    query.add('filters', `type:${safeFieldValue(Object.keys(types)[ind])}`);
-                    navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
+                    handleToggleFilter(`type:${safeFieldValue(Object.keys(types)[ind])}`);
                   }
                 }}
               />
@@ -469,7 +408,7 @@ export const ArchivesPage = memo(() => {
             paddingRight: theme.spacing(0.5)
           }}
         >
-          <ArchivesTable fileResults={fileResults} setFileID={handleFileChange} onLabelClick={handleLabelClick} />
+          <ArchivesTable fileResults={fileResults} onLabelClick={handleLabelClick} />
         </div>
       </PageFullWidth>
     );

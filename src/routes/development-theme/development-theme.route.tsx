@@ -4,10 +4,9 @@ import PaletteIcon from '@mui/icons-material/Palette';
 import { Button, IconButton, Stack, Switch, useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import useALContext from 'core/config/useALContext';
-import { createAppRoute } from 'core/router';
+import { AppNavigate, createAppRoute } from 'core/router';
 import PageCenter from 'core/template/components/pages/PageCenter';
 import { memo } from 'react';
-import { Navigate } from 'react-router';
 import { AlertExtendedScan, AlertPriority, AlertStatus } from 'routes/alerts/components/Components';
 import Classification from 'ui/Classification';
 import CustomChip from 'ui/CustomChip';
@@ -24,7 +23,7 @@ export const DevelopmentThemePage = memo(() => {
   const { user: currentUser, configuration } = useALContext();
 
   if (!currentUser.is_admin || !['development', 'staging'].includes(configuration.system.type))
-    return <Navigate to="/forbidden" replace />;
+    return <AppNavigate nav={nav => nav.here<'/forbidden'>({ replace: true }).update({ route: '/forbidden' })} />;
   else
     return (
       <PageCenter width="65%" margin={4}>

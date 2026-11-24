@@ -9,7 +9,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import { IconButton, Paper, Tab, Tabs, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
-import { createAppRoute } from 'core/router';
+import { AppLink, createAppRoute, useAppNavigate, useAppPathParams, useAppSearchSnapshot } from 'core/router';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import PageContainer from 'core/template/branding/AppPageContainer';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
@@ -25,8 +25,6 @@ import type { Role } from 'models/base/user';
 import type { Dispatch, SetStateAction } from 'react';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate, useParams } from 'react-router';
-import { Link } from 'react-router-dom';
 import { ForbiddenPage } from 'routes/forbidden/forbidden.page';
 import AlertsTable from 'routes/search/components/alerts';
 import FilesTable from 'routes/search/components/files';
@@ -56,13 +54,13 @@ type Params = {
 };
 
 export const SearchPage = memo(({ index = null }: SearchPageProps) => {
-  const { id } = useParams<Params>();
+  const id = useAppPathParams<'/search/:index'>()?.index;
   const { t } = useTranslation(['search']);
   const [pageSize] = useState<number>(PAGE_SIZE);
   const [searching, setSearching] = useState<boolean>(false);
   const { indexes, user: currentUser, configuration } = useALContext();
-  const location = useLocation();
-  const navigate = useNavigate();
+  const search = useAppSearchSnapshot<'/search/:index'>();
+  const navigate = useAppNavigate();
   const theme = useTheme();
   const { apiCall } = useMyAPI();
   const [query, setQuery] = useState<SimpleSearchQuery>(null);
@@ -121,25 +119,24 @@ export const SearchPage = memo(({ index = null }: SearchPageProps) => {
   const queryValue = useRef<string>('');
 
   const handleChangeTab = useCallback(
-    (event, newTab) => {
-      navigate(`${location.pathname}?${query.toString()}#${newTab}`);
-    },
-    [location.pathname, navigate, query]
+    (_event: unknown, newTab: string) =>
+      navigate
+        .here()
+        .update(s => ({ ...s, search: { ...s.search, index: newTab as (typeof SEARCH_INDICES)[number] } })),
+    [navigate]
   );
 
   const onClear = useCallback(() => {
-    query.delete('query');
-    navigate(`${location.pathname}?${query.toString()}${location.hash}`);
-  }, [location.hash, location.pathname, navigate, query]);
+    navigate.here().update(s => ({ ...s, search: { ...s.search, query: '', offset: 0 } }));
+  }, [navigate]);
 
   const onSearch = useCallback(() => {
     if (queryValue.current !== '') {
-      query.set('query', queryValue.current);
-      navigate(`${location.pathname}?${query.toString()}${location.hash}`);
+      navigate.here().update(s => ({ ...s, search: { ...s.search, query: queryValue.current, offset: 0 } }));
     } else {
       onClear();
     }
-  }, [location.hash, location.pathname, navigate, onClear, query]);
+  }, [navigate, onClear]);
 
   const onFilterValueChange = useCallback((inputValue: string) => {
     queryValue.current = inputValue;
@@ -174,10 +171,12 @@ export const SearchPage = memo(({ index = null }: SearchPageProps) => {
 
   useEffect(() => {
     // On location.search change we need to change the query object and reset the results
-    setQuery(new SimpleSearchQuery(location.search, `rows=${pageSize}&offset=0&filters=NOT%20to_be_deleted:true`));
+    setQuery(
+      new SimpleSearchQuery(search.toParams().toString(), `rows=${pageSize}&offset=0&filters=NOT%20to_be_deleted:true`)
+    );
     resetResults();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location.search, pageSize]);
+  }, [search?.toString(), pageSize]);
 
   useEffect(() => {
     const nextAvailableTab = () => {
@@ -187,10 +186,10 @@ export const SearchPage = memo(({ index = null }: SearchPageProps) => {
       return 'submission';
     };
     // On location.hash change, we need to change the tab
-    const newTab = location.hash.substring(1, location.hash.length) || index || id || nextAvailableTab();
+    const newTab = search.get('index') || index || id || nextAvailableTab();
     setTab(newTab);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, index, location.hash]);
+  }, [id, index, search?.toString()]);
 
   useEffect(() => {
     if (query) {
@@ -267,24 +266,18 @@ export const SearchPage = memo(({ index = null }: SearchPageProps) => {
               ['submission', 'result', 'file', 'all'].includes(index || id || 'all')
                 ? [
                     {
-                      icon:
-                        query && query.get('use_archive') === 'true' ? (
-                          <ArchiveIcon fontSize={downSM ? 'small' : 'medium'} />
-                        ) : (
-                          <ArchiveOutlinedIcon fontSize={downSM ? 'small' : 'medium'} />
-                        ),
-                      tooltip:
-                        query && query.get('use_archive') === 'true'
-                          ? t('use_archive.turn_off')
-                          : t('use_archive.turn_on'),
+                      icon: search.get('use_archive') ? (
+                        <ArchiveIcon fontSize={downSM ? 'small' : 'medium'} />
+                      ) : (
+                        <ArchiveOutlinedIcon fontSize={downSM ? 'small' : 'medium'} />
+                      ),
+                      tooltip: search.get('use_archive') ? t('use_archive.turn_off') : t('use_archive.turn_on'),
                       props: {
-                        onClick: () => {
-                          query.set(
-                            'use_archive',
-                            !query.has('use_archive') ? 'true' : query.get('use_archive') === 'false'
-                          );
-                          navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-                        }
+                        onClick: () =>
+                          navigate.here().update(s => ({
+                            ...s,
+                            search: { ...s.search, use_archive: !s.search.use_archive }
+                          }))
                       }
                     }
                   ]
@@ -381,8 +374,15 @@ export const SearchPage = memo(({ index = null }: SearchPageProps) => {
                   <Tooltip title={t('focus_search')}>
                     <IconButton
                       size={downSM ? 'small' : 'medium'}
-                      component={Link}
-                      to={`/search/${tab}${location.search}`}
+                      component={AppLink}
+                      nav={nav =>
+                        nav.to().create({
+                          route: '/search/:index',
+                          path: { index: tab as (typeof SEARCH_INDICES)[number] },
+                          search: search.toObject()
+                        })
+                      }
+                      navDeps={[tab, search?.toString()]}
                     >
                       <CenterFocusStrongOutlinedIcon fontSize="small" />
                     </IconButton>

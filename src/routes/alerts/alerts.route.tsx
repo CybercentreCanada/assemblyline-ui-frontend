@@ -3,19 +3,15 @@ import NotificationImportantOutlinedIcon from '@mui/icons-material/NotificationI
 import { AlertTitle, useMediaQuery, useTheme } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
-import { createAppRoute } from 'core/router';
+import { createAppRoute, useAppNavigate } from 'core/router';
 import { useAppUser } from 'core/template/components/app/hooks';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
 import SimpleList from 'deprecated/components/lists/simplelist/SimpleList';
-import useDrawer from 'layout/drawer/drawer.hooks';
 import type { CustomUser, IndexDefinition } from 'models/api/user';
 import type { Alert, AlertIndexed, AlertItem } from 'models/base/alert';
-import type { Workflow } from 'models/base/workflow';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
-import { useLocation, useNavigate } from 'react-router';
-import { AlertDetailPage } from 'routes/alert-detail/alert-detail.route';
 import AlertActions from 'routes/alerts/components/Actions';
 import AlertDefaultSearchParameters from 'routes/alerts/components/DefaultSearchParameters';
 import AlertFavorites from 'routes/alerts/components/Favorites';
@@ -29,7 +25,6 @@ import { SearchParamsProvider, useSearchParams } from 'routes/alerts/contexts/Se
 import type { SearchParams } from 'routes/alerts/utils/SearchParams';
 import type { SearchResult } from 'routes/alerts/utils/SearchParser';
 import { ForbiddenPage } from 'routes/forbidden/forbidden.page';
-import { ManageWorkflowCreatePage } from 'routes/manage-workflow-create/manage-workflow-create.route';
 import { IconButton } from 'ui/buttons/IconButton';
 import InformativeAlert from 'ui/InformativeAlert';
 import { PageHeader } from 'ui/layouts/PageHeader';
@@ -76,12 +71,10 @@ export type AlertSearchParams = SearchParams<typeof ALERT_DEFAULT_PARAMS>;
 export const AlertsContent = memo(() => {
   const { t } = useTranslation('alerts');
   const theme = useTheme();
-  const location = useLocation();
-  const navigate = useNavigate();
+  const navigate = useAppNavigate();
   const { apiCall } = useMyAPI();
   const { indexes } = useALContext();
   const { user: currentUser } = useAppUser<CustomUser>();
-  const { globalDrawerOpened, setGlobalDrawer, closeGlobalDrawer } = useDrawer();
   const { search, setSearchParams, setSearchObject } = useSearchParams<AlertSearchParams>();
 
   const [alerts, setAlerts] = useState<AlertItem[]>([]);
@@ -151,9 +144,13 @@ export const AlertsContent = memo(() => {
     (item: Alert) => {
       if (!item) return;
       if (isLGDown) document.getElementById(ALERT_SIMPLELIST_ID).blur();
-      navigate(`${location.pathname}${location.search}#/alert/${item.alert_id}`);
+      navigate.to().create({
+        route: '/alert/:id',
+        path: { id: item.alert_id },
+        search: { ...search.toObject(), alert: item as never }
+      });
     },
-    [isLGDown, location.pathname, location.search, navigate]
+    [isLGDown, navigate, search]
   );
 
   const handleCreateWorkflow = useCallback(() => {
@@ -166,35 +163,12 @@ export const AlertsContent = memo(() => {
       .map(v => ([' or ', ' and '].some(a => v.toLowerCase().includes(a)) ? `(${v})` : v))
       .join(' AND ');
 
-    const state: Partial<Workflow> = { query };
-    navigate(`${location.pathname}${location.search}#/workflow/`, { state });
-  }, [currentUser.roles, location.pathname, location.search, navigate, search]);
+    navigate.to().create({ route: '/manage/workflow/create', search: { query } });
+  }, [currentUser.roles, navigate, search]);
 
   useEffect(() => {
     handleFetch(search);
   }, [handleFetch, search]);
-
-  useEffect(() => {
-    if (alerts.length && !globalDrawerOpened && location.hash) {
-      navigate(`${location.pathname}${location.search}`);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [globalDrawerOpened]);
-
-  useEffect(() => {
-    const url = new URL(`${window.location.origin}${location.hash.slice(1)}`);
-    if (url.pathname.startsWith('/alert/')) {
-      const id = url.pathname.slice('/alert/'.length);
-      const alert = alerts.find(item => item.alert_id === id);
-      setGlobalDrawer(<AlertDetailPage id={id} alert={alert} inDrawer />, { hasMaximize: true });
-    } else if (url.pathname.startsWith('/workflow/')) {
-      setGlobalDrawer(
-        <ManageWorkflowCreatePage id={url.pathname.slice('/workflow/'.length)} onClose={closeGlobalDrawer} />
-      );
-    } else {
-      closeGlobalDrawer();
-    }
-  }, [alerts, closeGlobalDrawer, location.hash, setGlobalDrawer]);
 
   useEffect(() => {
     if (!!search.get('group_by')) return;

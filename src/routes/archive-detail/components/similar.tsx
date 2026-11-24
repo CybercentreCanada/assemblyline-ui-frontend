@@ -2,11 +2,11 @@ import ArchiveIcon from '@mui/icons-material/Archive';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import { AlertTitle, Box, IconButton, Skeleton, TableContainer, Tooltip, Typography, useTheme } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
+import { AppLink } from 'core/router';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import type { File, SimilarResult, SimilarResults, SimilarType } from 'models/api/file';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
 import { safeFieldValueURI } from 'shared/utils/utils';
 import {
   GridLinkRow,
@@ -21,11 +21,12 @@ import InformativeAlert from 'ui/InformativeAlert';
 import Moment from 'ui/Moment';
 import SectionContainer from 'ui/SectionContainer';
 
-const DEFAULT_SIMILAR: Record<SimilarType, { label: string; prefix: string; suffix: string }> = {
-  tlsh: { label: 'TLSH', prefix: '/search/file?query=tlsh:', suffix: '&use_archive=true' },
-  ssdeep: { label: 'SSDEEP', prefix: '/search/file?query=ssdeep:', suffix: '~&use_archive=true' },
-  vector: { label: 'Vector', prefix: '/search/result?query=result.sections.tags.vector:', suffix: '&use_archive=true' }
-};
+const DEFAULT_SIMILAR: Record<SimilarType, { label: string; index: 'file' | 'result'; field: string; suffix: string }> =
+  {
+    tlsh: { label: 'TLSH', index: 'file', field: 'tlsh:', suffix: '' },
+    ssdeep: { label: 'SSDEEP', index: 'file', field: 'ssdeep:', suffix: '~' },
+    vector: { label: 'Vector', index: 'result', field: 'result.sections.tags.vector:', suffix: '' }
+  };
 
 type SimilarItemProps = {
   data: SimilarResult;
@@ -74,11 +75,21 @@ const SimilarItem: React.FC<SimilarItemProps> = ({ data, drawer }) => {
         <div style={{ gridRow: 'span 2' }}>
           <Tooltip title={t('search.tooltip')} placement="left">
             <IconButton
-              component={Link}
+              component={AppLink}
               size="small"
-              to={`${DEFAULT_SIMILAR[data.type].prefix}${safeFieldValueURI(data.value)}${
-                DEFAULT_SIMILAR[data.type].suffix
-              }`}
+              nav={nav =>
+                nav.to().create({
+                  route: '/search/:index',
+                  path: { index: DEFAULT_SIMILAR[data.type].index },
+                  search: {
+                    query: `${DEFAULT_SIMILAR[data.type].field}${safeFieldValueURI(data.value)}${
+                      DEFAULT_SIMILAR[data.type].suffix
+                    }`,
+                    use_archive: true
+                  }
+                })
+              }
+              navDeps={[data.type, data.value]}
               onClick={e => e.stopPropagation()}
               style={{ margin: `0 ${theme.spacing(0.5)}` }}
             >
@@ -122,7 +133,12 @@ const SimilarItem: React.FC<SimilarItemProps> = ({ data, drawer }) => {
               <GridLinkRow
                 key={`${data.type}-${data.value}-${j}`}
                 hover
-                to={item?.from_archive ? `/archive/${item?.sha256}` : `/file/detail/${item?.sha256}`}
+                nav={nav =>
+                  item?.from_archive
+                    ? nav.to().create({ route: '/archive/:id', path: { id: item.sha256 } })
+                    : nav.to().create({ route: '/file/detail/:id', path: { id: item.sha256 } })
+                }
+                navDeps={[item?.from_archive, item?.sha256]}
               >
                 {hasArchived && (
                   <GridTableCell sx={{ '&.MuiTableCell-root>div': { justifyItems: 'flex-start' } }}>

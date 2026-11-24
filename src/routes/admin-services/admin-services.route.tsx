@@ -15,27 +15,23 @@ import {
   TextField,
   Tooltip,
   Typography,
-  useMediaQuery,
   useTheme
 } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import { invalidateAPIQuery } from 'core/api/utils/invalidateApiQuery';
 import useALContext from 'core/config/useALContext';
-import { createAppRoute } from 'core/router';
+import { AppNavigate, createAppRoute } from 'core/router';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import { useAppUser } from 'core/template/components/app/hooks';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
 import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
-import useDrawer from 'layout/drawer/drawer.hooks';
 import type { JSONFeedItem } from 'layout/notifications/notifications.hooks';
 import { useNotificationFeed } from 'layout/notifications/notifications.hooks';
 import type { CustomUser } from 'models/api/user';
 import type { ServiceIndexed, ServiceUpdateData, ServiceUpdates } from 'models/base/service';
 import type { ChangeEvent } from 'react';
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate, useLocation, useNavigate } from 'react-router';
-import { AdminServiceDetailPage } from 'routes/admin-service-detail/admin-service-detail.route';
 import CommunityServiceTable from 'routes/admin-services/components/CommunityServiceTable';
 import NewServiceTable from 'routes/admin-services/components/NewServiceTable';
 import ServiceTable from 'routes/search/components/service';
@@ -46,14 +42,11 @@ import { PageHeader } from 'ui/layouts/PageHeader';
 export const AdminServicesPage = memo(() => {
   const { t } = useTranslation(['adminServices']);
   const theme = useTheme();
-  const location = useLocation();
-  const navigate = useNavigate();
   const { configuration } = useALContext();
   const { fetchJSONNotifications } = useNotificationFeed();
   const { apiCall } = useMyAPI();
   const { user: currentUser } = useAppUser<CustomUser>();
   const { showSuccessMessage, showInfoMessage, showErrorMessage } = useMySnackbar();
-  const { setGlobalDrawer, closeGlobalDrawer, globalDrawerOpened } = useDrawer();
 
   const [serviceResults, setServiceResults] = useState<ServiceIndexed[]>(null);
   const [updates, setUpdates] = useState<ServiceUpdates>(null);
@@ -71,16 +64,6 @@ export const AdminServicesPage = memo(() => {
 
   const lastInstallingServices = useRef<string[]>([]);
   const installingServicesTimeout = useRef<NodeJS.Timeout>(null);
-
-  const isXL = useMediaQuery(theme.breakpoints.only('xl'));
-
-  const serviceNames = useMemo<string[]>(
-    () =>
-      (serviceFeeds || [])
-        .reduce((prev: string[], item) => (item?.summary ? [...prev, item.summary] : prev), [])
-        .sort(),
-    [serviceFeeds]
-  );
 
   const reload = useCallback(() => {
     apiCall<ServiceIndexed[]>({
@@ -219,18 +202,6 @@ export const AdminServicesPage = memo(() => {
     [pollInstalling]
   );
 
-  const onUpdated = useCallback(() => {
-    if (!isXL) closeGlobalDrawer();
-    setTimeout(() => window.dispatchEvent(new CustomEvent('reloadServicesEvent')), 1000);
-    invalidateAPIQuery(({ url }) => '/api/v4/user/whoami/' === url, 3000);
-  }, [closeGlobalDrawer, isXL]);
-
-  const onDeleted = useCallback(() => {
-    closeGlobalDrawer();
-    setTimeout(() => window.dispatchEvent(new CustomEvent('reloadServicesEvent')), 1000);
-    invalidateAPIQuery(({ url }) => '/api/v4/user/whoami/' === url, 3000);
-  }, [closeGlobalDrawer]);
-
   useEffectOnce(() => {
     if (currentUser.is_admin) {
       reload();
@@ -241,32 +212,6 @@ export const AdminServicesPage = memo(() => {
       window.removeEventListener('reloadServicesEvent', reload);
     };
   });
-
-  useEffect(() => {
-    if (serviceResults !== null && !globalDrawerOpened && location.hash) {
-      navigate(`${location.pathname}${location.search ? location.search : ''}`);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [globalDrawerOpened]);
-
-  useEffect(() => {
-    if (location.hash) {
-      setGlobalDrawer(
-        <AdminServiceDetailPage name={location.hash.slice(1)} onDeleted={onDeleted} onUpdated={onUpdated} />
-      );
-    } else {
-      closeGlobalDrawer();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location.hash, serviceNames]);
-
-  const setService = useCallback(
-    (service_name: string) => {
-      navigate(`${location.pathname}${location.search ? location.search : ''}#${service_name}`);
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [location.pathname, location.search]
-  );
 
   useEffect(() => {
     fetchJSONNotifications({
@@ -504,7 +449,7 @@ export const AdminServicesPage = memo(() => {
         </Grid>
       </Grid>
       <div style={{ paddingTop: theme.spacing(2) }}>
-        <ServiceTable serviceResults={serviceResults} updates={updates} setService={setService} onUpdate={onUpdate} />
+        <ServiceTable serviceResults={serviceResults} updates={updates} onUpdate={onUpdate} />
       </div>
 
       <Grid container alignItems="center" spacing={3} style={{ marginTop: theme.spacing(2) }}>
@@ -548,7 +493,7 @@ export const AdminServicesPage = memo(() => {
       </div>
     </PageFullWidth>
   ) : (
-    <Navigate to="/forbidden" replace />
+    <AppNavigate nav={nav => nav.here<'/forbidden'>({ replace: true }).update({ route: '/forbidden' })} />
   );
 });
 

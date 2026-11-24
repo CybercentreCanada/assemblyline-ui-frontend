@@ -1,9 +1,9 @@
 import LinkIcon from '@mui/icons-material/Link';
 import { Button, useTheme } from '@mui/material';
+import { AppLink } from 'core/router';
 import type { AppLeftNavItem } from 'core/template/components/app/AppConfigs';
 import { t } from 'i18next';
 import React from 'react';
-import { Link } from 'react-router-dom';
 
 type LinkGridProps = {
   items: AppLeftNavItem[];
@@ -16,7 +16,16 @@ export default function LinkGrid({ items }: LinkGridProps) {
   return (
     <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-around' }}>
       {items.map((e, i) => (
-        <Button key={i} component={Link} to={e.route}>
+        <Button
+          key={i}
+          {...(!e.route
+            ? null
+            : {
+                component: AppLink,
+                nav: nav => nav.to().create(e.route),
+                navDeps: [e.route]
+              })}
+        >
           <div style={{ height: '300px', width: '300px', padding, textAlign: 'center', color }}>
             {e.icon ? (
               React.cloneElement(e.icon, { style: { fontSize: '8rem' } }, null)

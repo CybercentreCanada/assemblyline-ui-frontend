@@ -1,7 +1,7 @@
 import { Box, Tooltip } from '@mui/material';
+import { useAppNavigate } from 'core/router';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router';
 
 type SearchResultCountProps = {
   count: number;
@@ -12,12 +12,10 @@ const SearchResultCount: React.FC<SearchResultCountProps> = ({ count, max = 1000
   const { t } = useTranslation();
   const params = new URLSearchParams(window.location.search);
   const trackedHits = params.get('track_total_hits');
-  const location = useLocation();
-  const navigate = useNavigate();
+  const navigate = useAppNavigate<'/search/:index'>();
 
   const trackFullHits = () => {
-    params.set('track_total_hits', 'true');
-    navigate(`${location.pathname}?${params.toString()}${location.hash}`);
+    navigate.here().update(s => ({ ...s, search: { ...s.search, track_total_hits: true } }));
   };
 
   const formattedNumber = x => x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ' ');

@@ -9,7 +9,7 @@ import type { TooltipProps } from '@mui/material';
 import { Box, Grid, IconButton, Skeleton, styled, Tooltip, Typography, useTheme } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
-import { createAppRoute } from 'core/router';
+import { createAppRoute, useAppNavigate, useAppPathParams } from 'core/router';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import PageCenter from 'core/template/components/pages/PageCenter';
 import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
@@ -17,8 +17,6 @@ import useAssistant from 'layout/assistant/assistant.hooks';
 import type { SubmissionReport } from 'models/api/submission_report';
 import { memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router';
-import { Link } from 'react-router-dom';
 import { ForbiddenPage } from 'routes/forbidden/forbidden.page';
 import AISummarySection from 'routes/submission-detail/components/ai_summary';
 import Attack from 'routes/submission-report/components/attack';
@@ -45,10 +43,10 @@ const NoPrintTooltip = memo(
 
 export const SubmissionReportPage = memo(() => {
   const { t } = useTranslation(['submissionReport']);
-  const { id } = useParams<ParamProps>();
+  const { id = null } = useAppPathParams<'/submission/report/:id'>();
   const { user: currentUser, c12nDef, configuration, settings } = useALContext();
   const { showErrorMessage, showWarningMessage } = useMySnackbar();
-  const navigate = useNavigate();
+  const navigate = useAppNavigate();
   const { apiCall } = useMyAPI();
   const theme = useTheme();
   const { addInsight, removeInsight } = useAssistant();
@@ -144,10 +142,10 @@ export const SubmissionReportPage = memo(() => {
         onFailure: api_data => {
           if (api_data.api_status_code === 425) {
             showWarningMessage(t('error.too_early'));
-            navigate(`/submission/detail/${id}`);
+            navigate.to().create({ route: '/submission/detail/:id', path: { id } });
           } else if (api_data.api_status_code === 404) {
             showErrorMessage(t('error.notfound'));
-            navigate('/notfound');
+            navigate.to().create({ route: '/not-found' });
           } else {
             showErrorMessage(api_data.api_error_message);
           }
@@ -244,7 +242,11 @@ export const SubmissionReportPage = memo(() => {
                       </IconButton>
                     </NoPrintTooltip>
                     <Tooltip title={t('detail_view')}>
-                      <IconButton component={Link} to={`/submission/detail/${report.sid}`} size="large">
+                      <IconButton
+                        nav={nav => nav.to().create({ route: '/submission/detail/:id', path: { id: report.sid } })}
+                        navDeps={[report.sid]}
+                        size="large"
+                      >
                         <ListAltOutlinedIcon />
                       </IconButton>
                     </Tooltip>

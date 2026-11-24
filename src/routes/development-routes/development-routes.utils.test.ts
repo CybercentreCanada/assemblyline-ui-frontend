@@ -364,7 +364,6 @@ describe('toRouteTableRow', () => {
 
     const row = toRouteTableRow(route, configuration);
 
-    expect(row.route).toBe(route);
     expect(row.path).toBe('/development/routes');
     expect(row.ancestor).toBe('/development');
     expect(row.pathParams).toEqual([]);

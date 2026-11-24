@@ -147,8 +147,6 @@ export type DevelopmentRoutesTableRowData = {
   path: string;
   /** Path param specs, one per `:param` segment. */
   pathParams: DevelopmentRoutesParamSpec[];
-  /** Original route definition this row was derived from. */
-  route: AppRoute;
   /** Search param specs, one per configured search param key. */
   searchParams: DevelopmentRoutesSearchParamSpec[];
   /** Rendered short icon element, or a placeholder when the route has none. */

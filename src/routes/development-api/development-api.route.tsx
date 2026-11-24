@@ -5,7 +5,7 @@ import { Button, Grid, Paper, Skeleton, Typography, useTheme } from '@mui/materi
 import { useAPIMutation } from 'core/api/hooks/useApiMutation';
 import { useALQuery } from 'core/api/hooks/useAppQuery';
 import useALContext from 'core/config/useALContext';
-import { createAppRoute } from 'core/router';
+import { AppNavigate, createAppRoute } from 'core/router';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import PageFullSize from 'core/template/branding/AppPageCenter';
 import type { ApiDocumentation } from 'models/api';
@@ -13,7 +13,6 @@ import type { Method } from 'models/utils/request';
 import type { editor } from 'monaco-editor';
 import { memo, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate } from 'react-router';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import type { Request, Response } from 'routes/development-api/development-api.models';
 import {
@@ -194,7 +193,7 @@ export const DevelopmentAPIPage = memo(() => {
   }, [currentRoute, request]);
 
   if (!currentUser.is_admin || !['development', 'staging'].includes(configuration.system.type))
-    return <Navigate to="/forbidden" replace />;
+    return <AppNavigate nav={nav => nav.here<'/forbidden'>({ replace: true }).update({ route: '/forbidden' })} />;
   else
     return (
       <PageFullSize margin={4}>

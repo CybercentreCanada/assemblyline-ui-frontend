@@ -1,7 +1,7 @@
 import { useTheme } from '@mui/material';
+import { AppLink } from 'core/router';
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
-import { Link } from 'react-router-dom';
 import remarkGfm from 'remark-gfm';
 
 export type MarkdownProps = {
@@ -82,11 +82,19 @@ export const Markdown = React.memo(({ children, slotProps }: MarkdownProps) => {
         ),
         li: ({ children }) => <li>{children}</li>,
         em: ({ children }) => <em>{children}</em>,
-        a: ({ href, children }) => (
-          <Link to={href || ''} style={{ color: theme.palette.primary.main, textDecoration: 'underline' }}>
-            {children}
-          </Link>
-        )
+        a: ({ href, children }) =>
+          href?.startsWith('/') && !href.startsWith('//') ? (
+            <AppLink
+              nav={nav => nav.to().create(href)}
+              style={{ color: theme.palette.primary.main, textDecoration: 'underline' }}
+            >
+              {children}
+            </AppLink>
+          ) : (
+            <a href={href} style={{ color: theme.palette.primary.main, textDecoration: 'underline' }}>
+              {children}
+            </a>
+          )
       }}
     >
       {children}

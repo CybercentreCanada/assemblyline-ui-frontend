@@ -1,9 +1,8 @@
 import { styled, Typography } from '@mui/material';
+import { useAppLocation, useAppNavigate } from 'core/router';
 import { createHashParamCodec } from 'features/hash-params';
 import type { ReactNode } from 'react';
 import { memo, useCallback } from 'react';
-import type { Location } from 'react-router';
-import { useLocation, useNavigate } from 'react-router';
 import { DemoContainer } from 'routes/development-library/components/DemoContainer';
 import { DemoSection } from 'routes/development-library/components/DemoSection';
 import { useForm } from 'routes/development-library/contexts/form';
@@ -61,7 +60,7 @@ const SECTION_CODEC = createHashParamCodec<Section>()(b => b.enum(SECTIONS));
 
 const SECTION_DEFAULT_CODEC = createHashParamCodec<Section>()(b => b.enum(SECTIONS, 'overview'));
 
-const makeLocation = (hash: string): Location => ({ pathname: '/library', search: '', hash, state: null, key: 'demo' });
+const makeLocation = (hash: string) => ({ pathname: '/library', search: '', hash, state: null, key: 'demo' });
 
 const show = (fn: () => unknown): string => {
   try {
@@ -113,33 +112,30 @@ ResultBlock.displayName = 'ResultBlock';
 //*****************************************************************************************
 
 const LiveHash = memo(() => {
-  const location = useLocation();
-  const navigate = useNavigate();
+  const location = useAppLocation<'/development/library'>()();
+  const navigate = useAppNavigate<'/development/library'>();
 
   const handleChange = useCallback(
     (_event: unknown, next: Section | null) =>
-      void navigate(
-        {
-          pathname: location.pathname,
-          search: location.search,
-          hash: SECTION_CODEC.stringify(next ?? undefined)
-        },
-        { replace: true }
-      ),
-    [location.pathname, location.search, navigate]
+      navigate.here({ replace: true }).update(s => ({ ...s, hash: SECTION_CODEC.stringify(next ?? undefined) })),
+    [navigate]
   );
 
   return (
     <Column>
       <SelectInput
         label="section"
-        value={SECTION_CODEC.parse(location) ?? null}
+        value={SECTION_CODEC.parse(makeLocation(location.hash ?? '')) ?? null}
         options={SECTION_OPTIONS}
         onChange={handleChange}
       />
       <ResultBlock label="location.hash">{location.hash || '(empty)'}</ResultBlock>
-      <ResultBlock label="sectionCodec.parse(location)">{show(() => SECTION_CODEC.parse(location))}</ResultBlock>
-      <ResultBlock label="stringCodec.parse(location)">{show(() => STRING_CODEC.parse(location))}</ResultBlock>
+      <ResultBlock label="sectionCodec.parse(location)">
+        {show(() => SECTION_CODEC.parse(makeLocation(location.hash ?? '')))}
+      </ResultBlock>
+      <ResultBlock label="stringCodec.parse(location)">
+        {show(() => STRING_CODEC.parse(makeLocation(location.hash ?? '')))}
+      </ResultBlock>
     </Column>
   );
 });

@@ -28,7 +28,7 @@ import Skeleton from '@mui/material/Skeleton';
 import { red } from '@mui/material/colors';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
-import { createAppRoute } from 'core/router';
+import { createAppRoute, useAppNavigate, useAppPathParams } from 'core/router';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import { useAppUser } from 'core/template/components/app/hooks';
 import PageCenter from 'core/template/components/pages/PageCenter';
@@ -37,7 +37,6 @@ import type { CustomUser } from 'models/api/user';
 import type { User } from 'models/base/user';
 import React, { memo, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate, useLocation, useNavigate, useParams } from 'react-router';
 import APIKeys from 'routes/user/components/api_keys';
 import Apps from 'routes/user/components/apps';
 import DisableOTP from 'routes/user/components/disable_otp';
@@ -98,10 +97,9 @@ const ClickRow = ({ children, enabled, onClick, chevron = false, ...other }) => 
 export const UserPage = memo(({ username = null }: UserPageProps) => {
   const { t } = useTranslation(['user']);
   const theme = useTheme();
-  const { id } = useParams<ParamProps>();
-  const location = useLocation();
+  const { id } = useAppPathParams<'/admin/users/:id'>();
   const inputRef = useRef(null);
-  const navigate = useNavigate();
+  const navigate = useAppNavigate();
   const { apiCall } = useMyAPI();
   const { user: currentUser, configuration, classificationAliases } = useALContext();
   const { showErrorMessage, showSuccessMessage, showWarningMessage } = useMySnackbar();
@@ -130,7 +128,7 @@ export const UserPage = memo(({ username = null }: UserPageProps) => {
       onSuccess: () => {
         showSuccessMessage(t('delete.success'));
         setTimeout(() => {
-          navigate('/admin/users');
+          navigate.here().closePanel({ route: '/admin/users' });
         }, 500);
       },
       onEnter: () => setButtonLoading(true),
@@ -291,14 +289,12 @@ export const UserPage = memo(({ username = null }: UserPageProps) => {
   }
 
   const reloadUser = () => {
-    if (currentUser.is_admin || !location.pathname.includes('/admin/')) {
-      apiCall({
-        url: `/api/v4/user/${username || id}/?load_avatar`,
-        onSuccess: api_data => {
-          setUser(api_data.api_response);
-        }
-      });
-    }
+    apiCall({
+      url: `/api/v4/user/${username || id}/?load_avatar`,
+      onSuccess: api_data => {
+        setUser(api_data.api_response);
+      }
+    });
   };
 
   useEffectOnce(() => {
@@ -311,9 +307,7 @@ export const UserPage = memo(({ username = null }: UserPageProps) => {
     getQuotas();
   });
 
-  return !currentUser.is_admin && location.pathname.includes('/admin/') ? (
-    <Navigate to="/forbidden" replace />
-  ) : (
+  return (
     <PageCenter margin={4} width="100%">
       <React.Fragment key="right">
         <Drawer anchor="right" open={drawerOpen} onClose={() => setDrawerOpen(false)}>

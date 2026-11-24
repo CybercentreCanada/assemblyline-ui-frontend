@@ -4,7 +4,7 @@ import type { PaperProps } from '@mui/material';
 import { Grid, Paper, Skeleton, styled, Typography, useTheme } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
-import { createAppRoute } from 'core/router';
+import { createAppRoute, useAppPathParams } from 'core/router';
 import { useAppUser } from 'core/template/components/app/hooks';
 import PageCenter from 'core/template/components/pages/PageCenter';
 import type { CustomUser } from 'models/api/user';
@@ -12,7 +12,6 @@ import type { Heuristic } from 'models/base/heuristic';
 import { DEFAULT_STATS, type Statistic } from 'models/base/statistic';
 import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router';
 import { ForbiddenPage } from 'routes/forbidden/forbidden.page';
 import ResultsTable from 'routes/search/components/results';
 import { safeFieldValueURI } from 'shared/utils/utils';
@@ -43,7 +42,7 @@ export type ManageHeuristicDetailPageProps = {
 
 export const ManageHeuristicDetailPage = memo(({ heur_id = null }: ManageHeuristicDetailPageProps) => {
   const { t, i18n } = useTranslation(['manageHeuristicDetail']);
-  const { id } = useParams<ParamProps>();
+  const { id } = useAppPathParams<'/manage/heuristic/detail/:id'>();
   const theme = useTheme();
   const [heuristic, setHeuristic] = useState<Heuristic>(null);
   const [stats, setStats] = useState<Statistic>(DEFAULT_STATS);
@@ -275,7 +274,7 @@ export const ManageHeuristicDetailPage = memo(({ heur_id = null }: ManageHeurist
                 <Typography variant="h6">{t('last10')}</Typography>
               </Grid>
               <Grid size={{ xs: 12 }}>
-                <ResultsTable resultResults={results} allowSort={false} allowHash />
+                <ResultsTable resultResults={results} allowSort={false} />
               </Grid>
             </>
           )}

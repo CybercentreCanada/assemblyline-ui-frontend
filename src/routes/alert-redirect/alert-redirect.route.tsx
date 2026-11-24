@@ -1,8 +1,7 @@
 import NotificationImportantOutlinedIcon from '@mui/icons-material/NotificationImportantOutlined';
 import { CircularProgress } from '@mui/material';
-import { createAppRoute } from 'core/router';
+import { AppNavigate, createAppRoute } from 'core/router';
 import { memo, useMemo } from 'react';
-import { Navigate } from 'react-router';
 import type { AlertSearchParams } from 'routes/alerts/alerts.route';
 import { ALERT_DEFAULT_PARAMS, ALERT_STORAGE_KEY } from 'routes/alerts/alerts.route';
 import { SearchParser } from 'routes/alerts/utils/SearchParser';
@@ -26,7 +25,7 @@ export const AlertRedirectPage = memo(() => {
         <CircularProgress variant="indeterminate" />
       </div>
     );
-  else return <Navigate to={`/alerts?${search.toString()}`} replace />;
+  else return <AppNavigate nav={nav => nav.to().create({ route: '/alerts', search: search.toObject() })} />;
 });
 
 export const AlertRedirectRoute = createAppRoute({

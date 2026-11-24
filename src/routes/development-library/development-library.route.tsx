@@ -1,9 +1,8 @@
 import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
 import useALContext from 'core/config/useALContext';
-import { createAppRoute } from 'core/router';
+import { AppNavigate, createAppRoute, useAppNavigate, useAppSearchSnapshot } from 'core/router';
 import { TableOfContentLayout, useTableOfContent } from 'features/table-of-content/table-of-content.providers';
 import React, { memo, useCallback, useEffect, useMemo } from 'react';
-import { Navigate, useLocation, useNavigate } from 'react-router';
 import type { LibraryFormStore } from 'routes/development-library/contexts/form';
 import { FormProvider, useForm } from 'routes/development-library/contexts/form';
 import { DateTimeSection } from 'routes/development-library/sections/DateTime';
@@ -18,7 +17,6 @@ import { PageHeader } from 'ui/layouts/PageHeader';
 import { PageLayout } from 'ui/layouts/PageLayout';
 import type { PageNavigationItemProp } from 'ui/layouts/PageNavigation';
 import { PageNavigation } from 'ui/layouts/PageNavigation';
-import SimpleSearchQuery from 'ui/SearchBar/simple-search-query';
 
 type LibraryTab = LibraryFormStore['state']['tab'];
 type ComponentsState = LibraryFormStore['components'];
@@ -29,8 +27,7 @@ type LibraryPageContentInnerProps = {
 };
 
 const LibraryPageContentInner = memo(({ tab, components }: LibraryPageContentInnerProps) => {
-  const location = useLocation();
-  const navigate = useNavigate();
+  const navigate = useAppNavigate<'/development/library'>();
   const { rootRef, headerRef, Anchors, ActiveAnchor, scrollTo } = useTableOfContent();
 
   const selectedName = components?.[tab]?.name ?? '';
@@ -55,9 +52,9 @@ const LibraryPageContentInner = memo(({ tab, components }: LibraryPageContentInn
   const handleLeftNavClick = useCallback<PageNavigationItemProp['onPageNavigation']>(
     (event, props) => {
       rootRef.current?.scrollTo({ top: 0, behavior: 'instant' });
-      navigate(`${location.pathname}?tab=${props.id}`);
+      navigate.here().update(s => ({ ...s, search: { ...s.search, tab: props.id as LibraryTab } }));
     },
-    [rootRef, navigate, location.pathname]
+    [rootRef, navigate]
   );
 
   return (
@@ -113,16 +110,15 @@ const LibraryPageContentInner = memo(({ tab, components }: LibraryPageContentInn
 
 export const DevelopmentLibraryContent = memo(() => {
   const form = useForm();
-  const location = useLocation();
+  const search = useAppSearchSnapshot<'/development/library'>();
   const { user: currentUser, configuration } = useALContext();
 
   useEffect(() => {
-    const url = new SimpleSearchQuery(location.search);
-    form.setFieldValue('state.tab', url.get('tab') as LibraryFormStore['state']['tab']);
-  }, [form, location.search]);
+    form.setFieldValue('state.tab', search.get('tab') as LibraryFormStore['state']['tab']);
+  }, [form, search?.toString()]);
 
   if (!currentUser.is_admin || !['development', 'staging'].includes(configuration.system.type)) {
-    return <Navigate to="/forbidden" replace />;
+    return <AppNavigate nav={nav => nav.here<'/forbidden'>({ replace: true }).update({ route: '/forbidden' })} />;
   }
 
   return (
@@ -161,6 +157,7 @@ export const DevelopmentLibraryRoute = createAppRoute({
       'search_params'
     ])
   }),
+  hash: s => s.string(null),
 
   ancestor: '/development',
   shortname: () => ['app_route.development_library.shortname', { ns: 'developmentAPI' }],

@@ -4,21 +4,16 @@ import EventOutlinedIcon from '@mui/icons-material/EventOutlined';
 import { Grid, IconButton, Tooltip, useTheme } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
-import { createAppRoute } from 'core/router';
+import { createAppRoute, useAppNavigate, useAppSearchSnapshot } from 'core/router';
 import PageContainer from 'core/template/branding/AppPageContainer';
 import { useAppUser } from 'core/template/components/app/hooks';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
-import { createSearchParams, SearchParamsProvider, useSearchParams } from 'features/search-params';
-import useDrawer from 'layout/drawer/drawer.hooks';
 import type { CustomUser, IndexDefinition } from 'models/api/user';
 import type { WorkflowIndexed } from 'models/base/workflow';
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
-import { useLocation, useNavigate } from 'react-router';
 import { ForbiddenPage } from 'routes/forbidden/forbidden.page';
-import { ManageWorkflowCreatePage } from 'routes/manage-workflow-create/manage-workflow-create.route';
-import { ManageWorkflowDetailPage } from 'routes/manage-workflow-detail/manage-workflow-detail.route';
 import WorkflowTable from 'routes/search/components/workflow';
 import { PageHeader } from 'ui/layouts/PageHeader';
 import { DEFAULT_SUGGESTION } from 'ui/SearchBar/search-textfield';
@@ -31,28 +26,14 @@ type SearchResults = {
   total: number;
 };
 
-const WORKFLOWS_PARAMS = createSearchParams(p => ({
-  query: p.string(''),
-  offset: p.number(0).min(0).source('transient').ephemeral(),
-  rows: p.number(25).locked().source('transient').ephemeral(),
-  sort: p.string('last_seen desc').ephemeral(),
-  filters: p.filters([]),
-  track_total_hits: p.number(10000).nullable().ephemeral(),
-  refresh: p.boolean(false).source('transient').ephemeral()
-}));
-
-type WorkflowsParams = typeof WORKFLOWS_PARAMS;
-
 export const ManageWorkflowsContent = memo(() => {
   const { t } = useTranslation(['manageWorkflows']);
   const theme = useTheme();
-  const location = useLocation();
-  const navigate = useNavigate();
+  const navigate = useAppNavigate<'/manage/workflows'>();
+  const search = useAppSearchSnapshot<'/manage/workflows'>();
   const { apiCall } = useMyAPI();
   const { indexes } = useALContext();
   const { user: currentUser } = useAppUser<CustomUser>();
-  const { globalDrawerOpened, setGlobalDrawer, closeGlobalDrawer } = useDrawer();
-  const { search, setSearchParams, setSearchObject } = useSearchParams<WorkflowsParams>();
 
   const [workflowResults, setWorkflowResults] = useState<SearchResults>(null);
   const [searching, setSearching] = useState<boolean>(false);
@@ -64,12 +45,18 @@ export const ManageWorkflowsContent = memo(() => {
 
   const handleToggleFilter = useCallback(
     (filter: string) => {
-      setSearchObject(o => {
-        const filters = o.filters.includes(filter) ? o.filters.filter(f => f !== filter) : [...o.filters, filter];
-        return { ...o, offset: 0, filters };
-      });
+      navigate.here().update(s => ({
+        ...s,
+        search: {
+          ...s.search,
+          offset: 0,
+          filters: s.search.filters.includes(filter)
+            ? s.search.filters.filter(value => value !== filter)
+            : [...s.search.filters, filter]
+        }
+      }));
     },
-    [setSearchObject]
+    [navigate]
   );
 
   const handleReload = useCallback(
@@ -92,44 +79,6 @@ export const ManageWorkflowsContent = memo(() => {
     [currentUser.roles]
   );
 
-  const setWorkflowID = useCallback(
-    (wf_id: string) => navigate(`${location.pathname}${location.search}#/detail/${wf_id}`),
-    [location.pathname, location.search, navigate]
-  );
-
-  useEffect(() => {
-    if (!location.hash || globalDrawerOpened || !workflowResults) return;
-    navigate(`${location.pathname}${location.search || ''}`);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [globalDrawerOpened]);
-
-  useEffect(() => {
-    const url = new URL(`${window.location.origin}${location.hash.slice(1)}`);
-
-    if (url.pathname.startsWith('/detail/')) {
-      setGlobalDrawer(
-        <ManageWorkflowDetailPage
-          id={url.pathname.slice('/detail/'.length)}
-          onClose={() => navigate(`${location.pathname}${location.search}`)}
-        />
-      );
-    } else if (url.pathname.startsWith('/create/')) {
-      setGlobalDrawer(
-        <ManageWorkflowCreatePage
-          id={url.pathname.slice('/create/'.length)}
-          onClose={id =>
-            id
-              ? navigate(`${location.pathname}${location.search}#/detail/${id}`)
-              : navigate(`${location.pathname}${location.search}`)
-          }
-        />
-      );
-    } else {
-      closeGlobalDrawer();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location.hash]);
-
   useEffect(() => {
     handleReload(search);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -137,14 +86,14 @@ export const ManageWorkflowsContent = memo(() => {
 
   useEffect(() => {
     function reload() {
-      setSearchObject(o => ({ ...o, offset: 0, refresh: !o.refresh }));
+      navigate.here().update(s => ({ ...s, search: { ...s.search, offset: 0, refresh: !s.search.refresh } }));
     }
 
     window.addEventListener('reloadWorkflows', reload);
     return () => {
       window.removeEventListener('reloadWorkflows', reload);
     };
-  }, [setSearchObject]);
+  }, [navigate]);
 
   return currentUser.roles.includes('workflow_view') ? (
     <PageFullWidth margin={4}>
@@ -161,7 +110,7 @@ export const ManageWorkflowsContent = memo(() => {
                   style={{
                     color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark
                   }}
-                  onClick={() => navigate(`${location.pathname}${location.search}#/create/`)}
+                  onClick={() => navigate.to().create({ route: '/manage/workflow/create' })}
                   size="large"
                 >
                   <AddCircleOutlineOutlinedIcon />
@@ -183,7 +132,12 @@ export const ManageWorkflowsContent = memo(() => {
                 ? t(`filtered${workflowResults?.total === 1 ? '' : 's'}`)
                 : t(`total${workflowResults?.total === 1 ? '' : 's'}`)
             }
-            onChange={v => setSearchParams(v)}
+            onChange={values =>
+              navigate.here().update(s => ({
+                ...s,
+                search: { ...s.search, ...ManageWorkflowsRoute.search.full(values).toObject() }
+              }))
+            }
             paramDefaults={search.defaults().toObject()}
             searchInputProps={{ placeholder: t('filter'), options: suggestions }}
             actionProps={[
@@ -215,7 +169,7 @@ export const ManageWorkflowsContent = memo(() => {
       </PageContainer>
 
       <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
-        <WorkflowTable workflowResults={workflowResults} setWorkflowID={setWorkflowID} />
+        <WorkflowTable workflowResults={workflowResults} />
       </div>
     </PageFullWidth>
   ) : (
@@ -223,11 +177,8 @@ export const ManageWorkflowsContent = memo(() => {
   );
 });
 
-export const ManageWorkflowsPage = memo(() => (
-  <SearchParamsProvider params={WORKFLOWS_PARAMS}>
-    <ManageWorkflowsContent />
-  </SearchParamsProvider>
-));
+export const ManageWorkflowsPage = memo(() => <ManageWorkflowsContent />);
+ManageWorkflowsPage.displayName = 'ManageWorkflowsPage';
 
 export const ManageWorkflowsRoute = createAppRoute({
   component: ManageWorkflowsPage,

@@ -20,7 +20,7 @@ import {
 import FormControl from '@mui/material/FormControl';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
-import { createAppRoute } from 'core/router';
+import { createAppRoute, useAppNavigate, useAppPathParams } from 'core/router';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import { useAppTheme } from 'core/template/components/app/hooks';
 import PageCenter from 'core/template/components/pages/PageCenter';
@@ -31,7 +31,6 @@ import { DEFAULT_STATS } from 'models/base/statistic';
 import React, { memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TbUserX } from 'react-icons/tb';
-import { useNavigate, useParams } from 'react-router';
 import { ForbiddenPage } from 'routes/forbidden/forbidden.page';
 import ResultsTable from 'routes/search/components/results';
 import { suricataConfig, suricataDef } from 'shared/utils/suricata';
@@ -65,7 +64,9 @@ type SaveSignatureProps = {
 const SaveSignature: React.FC<SaveSignatureProps> = React.memo(
   ({ signature = null, modified = false, handleSuccess = () => null }) => {
     const { t } = useTranslation(['manageSignatureDetail']);
-    const { id, type, source, name } = useParams<ParamProps>();
+    const { id, type, source, name } = useAppPathParams<
+      '/manage/signature/detail/:id' & '/manage/signature/detail/:type/:source/:name'
+    >();
     const theme = useTheme();
     const { apiCall } = useMyAPI();
     const { user: currentUser } = useALContext();
@@ -213,7 +214,9 @@ export type ManageSignatureDetailPageProps = {
 export const ManageSignatureDetailPage = memo(
   ({ signature_id = null, onUpdated = () => null, onDeleted = () => null }: ManageSignatureDetailPageProps) => {
     const { t, i18n } = useTranslation(['manageSignatureDetail']);
-    const { id, type, source, name } = useParams<ParamProps>();
+    const { id, type, source, name } = useAppPathParams<
+      '/manage/signature/detail/:id' & '/manage/signature/detail/:type/:source/:name'
+    >();
     const theme = useTheme();
     const [signature, setSignature] = useState<Signature>(null);
     const [stats, setStats] = useState<Statistic>(DEFAULT_STATS);
@@ -223,7 +226,7 @@ export const ManageSignatureDetailPage = memo(
     const [deleteDialog, setDeleteDialog] = useState(false);
     const [buttonLoading, setButtonLoading] = useState(false);
     const [modified, setModified] = useState(false);
-    const navigate = useNavigate();
+    const navigate = useAppNavigate();
     const { showSuccessMessage, showErrorMessage } = useMySnackbar();
     const { apiCall } = useMyAPI();
     const { user: currentUser, c12nDef } = useALContext();
@@ -378,7 +381,7 @@ export const ManageSignatureDetailPage = memo(
         method: 'DELETE',
         onSuccess: () => {
           showSuccessMessage(t('delete.success'));
-          if (id) setTimeout(() => navigate('/manage/signatures'), 1000);
+          if (id) setTimeout(() => navigate.here().closePanel({ route: '/manage/signatures' }), 1000);
           onDeleted();
         },
         onEnter: () => setButtonLoading(true),
@@ -622,7 +625,7 @@ export const ManageSignatureDetailPage = memo(
                   <Typography variant="h6">{t('last10')}</Typography>
                 </Grid>
                 <Grid size={{ xs: 12 }}>
-                  <ResultsTable resultResults={results} allowSort={false} allowHash />
+                  <ResultsTable resultResults={results} allowSort={false} />
                 </Grid>
               </>
             )}

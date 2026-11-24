@@ -4,7 +4,7 @@ import SupervisorAccountOutlinedIcon from '@mui/icons-material/SupervisorAccount
 import { useTheme } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
-import { createAppRoute } from 'core/router';
+import { AppNavigate, createAppRoute } from 'core/router';
 import PageContainer from 'core/template/branding/AppPageContainer';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
 import { createSearchParams, SearchParamsProvider, useSearchParams } from 'features/search-params';
@@ -13,7 +13,6 @@ import type { IndexDefinition } from 'models/api/user';
 import type { UserIndexed } from 'models/base/user';
 import { memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate } from 'react-router';
 import { AddUserPage } from 'routes/admin-users/components/users_add';
 import UsersTable from 'routes/search/components/users';
 import { PageHeader } from 'ui/layouts/PageHeader';
@@ -99,7 +98,7 @@ export const AdminUsersContent = memo(() => {
   }, [setSearchObject]);
 
   return !currentUser.is_admin ? (
-    <Navigate to="/forbidden" replace />
+    <AppNavigate nav={nav => nav.here<'/forbidden'>({ replace: true }).update({ route: '/forbidden' })} />
   ) : (
     <PageFullWidth margin={4}>
       <PageHeader

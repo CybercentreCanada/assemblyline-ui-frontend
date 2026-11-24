@@ -6,49 +6,30 @@ import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import { useTheme } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
-import { createAppRoute } from 'core/router';
+import { createAppRoute, useAppNavigate, useAppSearchSnapshot } from 'core/router';
 import PageContainer from 'core/template/branding/AppPageContainer';
 import { useAppUser } from 'core/template/components/app/hooks';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
-import { createSearchParams, SearchParamsProvider, useSearchParams } from 'features/search-params';
-import useDrawer from 'layout/drawer/drawer.hooks';
 import type { SearchResult } from 'models/api/search';
 import type { CustomUser, IndexDefinition } from 'models/api/user';
 import type { Safelist } from 'models/base/safelist';
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router';
 import { ForbiddenPage } from 'routes/forbidden/forbidden.page';
-import { ManageSafelistAddPage } from 'routes/manage-safelist-add/manage-safelist-add.route';
-import { ManageSafelistDetailPage } from 'routes/manage-safelist-detail/manage-safelist-detail.route';
 import SafelistTable from 'routes/search/components/safelist';
 import { IconButton } from 'ui/buttons/IconButton';
 import { PageHeader } from 'ui/layouts/PageHeader';
 import { DEFAULT_SUGGESTION } from 'ui/SearchBar/search-textfield';
 import SearchHeader from 'ui/SearchBar/SearchHeader';
 
-const SAFELIST_PARAMS = createSearchParams(p => ({
-  query: p.string(''),
-  offset: p.number(0).min(0).source('transient').ephemeral(),
-  rows: p.number(25).locked().source('transient').ephemeral(),
-  sort: p.string('added desc').ephemeral(),
-  filters: p.filters([]),
-  track_total_hits: p.number(10000).nullable().ephemeral(),
-  refresh: p.boolean(false).source('transient').ephemeral()
-}));
-
-type SafelistParams = typeof SAFELIST_PARAMS;
-
 export const ManageSafelistsContent = memo(() => {
   const { t } = useTranslation(['manageSafelist']);
   const theme = useTheme();
-  const location = useLocation();
-  const navigate = useNavigate();
+  const navigate = useAppNavigate<'/manage/safelists'>();
+  const search = useAppSearchSnapshot<'/manage/safelists'>();
   const { apiCall } = useMyAPI();
   const { indexes } = useALContext();
   const { user: currentUser } = useAppUser<CustomUser>();
-  const { globalDrawerOpened, setGlobalDrawer, closeGlobalDrawer } = useDrawer();
-  const { search, setSearchParams, setSearchObject } = useSearchParams<SafelistParams>();
 
   const [safelistResults, setSafelistResults] = useState<SearchResult<Safelist>>(null);
   const [searching, setSearching] = useState<boolean>(false);
@@ -60,12 +41,18 @@ export const ManageSafelistsContent = memo(() => {
 
   const handleToggleFilter = useCallback(
     (filter: string) => {
-      setSearchObject(o => {
-        const filters = o.filters.includes(filter) ? o.filters.filter(f => f !== filter) : [...o.filters, filter];
-        return { ...o, offset: 0, filters };
-      });
+      navigate.here().update(s => ({
+        ...s,
+        search: {
+          ...s.search,
+          offset: 0,
+          filters: s.search.filters.includes(filter)
+            ? s.search.filters.filter(value => value !== filter)
+            : [...s.search.filters, filter]
+        }
+      }));
     },
-    [setSearchObject]
+    [navigate]
   );
 
   const handleReload = useCallback(
@@ -88,26 +75,6 @@ export const ManageSafelistsContent = memo(() => {
     [currentUser.roles]
   );
 
-  const setSafelistID = useCallback(
-    (wf_id: string) => {
-      navigate(`${location.pathname}${location.search || ''}#${wf_id}`);
-    },
-    [location.pathname, location.search, navigate]
-  );
-
-  useEffect(() => {
-    if (!location.hash || globalDrawerOpened || !safelistResults) return;
-    navigate(`${location.pathname}${location.search || ''}`);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [globalDrawerOpened]);
-
-  useEffect(() => {
-    if (!location.hash) closeGlobalDrawer();
-    else if (location.hash === '#new') setGlobalDrawer(<ManageSafelistAddPage close={closeGlobalDrawer} />);
-    else setGlobalDrawer(<ManageSafelistDetailPage safelist_id={location.hash.slice(1)} close={closeGlobalDrawer} />);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location.hash]);
-
   useEffect(() => {
     handleReload(search);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -115,14 +82,14 @@ export const ManageSafelistsContent = memo(() => {
 
   useEffect(() => {
     function reload() {
-      setSearchObject(o => ({ ...o, offset: 0, refresh: !o.refresh }));
+      navigate.here().update(s => ({ ...s, search: { ...s.search, offset: 0, refresh: !s.search.refresh } }));
     }
 
     window.addEventListener('reloadSafelist', reload);
     return () => {
       window.removeEventListener('reloadSafelist', reload);
     };
-  }, [setSearchObject]);
+  }, [navigate]);
 
   return currentUser.roles.includes('safelist_view') ? (
     <PageFullWidth margin={4}>
@@ -137,7 +104,7 @@ export const ManageSafelistsContent = memo(() => {
             preventRender={!currentUser.roles.includes('safelist_manage')}
             size="large"
             sx={{ color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark }}
-            onClick={() => navigate(`${location.pathname}${location.search || ''}#new`)}
+            nav={nav => nav.to().create({ route: '/manage/safelist/add' })}
           >
             <AddCircleOutlineOutlinedIcon />
           </IconButton>
@@ -155,7 +122,12 @@ export const ManageSafelistsContent = memo(() => {
                 ? t(`filtered${safelistResults?.total === 1 ? '' : 's'}`)
                 : t(`total${safelistResults?.total === 1 ? '' : 's'}`)
             }
-            onChange={v => setSearchParams(v)}
+            onChange={values =>
+              navigate.here().update(s => ({
+                ...s,
+                search: { ...s.search, ...ManageSafelistsRoute.search.full(values).toObject() }
+              }))
+            }
             paramDefaults={search.defaults().toObject()}
             searchInputProps={{ placeholder: t('filter'), options: suggestions }}
             actionProps={[
@@ -193,7 +165,7 @@ export const ManageSafelistsContent = memo(() => {
       </PageContainer>
 
       <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
-        <SafelistTable safelistResults={safelistResults} setSafelistID={setSafelistID} />
+        <SafelistTable safelistResults={safelistResults} />
       </div>
     </PageFullWidth>
   ) : (
@@ -201,11 +173,8 @@ export const ManageSafelistsContent = memo(() => {
   );
 });
 
-export const ManageSafelistsPage = memo(() => (
-  <SearchParamsProvider params={SAFELIST_PARAMS}>
-    <ManageSafelistsContent />
-  </SearchParamsProvider>
-));
+export const ManageSafelistsPage = memo(() => <ManageSafelistsContent />);
+ManageSafelistsPage.displayName = 'ManageSafelistsPage';
 
 export const ManageSafelistsRoute = createAppRoute({
   component: ManageSafelistsPage,

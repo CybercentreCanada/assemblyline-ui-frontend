@@ -17,7 +17,7 @@ import {
 import Alert from '@mui/material/Alert';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
-import { createAppRoute } from 'core/router';
+import { createAppRoute, useAppPathParams } from 'core/router';
 import { useAppUser } from 'core/template/components/app/hooks';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
 import ListCarousel from 'deprecated/components/lists/carousel/ListCarousel';
@@ -29,7 +29,6 @@ import type { AlertItem } from 'models/base/alert';
 import React, { memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BsClipboard } from 'react-icons/bs';
-import { useParams } from 'react-router';
 import { ALERT_DEFAULT_PARAMS, ALERT_SIMPLELIST_ID } from 'routes/alerts/alerts.route';
 import AlertActions, {
   AlertBadlist,
@@ -111,7 +110,7 @@ export const AlertDetailContent = memo(
     const { copy } = useClipboard();
     const { addInsight, removeInsight } = useAssistant();
     const { c12nDef, configuration } = useALContext();
-    const { id: paramId } = useParams<Params>();
+    const paramId = useAppPathParams<'/alert/:id'>()?.id;
     const { user: currentUser } = useAppUser<CustomUser>();
     const fetchers = useClueFetcherSelector(s => s.fetchers);
 

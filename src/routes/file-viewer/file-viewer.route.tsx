@@ -28,7 +28,14 @@ import {
 } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
-import { createAppRoute } from 'core/router';
+import {
+  AppLink,
+  AppNavigate,
+  createAppRoute,
+  useAppNavigate,
+  useAppPathParams,
+  useAppSearchParams
+} from 'core/router';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import PageFullSize from 'core/template/branding/AppPageCenter';
 import { useAppUser } from 'core/template/components/app/hooks';
@@ -38,8 +45,6 @@ import type { File } from 'models/base/file';
 import type { Submission } from 'models/base/submission';
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate, useParams } from 'react-router';
-import { Link } from 'react-router-dom';
 import { ASCIISection } from 'routes/file-viewer/components/ascii';
 import CodeSection from 'routes/file-viewer/components/code_summary';
 import { HexSection } from 'routes/file-viewer/components/hex';
@@ -66,22 +71,16 @@ export type Tab = (typeof TAB_OPTIONS)[number];
 
 export const DEFAULT_TAB: Tab = 'ascii';
 
-type ParamProps = {
-  id: string;
-  tab: Tab;
-};
-
 export const FileViewerContent = memo(() => {
   const { t } = useTranslation(['fileViewer']);
   const theme = useTheme();
-  const location = useLocation();
-  const navigate = useNavigate();
+  const navigate = useAppNavigate<'/file/viewer/:id/:tab'>();
   const selection = useSelection();
 
   const { addInsight, removeInsight } = useAssistant();
   const { apiCall } = useMyAPI();
   const { configuration } = useALContext();
-  const { id: sha256, tab: paramTab } = useParams<ParamProps>();
+  const { id: sha256, tab: paramTab } = useAppPathParams<'/file/viewer/:id/:tab'>();
   const { user: currentUser } = useAppUser<CustomUser>();
   const { closeSnackbar, showSuccessMessage } = useMySnackbar();
 
@@ -116,7 +115,7 @@ export const FileViewerContent = memo(() => {
         onSuccess: api_data => {
           showSuccessMessage(t('submit.success'));
           setTimeout(() => {
-            navigate(`/submission/detail/${api_data.api_response.sid}`);
+            navigate.to().create({ route: '/submission/detail/:id', path: { id: api_data.api_response.sid } });
           }, 500);
         }
       });
@@ -142,7 +141,7 @@ export const FileViewerContent = memo(() => {
         onSuccess: api_data => {
           showSuccessMessage(t('submit.success'));
           setTimeout(() => {
-            navigate(`/submission/detail/${api_data.api_response.sid}`);
+            navigate.to().create({ route: '/submission/detail/:id', path: { id: api_data.api_response.sid } });
           }, 500);
         }
       });
@@ -295,16 +294,16 @@ export const FileViewerContent = memo(() => {
                     </ListItem>
 
                     <ListItemButton
-                      component={Link}
+                      component={AppLink}
                       dense
                       onClick={() => setSubmitAnchor(null)}
                       {...(isSelection
                         ? {
-                            to: '/submit',
-                            state: { raw: selection?.getSelection() }
+                            nav: nav =>
+                              nav.to().create({ route: '/submit', search: { raw: selection?.getSelection() } })
                           }
                         : {
-                            to: `/submit?hash=${sha256}`
+                            nav: nav => nav.to().create({ route: '/submit', search: { hash: sha256 } })
                           })}
                     >
                       <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
@@ -351,7 +350,11 @@ export const FileViewerContent = memo(() => {
             )}
             {currentUser.roles.includes('submission_view') && (
               <Tooltip title={t('detail')}>
-                <IconButton component={Link} to={`/file/detail/${sha256}`} size="large">
+                <IconButton
+                  nav={nav => nav.to().create({ route: '/file/detail/:id', path: { id: sha256 } })}
+                  navDeps={[sha256]}
+                  size="large"
+                >
                   <DescriptionOutlinedIcon />
                 </IconButton>
               </Tooltip>
@@ -359,8 +362,14 @@ export const FileViewerContent = memo(() => {
             {currentUser.roles.includes('submission_view') && (
               <Tooltip title={t('related')}>
                 <IconButton
-                  component={Link}
-                  to={`/search/submission?query=files.sha256:${sha256} OR results:${sha256}* OR errors:${sha256}*`}
+                  nav={nav =>
+                    nav.to().create({
+                      route: '/search/:index',
+                      path: { index: 'submission' },
+                      search: { query: `files.sha256:${sha256} OR results:${sha256}* OR errors:${sha256}*` }
+                    })
+                  }
+                  navDeps={[sha256]}
                   size="large"
                 >
                   <ViewCarouselOutlinedIcon />
@@ -395,7 +404,9 @@ export const FileViewerContent = memo(() => {
             defaultTab={DEFAULT_TAB}
             paper
             onChange={(_event, value) => {
-              navigate(`/file/viewer/${sha256}/${value}/${location.search}${location.hash}`, { replace: true });
+              navigate
+                .here({ replace: true })
+                .update({ route: '/file/viewer/:id/:tab', path: { id: sha256, tab: value } });
               selection?.setSelection?.(null);
             }}
             tabs={{
@@ -468,6 +479,26 @@ export const FileViewerPage = memo(() => (
   </SelectionProvider>
 ));
 
+FileViewerPage.displayName = 'FileViewerPage';
+
+const FileViewerRootPage = memo(() => {
+  const { id = null } = useAppPathParams<'/file/viewer/:id'>();
+  const search = useAppSearchParams<'/file/viewer/:id'>();
+
+  return (
+    <AppNavigate
+      nav={nav =>
+        nav
+          .to({ replace: true })
+          .update({ route: '/file/viewer/:id/:tab', path: { id, tab: null }, search: search as never })
+      }
+      navDeps={[id, search]}
+    />
+  );
+});
+
+FileViewerRootPage.displayName = 'FileViewerRootPage';
+
 export const FileViewerRoute = createAppRoute({
   component: FileViewerPage,
 
@@ -500,7 +531,7 @@ export const FileViewerRoute = createAppRoute({
 });
 
 export const FileViewerRootRoute = createAppRoute({
-  component: FileViewerPage,
+  component: FileViewerRootPage,
 
   path: '/file/viewer/:id',
   params: s => ({

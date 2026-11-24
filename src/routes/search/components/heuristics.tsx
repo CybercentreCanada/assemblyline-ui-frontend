@@ -6,7 +6,6 @@ import type { SearchResult } from 'models/api/search';
 import type { Heuristic } from 'models/base/heuristic';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
 import Classification from 'ui/Classification';
 import {
   DivTable,
@@ -22,11 +21,10 @@ import Moment from 'ui/Moment';
 
 type Props = {
   heuristicResults: SearchResult<Heuristic>;
-  setHeuristicID?: (id: string) => void;
   allowSort?: boolean;
 };
 
-const WrappedHeuristicsTable: React.FC<Props> = ({ heuristicResults, setHeuristicID = null, allowSort = true }) => {
+const WrappedHeuristicsTable: React.FC<Props> = ({ heuristicResults, allowSort = true }) => {
   const { t } = useTranslation(['search']);
   const { c12nDef } = useALContext();
 
@@ -65,14 +63,10 @@ const WrappedHeuristicsTable: React.FC<Props> = ({ heuristicResults, setHeuristi
             {heuristicResults.items.map((heuristic, i) => (
               <LinkRow
                 key={`${heuristic.heur_id}-${i}`}
-                component={Link}
-                to={`/manage/heuristic/${heuristic.heur_id}`}
-                onClick={event => {
-                  if (setHeuristicID) {
-                    event.preventDefault();
-                    setHeuristicID(heuristic.heur_id);
-                  }
-                }}
+                nav={nav =>
+                  nav.to().create({ route: '/manage/heuristic/detail/:id', path: { id: heuristic.heur_id } })
+                }
+                navDeps={[heuristic.heur_id]}
                 hover
               >
                 <DivTableCell>{heuristic.heur_id}</DivTableCell>

@@ -6,8 +6,6 @@ import type { SearchResult } from 'models/api/search';
 import type { RetrohuntIndexed } from 'models/base/retrohunt';
 import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation } from 'react-router';
-import { Link } from 'react-router-dom';
 import Classification from 'ui/Classification';
 import CustomChip from 'ui/CustomChip';
 import {
@@ -25,18 +23,11 @@ import Moment from 'ui/Moment';
 type Props = {
   retrohuntResults: SearchResult<RetrohuntIndexed>;
   allowSort?: boolean;
-  onRowClick?: (retrohunt: RetrohuntIndexed) => void;
   onSort?: (value: { name: string; field: string }) => void;
 };
 
-const WrappedRetrohuntTable: React.FC<Props> = ({
-  retrohuntResults,
-  allowSort = true,
-  onRowClick = null,
-  onSort = () => null
-}) => {
+const WrappedRetrohuntTable: React.FC<Props> = ({ retrohuntResults, allowSort = true, onSort = () => null }) => {
   const { t } = useTranslation(['search']);
-  const location = useLocation();
   const { c12nDef } = useALContext();
 
   const hasTotalHits = useMemo<boolean>(
@@ -117,18 +108,10 @@ const WrappedRetrohuntTable: React.FC<Props> = ({
             {retrohuntResults.items.map((retrohunt, id) => (
               <LinkRow
                 key={`${retrohunt.id}-${id}`}
-                component={Link}
-                to={`/retrohunt/${retrohunt.key}`}
-                onClick={event => {
-                  if (!onRowClick) return;
-                  event.preventDefault();
-                  onRowClick(retrohunt);
-                }}
+                nav={nav => nav.to().create({ route: '/retrohunt/detail/:id', path: { id: retrohunt.key } })}
+                navDeps={[retrohunt.key]}
                 hover
                 style={{ textDecoration: 'none' }}
-                selected={new URL(`${window.location.origin}/${location.hash.slice(1)}`).pathname.endsWith(
-                  `/${retrohunt?.key}`
-                )}
               >
                 <DivTableCell style={{ whiteSpace: 'nowrap' }}>
                   <Tooltip title={retrohunt?.created_time}>

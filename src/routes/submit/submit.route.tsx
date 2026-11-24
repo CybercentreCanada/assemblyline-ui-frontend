@@ -1,14 +1,13 @@
 import PublishOutlinedIcon from '@mui/icons-material/PublishOutlined';
 import { Alert, Collapse, styled, useMediaQuery, useTheme } from '@mui/material';
 import useALContext from 'core/config/useALContext';
-import { createAppRoute } from 'core/router';
+import { createAppRoute, useAppSearchSnapshot } from 'core/router';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import { useAppBanner } from 'core/template/components/app/hooks';
 import PageCenter from 'core/template/components/pages/PageCenter';
 import type { Metadata } from 'models/base/submission';
 import { memo, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation } from 'react-router';
 import { initializeSettings, loadDefaultProfile, loadSubmissionProfile } from 'routes/settings/settings.utils';
 import { ServiceParameters } from 'routes/submit/components/ServiceParameters';
 import { SubmissionData } from 'routes/submit/components/SubmissionData';
@@ -30,13 +29,12 @@ import {
 } from 'routes/submit/components/SubmissionInputs';
 import { SubmissionMetadata } from 'routes/submit/components/SubmissionMetadata';
 import { SubmissionOptions } from 'routes/submit/components/SubmissionOptions';
-import type { SubmitState, SubmitStore } from 'routes/submit/submit.form';
+import type { SubmitStore } from 'routes/submit/submit.form';
 import { FLOW, FormProvider, useForm } from 'routes/submit/submit.form';
 import {
   calculateFileHash,
   getDefaultExternalSources,
   getPreferredSubmissionProfile,
-  isValidJSON,
   switchProfile,
   useAutoURLServicesSelection
 } from 'routes/submit/submit.utils';
@@ -116,7 +114,7 @@ export const SubmitContent = memo(() => {
   const theme = useTheme();
   const downMD = useMediaQuery(theme.breakpoints.down('md'));
   const banner = useAppBanner();
-  const location = useLocation();
+  const search = useAppSearchSnapshot<'/submit'>();
   const { closeSnackbar } = useMySnackbar();
   const { user: currentUser, configuration, settings } = useALContext();
   const form = useForm();
@@ -124,20 +122,16 @@ export const SubmitContent = memo(() => {
   const applyAutoURLServicesSelection = useAutoURLServicesSelection();
 
   const setClassificationFromURL = useCallback(
-    (state: SubmitState, search: URLSearchParams) => {
-      if (state?.c12n) {
-        form.setFieldValue('settings.classification.value', state.c12n);
-      } else {
-        const c12 = search.get('classification');
-        if (c12) form.setFieldValue('settings.classification.value', c12);
-      }
+    (params: typeof search) => {
+      const classification = params.get('classification');
+      if (classification) form.setFieldValue('settings.classification.value', classification);
     },
     [form]
   );
 
   const setHashFromURL = useCallback(
-    (state: SubmitState, search: URLSearchParams) => {
-      const raw = state?.hash || search.get('hash');
+    (params: typeof search) => {
+      const raw = params.get('hash');
       if (!raw) return;
 
       const [type, value] = getSubmitType(raw, configuration);
@@ -149,24 +143,16 @@ export const SubmitContent = memo(() => {
   );
 
   const setMetadataFromURL = useCallback(
-    (state: SubmitState, search: URLSearchParams) => {
-      if (state?.metadata && typeof state.metadata === 'object' && Object.keys(state.metadata).length > 0) {
-        form.setFieldValue('metadata.data', state.metadata);
-        return;
-      }
-
-      const raw = search.get('metadata');
-      if (isValidJSON(raw)) {
-        const metadata = JSON.parse(raw) as Metadata;
-        form.setFieldValue('metadata.data', metadata);
-      }
+    (params: typeof search) => {
+      const metadata = params.get('metadata');
+      if (metadata) form.setFieldValue('metadata.data', metadata as Metadata);
     },
     [form]
   );
 
   const setProfileFromURL = useCallback(
-    (state: SubmitState, search: URLSearchParams) => {
-      const name = state?.profile || search.get('profile');
+    (params: typeof search) => {
+      const name = params.get('profile');
       if (!name || !(name in settings.submission_profiles)) return;
 
       form.setFieldValue('state.profile', name);
@@ -176,8 +162,8 @@ export const SubmitContent = memo(() => {
   );
 
   const setRawFromURL = useCallback(
-    (state: SubmitState, search: URLSearchParams) => {
-      const raw = state?.raw || search.get('raw');
+    (params: typeof search) => {
+      const raw = params.get('raw');
       if (!raw) return;
 
       const encoder = new TextEncoder();
@@ -194,8 +180,8 @@ export const SubmitContent = memo(() => {
   );
 
   const setDescriptionFromURL = useCallback(
-    (state: SubmitState, search: URLSearchParams) => {
-      const desc = state?.description || search.get('description');
+    (params: typeof search) => {
+      const desc = params.get('description');
       if (!desc) return;
       form.setFieldValue('settings.description.value', desc);
     },
@@ -203,39 +189,34 @@ export const SubmitContent = memo(() => {
   );
 
   const setPriorityFromURL = useCallback(
-    (state: SubmitState, search: URLSearchParams) => {
-      const priority = state?.priority || search.get('priority');
-      if (!priority) return;
-      const val = Number.parseInt(priority, 10);
-      if (val === 500 || val === 1000 || val === 1500) {
-        form.setFieldValue('settings.priority.value', val);
+    (params: typeof search) => {
+      const priority = params.get('priority');
+      if (priority === 500 || priority === 1000 || priority === 1500) {
+        form.setFieldValue('settings.priority.value', priority);
       }
     },
     [form]
   );
 
   const setTTLFromURL = useCallback(
-    (state: SubmitState, search: URLSearchParams) => {
-      const ttl = state?.ttl || search.get('ttl');
-      if (!ttl) return;
-
-      const val = Number.parseInt(ttl, 10);
-      if (Number.isNaN(val)) return;
+    (params: typeof search) => {
+      const ttl = params.get('ttl');
+      if (ttl === null) return;
 
       const maxDTL = configuration.submission.max_dtl;
       const max = maxDTL !== 0 ? maxDTL : 365;
       const min = maxDTL !== 0 ? 1 : 0;
 
-      if (val >= min && val <= max) {
-        form.setFieldValue('settings.ttl.value', val);
+      if (ttl >= min && ttl <= max) {
+        form.setFieldValue('settings.ttl.value', ttl);
       }
     },
     [configuration, form]
   );
 
   const setFileTypeFromURL = useCallback(
-    (state: SubmitState, search: URLSearchParams) => {
-      const fileType = state?.params?.filetype_override || search.get('params.filetype_override');
+    (params: typeof search) => {
+      const fileType = params.get('filetypeOverride');
       if (!fileType) return;
       form.setFieldValue('settings.filetype_override.value', fileType);
     },
@@ -265,25 +246,22 @@ export const SubmitContent = memo(() => {
     );
     form.setFieldValue('settings.default_external_sources', getDefaultExternalSources(settings, configuration));
 
-    const search = new URLSearchParams(location.search);
-    const state = location.state as SubmitState;
-
-    setClassificationFromURL(state, search);
-    setHashFromURL(state, search);
-    setMetadataFromURL(state, search);
-    setProfileFromURL(state, search);
-    setRawFromURL(state, search);
-    setDescriptionFromURL(state, search);
-    setPriorityFromURL(state, search);
-    setTTLFromURL(state, search);
-    setFileTypeFromURL(state, search);
+    setClassificationFromURL(search);
+    setHashFromURL(search);
+    setMetadataFromURL(search);
+    setProfileFromURL(search);
+    setRawFromURL(search);
+    setDescriptionFromURL(search);
+    setPriorityFromURL(search);
+    setTTLFromURL(search);
+    setFileTypeFromURL(search);
 
     form.setFieldValue('state.phase', 'editing');
 
     applyAutoURLServicesSelection();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [configuration, currentUser, settings]);
+  }, [configuration, currentUser, search?.toString(), settings]);
 
   return (
     <PageCenter maxWidth={downMD ? '100%' : `${theme.breakpoints.values.md}px`} margin={3.5} width="100%">

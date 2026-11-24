@@ -5,10 +5,8 @@ import TableContainer from '@mui/material/TableContainer';
 import useALContext from 'core/config/useALContext';
 import type { SearchResult } from 'models/api/search';
 import type { ResultIndexed } from 'models/base/result';
-import React from 'react';
+import type { ElementType } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation } from 'react-router';
-import { Link } from 'react-router-dom';
 import Classification from 'ui/Classification';
 import {
   DivTable,
@@ -25,21 +23,14 @@ import Verdict from 'ui/Verdict';
 
 type Props = {
   resultResults: SearchResult<ResultIndexed>;
-  component?: React.ElementType;
+  component?: ElementType;
   allowSort?: boolean;
-  allowHash?: boolean;
 };
 
-const WrappedResultsTable: React.FC<Props> = ({
-  resultResults,
-  component = Paper,
-  allowSort = true,
-  allowHash = false
-}) => {
+const WrappedResultsTable: React.FC<Props> = ({ resultResults, component = Paper, allowSort = true }) => {
   const { t } = useTranslation(['search']);
   const { c12nDef } = useALContext();
   const theme = useTheme();
-  const location = useLocation();
 
   return resultResults ? (
     resultResults.total !== 0 ? (
@@ -74,8 +65,8 @@ const WrappedResultsTable: React.FC<Props> = ({
             {resultResults.items.map((result, id) => (
               <LinkRow
                 key={`${result.id}-${id}`}
-                component={Link}
-                to={`/file/detail/${result.id.substring(0, 64)}${!allowHash ? '' : location.hash}`}
+                nav={nav => nav.to().create({ route: '/file/detail/:id', path: { id: result.id.substring(0, 64) } })}
+                navDeps={[result.id]}
                 hover
                 style={{ textDecoration: 'none' }}
               >

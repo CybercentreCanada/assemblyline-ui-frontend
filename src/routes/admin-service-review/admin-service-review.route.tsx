@@ -6,7 +6,7 @@ import type { TypographyProps } from '@mui/material';
 import { Grid, IconButton, MenuItem, Select, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
 import useMyAPI from 'core/api/hooks/useMyAPI';
-import { createAppRoute } from 'core/router';
+import { AppLink, AppNavigate, createAppRoute, useAppSearchSnapshot } from 'core/router';
 import { useAppUser } from 'core/template/components/app/hooks';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
 import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
@@ -16,8 +16,6 @@ import type { Service as ServiceData } from 'models/base/service';
 import type { Dispatch, SetStateAction } from 'react';
 import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate, useLocation } from 'react-router';
-import { Link } from 'react-router-dom';
 import { getVersionQuery } from 'shared/utils/utils';
 import LineGraph from 'ui/LineGraph';
 
@@ -122,11 +120,18 @@ function ServiceDetail({ stats, comp, show }: ServiceDetailProps) {
           {stats ? (
             <Tooltip title={t('errors')}>
               <IconButton
-                component={Link}
+                component={AppLink}
                 style={{ color: theme.palette.action.active, alignSelf: 'self-end' }}
-                to={`/admin/errors?tc=1y&filters=response.service_name%3A${
-                  stats.service.name
-                }&filters=${getVersionQuery(stats.service.version)}`}
+                nav={nav =>
+                  nav.to().create({
+                    route: '/admin/errors',
+                    search: {
+                      tc: '1y',
+                      filters: [`response.service_name:${stats.service.name}`, getVersionQuery(stats.service.version)]
+                    }
+                  })
+                }
+                navDeps={[stats.service.name, stats.service.version]}
                 size="large"
               >
                 <ErrorOutlineOutlinedIcon />
@@ -196,11 +201,10 @@ export const AdminServiceReviewPage = memo(() => {
   const { t } = useTranslation(['adminServiceReview']);
   const theme = useTheme();
 
-  const location = useLocation();
-  const params = new URLSearchParams(location.search);
-  const defaultSelectedService = params.get('service') || '';
-  const defaultVersion1 = params.get('v1') || '';
-  const defaultVersion2 = params.get('v2') || '';
+  const search = useAppSearchSnapshot<'/admin/service_review'>();
+  const defaultSelectedService = search.get('service') || '';
+  const defaultVersion1 = search.get('v1') || '';
+  const defaultVersion2 = search.get('v2') || '';
 
   const [services, setServices] = useState<ServiceData['name'][]>(null);
   const [selectedService, setSelectedService] = useState<string>(defaultSelectedService);
@@ -352,7 +356,7 @@ export const AdminServiceReviewPage = memo(() => {
       )}
     </PageFullWidth>
   ) : (
-    <Navigate to="/forbidden" replace />
+    <AppNavigate nav={nav => nav.here<'/forbidden'>({ replace: true }).update({ route: '/forbidden' })} />
   );
 });
 
