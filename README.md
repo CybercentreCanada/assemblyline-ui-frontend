@@ -27,6 +27,16 @@ docker run --name frontend cccs/assemblyline-ui-frontend
 
 For information on frontend development, follow this [guide](https://cybercentrecanada.github.io/assemblyline4_docs/developer_manual/frontend/frontend/).
 
+### React Compiler Pilot
+
+Vite and Vitest use the same React Compiler configuration in `react-compiler.config.mts`.
+Compilation uses annotation mode: only functions with a `"use memo"` directive are selected.
+The initial pilot is `TextInput`; existing manual memoization is retained.
+
+The compiler is enabled by default. Set `REACT_COMPILER=false` to disable it for development,
+tests, or builds. `REACT_COMPILER_DEBUG=true` logs compilation successes and errors.
+Test fixtures are excluded from compilation. Unannotated application functions remain uncompiled.
+
 ## Documentation
 
 For more information about this Assemblyline component, follow this [overview](https://cybercentrecanada.github.io/assemblyline4_docs/overview/architecture/) of the system's architecture.
