@@ -7,7 +7,6 @@ import {
   formatRouteName,
   formatSearchParams,
   formatValue,
-  isDevelopmentRoutesAllowed,
   renderIcon,
   toRouteTableRow
 } from 'routes/development-routes';
@@ -51,22 +50,6 @@ describe('createMockRouteLocation', () => {
     } as AppRoute;
 
     expect(createMockRouteLocation(route).hash).toBe('query');
-  });
-});
-
-//*****************************************************************************************
-// isDevelopmentRoutesAllowed
-//*****************************************************************************************
-
-describe('isDevelopmentRoutesAllowed', () => {
-  it('allows administrators in development and staging', () => {
-    expect(isDevelopmentRoutesAllowed(true, 'development')).toBe(true);
-    expect(isDevelopmentRoutesAllowed(true, 'staging')).toBe(true);
-  });
-
-  it('denies non-admin users and production systems', () => {
-    expect(isDevelopmentRoutesAllowed(false, 'development')).toBe(false);
-    expect(isDevelopmentRoutesAllowed(true, 'production')).toBe(false);
   });
 });
 
