@@ -1,7 +1,6 @@
 import AltRouteOutlinedIcon from '@mui/icons-material/AltRouteOutlined';
-import { useAppRoutes } from 'app/core.routes';
 import useALContext from 'core/config/useALContext';
-import { createAppRoute } from 'core/router';
+import { createAppRoute, useAppLocationParamStore } from 'core/router';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
 import { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -14,7 +13,7 @@ export const DevelopmentRoutesPage = memo(() => {
   const { t } = useTranslation('developmentRoutes');
   const { configuration, user } = useALContext();
 
-  const routes = useAppRoutes();
+  const routes = useAppLocationParamStore(state => Object.values(state.routes));
 
   const notAllowed = useMemo(
     () => !user.is_admin || !['development', 'staging'].includes(configuration.system.type),
@@ -27,7 +26,7 @@ export const DevelopmentRoutesPage = memo(() => {
         ? []
         : [...routes]
             .sort((first, second) => first.path.localeCompare(second.path))
-            .map(route => toRouteTableRow(route, configuration as unknown as AppConfigStore)),
+            .map(route => toRouteTableRow(route, configuration)),
     [configuration, notAllowed, routes]
   );
 

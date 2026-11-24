@@ -1,6 +1,7 @@
 import type { InferHashParamBlueprintFromValue } from 'features/hash-params';
 import type { InferPathParamBlueprintFromValue } from 'features/path-params';
 import i18next from 'i18next';
+import type { Configuration } from 'models/base/config';
 import type { ReactNode } from 'react';
 import type {
   DevelopmentRoutesHashParamSpec,
@@ -9,6 +10,8 @@ import type {
   DevelopmentRoutesSearchParamSpec,
   DevelopmentRoutesTableRowData
 } from 'routes/development-routes';
+
+type RouteIconFactory = (location: never, configuration: Configuration) => ReactNode;
 
 //*****************************************************************************************
 // Mock Route Location
@@ -121,18 +124,18 @@ export const formatRouteName = (value: unknown, lng: 'en' | 'fr' = 'en'): string
  * @name renderIcon
  * @description Invokes a route's `shorticon`/`fullicon` callback with a mock location so it can be rendered outside of real navigation.
  * @param iconFactory - Route icon callback to invoke.
- * @param configState - Application config state passed to the icon callback.
+ * @param configuration - Application config state passed to the icon callback.
  * @param route - Route used to build the mock location argument.
  * @returns The rendered icon element, or `—` when no icon factory is provided.
  */
 export const renderIcon = (
-  iconFactory: ((location: never, config: AppConfigStore) => ReactNode) | undefined,
-  configState: AppConfigStore,
+  iconFactory: RouteIconFactory | undefined,
+  configuration: Configuration,
   route: AppRoute | null = null
 ): ReactNode => {
   if (!iconFactory) return '—';
   const location = route ? (createMockRouteLocation(route) as never) : ({ path: {}, search: {}, hash: null } as never);
-  return iconFactory(location, configState) ?? '—';
+  return iconFactory(location, configuration) ?? '—';
 };
 
 /**
@@ -175,7 +178,7 @@ export const formatPathParams = (route: AppRoute): DevelopmentRoutesParamSpec[] 
   return Object.entries(blueprints).map(([key, blueprint]) => ({
     key,
     kind: blueprint.kind,
-    defaultValueLabel: formatValue(blueprint.type),
+    defaultValueLabel: formatValue(blueprint.parse(undefined)),
     options: blueprint.options?.map(option => formatValue(option))
   }));
 };
@@ -234,22 +237,22 @@ export const formatHashParam = (route: AppRoute): DevelopmentRoutesHashParamSpec
  * @name toRouteTableRow
  * @description Flattens a route definition into a display-ready row for the development routes inventory table.
  * @param route - Route to flatten.
- * @param configState - Application config state passed to route metadata callbacks.
+ * @param configuration - Application config state passed to route metadata callbacks.
  * @returns A fully populated table row.
  */
-export const toRouteTableRow = (route: AppRoute, configState: AppConfigStore): DevelopmentRoutesTableRowData => {
+export const toRouteTableRow = (route: AppRoute, configuration: Configuration): DevelopmentRoutesTableRowData => {
   const mockLocation = createMockRouteLocation(route) as never;
 
   return {
     route,
     path: route.path,
     ancestor: route.ancestor ?? '—',
-    shortNameEN: formatRouteName(route.shortname?.(mockLocation, configState), 'en'),
-    shortNameFR: formatRouteName(route.shortname?.(mockLocation, configState), 'fr'),
-    fullNameEN: formatRouteName(route.fullname?.(mockLocation, configState), 'en'),
-    fullNameFR: formatRouteName(route.fullname?.(mockLocation, configState), 'fr'),
-    shortIcon: renderIcon(route.shorticon, configState, route),
-    fullIcon: renderIcon(route.fullicon, configState, route),
+    shortNameEN: formatRouteName(route.shortname?.(mockLocation, configuration as never), 'en'),
+    shortNameFR: formatRouteName(route.shortname?.(mockLocation, configuration as never), 'fr'),
+    fullNameEN: formatRouteName(route.fullname?.(mockLocation, configuration as never), 'en'),
+    fullNameFR: formatRouteName(route.fullname?.(mockLocation, configuration as never), 'fr'),
+    shortIcon: renderIcon(route.shorticon as unknown as RouteIconFactory, configuration, route),
+    fullIcon: renderIcon(route.fullicon as unknown as RouteIconFactory, configuration, route),
     pathParams: formatPathParams(route),
     searchParams: formatSearchParams(route),
     hashParam: formatHashParam(route),

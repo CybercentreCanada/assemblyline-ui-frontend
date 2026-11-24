@@ -1,6 +1,5 @@
 export {
   DevelopmentRoutesTable,
-  DevelopmentRoutesTableRow,
   HashParamEntry,
   ParamKindBadge,
   PathParamEntry,
@@ -8,7 +7,6 @@ export {
 } from './development-routes.components';
 export type {
   DevelopmentRoutesTableProps,
-  DevelopmentRoutesTableRowProps,
   HashParamEntryProps,
   ParamKindBadgeProps,
   PathParamEntryProps,

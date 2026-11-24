@@ -1,4 +1,6 @@
 import { createHashParamCodec } from 'features/hash-params';
+import { createPathParamsCodec } from 'features/path-params';
+import type { Configuration } from 'models/base/config';
 import {
   createMockRouteLocation,
   formatFunctionText,
@@ -23,7 +25,7 @@ describe('createMockRouteLocation', () => {
       params: {
         type: { id: '' }
       }
-    } as AppRoute;
+    } as unknown as AppRoute;
 
     const location = createMockRouteLocation(route);
 
@@ -121,24 +123,24 @@ describe('formatRouteName', () => {
 
 describe('renderIcon', () => {
   it('returns a placeholder when no icon factory is provided', () => {
-    expect(renderIcon(undefined, {} as AppConfigStore)).toBe('—');
+    expect(renderIcon(undefined, {} as Configuration)).toBe('—');
   });
 
   it('invokes the icon factory with a mock location and the config state', () => {
-    const configState = {} as AppConfigStore;
+    const configuration = {} as Configuration;
     const route = { path: '/manage/signature/detail/:id', params: { type: { id: '' } } } as AppRoute;
 
-    const iconFactory = (location: never, config: AppConfigStore) =>
-      `${JSON.stringify(location)}|${config === configState}`;
+    const iconFactory = (location: never, config: Configuration) =>
+      `${JSON.stringify(location)}|${config === configuration}`;
 
-    const result = renderIcon(iconFactory, configState, route);
+    const result = renderIcon(iconFactory, configuration, route);
 
     expect(result).toContain('SampleId');
     expect(result).toContain('true');
   });
 
   it('returns a placeholder when the icon factory resolves to null', () => {
-    expect(renderIcon(() => null, {} as AppConfigStore)).toBe('—');
+    expect(renderIcon(() => null, {} as Configuration)).toBe('—');
   });
 });
 
@@ -181,17 +183,19 @@ describe('formatPathParams', () => {
 
   it('builds one spec per path param blueprint', () => {
     const route = {
-      path: '/manage/signature/detail/:id',
-      params: {
-        blueprints: {
-          id: { type: 'abc', kind: 'string', parse: (v: string) => v, stringify: (v: string) => v }
-        }
-      }
+      path: '/file/:section/:enabled',
+      params: createPathParamsCodec('/file/:section/:enabled')(blueprints => ({
+        section: blueprints.string('section'),
+        enabled: blueprints.boolean(true)
+      }))
     } as unknown as AppRoute;
 
     const specs = formatPathParams(route);
 
-    expect(specs).toEqual([{ key: 'id', kind: 'string', defaultValueLabel: 'abc', options: undefined }]);
+    expect(specs).toEqual([
+      { key: 'section', kind: 'string', defaultValueLabel: 'section', options: undefined },
+      { key: 'enabled', kind: 'boolean', defaultValueLabel: 'true', options: undefined }
+    ]);
   });
 
   it('formats enum options into display strings', () => {
@@ -356,9 +360,9 @@ describe('toRouteTableRow', () => {
       forbidden: (_location: unknown, config: { user: { is_admin: boolean } }) => !config.user.is_admin
     } as unknown as AppRoute;
 
-    const configState = { user: { is_admin: true } } as unknown as AppConfigStore;
+    const configuration = {} as Configuration;
 
-    const row = toRouteTableRow(route, configState);
+    const row = toRouteTableRow(route, configuration);
 
     expect(row.route).toBe(route);
     expect(row.path).toBe('/development/routes');
@@ -372,7 +376,7 @@ describe('toRouteTableRow', () => {
 
   it('falls back to a placeholder ancestor when the route has none', () => {
     const route = { path: '/development/routes', params: { blueprints: {} } } as unknown as AppRoute;
-    const row = toRouteTableRow(route, {} as AppConfigStore);
+    const row = toRouteTableRow(route, {} as Configuration);
 
     expect(row.ancestor).toBe('—');
     expect(row.disabled).toBe('—');

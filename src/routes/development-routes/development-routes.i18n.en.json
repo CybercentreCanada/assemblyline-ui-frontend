@@ -7,7 +7,6 @@
   "flag.nullable": "Nullable",
   "guard.disabled": "disabled",
   "guard.forbidden": "forbidden",
-  "header.action": "Action",
   "header.english": "English",
   "header.french": "French",
   "header.guard_functions": "Guard functions",

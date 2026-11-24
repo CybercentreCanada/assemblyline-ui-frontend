@@ -1,5 +1,4 @@
 import {
-  Button,
   Chip,
   Paper,
   Table,
@@ -14,7 +13,6 @@ import {
 } from '@mui/material';
 import type { ColumnDef, SortingState } from '@tanstack/react-table';
 import { getCoreRowModel, getSortedRowModel, useReactTable } from '@tanstack/react-table';
-import { useAppConfigStore } from 'core/config';
 import { memo, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type {
@@ -24,19 +22,7 @@ import type {
   DevelopmentRoutesSearchParamSpec,
   DevelopmentRoutesTableRowData
 } from 'routes/development-routes';
-import {
-  createMockRouteLocation,
-  FLAG_CHIP_ICON,
-  formatFunctionText,
-  formatHashParam,
-  formatPathParams,
-  formatRouteName,
-  formatSearchParams,
-  PARAM_KIND_LABEL,
-  renderIcon,
-  SOURCE_ICON,
-  SQUARE_CHIP_SX
-} from 'routes/development-routes';
+import { FLAG_CHIP_ICON, PARAM_KIND_LABEL, SOURCE_ICON, SQUARE_CHIP_SX } from 'routes/development-routes';
 
 //*****************************************************************************************
 // Param Kind Badge
@@ -48,8 +34,8 @@ export type ParamKindBadgeProps = {
 };
 
 export const ParamKindBadge = memo(({ kind }: ParamKindBadgeProps) => {
-  const theme = useTheme();
   const { t } = useTranslation('developmentRoutes');
+  const theme = useTheme();
 
   const backgroundColor = {
     string: theme.palette.info.main,
@@ -122,8 +108,8 @@ export type SearchParamEntryProps = {
 };
 
 export const SearchParamEntry = memo(({ param }: SearchParamEntryProps) => {
-  const theme = useTheme();
   const { t } = useTranslation('developmentRoutes');
+  const theme = useTheme();
 
   const sourceColor = {
     search: theme.palette.info.main,
@@ -207,114 +193,6 @@ export const HashParamEntry = memo(({ param }: HashParamEntryProps) => (
 HashParamEntry.displayName = 'HashParamEntry';
 
 //*****************************************************************************************
-// Development Routes Table Row
-//*****************************************************************************************
-
-export type DevelopmentRoutesTableRowProps = {
-  /** Route this row renders metadata, params, and guard functions for. */
-  route: AppRoute;
-};
-
-export const DevelopmentRoutesTableRow = memo(({ route }: DevelopmentRoutesTableRowProps) => {
-  const configState = useAppConfigStore(state => state);
-  const { t } = useTranslation('developmentRoutes');
-  const mockLocation = createMockRouteLocation(route) as never;
-  const shortNameEN = formatRouteName(route.shortname?.(mockLocation, configState), 'en');
-  const shortNameFR = formatRouteName(route.shortname?.(mockLocation, configState), 'fr');
-  const fullNameEN = formatRouteName(route.fullname?.(mockLocation, configState), 'en');
-  const fullNameFR = formatRouteName(route.fullname?.(mockLocation, configState), 'fr');
-  const pathParams = formatPathParams(route);
-  const searchParams = formatSearchParams(route);
-  const hashParam = formatHashParam(route);
-  const disabled = formatFunctionText(route.disabled);
-  const forbidden = formatFunctionText(route.forbidden);
-
-  return (
-    <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-      <TableCell sx={{ verticalAlign: 'top', width: '20%' }}>
-        <Typography fontWeight={600} variant="body1">
-          {route.path}
-        </Typography>
-        <Typography color="text.secondary" variant="body2">
-          {route.ancestor}
-        </Typography>
-      </TableCell>
-      <TableCell sx={{ verticalAlign: 'top', width: '5%' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <div style={{ display: 'flex', alignItems: 'center', height: 32 }}>
-            <span>{renderIcon(route.shorticon, configState, route)}</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', height: 32 }}>
-            <span>{renderIcon(route.fullicon, configState, route)}</span>
-          </div>
-        </div>
-      </TableCell>
-      <TableCell sx={{ verticalAlign: 'top', width: '13%' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <Typography noWrap sx={{ display: 'flex', alignItems: 'center', height: 32 }} variant="body1">
-            {shortNameEN}
-          </Typography>
-          <Typography noWrap sx={{ display: 'flex', alignItems: 'center', height: 32 }} variant="body1">
-            {fullNameEN}
-          </Typography>
-        </div>
-      </TableCell>
-      <TableCell sx={{ verticalAlign: 'top', width: '13%' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <Typography noWrap sx={{ display: 'flex', alignItems: 'center', height: 32 }} variant="body1">
-            {shortNameFR}
-          </Typography>
-          <Typography noWrap sx={{ display: 'flex', alignItems: 'center', height: 32 }} variant="body1">
-            {fullNameFR}
-          </Typography>
-        </div>
-      </TableCell>
-      <TableCell sx={{ verticalAlign: 'top', width: '12%' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          <Typography fontWeight={600} variant="body1">
-            {route.path}
-          </Typography>
-          {pathParams.map(param => (
-            <PathParamEntry key={param.key} param={param} />
-          ))}
-        </div>
-      </TableCell>
-      <TableCell sx={{ verticalAlign: 'top', width: '12%' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          {searchParams.map(param => (
-            <SearchParamEntry key={param.key} param={param} />
-          ))}
-        </div>
-      </TableCell>
-      <TableCell sx={{ verticalAlign: 'top', width: '10%' }}>
-        {hashParam && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <HashParamEntry param={hashParam} />
-          </div>
-        )}
-      </TableCell>
-      <TableCell sx={{ verticalAlign: 'top', width: '9%' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          <Typography color={route.disabled ? 'warning.main' : 'text.secondary'} variant="body2">
-            {t('guard.disabled')}: {disabled}
-          </Typography>
-          <Typography color={route.forbidden ? 'error.main' : 'text.secondary'} variant="body2">
-            {t('guard.forbidden')}: {forbidden}
-          </Typography>
-        </div>
-      </TableCell>
-      <TableCell align="right" sx={{ verticalAlign: 'top', width: '6%' }}>
-        <Button size="small" variant="outlined">
-          {t('header.action')}
-        </Button>
-      </TableCell>
-    </TableRow>
-  );
-});
-
-DevelopmentRoutesTableRow.displayName = 'DevelopmentRoutesTableRow';
-
-//*****************************************************************************************
 // Development Routes Table
 //*****************************************************************************************
 
@@ -324,8 +202,9 @@ export type DevelopmentRoutesTableProps = {
 };
 
 export const DevelopmentRoutesTable = memo(({ rows }: DevelopmentRoutesTableProps) => {
-  const [sorting, setSorting] = useState<SortingState>([{ id: 'path', desc: false }]);
   const { t } = useTranslation('developmentRoutes');
+
+  const [sorting, setSorting] = useState<SortingState>([{ id: 'path', desc: false }]);
 
   const columns = useMemo<ColumnDef<DevelopmentRoutesTableRowData, unknown>[]>(
     () => [
@@ -336,8 +215,7 @@ export const DevelopmentRoutesTable = memo(({ rows }: DevelopmentRoutesTableProp
       { accessorKey: 'pathParams', id: 'pathParams', header: t('header.path_params'), enableSorting: false },
       { accessorKey: 'searchParams', id: 'searchParams', header: t('header.search_params'), enableSorting: false },
       { accessorKey: 'hashParam', id: 'hashParam', header: t('header.hash_param'), enableSorting: false },
-      { accessorKey: 'disabled', id: 'guards', header: t('header.guard_functions'), enableSorting: false },
-      { id: 'actions', header: t('header.action'), enableSorting: false }
+      { accessorKey: 'disabled', id: 'guards', header: t('header.guard_functions'), enableSorting: false }
     ],
     [t]
   );
@@ -364,9 +242,6 @@ export const DevelopmentRoutesTable = memo(({ rows }: DevelopmentRoutesTableProp
             <TableCell sx={{ fontWeight: 700, whiteSpace: 'nowrap' }}>{t('header.search_params')}</TableCell>
             <TableCell sx={{ fontWeight: 700, whiteSpace: 'nowrap' }}>{t('header.hash_param')}</TableCell>
             <TableCell sx={{ fontWeight: 700, whiteSpace: 'nowrap' }}>{t('header.guard_functions')}</TableCell>
-            <TableCell align="right" sx={{ fontWeight: 700, whiteSpace: 'nowrap' }}>
-              {t('header.action')}
-            </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -377,16 +252,6 @@ export const DevelopmentRoutesTable = memo(({ rows }: DevelopmentRoutesTableProp
               <TableRow key={row.id}>
                 {row.getVisibleCells().map(cell => {
                   const key = cell.column.id;
-                  if (key === 'actions') {
-                    return (
-                      <TableCell key={key} align="right" sx={{ verticalAlign: 'top', width: '6%' }}>
-                        <Button size="small" variant="outlined">
-                          {t('header.action')}
-                        </Button>
-                      </TableCell>
-                    );
-                  }
-
                   if (key === 'path') {
                     return (
                       <TableCell key={key} sx={{ verticalAlign: 'top', width: '20%' }}>
