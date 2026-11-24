@@ -473,7 +473,7 @@ export const FileViewerRoute = createAppRoute({
 
   path: '/file/viewer/:id/:tab',
   params: s => ({
-    id: s.string(),
+    id: s.string(''),
     tab: s.enum(TAB_OPTIONS, 'ascii')
   }),
   search: s => ({
@@ -496,7 +496,7 @@ export const FileViewerRoute = createAppRoute({
   fullicon: () => <PageviewOutlinedIcon />,
 
   disabled: () => false,
-  forbidden: () => false
+  forbidden: (_location, config) => !config.user.roles.includes('file_detail')
 });
 
 export const FileViewerRootRoute = createAppRoute({
@@ -504,7 +504,7 @@ export const FileViewerRootRoute = createAppRoute({
 
   path: '/file/viewer/:id',
   params: s => ({
-    id: s.string()
+    id: s.string('')
   }),
   search: s => ({
     cursor: s.number(null),

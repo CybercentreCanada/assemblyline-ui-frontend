@@ -656,7 +656,7 @@ export const ManageSignatureDetailRoute = createAppRoute({
 
   path: '/manage/signature/detail/:id',
   params: s => ({
-    id: s.string()
+    id: s.string('')
   }),
 
   ancestor: '/manage/signatures',

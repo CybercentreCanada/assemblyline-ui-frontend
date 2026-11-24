@@ -350,5 +350,5 @@ export const AlertsRoute = createAppRoute({
   fullicon: () => <NotificationImportantOutlinedIcon />,
 
   disabled: () => false,
-  forbidden: () => false
+  forbidden: (_location, config) => !config.user.roles.includes('alert_view')
 });

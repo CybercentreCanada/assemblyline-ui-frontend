@@ -1083,7 +1083,7 @@ export const AdminUserDetailRoute = createAppRoute({
 
   path: '/admin/users/:id',
   params: s => ({
-    id: s.string()
+    id: s.string('')
   }),
 
   ancestor: '/admin/users',

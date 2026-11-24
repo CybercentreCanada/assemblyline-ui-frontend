@@ -1045,7 +1045,7 @@ export const AlertDetailRoute = createAppRoute({
 
   path: '/alert/:id',
   params: s => ({
-    id: s.string()
+    id: s.string('')
   }),
   search: s => ({
     alert: s
@@ -1067,5 +1067,5 @@ export const AlertDetailRoute = createAppRoute({
   fullicon: () => <BallotOutlinedIcon />,
 
   disabled: () => false,
-  forbidden: () => false
+  forbidden: (_location, config) => !config.user.roles.includes('alert_view')
 });
