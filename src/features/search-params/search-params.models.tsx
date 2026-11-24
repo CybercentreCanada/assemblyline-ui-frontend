@@ -23,6 +23,43 @@ export type ObjectParamShape = ObjectParamPrimitive | ObjectParamShape[] | { [ke
 export type ObjectParamValue = Record<string, ObjectParamShape> | ObjectParamShape[];
 
 //*****************************************************************************************
+// Search Param Blueprint Introspection
+//*****************************************************************************************
+
+/** Identifies which blueprint variant produced a search parameter. */
+export type SearchParamBlueprintKind = 'boolean' | 'number' | 'string' | 'enum' | 'filters' | 'object';
+
+/** Plain-object description of a search param blueprint's configuration, for tooling/introspection. */
+export type SearchParamBlueprintDescriptor = {
+  /** Param key configured on the search param engine. */
+  key: string;
+  /** Blueprint variant that produced this param. */
+  kind: SearchParamBlueprintKind;
+  /** Configured default value, in the blueprint's own runtime type. */
+  defaultValue: unknown;
+  /** Where this param resolves its value from. */
+  source: SearchParamSource;
+  /** Whether this param is excluded from persistence mechanisms (e.g. localStorage). */
+  ephemeral: boolean;
+  /** Whether changes to this param are ignored when detecting snapshot differences. */
+  ignored: boolean;
+  /** Whether this param always resolves to its default value, ignoring external input. */
+  locked: boolean;
+  /** Whether `null` is considered a valid value for this param. */
+  nullable: boolean;
+  /** Allowed values, present only for the `enum` blueprint. */
+  options?: readonly EnumParamValue[];
+  /** Configured minimum, present only for `number` blueprints with a min. */
+  min?: number | null;
+  /** Configured maximum, present only for `number` blueprints with a max. */
+  max?: number | null;
+  /** Prefix token used to negate a filter value, present only for the `filters` blueprint. */
+  not?: string;
+  /** Prefix token used to omit a filter value, present only for the `filters` blueprint. */
+  omit?: string;
+};
+
+//*****************************************************************************************
 // Search Param Blueprints
 //*****************************************************************************************
 

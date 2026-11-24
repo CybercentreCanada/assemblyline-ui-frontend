@@ -19,6 +19,8 @@ A blueprint defines how a hash value is parsed and serialized. `HASH_PARAM_BLUEP
 
 - `string(defaultValue?)` for any non-empty string
 - `enum(values, defaultValue?)` for one of a fixed set of string, number, or boolean values
+- `kind` identifies configured `string` and `enum` blueprints; the fallback blueprint uses `kind: 'none'` when a route has no hash configuration
+- `parse(undefined)` returns the effective configured default
 
 String blueprints default to `''`. Enum blueprints have no default unless one is provided.
 
@@ -91,13 +93,14 @@ Parsing removes one leading `#`, decodes the fragment, and passes the result to 
 
 ### Public Types
 
-| Type                                          | Purpose                                    |
-| --------------------------------------------- | ------------------------------------------ |
-| `HashParamValue`                              | Allowed string, number, and boolean values |
-| `HashParamBlueprintKind`                      | Identifies a string or enum blueprint      |
-| `InferHashParamBlueprintFromValue<Value>`     | Describes one hash blueprint               |
-| `InferHashParamFromBlueprint<Blueprint>`      | Derives a blueprint's value type           |
-| `InferHashParamCodecFromBlueprint<Blueprint>` | Describes the codec for a blueprint        |
+| Type                                          | Purpose                                            |
+| --------------------------------------------- | -------------------------------------------------- |
+| `HashParamValue`                              | Allowed string, number, and boolean values         |
+| `HashParamBlueprintKind`                      | Identifies a configured string or enum blueprint   |
+| `HashParamBlueprintKindOrNone`                | Also includes `none` for the unconfigured fallback |
+| `InferHashParamBlueprintFromValue<Value>`     | Describes one hash blueprint                       |
+| `InferHashParamFromBlueprint<Blueprint>`      | Derives a blueprint's value type                   |
+| `InferHashParamCodecFromBlueprint<Blueprint>` | Describes the codec for a blueprint                |
 
 ### Data Flow And Boundaries
 

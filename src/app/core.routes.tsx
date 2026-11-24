@@ -28,6 +28,7 @@ import { DashboardRoute } from 'routes/dashboard/dashboard.route';
 import { DevelopmentAPIRoute } from 'routes/development-api/development-api.route';
 import { DevelopmentCustomizeRoute } from 'routes/development-customize/development-customize.route';
 import { DevelopmentLibraryRoute } from 'routes/development-library/development-library.route';
+import { DevelopmentRoutesRoute } from 'routes/development-routes/development-routes.route';
 import { DevelopmentThemeRoute } from 'routes/development-theme/development-theme.route';
 import { FileDetailRoute } from 'routes/file-detail/file-detail.route';
 import { FileViewerRootRoute, FileViewerRoute } from 'routes/file-viewer/file-viewer.route';
@@ -103,6 +104,7 @@ const APP_ROUTES = [
   DevelopmentAPIRoute,
   DevelopmentCustomizeRoute,
   DevelopmentLibraryRoute,
+  DevelopmentRoutesRoute,
   DevelopmentThemeRoute,
   DisabledRoute,
   FileDetailRoute,

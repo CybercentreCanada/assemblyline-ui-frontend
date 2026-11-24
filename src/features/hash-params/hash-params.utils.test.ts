@@ -8,6 +8,9 @@ describe('hash-params.codec', () => {
     it('returns a safe no-op hash blueprint', () => {
       const blueprint = getDefaultHashParamBlueprint();
 
+      expect(blueprint.kind).toBe('none');
+      expectTypeOf<typeof blueprint.kind>().toEqualTypeOf<'none'>();
+      expect(blueprint).not.toHaveProperty('configured');
       expect(blueprint.type).toBe('');
       expect(blueprint.parse('abc')).toBeUndefined();
       expect(blueprint.stringify('abc')).toBe('');
@@ -19,6 +22,9 @@ describe('hash-params.codec', () => {
       const blueprint = HASH_PARAM_BLUEPRINTS.enum(['title', 'section-1'] as const);
       type Codec = InferHashParamCodecFromBlueprint<typeof blueprint>;
 
+      expect(blueprint.kind).toBe('enum');
+      expectTypeOf<typeof blueprint.kind>().toEqualTypeOf<'enum'>();
+      expect(blueprint).not.toHaveProperty('configured');
       expectTypeOf<Codec['blueprint']>().toEqualTypeOf<typeof blueprint>();
       expectTypeOf<Codec['type']>().toEqualTypeOf<'title' | 'section-1'>();
       expectTypeOf<ReturnType<Codec['parse']>>().toEqualTypeOf<'title' | 'section-1' | undefined>();
@@ -30,6 +36,7 @@ describe('hash-params.codec', () => {
         blueprint.enum(['title', 'section'] as const)
       );
 
+      expect(codec.blueprint.kind).toBe('enum');
       expectTypeOf<typeof codec.type>().toEqualTypeOf<'title' | 'section'>();
       expectTypeOf<ReturnType<typeof codec.parse>>().toEqualTypeOf<'title' | 'section' | undefined>();
       expectTypeOf<Parameters<typeof codec.stringify>[0]>().toEqualTypeOf<'title' | 'section' | undefined>();
@@ -149,6 +156,10 @@ describe('hash-params.codec', () => {
 
     it('should parse and stringify string hash values, falling back to the default', () => {
       const codec = createHashParamCodec()(blueprint => blueprint.string('fallback'));
+
+      expect(codec.blueprint.kind).toBe('string');
+      expectTypeOf<typeof codec.blueprint.kind>().toEqualTypeOf<'string'>();
+      expect(codec.blueprint).not.toHaveProperty('configured');
 
       const location1: Location = { pathname: '/test', hash: '#custom', search: '', state: null, key: 'default' };
       expect(codec.parse(location1)).toBe('custom');

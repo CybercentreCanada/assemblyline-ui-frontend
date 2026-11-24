@@ -10,6 +10,9 @@ export type HashParamValue = string | number | boolean;
 /** Identifies which blueprint variant produced a hash parameter. */
 export type HashParamBlueprintKind = 'string' | 'enum';
 
+/** Identifies the fallback blueprint used when a route does not configure a hash parameter. */
+export type HashParamBlueprintKindOrNone = HashParamBlueprintKind | 'none';
+
 //*****************************************************************************************
 // Hash Params Blueprints
 //*****************************************************************************************
@@ -19,13 +22,16 @@ export type HashParamBlueprintKind = 'string' | 'enum';
  * Returns a single enum value representing the hash fragment.
  * The generic `Value` determines the runtime type of the resolved parameter.
  */
-export type InferHashParamBlueprintFromValue<Value extends HashParamValue = HashParamValue> = {
-  /** Representative value used for type inference at compile time. */
-  type: Value;
-  /** Identifies the blueprint variant (e.g. distinguishes `enum` from a plain `string`). */
-  kind: HashParamBlueprintKind;
+export type InferHashParamBlueprintFromValue<
+  Value extends HashParamValue = HashParamValue,
+  Kind extends HashParamBlueprintKindOrNone = HashParamBlueprintKindOrNone
+> = {
+  /** Identifies the configured blueprint variant or the `none` fallback. */
+  kind: Kind;
   /** Allowed values, present only for the `enum` blueprint. */
   options?: readonly HashParamValue[];
+  /** Representative value used for type inference at compile time. */
+  type: Value;
   /** Deserializes a raw URL hash into the typed value. */
   parse: (value: string | undefined) => Value | undefined;
   /** Serializes the typed value back into a URL-safe hash string. */
