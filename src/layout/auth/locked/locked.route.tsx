@@ -2,10 +2,15 @@ import HourglassEmptyOutlinedIcon from '@mui/icons-material/HourglassEmptyOutlin
 import { useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import useALContext from 'core/config/useALContext';
+import { createAppRoute } from 'core/router';
 import PageCenter from 'core/template/components/pages/PageCenter';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ForbiddenPage } from 'routes/forbidden/forbidden.page';
+
+//*****************************************************************************************
+// Locked Page
+//*****************************************************************************************
 
 export const LockedPage = memo(() => {
   const { t } = useTranslation(['locked']);
@@ -37,4 +42,25 @@ export const LockedPage = memo(() => {
       )}
     </>
   );
+});
+
+LockedPage.displayName = 'LockedPage';
+
+//*****************************************************************************************
+// Locked Route
+//*****************************************************************************************
+
+export const LockedRoute = createAppRoute({
+  component: LockedPage,
+
+  path: '/locked',
+
+  ancestor: null,
+  shortname: () => ['app_route.locked.shortname', { ns: 'locked' }],
+  fullname: () => ['app_route.locked.fullname', { ns: 'locked' }],
+  shorticon: () => <HourglassEmptyOutlinedIcon />,
+  fullicon: () => <HourglassEmptyOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
 });

@@ -1,4 +1,8 @@
 {
+  "app_route.disabled.fullname": "Désactivé",
+  "app_route.disabled.shortname": "Désactivé",
+  "app_route.forbidden.fullname": "Interdit",
+  "app_route.forbidden.shortname": "Interdit",
   "disabled": "Votre compte utilisateur à été désactivé ...",
   "not_allowed": "Vous n'êtes pas autorisé à afficher cette page ...",
   "title": "403: Interdit"

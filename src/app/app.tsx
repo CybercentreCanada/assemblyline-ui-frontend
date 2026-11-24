@@ -3,6 +3,7 @@ import { useClue } from '@cccsaurora/clue-ui';
 import { DEFAULT_APP_CONFIG_STORE } from 'app/core.config';
 import { DEFAULT_APP_INTERFACE_STORE } from 'app/core.interface';
 import { APP_PREFERENCE_SCHEMA, APP_PREFERENCE_STORAGE_KEY, DEFAULT_APP_PREFERENCE_STORE } from 'app/core.preference';
+import { useAppRoutes } from 'app/core.routes';
 import Routes from 'app/routes';
 import useMyPreferences from 'app/useMyPreferences';
 import useMySitemap from 'app/useMySitemap';
@@ -13,6 +14,13 @@ import { AppConfigStoreProvider } from 'core/config';
 import useALContext from 'core/config/useALContext';
 import { AppInterfaceStoreProvider } from 'core/interface';
 import { AppPreferenceProvider, AppPreferenceStoreProvider } from 'core/preference';
+import {
+  AppLocationParamProvider,
+  AppLocationParamStoreProvider,
+  AppNavigationStoreProvider,
+  AppPageKeyStoreProvider,
+  AppRouterStoreProvider
+} from 'core/router';
 import type { AppPreferenceConfigs, AppSiteMapConfigs, AppTheme } from 'core/template/components/app/AppConfigs';
 import AppProvider from 'core/template/components/app/AppProvider';
 import type { AppUserService } from 'core/template/components/app/AppUserService';
@@ -106,6 +114,7 @@ const MyAppMain = () => {
 };
 
 export const MyApp: React.FC = () => {
+  const appRoutes = useAppRoutes();
   const myPreferences: AppPreferenceConfigs = useMyPreferences();
   const myThemes: AppTheme[] = useMyTheme();
   const mySitemap: AppSiteMapConfigs = useMySitemap();
@@ -126,7 +135,9 @@ export const MyApp: React.FC = () => {
                 user={myUser}
                 // search={mySearch}
               >
-                <MyAppMain />
+                <AppLocationParamProvider routes={appRoutes}>
+                  <MyAppMain />
+                </AppLocationParamProvider>
               </AppProvider>
             </QuotaProvider>
           </SafeResultsProvider>
@@ -144,7 +155,15 @@ const AppStores = memo(({ children }: PropsWithChildren) => (
   <AppConfigStoreProvider data={DEFAULT_APP_CONFIG_STORE}>
     <AppInterfaceStoreProvider data={DEFAULT_APP_INTERFACE_STORE}>
       <AppPreferenceStoreProvider data={DEFAULT_APP_PREFERENCE_STORE}>
-        <>{children}</>
+        <AppRouterStoreProvider>
+          <AppNavigationStoreProvider>
+            <AppLocationParamStoreProvider>
+              <AppPageKeyStoreProvider>
+                <>{children}</>
+              </AppPageKeyStoreProvider>
+            </AppLocationParamStoreProvider>
+          </AppNavigationStoreProvider>
+        </AppRouterStoreProvider>
       </AppPreferenceStoreProvider>
     </AppInterfaceStoreProvider>
   </AppConfigStoreProvider>

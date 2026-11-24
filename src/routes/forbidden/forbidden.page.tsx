@@ -6,6 +6,7 @@ import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export type ForbiddenPageProps = {
+  /** Show the disabled-access message instead of the standard forbidden message. */
   disabled?: boolean;
 };
 
