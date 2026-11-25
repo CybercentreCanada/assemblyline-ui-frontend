@@ -3,19 +3,15 @@ import NotificationImportantOutlinedIcon from '@mui/icons-material/NotificationI
 import { AlertTitle, useMediaQuery, useTheme } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
-import { createAppRoute } from 'core/router';
-import { useAppUser } from 'core/template/components/app/hooks';
+import { createAppRoute, useAppNavigate, useAppSearchSnapshot } from 'core/router';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
 import SimpleList from 'deprecated/components/lists/simplelist/SimpleList';
-import useDrawer from 'layout/drawer/drawer.hooks';
-import type { CustomUser, IndexDefinition } from 'models/api/user';
+import type { InferSearchParamValueMapFromEngine } from 'features/search-params';
+import type { IndexDefinition } from 'models/api/user';
 import type { Alert, AlertIndexed, AlertItem } from 'models/base/alert';
-import type { Workflow } from 'models/base/workflow';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
-import { useLocation, useNavigate } from 'react-router';
-import { AlertDetailPage } from 'routes/alert-detail/alert-detail.route';
 import AlertActions from 'routes/alerts/components/Actions';
 import AlertDefaultSearchParameters from 'routes/alerts/components/DefaultSearchParameters';
 import AlertFavorites from 'routes/alerts/components/Favorites';
@@ -25,11 +21,6 @@ import { AlertSearchResults } from 'routes/alerts/components/Results';
 import SearchHeader from 'routes/alerts/components/SearchHeader';
 import AlertWorkflows from 'routes/alerts/components/Workflows';
 import { AlertsProvider } from 'routes/alerts/contexts/AlertsContext';
-import { SearchParamsProvider, useSearchParams } from 'routes/alerts/contexts/SearchParamsContext';
-import type { SearchParams } from 'routes/alerts/utils/SearchParams';
-import type { SearchResult } from 'routes/alerts/utils/SearchParser';
-import { ForbiddenPage } from 'routes/forbidden/forbidden.page';
-import { ManageWorkflowCreatePage } from 'routes/manage-workflow-create/manage-workflow-create.route';
 import { IconButton } from 'ui/buttons/IconButton';
 import InformativeAlert from 'ui/InformativeAlert';
 import { PageHeader } from 'ui/layouts/PageHeader';
@@ -57,32 +48,27 @@ export const ALERT_SIMPLELIST_ID = 'al.alerts.simplelist';
 
 export const ALERT_STORAGE_KEY = 'alert.search';
 
-export const ALERT_DEFAULT_PARAMS = {
-  fq: [],
-  group_by: 'file.sha256',
-  no_delay: false,
-  offset: 0,
+export const ALERT_DEFAULT_PARAMS: AlertSearchParams = {
   q: '',
+  offset: 0,
   rows: PAGE_SIZE,
   sort: 'reporting_ts desc',
+  group_by: 'file.sha256',
+  fq: [],
+  no_delay: false,
   tc_start: '',
   tc: '4d',
   track_total_hits: 10000,
   refresh: false
 };
 
-export type AlertSearchParams = SearchParams<typeof ALERT_DEFAULT_PARAMS>;
-
-export const AlertsContent = memo(() => {
+export const AlertsPage = memo(() => {
   const { t } = useTranslation('alerts');
   const theme = useTheme();
-  const location = useLocation();
-  const navigate = useNavigate();
+  const navigate = useAppNavigate<'/alerts'>();
+  const search = useAppSearchSnapshot<'/alerts'>();
   const { apiCall } = useMyAPI();
-  const { indexes } = useALContext();
-  const { user: currentUser } = useAppUser<CustomUser>();
-  const { globalDrawerOpened, setGlobalDrawer, closeGlobalDrawer } = useDrawer();
-  const { search, setSearchParams, setSearchObject } = useSearchParams<AlertSearchParams>();
+  const { indexes, user: currentUser } = useALContext();
 
   const [alerts, setAlerts] = useState<AlertItem[]>([]);
   const [countedTotal, setCountedTotal] = useState<number>(0);
@@ -97,10 +83,10 @@ export const AlertsContent = memo(() => {
   const suggestions = useMemo<IndexDefinition>(() => ({ ...indexes.alert, ...DEFAULT_SUGGESTION }), [indexes]);
 
   const handleFetch = useCallback(
-    (body: SearchResult<AlertSearchParams>) => {
+    (body: typeof search) => {
       if (!currentUser.roles.includes('alert_view')) return;
 
-      const query = body.filter((k, v) => !['tc_start'].includes(k)).toParams();
+      const query = body.omit(['tc_start']).toParams();
       query.sort();
       if (query.toString() === prevSearch.current) return;
       prevSearch.current = query.toString();
@@ -108,7 +94,7 @@ export const AlertsContent = memo(() => {
       const groupBy = query.get('group_by');
       const pathname = groupBy !== '' ? `/api/v4/alert/grouped/${groupBy}/` : `/api/v4/alert/list/`;
 
-      let query2 = body.filter((k, v) => !['refresh'].includes(k));
+      let query2 = body.omit(['refresh']);
       if (Number(query2.get('offset') || 0) === 0) {
         query2 = query2.set(o => ({ ...o, tc_start: '' }));
         setScrollReset(true);
@@ -119,7 +105,9 @@ export const AlertsContent = memo(() => {
         method: 'GET',
         onSuccess: ({ api_response }) => {
           if ('tc_start' in api_response) {
-            setSearchObject(o => ({ ...o, tc_start: api_response.tc_start }));
+            navigate
+              .here<'/alerts'>({ replace: true })
+              .update(s => ({ ...s, search: { ...s.search, tc_start: api_response.tc_start } }));
           }
 
           const max = api_response.offset + api_response.rows;
@@ -144,16 +132,20 @@ export const AlertsContent = memo(() => {
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [currentUser.roles, setSearchObject]
+    [currentUser.roles, navigate]
   );
 
   const handleSelectedItemChange = useCallback(
     (item: Alert) => {
       if (!item) return;
       if (isLGDown) document.getElementById(ALERT_SIMPLELIST_ID).blur();
-      navigate(`${location.pathname}${location.search}#/alert/${item.alert_id}`);
+      navigate.to().create({
+        route: '/alert/:id',
+        path: { id: item.alert_id },
+        search: { ...search.toObject(), alert: item as never }
+      });
     },
-    [isLGDown, location.pathname, location.search, navigate]
+    [isLGDown, navigate, search?.toString()]
   );
 
   const handleCreateWorkflow = useCallback(() => {
@@ -166,46 +158,25 @@ export const AlertsContent = memo(() => {
       .map(v => ([' or ', ' and '].some(a => v.toLowerCase().includes(a)) ? `(${v})` : v))
       .join(' AND ');
 
-    const state: Partial<Workflow> = { query };
-    navigate(`${location.pathname}${location.search}#/workflow/`, { state });
-  }, [currentUser.roles, location.pathname, location.search, navigate, search]);
+    navigate.to().create({ route: '/manage/workflow/create', search: { query } });
+  }, [currentUser.roles, navigate, search?.toString()]);
 
   useEffect(() => {
     handleFetch(search);
-  }, [handleFetch, search]);
-
-  useEffect(() => {
-    if (alerts.length && !globalDrawerOpened && location.hash) {
-      navigate(`${location.pathname}${location.search}`);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [globalDrawerOpened]);
-
-  useEffect(() => {
-    const url = new URL(`${window.location.origin}${location.hash.slice(1)}`);
-    if (url.pathname.startsWith('/alert/')) {
-      const id = url.pathname.slice('/alert/'.length);
-      const alert = alerts.find(item => item.alert_id === id);
-      setGlobalDrawer(<AlertDetailPage id={id} alert={alert} inDrawer />, { hasMaximize: true });
-    } else if (url.pathname.startsWith('/workflow/')) {
-      setGlobalDrawer(
-        <ManageWorkflowCreatePage id={url.pathname.slice('/workflow/'.length)} onClose={closeGlobalDrawer} />
-      );
-    } else {
-      closeGlobalDrawer();
-    }
-  }, [alerts, closeGlobalDrawer, location.hash, setGlobalDrawer]);
+  }, [handleFetch, search?.toString()]);
 
   useEffect(() => {
     if (!!search.get('group_by')) return;
-    else if (!alerts || alerts.length === 0) setSearchObject(v => ({ ...v, tc_start: '' }));
+    else if (!alerts || alerts.length === 0)
+      navigate.here<'/alerts'>({ replace: true }).update(s => ({ ...s, search: { ...s.search, tc_start: '' } }));
     else {
       const dates = alerts.map(a => new Date(a.reporting_ts).getTime());
       const min = Math.max(...dates);
-      setSearchObject(o => ({ ...o, tc_start: new Date(min).toISOString() }));
+      navigate
+        .here<'/alerts'>({ replace: true })
+        .update(s => ({ ...s, search: { ...s.search, tc_start: new Date(min).toISOString() } }));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [alerts]);
+  }, [alerts, navigate, search?.toString()]);
 
   useEffect(() => {
     const update = ({ detail }: CustomEvent<Alert[]>) => {
@@ -224,107 +195,109 @@ export const AlertsContent = memo(() => {
   }, []);
 
   useEffect(() => {
-    const refresh = ({ detail = null }: CustomEvent<AlertSearchParams>) => {
-      setSearchObject(o => ({ ...o, ...detail, offset: 0, refresh: !o.refresh, fq: [...(detail?.fq || []), ...o.fq] }));
+    const refresh = ({ detail = null }: CustomEvent<InferSearchParamValueMapFromEngine<typeof AlertsRoute.search>>) => {
+      navigate.here<'/alerts'>().update(s => ({
+        ...s,
+        ...detail,
+        offset: 0,
+        refresh: !s.search.refresh,
+        fq: [...(detail?.fq || []), ...s.search.fq]
+      }));
     };
 
     window.addEventListener('alertRefresh', refresh);
     return () => {
       window.removeEventListener('alertRefresh', refresh);
     };
-  }, [setSearchObject]);
+  }, [navigate]);
 
-  if (!currentUser.roles.includes('alert_view')) return <ForbiddenPage />;
-  else
-    return (
-      <PageFullWidth margin={4}>
-        <PageHeader
-          primary={t('alerts')}
-          slotProps={{
-            root: { style: { marginBottom: theme.spacing(2) } }
-          }}
-          actions={
-            <>
-              <AlertDefaultSearchParameters key="default-search-parameters" />
-              <IconButton
-                preventRender={!currentUser.roles.includes('workflow_manage')}
-                size="large"
-                tooltip={t('workflow.tooltip')}
-                onClick={handleCreateWorkflow}
-              >
-                <BiNetworkChart fontSize="x-large" />
-                <AddIcon style={{ position: 'absolute', bottom: '10px', right: '6px', fontSize: 'small' }} />
-              </IconButton>
-            </>
-          }
-        />
+  return (
+    <PageFullWidth margin={4}>
+      <PageHeader
+        primary={t('alerts')}
+        slotProps={{
+          root: { style: { marginBottom: theme.spacing(2) } }
+        }}
+        actions={
+          <>
+            <AlertDefaultSearchParameters key="default-search-parameters" />
+            <IconButton
+              preventRender={!currentUser.roles.includes('workflow_manage')}
+              size="large"
+              tooltip={t('workflow.tooltip')}
+              onClick={handleCreateWorkflow}
+            >
+              <BiNetworkChart fontSize="x-large" />
+              <AddIcon style={{ position: 'absolute', bottom: '10px', right: '6px', fontSize: 'small' }} />
+            </IconButton>
+          </>
+        }
+      />
 
-        <SearchHeader
-          value={search.toParams()}
-          loading={loading}
-          suggestions={suggestions}
-          pageSize={PAGE_SIZE}
-          total={total}
-          placeholder={t('search.placeholder')}
-          defaultValue={{ rows: 25 }}
-          paramKeys={{ query: 'q' }}
-          onChange={v => setSearchParams(v)}
-          disableFilterList
-          disablePagination
-          disableTotalResults
-          endAdornment={
-            <>
-              <AlertFavorites />
-              <AlertFilters />
-              <AlertWorkflows alerts={alerts} />
-            </>
-          }
-        >
-          <AlertSearchResults loading={loading} total={total} />
-        </SearchHeader>
+      <SearchHeader
+        value={search.toParams()}
+        loading={loading}
+        suggestions={suggestions}
+        pageSize={PAGE_SIZE}
+        total={total}
+        placeholder={t('search.placeholder')}
+        defaultValue={{ rows: 25 }}
+        paramKeys={{ query: 'q' }}
+        onChange={v =>
+          navigate.here().update(s => ({ ...s, search: { ...s.search, ...AlertsRoute.search.full(v).toObject() } }))
+        }
+        disableFilterList
+        disablePagination
+        disableTotalResults
+        endAdornment={
+          <>
+            <AlertFavorites />
+            <AlertFilters />
+            <AlertWorkflows alerts={alerts} />
+          </>
+        }
+      >
+        <AlertSearchResults loading={loading} total={total} />
+      </SearchHeader>
 
-        <SimpleList
-          id={ALERT_SIMPLELIST_ID}
-          disableProgress
-          scrollInfinite={0 < countedTotal && countedTotal < total}
-          scrollReset={scrollReset}
-          scrollLoadNextThreshold={75}
-          scrollTargetId="app-scrollct"
-          loading={loading}
-          items={alerts}
-          emptyValue={
-            <div style={{ width: '100%' }}>
-              <InformativeAlert>
-                <AlertTitle>{t('no_alerts_title')}</AlertTitle>
-                {t('no_alerts_desc')}
-              </InformativeAlert>
-            </div>
-          }
-          onLoadNext={() => setSearchObject(v => ({ ...v, offset: v.offset + v.rows }))}
-          onCursorChange={handleSelectedItemChange}
-          onItemSelected={handleSelectedItemChange}
-          onRenderActions={(item: AlertItem) => <AlertActions alert={item} />}
-        >
-          {(item: Alert) => <AlertListItem item={item} />}
-        </SimpleList>
-      </PageFullWidth>
-    );
+      <SimpleList
+        id={ALERT_SIMPLELIST_ID}
+        disableProgress
+        scrollInfinite={0 < countedTotal && countedTotal < total}
+        scrollReset={scrollReset}
+        scrollLoadNextThreshold={75}
+        scrollTargetId="app-scrollct"
+        loading={loading}
+        items={alerts}
+        emptyValue={
+          <div style={{ width: '100%' }}>
+            <InformativeAlert>
+              <AlertTitle>{t('no_alerts_title')}</AlertTitle>
+              {t('no_alerts_desc')}
+            </InformativeAlert>
+          </div>
+        }
+        onLoadNext={() =>
+          navigate
+            .here<'/alerts'>()
+            .update(s => ({ ...s, search: { ...s.search, offset: s.search.offset + s.search.rows } }))
+        }
+        onCursorChange={handleSelectedItemChange}
+        onItemSelected={handleSelectedItemChange}
+        onRenderActions={(item: AlertItem) => <AlertActions alert={item} />}
+      >
+        {(item: Alert) => <AlertListItem item={item} />}
+      </SimpleList>
+    </PageFullWidth>
+  );
 });
 
-export const AlertsPage = memo(() => (
-  <SearchParamsProvider
-    defaultValue={ALERT_DEFAULT_PARAMS}
-    hidden={['rows', 'offset', 'tc_start', 'track_total_hits']}
-    enforced={['rows']}
-  >
-    <AlertsProvider>
-      <AlertsContent />
-    </AlertsProvider>
-  </SearchParamsProvider>
-));
-
 export const AlertsRoute = createAppRoute({
-  component: AlertsPage,
+  component: memo(() => (
+    <AlertsProvider>
+      <AlertsPage />
+    </AlertsProvider>
+  )),
 
   path: '/alerts',
   search: s => ({
@@ -352,3 +325,9 @@ export const AlertsRoute = createAppRoute({
   disabled: () => false,
   forbidden: (_location, config) => !config.user.roles.includes('alert_view')
 });
+
+export type AlertSearchParams = {
+  -readonly [K in keyof InferSearchParamValueMapFromEngine<
+    typeof AlertsRoute.search
+  >]: InferSearchParamValueMapFromEngine<typeof AlertsRoute.search>[K];
+};

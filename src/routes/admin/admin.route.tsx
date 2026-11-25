@@ -1,10 +1,9 @@
 import BusinessOutlinedIcon from '@mui/icons-material/BusinessOutlined';
-import { createAppRoute } from 'core/router';
+import { AppNavigate, createAppRoute } from 'core/router';
 import { useAppConfigs, useAppUser } from 'core/template/components/app/hooks';
 import PageCenter from 'core/template/components/pages/PageCenter';
 import type { CustomUser } from 'models/api/user';
 import { memo } from 'react';
-import { Navigate } from 'react-router';
 import LinkGrid from 'ui/linkgrid';
 
 export const AdminPage = memo(() => {
@@ -26,7 +25,7 @@ export const AdminPage = memo(() => {
       <LinkGrid items={layout.topnav.adminMenu.length !== 0 ? layout.topnav.adminMenu : items} />
     </PageCenter>
   ) : (
-    <Navigate to="/forbidden" replace />
+    <AppNavigate nav={nav => nav.here<'/forbidden'>({ replace: true }).update({ route: '/forbidden' })} />
   );
 });
 

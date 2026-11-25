@@ -9,7 +9,6 @@ import type { ServiceIndexed, ServiceUpdateData, ServiceUpdates } from 'models/b
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { HiOutlineExternalLink } from 'react-icons/hi';
-import { Link } from 'react-router-dom';
 import Classification from 'ui/Classification';
 import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow, LinkRow } from 'ui/DivTable';
 import InformativeAlert from 'ui/InformativeAlert';
@@ -17,11 +16,10 @@ import InformativeAlert from 'ui/InformativeAlert';
 type Props = {
   serviceResults: ServiceIndexed[];
   updates: ServiceUpdates;
-  setService: (svc: string) => void;
   onUpdate: (svc: string, updateData: ServiceUpdateData) => void;
 };
 
-const WrappedServiceTable: React.FC<Props> = ({ serviceResults, updates, setService, onUpdate }) => {
+const WrappedServiceTable: React.FC<Props> = ({ serviceResults, updates, onUpdate }) => {
   const { t } = useTranslation(['search']);
   const { c12nDef } = useALContext();
   const theme = useTheme();
@@ -47,15 +45,9 @@ const WrappedServiceTable: React.FC<Props> = ({ serviceResults, updates, setServ
             {serviceResults.map((result, i) => (
               <LinkRow
                 key={`${result.name}-${i}`}
-                component={Link}
-                to={`/admin/services/${result.name}`}
+                nav={nav => nav.to().create({ route: '/admin/services/:svc', path: { svc: result.name } })}
+                navDeps={[result.name]}
                 hover
-                onClick={event => {
-                  if (setService) {
-                    event.preventDefault();
-                    setService(result.name);
-                  }
-                }}
               >
                 <DivTableCell>{result.name}</DivTableCell>
                 <DivTableCell>{result.version}</DivTableCell>

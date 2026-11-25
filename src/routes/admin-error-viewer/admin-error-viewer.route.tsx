@@ -4,19 +4,15 @@ import PanToolOutlinedIcon from '@mui/icons-material/PanToolOutlined';
 import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
 import { Grid, Typography, useTheme } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
-import { createAppRoute } from 'core/router';
+import useALContext from 'core/config/useALContext';
+import { createAppRoute, useAppNavigate, useAppSearchSnapshot } from 'core/router';
 import PageContainer from 'core/template/branding/AppPageContainer';
-import { useAppUser } from 'core/template/components/app/hooks';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
-import { createSearchParams, SearchParamsProvider, useSearchParams } from 'features/search-params';
-import useDrawer from 'layout/drawer/drawer.hooks';
 import type { FacetResult, HistogramResult, SearchResult } from 'models/api/search';
-import type { CustomUser, IndexDefinition } from 'models/api/user';
+import type { IndexDefinition } from 'models/api/user';
 import type { Error } from 'models/base/error';
 import { memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate, useLocation, useNavigate } from 'react-router';
-import { AdminErrorDetailPage } from 'routes/admin-error-detail/admin-error-detail.route';
 import ErrorsTable from 'routes/search/components/errors';
 import { safeFieldValue } from 'shared/utils/utils';
 import { DateTimeRangePicker } from 'ui/DateTime/DateTimeRangePicker';
@@ -26,33 +22,13 @@ import LineGraph from 'ui/LineGraph';
 import SearchHeader from 'ui/SearchBar/SearchHeader';
 import { DEFAULT_SUGGESTION } from 'ui/SearchBar/search-textfield';
 
-const ERROR_VIEWER_PARAMS = createSearchParams(p => ({
-  query: p.string(''),
-  offset: p.number(0).min(0).source('transient').ephemeral(),
-  rows: p.number(25).locked().source('transient').ephemeral(),
-  sort: p.string('created desc').ephemeral(),
-  start: p.string('now-4d'),
-  end: p.string('now'),
-  gap: p.string('4h'),
-  filters: p.filters([]),
-  track_total_hits: p.number(10000).nullable().ephemeral(),
-  mincount: p.number(0).min(0).source('transient').ephemeral(),
-  use_archive: p.boolean(false),
-  archive_only: p.boolean(false),
-  timeout: p.string('').source('transient').ephemeral()
-}));
-
-type ErrorViewerParams = typeof ERROR_VIEWER_PARAMS;
-
-const AdminErrorViewerContent = memo(() => {
+export const AdminErrorViewerPage = memo(() => {
   const { t, i18n } = useTranslation(['adminErrorViewer']);
   const theme = useTheme();
-  const location = useLocation();
-  const navigate = useNavigate();
+  const navigate = useAppNavigate<'/admin/errors'>();
   const { apiCall } = useMyAPI();
-  const { user: currentUser } = useAppUser<CustomUser>();
-  const { globalDrawerOpened, setGlobalDrawer, closeGlobalDrawer } = useDrawer();
-  const { search, setSearchParams, setSearchObject } = useSearchParams<ErrorViewerParams>();
+  const { user: currentUser } = useALContext();
+  const search = useAppSearchSnapshot<'/admin/errors'>();
 
   const [errorResults, setErrorResults] = useState<SearchResult<Error>>(null);
   const [histogram, setHistogram] = useState<HistogramResult>(null);
@@ -61,20 +37,20 @@ const AdminErrorViewerContent = memo(() => {
   const [searching, setSearching] = useState<boolean>(false);
   const [suggestions, setSuggestions] = useState<IndexDefinition>(DEFAULT_SUGGESTION);
 
-  const setErrorKey = useCallback(
-    (error_key: string) => navigate(`${location.pathname}${location.search || ''}#${error_key}`),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [location.search]
-  );
-
   const handleToggleFilter = useCallback(
     (filter: string) => {
-      setSearchObject(o => {
-        const filters = o.filters.includes(filter) ? o.filters.filter(f => f !== filter) : [...o.filters, filter];
-        return { ...o, offset: 0, filters };
-      });
+      navigate.here().update(s => ({
+        ...s,
+        search: {
+          ...s.search,
+          offset: 0,
+          filters: s.search.filters.includes(filter)
+            ? s.search.filters.filter(f => f !== filter)
+            : [...s.search.filters, filter]
+        }
+      }));
     },
-    [setSearchObject]
+    [navigate]
   );
 
   useEffect(() => {
@@ -118,10 +94,7 @@ const AdminErrorViewerContent = memo(() => {
       method: 'POST',
       body: body
         .pick(['query', 'mincount', 'filters', 'timeout', 'use_archive', 'archive_only'])
-        .set(s => {
-          s.mincount = 1;
-          return s;
-        })
+        .set(s => ({ ...s, mincount: 1 }))
         .toObject(),
       onSuccess: ({ api_response }) =>
         setNames(
@@ -138,10 +111,7 @@ const AdminErrorViewerContent = memo(() => {
       method: 'POST',
       body: body
         .pick(['query', 'mincount', 'filters', 'timeout', 'use_archive', 'archive_only'])
-        .set(s => {
-          s.mincount = 1;
-          return s;
-        })
+        .set(s => ({ ...s, mincount: 1 }))
         .toObject(),
       onSuccess: ({ api_response }) =>
         setTypes(
@@ -154,7 +124,7 @@ const AdminErrorViewerContent = memo(() => {
     });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentUser.is_admin, search]);
+  }, [currentUser.is_admin, search?.toString()]);
 
   useEffect(() => {
     apiCall<IndexDefinition>({
@@ -164,19 +134,7 @@ const AdminErrorViewerContent = memo(() => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    if (!location.hash || globalDrawerOpened || !errorResults) return;
-    navigate(`${location.pathname}${location.search || ''}`);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [globalDrawerOpened]);
-
-  useEffect(() => {
-    if (location.hash) setGlobalDrawer(<AdminErrorDetailPage error_key={location.hash.substr(1)} />);
-    else closeGlobalDrawer();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location.hash]);
-
-  return currentUser.is_admin ? (
+  return (
     <PageFullWidth margin={4}>
       <div
         style={{
@@ -196,7 +154,9 @@ const AdminErrorViewerContent = memo(() => {
           value={{ start: search.get('start'), end: search.get('end'), gap: search.get('gap') }}
           disabled={searching}
           hasGap
-          onChange={(e, { start, end, gap }) => setSearchObject(o => ({ ...o, offset: 0, start, end, gap }))}
+          onChange={(e, { start, end, gap }) =>
+            navigate.here().update(s => ({ ...s, search: { ...s.search, offset: 0, start, end, gap } }))
+          }
         />
       </div>
 
@@ -211,7 +171,11 @@ const AdminErrorViewerContent = memo(() => {
                 ? t(`filtered${errorResults?.total === 1 ? '' : 's'}`)
                 : t(`total${errorResults?.total === 1 ? '' : 's'}`)
             }
-            onChange={v => setSearchParams(v)}
+            onChange={v =>
+              navigate
+                .here()
+                .update(s => ({ ...s, search: { ...s.search, ...AdminErrorViewerRoute.search.full(v).toObject() } }))
+            }
             searchInputProps={{ placeholder: t('filter'), options: suggestions }}
             actionProps={[
               {
@@ -274,7 +238,10 @@ const AdminErrorViewerContent = memo(() => {
               onClick={(evt, element) => {
                 if (!searching && element.length > 0) {
                   const filter = `response.service_name:${Object.keys(names)[element[0].index]}`;
-                  setSearchObject(o => ({ ...o, offset: 0, filters: [...o.filters, filter] }));
+                  navigate.here().update(s => ({
+                    ...s,
+                    search: { ...s.search, offset: 0, filters: [...s.search.filters, filter] }
+                  }));
                 }
               }}
             />
@@ -288,7 +255,10 @@ const AdminErrorViewerContent = memo(() => {
               onClick={(evt, element) => {
                 if (!searching && element.length > 0) {
                   const filter = `type:${safeFieldValue(Object.keys(types)[element[0].index])}`;
-                  setSearchObject(o => ({ ...o, offset: 0, filters: [...o.filters, filter] }));
+                  navigate.here().update(s => ({
+                    ...s,
+                    search: { ...s.search, offset: 0, filters: [...s.search.filters, filter] }
+                  }));
                 }
               }}
             />
@@ -297,19 +267,11 @@ const AdminErrorViewerContent = memo(() => {
       )}
 
       <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
-        <ErrorsTable errorResults={errorResults} setErrorKey={setErrorKey} />
+        <ErrorsTable errorResults={errorResults} />
       </div>
     </PageFullWidth>
-  ) : (
-    <Navigate to="/forbidden" replace />
   );
 });
-
-export const AdminErrorViewerPage = memo(() => (
-  <SearchParamsProvider params={ERROR_VIEWER_PARAMS}>
-    <AdminErrorViewerContent />
-  </SearchParamsProvider>
-));
 
 export const AdminErrorViewerRoute = createAppRoute({
   component: AdminErrorViewerPage,

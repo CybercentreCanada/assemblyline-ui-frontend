@@ -2,13 +2,12 @@ import ListOutlinedIcon from '@mui/icons-material/ListOutlined';
 import { Grid, Skeleton, Typography, useTheme } from '@mui/material';
 import { useAPIQuery } from 'core/api/hooks/useApiQuery';
 import useALContext from 'core/config/useALContext';
-import { createAppRoute } from 'core/router';
+import { createAppRoute, useAppPathParams } from 'core/router';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import PageCenter from 'core/template/components/pages/PageCenter';
 import { PRIORITIES, STATUSES, type Workflow } from 'models/base/workflow';
 import { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router';
 import { ForbiddenPage } from 'routes/forbidden/forbidden.page';
 import {
   DeleteWorkflowAction,
@@ -38,7 +37,7 @@ export type ManageWorkflowDetailPageProps = {
 
 export const ManageWorkflowDetailPage = memo(({ id: propID = null, onClose = null }: ManageWorkflowDetailPageProps) => {
   const { t } = useTranslation(['manageWorkflowDetail']);
-  const { id: paramID } = useParams<Params>();
+  const paramID = useAppPathParams<'/manage/workflow/detail/:id'>()?.id;
   const theme = useTheme();
   const { c12nDef, user: currentUser } = useALContext();
   const { showErrorMessage } = useMySnackbar();

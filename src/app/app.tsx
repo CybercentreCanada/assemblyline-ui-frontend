@@ -4,7 +4,6 @@ import { DEFAULT_APP_CONFIG_STORE } from 'app/core.config';
 import { DEFAULT_APP_INTERFACE_STORE } from 'app/core.interface';
 import { APP_PREFERENCE_SCHEMA, APP_PREFERENCE_STORAGE_KEY, DEFAULT_APP_PREFERENCE_STORE } from 'app/core.preference';
 import { useAppRoutes } from 'app/core.routes';
-import Routes from 'app/routes';
 import useMyPreferences from 'app/useMyPreferences';
 import useMySitemap from 'app/useMySitemap';
 import { APIProvider } from 'core/api/api.providers';
@@ -17,8 +16,11 @@ import { AppPreferenceProvider, AppPreferenceStoreProvider } from 'core/preferen
 import {
   AppLocationParamProvider,
   AppLocationParamStoreProvider,
+  AppNavigationProvider,
   AppNavigationStoreProvider,
   AppPageKeyStoreProvider,
+  AppRouterPanelLayout,
+  AppRouterProvider,
   AppRouterStoreProvider
 } from 'core/router';
 import type { AppPreferenceConfigs, AppSiteMapConfigs, AppTheme } from 'core/template/components/app/AppConfigs';
@@ -38,7 +40,6 @@ import SafeResultsProvider from 'layout/safe-results/safe-results.providers';
 import type { CustomUser } from 'models/api/user';
 import type { PropsWithChildren } from 'react';
 import React, { memo, useCallback, useEffect, useState } from 'react';
-import { BrowserRouter } from 'react-router-dom';
 import setMomentFRLocale from 'shared/utils/moment-fr-locale';
 import { getProvider, getSAMLData } from 'shared/utils/utils';
 
@@ -107,7 +108,7 @@ const MyAppMain = () => {
     ) : (
       <LoadingPage />
     ),
-    routes: <Routes />,
+    routes: <AppRouterPanelLayout panelKey={0} />,
     tos: <ToSPage />,
     quota: <QuotaPage />
   }[renderedApp];
@@ -123,27 +124,29 @@ export const MyApp: React.FC = () => {
   // const mySearch: AppSearchService<SearchItem> = useMySearch();
 
   return (
-    <BrowserRouter basename="/">
-      <AppPreferenceProvider schema={APP_PREFERENCE_SCHEMA} storageKey={APP_PREFERENCE_STORAGE_KEY}>
-        <APIProvider>
-          <SafeResultsProvider>
-            <QuotaProvider>
-              <AppProvider
-                preferences={myPreferences}
-                themes={myThemes}
-                sitemap={mySitemap}
-                user={myUser}
-                // search={mySearch}
-              >
-                <AppLocationParamProvider routes={appRoutes}>
-                  <MyAppMain />
-                </AppLocationParamProvider>
-              </AppProvider>
-            </QuotaProvider>
-          </SafeResultsProvider>
-        </APIProvider>
-      </AppPreferenceProvider>
-    </BrowserRouter>
+    <AppRouterProvider>
+      <AppNavigationProvider>
+        <AppLocationParamProvider routes={appRoutes}>
+          <AppPreferenceProvider schema={APP_PREFERENCE_SCHEMA} storageKey={APP_PREFERENCE_STORAGE_KEY}>
+            <APIProvider>
+              <SafeResultsProvider>
+                <QuotaProvider>
+                  <AppProvider
+                    preferences={myPreferences}
+                    themes={myThemes}
+                    sitemap={mySitemap}
+                    user={myUser}
+                    // search={mySearch}
+                  >
+                    <MyAppMain />
+                  </AppProvider>
+                </QuotaProvider>
+              </SafeResultsProvider>
+            </APIProvider>
+          </AppPreferenceProvider>
+        </AppLocationParamProvider>
+      </AppNavigationProvider>
+    </AppRouterProvider>
   );
 };
 

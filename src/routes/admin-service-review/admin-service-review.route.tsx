@@ -3,10 +3,10 @@ import ArrowUpwardOutlinedIcon from '@mui/icons-material/ArrowUpwardOutlined';
 import CompareArrowsOutlinedIcon from '@mui/icons-material/CompareArrowsOutlined';
 import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import type { TypographyProps } from '@mui/material';
-import { Grid, IconButton, MenuItem, Select, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
+import { Grid, MenuItem, Select, Skeleton, Typography, useTheme } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
 import useMyAPI from 'core/api/hooks/useMyAPI';
-import { createAppRoute } from 'core/router';
+import { createAppRoute, useAppSearchSnapshot } from 'core/router';
 import { useAppUser } from 'core/template/components/app/hooks';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
 import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
@@ -16,9 +16,8 @@ import type { Service as ServiceData } from 'models/base/service';
 import type { Dispatch, SetStateAction } from 'react';
 import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate, useLocation } from 'react-router';
-import { Link } from 'react-router-dom';
 import { getVersionQuery } from 'shared/utils/utils';
+import { IconButton } from 'ui/buttons/IconButton';
 import LineGraph from 'ui/LineGraph';
 
 // TODO: version doesn't seem to be set correctly
@@ -120,18 +119,26 @@ function ServiceDetail({ stats, comp, show }: ServiceDetailProps) {
         </div>
         <div style={{ marginBottom: theme.spacing(2), display: 'flex', flexDirection: 'column' }}>
           {stats ? (
-            <Tooltip title={t('errors')}>
+            <div style={{ alignSelf: 'self-end' }}>
               <IconButton
-                component={Link}
-                style={{ color: theme.palette.action.active, alignSelf: 'self-end' }}
-                to={`/admin/errors?tc=1y&filters=response.service_name%3A${
-                  stats.service.name
-                }&filters=${getVersionQuery(stats.service.version)}`}
+                tooltip={t('errors')}
+                nav={nav =>
+                  nav.here().create({
+                    route: '/admin/errors',
+                    search: {
+                      start: 'now-1y/d',
+                      gap: '30d',
+                      filters: [`response.service_name:${stats.service.name}`, getVersionQuery(stats.service.version)]
+                    }
+                  })
+                }
+                navDeps={[stats.service.name, stats.service.version]}
+                style={{ color: theme.palette.action.active }}
                 size="large"
               >
                 <ErrorOutlineOutlinedIcon />
               </IconButton>
-            </Tooltip>
+            </div>
           ) : (
             <Skeleton
               component="div"
@@ -195,12 +202,11 @@ function VersionSelector({ possibleVersions, selectedService, version, setVersio
 export const AdminServiceReviewPage = memo(() => {
   const { t } = useTranslation(['adminServiceReview']);
   const theme = useTheme();
+  const search = useAppSearchSnapshot<'/admin/service_review'>();
 
-  const location = useLocation();
-  const params = new URLSearchParams(location.search);
-  const defaultSelectedService = params.get('service') || '';
-  const defaultVersion1 = params.get('v1') || '';
-  const defaultVersion2 = params.get('v2') || '';
+  const defaultSelectedService = search.get('service') || '';
+  const defaultVersion1 = search.get('v1') || '';
+  const defaultVersion2 = search.get('v2') || '';
 
   const [services, setServices] = useState<ServiceData['name'][]>(null);
   const [selectedService, setSelectedService] = useState<string>(defaultSelectedService);
@@ -268,7 +274,7 @@ export const AdminServiceReviewPage = memo(() => {
     }
   });
 
-  return currentUser.is_admin ? (
+  return (
     <PageFullWidth margin={4}>
       <Grid
         container
@@ -351,8 +357,6 @@ export const AdminServiceReviewPage = memo(() => {
         </>
       )}
     </PageFullWidth>
-  ) : (
-    <Navigate to="/forbidden" replace />
   );
 });
 

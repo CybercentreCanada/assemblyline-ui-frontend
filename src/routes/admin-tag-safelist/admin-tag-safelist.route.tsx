@@ -2,7 +2,7 @@ import Editor, { DiffEditor, loader } from '@monaco-editor/react';
 import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import { Dialog, DialogActions, DialogContent, DialogTitle, Skeleton, useTheme } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
-import { createAppRoute } from 'core/router';
+import { createAppRoute, useAppBlocker } from 'core/router';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import PageFullSize from 'core/template/branding/AppPageCenter';
 import { useAppTheme, useAppUser } from 'core/template/components/app/hooks';
@@ -11,10 +11,8 @@ import type { CustomUser } from 'models/api/user';
 import { memo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ReactResizeDetector from 'react-resize-detector';
-import { Navigate } from 'react-router';
 import { Button } from 'ui/buttons/Button';
 import { PageHeader } from 'ui/layouts/PageHeader';
-import { RouterPrompt } from 'ui/RouterPrompt';
 
 loader.config({ paths: { vs: '/cdn/monaco_0.35.0/vs' } });
 
@@ -32,6 +30,11 @@ export const AdminTagSafelistPage = memo(() => {
 
   const containerEL = useRef<HTMLDivElement>(null);
   const containerDialogEL = useRef<HTMLDivElement>(null);
+
+  useAppBlocker(
+    () => (tagSafelist !== originalTagSafelist ? 'unsaved_changes' : null),
+    [tagSafelist, originalTagSafelist]
+  );
 
   useEffectOnce(() => {
     if (currentUser.is_admin) {
@@ -75,10 +78,8 @@ export const AdminTagSafelistPage = memo(() => {
     editor.focus();
   };
 
-  return currentUser.is_admin ? (
+  return (
     <PageFullSize margin={4}>
-      <RouterPrompt when={tagSafelist !== originalTagSafelist} />
-
       <PageHeader
         primary={t('title')}
         slotProps={{
@@ -183,8 +184,6 @@ export const AdminTagSafelistPage = memo(() => {
         </div>
       </div>
     </PageFullSize>
-  ) : (
-    <Navigate to="/forbidden" replace />
   );
 });
 

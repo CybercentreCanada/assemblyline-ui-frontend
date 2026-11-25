@@ -20,8 +20,10 @@ import Autocomplete from '@mui/material/Autocomplete';
 import match from 'autosuggest-highlight/match';
 import parse from 'autosuggest-highlight/parse';
 import useMyAPI from 'core/api/hooks/useMyAPI';
+import { useAppSearchSnapshot } from 'core/router';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import { useAppUser } from 'core/template/components/app/hooks';
+import type { InferSearchParamSnapshotFromEngine } from 'features/search-params';
 import type { CustomUser } from 'models/api/user';
 import type { AlertItem } from 'models/base/alert';
 import { LABELS, PRIORITIES, STATUSES, type Label, type Priority, type Status } from 'models/base/workflow';
@@ -29,10 +31,8 @@ import type { SyntheticEvent } from 'react';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
-import type { AlertSearchParams } from 'routes/alerts/alerts.route';
+import type { AlertsRoute } from 'routes/alerts/alerts.route';
 import AlertFiltersSelected from 'routes/alerts/components/FiltersSelected';
-import { useSearchParams } from 'routes/alerts/contexts/SearchParamsContext';
-import type { SearchResult } from 'routes/alerts/utils/SearchParser';
 import CustomChip from 'ui/CustomChip';
 
 type WorkflowBody = {
@@ -44,7 +44,7 @@ type WorkflowBody = {
 
 type AlertWorkflowDrawerProps = {
   alerts: AlertItem[];
-  search: SearchResult<AlertSearchParams>;
+  search: InferSearchParamSnapshotFromEngine<typeof AlertsRoute.search>;
   open: boolean;
   initialBody?: WorkflowBody;
   onClose?: () => void;
@@ -76,15 +76,15 @@ export const AlertWorkflowDrawer = React.memo(
       return values;
     }, [labelFilters]);
 
-    const isSingleAlert = useMemo<boolean>(
-      () => search && search.has('q') && !!search.get('q').startsWith('alert_id'),
-      [search]
-    );
+    const isSingleAlert = useMemo<boolean>(() => {
+      if (!search || !search.has('q')) return false;
+      const query = search.get('q');
+      return typeof query === 'string' && query.startsWith('alert_id');
+    }, [search?.toString()]);
 
-    const filteredSearch = useMemo<SearchResult<AlertSearchParams>>(
-      () =>
-        !search ? null : search.filter(k => ['q', 'tc', 'tc_start', ...(isSingleAlert ? [] : ['fq'])].includes(k)),
-      [isSingleAlert, search]
+    const filteredSearch = useMemo(
+      () => (!search ? null : search.pick(isSingleAlert ? ['q', 'tc', 'tc_start'] : ['q', 'tc', 'tc_start', 'fq'])),
+      [isSingleAlert, search?.toString()]
     );
 
     const hasParams = useMemo<boolean>(
@@ -356,7 +356,7 @@ const WrappedAlertWorkflows = ({ alerts = [] }: Props) => {
   const { t } = useTranslation('alerts');
   const theme = useTheme();
   const { user: currentUser } = useAppUser<CustomUser>();
-  const { search } = useSearchParams<AlertSearchParams>();
+  const search = useAppSearchSnapshot<'/alerts'>();
 
   const [open, setOpen] = useState<boolean>(false);
 

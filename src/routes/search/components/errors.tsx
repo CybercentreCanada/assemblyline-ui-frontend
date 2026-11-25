@@ -11,7 +11,6 @@ import type { Error, ErrorType } from 'models/base/error';
 import type { ReactElement } from 'react';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
 import { bytesToSize } from 'shared/utils/utils';
 import {
   DivTable,
@@ -29,11 +28,10 @@ const MAX_MESSAGE_SIZE = 2500;
 
 type Props = {
   errorResults: SearchResult<Error>;
-  setErrorKey?: (key: string) => void;
   allowSort?: boolean;
 };
 
-const WrappedErrorsTable: React.FC<Props> = ({ errorResults, setErrorKey = null, allowSort = true }) => {
+const WrappedErrorsTable: React.FC<Props> = ({ errorResults, allowSort = true }) => {
   const { t } = useTranslation(['adminErrorViewer']);
   const theme = useTheme();
 
@@ -84,14 +82,8 @@ const WrappedErrorsTable: React.FC<Props> = ({ errorResults, setErrorKey = null,
             {errorResults.items.map((error, i) => (
               <LinkRow
                 key={`${error.id}-${i}`}
-                component={Link}
-                to={`/admin/errors/${error.id}`}
-                onClick={event => {
-                  if (setErrorKey) {
-                    event.preventDefault();
-                    setErrorKey(error.id);
-                  }
-                }}
+                nav={nav => nav.to().create({ route: '/admin/errors/:id', path: { id: error.id } })}
+                navDeps={[error.id]}
                 hover
               >
                 <DivTableCell style={{ whiteSpace: 'nowrap' }}>

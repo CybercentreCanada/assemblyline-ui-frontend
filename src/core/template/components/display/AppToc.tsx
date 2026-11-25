@@ -2,8 +2,7 @@ import { styled, useTheme } from '@mui/material';
 import { useAppBar, useAppLayout, useAppUser } from 'core/template/components/app/hooks';
 import { memo, type ReactNode, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation } from 'react-router';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router';
 
 const TocRoot = styled('div')(({ theme }) => ({
   display: 'flex',

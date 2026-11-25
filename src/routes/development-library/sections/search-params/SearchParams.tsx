@@ -1,8 +1,8 @@
 import { Button, styled, Typography } from '@mui/material';
+import { useAppLocation } from 'core/router';
 import { createSearchParamsStore } from 'features/search-params';
 import type { ReactNode } from 'react';
 import { memo, useCallback, useMemo, useState } from 'react';
-import { useLocation } from 'react-router';
 import { DemoContainer } from 'routes/development-library/components/DemoContainer';
 import { DemoSection } from 'routes/development-library/components/DemoSection';
 import { useForm } from 'routes/development-library/contexts/form';
@@ -250,7 +250,7 @@ KindDemo.displayName = 'KindDemo';
 //*****************************************************************************************
 
 const LiveStoreControls = memo(() => {
-  const location = useLocation();
+  const location = useAppLocation<'/development/library'>()();
   const { search, setSearchObject, setSearchParams, setDefaultParams, clearDefaultParams } =
     LIVE_STORE.useSearchParams<typeof LIVE_PARAMS>();
 
@@ -325,8 +325,8 @@ const LiveStoreControls = memo(() => {
       </div>
 
       <ResultBlock label="useSearchParams().search.toObject()">{stringifyResult(() => values)}</ResultBlock>
-      <ResultBlock label="useLocation().search">{location.search || '(empty)'}</ResultBlock>
-      <ResultBlock label="useLocation().state">{stringifyResult(() => location.state)}</ResultBlock>
+      <ResultBlock label="useAppLocation().search">{stringifyResult(() => location.search)}</ResultBlock>
+      <ResultBlock label="useAppLocation().hash">{stringifyResult(() => location.hash)}</ResultBlock>
       <ResultBlock label={`localStorage.getItem('${LIVE_STORAGE_KEY}')`}>{saved ?? '(empty)'}</ResultBlock>
     </Column>
   );

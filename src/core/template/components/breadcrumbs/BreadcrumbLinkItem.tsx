@@ -1,7 +1,7 @@
 import { Link, Tooltip } from '@mui/material';
 import { useAppSitemap, type BreadcrumbItem } from 'core/template/components/app/hooks';
 import BreadcrumbIcon from 'core/template/components/breadcrumbs/BreadcrumbIcon';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router';
 
 type BreadcrumbLinkItemProps = {
   textOnly?: boolean;

@@ -9,7 +9,6 @@ import type { SearchResult } from 'models/api/search';
 import { LABELS_COLOR_MAP, type FileIndexed, type LabelCategories } from 'models/base/file';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
 import { FileDownloader } from 'ui/buttons/FileDownloader';
 import Classification from 'ui/Classification';
 import CustomChip from 'ui/CustomChip';
@@ -101,16 +100,10 @@ const LabelCell = React.memo(WrappedLabelCell);
 type Props = {
   fileResults: SearchResult<FileIndexed>;
   allowSort?: boolean;
-  setFileID?: (id: string) => void;
   onLabelClick?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>, label: string) => void;
 };
 
-const WrappedArchivesTable: React.FC<Props> = ({
-  fileResults,
-  allowSort = true,
-  setFileID = null,
-  onLabelClick = null
-}) => {
+const WrappedArchivesTable: React.FC<Props> = ({ fileResults, allowSort = true, onLabelClick = null }) => {
   const { t } = useTranslation(['archive']);
   const theme = useTheme();
   const { c12nDef, user: currentUser } = useALContext();
@@ -143,14 +136,8 @@ const WrappedArchivesTable: React.FC<Props> = ({
             {fileResults.items.map((file, i) => (
               <LinkRow
                 key={`${file.sha256}-${i}`}
-                component={Link}
-                to={`/archive/${file.sha256}`}
-                onClick={event => {
-                  if (setFileID) {
-                    event.preventDefault();
-                    setFileID(file.sha256);
-                  }
-                }}
+                nav={nav => nav.to().create({ route: '/archive/:id', path: { id: file.sha256 } })}
+                navDeps={[file.sha256]}
                 hover
                 style={{ textDecoration: 'none' }}
               >

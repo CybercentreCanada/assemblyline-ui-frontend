@@ -1,22 +1,27 @@
 import ListAltOutlinedIcon from '@mui/icons-material/ListAltOutlined';
 import useALContext from 'core/config/useALContext';
-import { createAppRoute } from 'core/router';
+import { AppNavigate, createAppRoute } from 'core/router';
 import { memo } from 'react';
-import { Navigate, useParams } from 'react-router';
-
-type ParamProps = {
-  id: string;
-};
 
 export const SubmissionRedirectPage = memo(() => {
-  const { id } = useParams<ParamProps>();
-
   const { settings } = useALContext();
 
   return settings.submission_view === 'details' ? (
-    <Navigate to={`/submission/detail/${id}`} replace />
+    <AppNavigate<'/submission/:id'>
+      nav={nav =>
+        nav
+          .here<'/submission/detail/:id'>({ replace: true })
+          .update(s => ({ route: '/submission/detail/:id', path: { id: s.path.id } }))
+      }
+    />
   ) : (
-    <Navigate to={`/submission/report/${id}`} replace />
+    <AppNavigate<'/submission/:id'>
+      nav={nav =>
+        nav
+          .here<'/submission/report/:id'>({ replace: true })
+          .update(s => ({ route: '/submission/report/:id', path: { id: s.path.id } }))
+      }
+    />
   );
 });
 

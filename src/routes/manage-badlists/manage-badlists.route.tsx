@@ -6,46 +6,26 @@ import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined
 import { useTheme } from '@mui/material';
 import { useALQuery } from 'core/api/hooks/useAppQuery';
 import useALContext from 'core/config/useALContext';
-import { createAppRoute } from 'core/router';
+import { createAppRoute, useAppNavigate, useAppSearchSnapshot } from 'core/router';
 import PageContainer from 'core/template/branding/AppPageContainer';
 import { useAppUser } from 'core/template/components/app/hooks';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
-import { createSearchParams, SearchParamsProvider, useSearchParams } from 'features/search-params';
-import useDrawer from 'layout/drawer/drawer.hooks';
 import type { CustomUser, IndexDefinition } from 'models/api/user';
 import { memo, useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router';
-import { ForbiddenPage } from 'routes/forbidden/forbidden.page';
-import { ManageBadlistAddPage } from 'routes/manage-badlist-add/manage-badlist-add.route';
-import { ManageBadlistDetailPage } from 'routes/manage-badlist-detail/manage-badlist-detail.route';
 import BadlistTable from 'routes/search/components/badlist';
 import { IconButton } from 'ui/buttons/IconButton';
 import { PageHeader } from 'ui/layouts/PageHeader';
 import { DEFAULT_SUGGESTION } from 'ui/SearchBar/search-textfield';
 import SearchHeader from 'ui/SearchBar/SearchHeader';
 
-const BADLIST_PARAMS = createSearchParams(p => ({
-  query: p.string(''),
-  offset: p.number(0).min(0).source('transient').ephemeral(),
-  rows: p.number(25).locked().source('transient').ephemeral(),
-  sort: p.string('added desc').ephemeral(),
-  filters: p.filters([]),
-  track_total_hits: p.number(10000).nullable().ephemeral(),
-  refresh: p.boolean(false).source('transient').ephemeral()
-}));
-
-export type BadlistParams = typeof BADLIST_PARAMS;
-
-export const ManageBadlistsContent = memo(() => {
+export const ManageBadlistsPage = memo(() => {
   const { t } = useTranslation(['manageBadlist']);
   const theme = useTheme();
-  const location = useLocation();
-  const navigate = useNavigate();
+  const navigate = useAppNavigate<'/manage/badlists'>();
+  const search = useAppSearchSnapshot<'/manage/badlists'>();
   const { indexes } = useALContext();
   const { user: currentUser } = useAppUser<CustomUser>();
-  const { globalDrawerOpened, setGlobalDrawer, closeGlobalDrawer } = useDrawer();
-  const { search, setSearchParams, setSearchObject } = useSearchParams<BadlistParams>();
 
   const suggestions = useMemo<IndexDefinition>(
     () => ({ ...indexes.badlist, ...DEFAULT_SUGGESTION }),
@@ -64,39 +44,32 @@ export const ManageBadlistsContent = memo(() => {
 
   const handleToggleFilter = useCallback(
     (filter: string) => {
-      setSearchObject(o => {
-        const filters = o.filters.includes(filter) ? o.filters.filter(f => f !== filter) : [...o.filters, filter];
-        return { ...o, offset: 0, filters };
-      });
+      navigate.here().update(s => ({
+        ...s,
+        search: {
+          ...s.search,
+          offset: 0,
+          filters: s.search.filters.includes(filter)
+            ? s.search.filters.filter(f => f !== filter)
+            : [...s.search.filters, filter]
+        }
+      }));
     },
-    [setSearchObject]
+    [navigate]
   );
 
   useEffect(() => {
-    if (!location.hash || globalDrawerOpened || !badlists.data) return;
-    navigate(`${location.pathname}${location.search || ''}`);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [globalDrawerOpened]);
-
-  useEffect(() => {
-    if (!location.hash) closeGlobalDrawer();
-    else if (location.hash === '#new') setGlobalDrawer(<ManageBadlistAddPage close={closeGlobalDrawer} />);
-    else setGlobalDrawer(<ManageBadlistDetailPage badlist_id={location.hash.slice(1)} close={closeGlobalDrawer} />);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location.hash]);
-
-  useEffect(() => {
     function reload() {
-      setSearchObject(o => ({ ...o, offset: 0, refresh: !o.refresh }));
+      navigate.here().update(s => ({ ...s, search: { ...s.search, offset: 0, refresh: !s.search.refresh } }));
     }
 
     window.addEventListener('reloadBadlist', reload);
     return () => {
       window.removeEventListener('reloadBadlist', reload);
     };
-  }, [setSearchObject]);
+  }, [navigate]);
 
-  return currentUser.roles.includes('badlist_view') ? (
+  return (
     <PageFullWidth margin={4}>
       <PageHeader
         primary={t('title')}
@@ -109,7 +82,7 @@ export const ManageBadlistsContent = memo(() => {
             preventRender={!currentUser.roles.includes('badlist_manage')}
             size="large"
             sx={{ color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark }}
-            onClick={() => navigate(`${location.pathname}${location.search || ''}#new`)}
+            onClick={() => navigate.to().create({ route: '/manage/badlist/add' })}
           >
             <AddCircleOutlineOutlinedIcon />
           </IconButton>
@@ -127,7 +100,11 @@ export const ManageBadlistsContent = memo(() => {
                 ? t(`filtered${badlists.data?.total === 1 ? '' : 's'}`)
                 : t(`total${badlists.data?.total === 1 ? '' : 's'}`)
             }
-            onChange={v => setSearchParams(v)}
+            onChange={v =>
+              navigate
+                .here()
+                .update(s => ({ ...s, search: { ...s.search, ...ManageBadlistsRoute.search.full(v).toObject() } }))
+            }
             paramDefaults={search.defaults().toObject()}
             searchInputProps={{ placeholder: t('filter'), options: suggestions }}
             actionProps={[
@@ -168,16 +145,8 @@ export const ManageBadlistsContent = memo(() => {
         <BadlistTable badlistResults={badlists.data} isLoading={badlists.isLoading} />
       </div>
     </PageFullWidth>
-  ) : (
-    <ForbiddenPage />
   );
 });
-
-export const ManageBadlistsPage = memo(() => (
-  <SearchParamsProvider params={BADLIST_PARAMS}>
-    <ManageBadlistsContent />
-  </SearchParamsProvider>
-));
 
 export const ManageBadlistsRoute = createAppRoute({
   component: ManageBadlistsPage,

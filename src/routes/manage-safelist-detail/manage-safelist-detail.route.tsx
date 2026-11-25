@@ -7,15 +7,14 @@ import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
 import { Divider, Grid, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
-import { createAppRoute } from 'core/router';
+import { createAppRoute, useAppNavigate, useAppPathParams } from 'core/router';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import PageCenter from 'core/template/components/pages/PageCenter';
 import type { Safelist } from 'models/base/safelist';
 import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router';
 import { ForbiddenPage } from 'routes/forbidden/forbidden.page';
-import { bytesToSize, safeFieldValue, safeFieldValueURI } from 'shared/utils/utils';
+import { bytesToSize, safeFieldValue } from 'shared/utils/utils';
 import { IconButton } from 'ui/buttons/IconButton';
 import Classification from 'ui/Classification';
 import ConfirmationDialog from 'ui/ConfirmationDialog';
@@ -36,7 +35,7 @@ export type ManageSafelistDetailPageProps = {
 export const ManageSafelistDetailPage = memo(
   ({ safelist_id = null, close = () => null }: ManageSafelistDetailPageProps) => {
     const { t, i18n } = useTranslation(['manageSafelistDetail']);
-    const { id } = useParams<ParamProps>();
+    const { id } = useAppPathParams<'/manage/safelist/detail/:id'>();
     const theme = useTheme();
     const [safelist, setSafelist] = useState<Safelist>(null);
     const [histogram, setHistogram] = useState<any>(null);
@@ -48,7 +47,7 @@ export const ManageSafelistDetailPage = memo(
     const { user: currentUser, c12nDef } = useALContext();
     const { showSuccessMessage } = useMySnackbar();
     const { apiCall } = useMyAPI();
-    const navigate = useNavigate();
+    const navigate = useAppNavigate<'/manage/safelist/detail/:id'>();
 
     useEffect(() => {
       if ((safelist_id || id) && currentUser.roles.includes('safelist_view')) {
@@ -99,7 +98,7 @@ export const ManageSafelistDetailPage = memo(
           setDeleteDialog(false);
           showSuccessMessage(t('delete.success'));
           if (id) {
-            setTimeout(() => navigate('/manage/safelist'), 1000);
+            setTimeout(() => navigate.here().closePanel({ route: '/manage/safelists' }), 1000);
           }
           setTimeout(() => window.dispatchEvent(new CustomEvent('reloadSafelist')), 1000);
           close();
@@ -256,13 +255,21 @@ export const ManageSafelistDetailPage = memo(
                   loading={!safelist}
                   preventRender={!(safelist_id || id) || !currentUser.roles.includes('submission_view')}
                   sx={{ color: theme.palette.action.active }}
-                  to={() =>
-                    safelist.type === 'file'
-                      ? `/search/result/?query=result.sections.heuristic.signature.name:"SAFELIST_${safelist_id || id}"`
-                      : safelist.type === 'signature'
-                        ? `/search/result/?query=result.sections.heuristic.signature.name:${safeFieldValueURI(safelist.signature.name)}`
-                        : `/search/result/?query=result.sections.safelisted_tags.${safelist.tag.type}:${safeFieldValueURI(safelist.tag.value)}`
+                  nav={nav =>
+                    nav.to().create({
+                      route: '/search/:index',
+                      path: { index: 'result' },
+                      search: {
+                        query:
+                          safelist.type === 'file'
+                            ? `result.sections.heuristic.signature.name:"SAFELIST_${safelist_id || id}"`
+                            : safelist.type === 'signature'
+                              ? `result.sections.heuristic.signature.name:${safeFieldValue(safelist.signature.name)}`
+                              : `result.sections.safelisted_tags.${safelist.tag.type}:${safeFieldValue(safelist.tag.value)}`
+                      }
+                    })
                   }
+                  navDeps={[safelist, safelist_id, id]}
                   size="large"
                 >
                   <YoutubeSearchedForIcon />

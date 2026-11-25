@@ -20,16 +20,14 @@ import {
   useTheme
 } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
-import { useAppUser } from 'core/template/components/app/hooks';
+import useALContext from 'core/config/useALContext';
+import { useAppNavigate, useAppSearchSnapshot } from 'core/router';
 import useClipboard from 'layout/clipboard/clipboard.hooks';
-import type { CustomUser } from 'models/api/user';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { AlertSearchParams } from 'routes/alerts/alerts.route';
-import { ALERT_DEFAULT_PARAMS } from 'routes/alerts/alerts.route';
+import { ALERT_DEFAULT_PARAMS, AlertsRoute } from 'routes/alerts/alerts.route';
 import type { Favorite } from 'routes/alerts/components/Favorites';
 import { useAlerts } from 'routes/alerts/contexts/AlertsContext';
-import { useSearchParams } from 'routes/alerts/contexts/SearchParamsContext';
 import { humanReadableNumber, safeFieldValue } from 'shared/utils/utils';
 import CustomChip from 'ui/CustomChip';
 
@@ -436,10 +434,11 @@ type Filters = {
 const WrappedAlertFilters = () => {
   const { t } = useTranslation('alerts');
   const theme = useTheme();
+  const navigate = useAppNavigate<'/alerts'>();
   const { apiCall } = useMyAPI();
   const { copy } = useClipboard();
-  const { search, setSearchParams } = useSearchParams<AlertSearchParams>();
-  const { user: currentUser } = useAppUser<CustomUser>();
+  const search = useAppSearchSnapshot<'/alerts'>();
+  const { user: currentUser } = useALContext();
   const alertValues = useAlerts();
   const isMDUp = useMediaQuery(theme.breakpoints.up('md'));
 
@@ -508,7 +507,7 @@ const WrappedAlertFilters = () => {
             q.delete('group_by');
           }
 
-          q.forEach(([v, k]) => {
+          q.forEach((v, k) => {
             if (k === 'fq' && v.startsWith(strip)) q.delete(k, v);
             else if (!['q', 'tc', 'tc_start', 'no_delay'].includes(k)) q.delete(k, v);
           });
@@ -527,7 +526,7 @@ const WrappedAlertFilters = () => {
       q.delete('group_by');
     }
 
-    q.forEach(([v, k]) => {
+    q.forEach((v, k) => {
       if (!['q', 'tc', 'tc_start', 'no_delay', 'fq'].includes(k)) q.delete(k, v);
     });
 
@@ -552,19 +551,17 @@ const WrappedAlertFilters = () => {
   );
 
   const handleClear = useCallback(() => {
-    const entries = Object.entries(ALERT_DEFAULT_PARAMS).reduce((prev, [key, value]) => {
-      if (!value) return prev;
-      else if (Array.isArray(value)) return [...prev, ...(value as string[]).map(v => [key, v])];
-      else return [...prev, [key, String(value)]];
-    }, [] as string[][]);
-    setQuery(new URLSearchParams(entries));
+    setQuery(AlertsRoute.search.full(new URLSearchParams()).toParams());
   }, []);
 
   const handleApply = useCallback(() => {
     query.set('offset', '0');
-    setSearchParams(query);
+    navigate.here<'/alerts'>().update(s => ({
+      ...s,
+      search: AlertsRoute.search.full(query).toObject()
+    }));
     setOpen(false);
-  }, [query, setSearchParams]);
+  }, [navigate, query]);
 
   const handleQueryChange = useCallback((key: string, value: string) => {
     setQuery(prev => {
@@ -648,7 +645,7 @@ const WrappedAlertFilters = () => {
 
   useEffect(() => {
     if (open) setQuery(search.toParams());
-  }, [open, search]);
+  }, [open, search?.toString()]);
 
   useEffect(() => {
     if (render) {
@@ -714,7 +711,7 @@ const WrappedAlertFilters = () => {
                   <div>
                     <IconButton
                       onClick={() => {
-                        const s = search.filter((k, v) => ['fq', 'group_by', 'q', 'sort', 'tc'].includes(k)).toString();
+                        const s = search.pick(['fq', 'group_by', 'q', 'sort', 'tc']).toString();
                         copy(`${window.location.href}?${s}${window.location.hash}`).catch(e => {
                           // eslint-disable-next-line no-console
                           console.error(e);
@@ -729,22 +726,26 @@ const WrappedAlertFilters = () => {
               </div>
               <div style={{ marginBottom: theme.spacing(2), marginTop: theme.spacing(2) }}>
                 <AlertSort
-                  value={query.has('sort') ? query.get('sort') : ALERT_DEFAULT_PARAMS.sort.toString()}
+                  value={query.has('sort') ? query.get('sort') : AlertsRoute.search.getDefaultValues().get('sort')}
                   onChange={value => handleQueryChange('sort', value)}
                 />
 
                 <AlertSelect
                   label="tc"
-                  value={query.has('tc') ? query.get('tc') : ALERT_DEFAULT_PARAMS.tc.toString()}
-                  defaultValue={ALERT_DEFAULT_PARAMS.tc.toString()}
+                  value={query.has('tc') ? query.get('tc') : AlertsRoute.search.getDefaultValues().get('tc')}
+                  defaultValue={AlertsRoute.search.getDefaultValues().get('tc')}
                   options={TC_OPTIONS}
                   onChange={value => handleQueryChange('tc', value)}
                 />
 
                 <AlertSelect
                   label="groupBy"
-                  value={query.has('group_by') ? query.get('group_by') : ALERT_DEFAULT_PARAMS.group_by.toString()}
-                  defaultValue={ALERT_DEFAULT_PARAMS.group_by.toString()}
+                  value={
+                    query.has('group_by')
+                      ? query.get('group_by')
+                      : AlertsRoute.search.getDefaultValues().get('group_by')
+                  }
+                  defaultValue={AlertsRoute.search.getDefaultValues().get('group_by')}
                   options={GROUPBY_OPTIONS}
                   onChange={value => handleQueryChange('group_by', value)}
                 />

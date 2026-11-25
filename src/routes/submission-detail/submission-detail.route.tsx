@@ -38,11 +38,11 @@ import {
 } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
-import { createAppRoute } from 'core/router';
+import { AppLink, createAppRoute, useAppLocation, useAppNavigate, useAppPathParams } from 'core/router';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import PageCenter from 'core/template/components/pages/PageCenter';
+import type { ObjectParamShape } from 'features/search-params';
 import useAssistant from 'layout/assistant/assistant.hooks';
-import useDrawer from 'layout/drawer/drawer.hooks';
 import useHighlighter from 'layout/highlighter/highlighter.hooks';
 import type { HighlighMapProps } from 'layout/highlighter/highlighter.providers';
 import type { Configuration } from 'models/api/help';
@@ -58,12 +58,8 @@ import type { Attack, Tag } from 'models/base/tagging';
 import moment from 'moment';
 import { memo, useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate, useParams } from 'react-router';
-import { Link } from 'react-router-dom';
 import Detection from 'routes/file-detail/components/detection';
-import { FileDetailContent } from 'routes/file-detail/file-detail.route';
 import { ForbiddenPage } from 'routes/forbidden/forbidden.page';
-import { ManageHeuristicDetailPage } from 'routes/manage-heuristic-detail/manage-heuristic-detail.route';
 import AISummarySection from 'routes/submission-detail/components/ai_summary';
 import AttackSection from 'routes/submission-detail/components/attack';
 import ErrorSection from 'routes/submission-detail/components/errors';
@@ -86,11 +82,6 @@ import VerdictBar from 'ui/VerdictBar';
 const NAMESPACE = '/live_submission';
 const MESSAGE_TIMEOUT = 5000;
 const OUTSTANDING_TRIGGER_COUNT = 4;
-
-type ParamProps = {
-  id: string;
-  fid?: string;
-};
 
 const resultReducer = (currentResults: MultipleKeys, newResults: MultipleKeys) => {
   if (newResults === null) return null;
@@ -120,15 +111,16 @@ const incrementReducer = (old: number, increment: number) => {
 export const SubmissionDetailPage = memo(() => {
   const { t, i18n } = useTranslation(['submissionDetail']);
   const theme = useTheme();
-  const location = useLocation();
-  const navigate = useNavigate();
+  const navigate = useAppNavigate();
   const { apiCall } = useMyAPI();
   const { addInsight, removeInsight } = useAssistant();
   const { showSuccessMessage, showErrorMessage } = useMySnackbar();
   const { user: currentUser, configuration: systemConfig, settings } = useALContext();
   const { setHighlightMap } = useHighlighter();
-  const { setGlobalDrawer, globalDrawerOpened } = useDrawer();
-  const { id, fid } = useParams<ParamProps>();
+  const id = useAppPathParams<'/submission/detail/:id'>()?.id;
+  const fid = useAppLocation<'/file/detail/:id'>('to')(location =>
+    location.route === '/file/detail/:id' ? location.path.id : null
+  );
 
   const [submission, setSubmission] = useState<ParsedSubmission>(null);
   const [summary, setSummary] = useState<SubmissionSummary>(null);
@@ -549,7 +541,7 @@ export const SubmissionDetailPage = memo(() => {
           setSummary(null);
           setTree(null);
           setTimeout(() => {
-            navigate(`/submission/detail/${api_data.api_response.sid}`);
+            navigate.here().update({ route: '/submission/detail/:id', path: { id: api_data.api_response.sid } });
           }, 500);
         }
       });
@@ -571,7 +563,7 @@ export const SubmissionDetailPage = memo(() => {
             setSummary(null);
             setTree(null);
             setTimeout(() => {
-              navigate(`/submission/detail/${api_data.api_response.sid}`);
+              navigate.here().update({ route: '/submission/detail/:id', path: { id: api_data.api_response.sid } });
             }, 500);
           }
         });
@@ -605,7 +597,7 @@ export const SubmissionDetailPage = memo(() => {
           showSuccessMessage(t('delete.success'));
           setDeleteDialog(false);
           setTimeout(() => {
-            navigate('/submissions');
+            navigate.here().closePanel({ route: '/submissions' });
           }, 500);
         },
         onEnter: () => setWaitingDialog(true),
@@ -871,73 +863,41 @@ export const SubmissionDetailPage = memo(() => {
   }, [watchQueue, socket, handleErrorMessage]);
 
   useEffect(() => {
-    if (submission !== null && !globalDrawerOpened && fid !== undefined) {
-      navigate(`/submission/detail/${id}`);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [globalDrawerOpened]);
-
-  useEffect(() => {
     if (fid) {
       if (liveResults) {
-        const curFileLiveResults = [];
         const curFileLiveErrors = [];
-        Object.entries(liveResults.result).forEach(([resultKey, result]) => {
-          if (resultKey.startsWith(fid)) {
-            curFileLiveResults.push(result);
-          }
-        });
         Object.entries(liveResults.error).forEach(([errorKey, error]) => {
           if (errorKey.startsWith(fid)) {
             curFileLiveErrors.push(error);
           }
         });
-        setGlobalDrawer(
-          <FileDetailContent
-            sha256={fid}
-            sid={id}
-            metadata={submission?.metadata}
-            liveResultKeys={liveResultKeys}
-            liveErrors={curFileLiveErrors}
-            force={submission && submission.max_score < 0}
-            filetype_override={submission?.files?.[0]?.sha256 !== fid ? null : submission?.params?.filetype_override}
-          />,
-          { hasMaximize: true }
-        );
-      } else {
-        setGlobalDrawer(
-          <FileDetailContent
-            sha256={fid}
-            sid={id}
-            metadata={submission?.metadata}
-            force={submission && submission.max_score < 0}
-            filetype_override={submission?.files?.[0]?.sha256 !== fid ? null : submission?.params?.filetype_override}
-          />,
-          {
-            hasMaximize: true
+        navigate.to<'/file/detail/:id'>({ replace: true }).update(s => ({
+          ...s,
+          search: {
+            name: s?.search?.name ?? null,
+            sid: submission?.sid ?? null,
+            metadata: submission?.metadata,
+            liveResultKeys,
+            liveErrors: curFileLiveErrors as ObjectParamShape[],
+            force: submission && submission.max_score < 0,
+            filetypeOverride: submission?.files?.[0]?.sha256 !== fid ? null : submission?.params?.filetype_override
           }
-        );
+        }));
+      } else {
+        navigate.to<'/file/detail/:id'>({ replace: true }).update(s => ({
+          ...s,
+          search: {
+            name: s?.search?.name ?? null,
+            sid: submission?.sid ?? null,
+            metadata: submission?.metadata,
+            force: submission && submission.max_score < 0,
+            filetypeOverride: submission?.files?.[0]?.sha256 !== fid ? null : submission?.params?.filetype_override
+          }
+        }));
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fid, submission]);
-
-  useEffect(() => {
-    if (!fid && location.hash) {
-      setGlobalDrawer(<ManageHeuristicDetailPage heur_id={location.hash.slice(1)} />);
-    }
-  }, [fid, location.hash, setGlobalDrawer]);
-
-  useEffect(() => {
-    if (!fid && !location.hash) setGlobalDrawer(null);
-  }, [fid, location.hash, setGlobalDrawer]);
-
-  useEffect(() => {
-    if (!fid && !globalDrawerOpened && location.hash) {
-      navigate(`${location.pathname}${location.search ? location.search : ''}`);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fid, globalDrawerOpened]);
 
   useEffect(() => {
     if (loadTrigger === 0) return;
@@ -1256,15 +1216,24 @@ export const SubmissionDetailPage = memo(() => {
                     <List disablePadding>
                       {submission?.files?.[0]?.sha256 && (
                         <ListItemButton
-                          component={Link}
-                          to={`/submit?hash=${submission.files[0].sha256}`}
-                          state={{
-                            c12n: submission.classification,
-                            metadata: submission.metadata,
-                            params: {
-                              filetype_override: submission?.params?.filetype_override
-                            }
-                          }}
+                          component={AppLink}
+                          nav={nav =>
+                            nav.to().create({
+                              route: '/submit',
+                              search: {
+                                hash: submission.files[0].sha256,
+                                classification: submission.classification,
+                                metadata: submission.metadata,
+                                filetypeOverride: submission?.params?.filetype_override
+                              }
+                            })
+                          }
+                          navDeps={[
+                            submission.files[0].sha256,
+                            submission.classification,
+                            submission.metadata,
+                            submission.params?.filetype_override
+                          ]}
                           dense
                           onClick={() => setResubmitAnchor(null)}
                         >
@@ -1321,14 +1290,14 @@ export const SubmissionDetailPage = memo(() => {
             </IconButton>
 
             <IconButton
-              component={Link}
+              nav={nav => nav.to().create({ route: '/submission/report/:id', path: { id: submission.sid } })}
+              navDeps={[submission?.sid]}
               size="large"
               tooltip={t('report_view')}
               {...(!submission
                 ? { loading: true }
                 : {
-                    preventRender: submission.state !== 'completed',
-                    to: `/submission/report/${submission.sid}`
+                    preventRender: submission.state !== 'completed'
                   })}
             >
               <ChromeReaderModeOutlinedIcon />
@@ -1341,12 +1310,18 @@ export const SubmissionDetailPage = memo(() => {
               <Typography variant="caption" component={'div'}>
                 <i>
                   <span>{t('psid')}: </span>
-                  <Link
+                  <AppLink
                     style={{ textDecoration: 'none', color: theme.palette.primary.main }}
-                    to={`/submission/detail/${submission.params.psid}`}
+                    nav={nav =>
+                      nav.to<'/submission/detail/:id'>().create({
+                        route: '/submission/detail/:id',
+                        path: { id: submission.params.psid }
+                      })
+                    }
+                    navDeps={[submission.params.psid]}
                   >
                     {submission.params.psid}
-                  </Link>
+                  </AppLink>
                 </i>
               </Typography>
             )}

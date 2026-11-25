@@ -48,7 +48,8 @@ const WrappedUsersTable: React.FC<Props> = ({ userResults }) => {
             {userResults.items.map((user, i) => (
               <LinkRow
                 key={`${user.id}-${i}`}
-                to={`/admin/users/${user.uname}`}
+                nav={nav => nav.to().create({ route: '/admin/users/:id', path: { id: user.uname } })}
+                navDeps={[user.uname]}
                 hover
                 style={{ textDecoration: 'none' }}
               >

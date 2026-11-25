@@ -9,6 +9,7 @@ import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import { Divider, ListSubheader, Link as MaterialLink, Menu, MenuItem, SvgIcon, Tooltip } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
+import { AppLink } from 'core/router';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import { isAccessible } from 'features/classification';
 import useClipboard from 'layout/clipboard/clipboard.hooks';
@@ -21,8 +22,7 @@ import type { Safelist } from 'models/base/safelist';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { HiOutlineExternalLink } from 'react-icons/hi';
-import { Link } from 'react-router-dom';
-import { getSHA256, getSubmitType, safeFieldValueURI, toTitleCase } from 'shared/utils/utils';
+import { getSHA256, getSubmitType, safeFieldValue, toTitleCase } from 'shared/utils/utils';
 import Classification from 'ui/Classification';
 import ClassificationMismatchDialog from 'ui/ClassificationMismatchDialog';
 import { CLUE_TYPE_MAP } from 'ui/EnrichmentCustomChip';
@@ -58,7 +58,7 @@ const initialMenuState: Coordinates = {
   mouseY: null
 };
 
-const categoryPrefix = {
+export const CATEGORY_PREFIX_MAP: Record<ExternalLinkType | 'heuristic' | 'signature', string> = {
   heuristic: 'result.sections.heuristic.name',
   signature: 'result.sections.heuristic.signature.name',
   metadata: 'metadata.',
@@ -66,17 +66,19 @@ const categoryPrefix = {
   hash: ''
 } as const;
 
-const categoryIndex = {
-  heuristic: '/result',
-  signature: '/result',
-  metadata: '',
-  tag: '/result',
-  hash: ''
+export type SearchIndex = 'submission' | 'file' | 'result' | 'signature' | 'alert' | 'retrohunt';
+
+export const CATEGORY_INDEX_MAP: Record<ExternalLinkType | 'heuristic' | 'signature', SearchIndex | null> = {
+  heuristic: 'result',
+  signature: 'result',
+  metadata: null,
+  tag: 'result',
+  hash: null
 } as const;
 
 export type ActionMenuProps = {
-  category: 'heuristic' | 'signature' | 'hash' | 'metadata' | 'tag';
-  index?: string;
+  category: ExternalLinkType | 'heuristic' | 'signature';
+  index?: SearchIndex;
   type: string;
   value: string;
   classification?: string | null;
@@ -429,10 +431,19 @@ const WrappedActionMenu = ({
           <MenuItem
             id="sigID"
             dense
-            component={Link}
-            to={`/manage/signature/${type.substring(10)}/${value.substring(0, value.indexOf('.'))}/${value.substring(
-              value.indexOf('.') + 1
-            )}`}
+            component={AppLink}
+            nav={nav =>
+              nav.to().create({
+                route: '/manage/signature/detail/:type/:source/:name',
+                path: {
+                  type: type.substring(10),
+                  source: value.substring(0, value.indexOf('.')),
+                  name: value.substring(value.indexOf('.') + 1)
+                }
+              })
+            }
+            navDeps={[type, value]}
+            onClick={handleClose}
           >
             {SIGNATURE_ICON}
             {t('goto_signature')}
@@ -445,13 +456,32 @@ const WrappedActionMenu = ({
         {currentUser.roles.includes('submission_view') && (
           <MenuItem
             dense
-            component={Link}
-            to={
+            component={AppLink}
+            nav={nav =>
               index
-                ? `/search${index}?query=${type}:${safeFieldValueURI(value)}`
-                : `/search${categoryIndex[category]}?query=${category === 'tag' && maliciousness === 'safe' ? 'result.sections.safelisted_tags.' : categoryPrefix[category]}${type}:${safeFieldValueURI(
-                    value
-                  )}`
+                ? nav.to<'/search/:index'>().create({
+                    route: '/search/:index',
+                    path: { index },
+                    search: { query: `${type}:${safeFieldValue(value)}` }
+                  })
+                : CATEGORY_INDEX_MAP[category]
+                  ? nav.to<'/search/:index'>().create({
+                      route: '/search/:index',
+                      path: { index: CATEGORY_INDEX_MAP[category] },
+                      search: {
+                        query: `${category === 'tag' && maliciousness === 'safe' ? 'result.sections.safelisted_tags.' : CATEGORY_PREFIX_MAP[category]}${type}:${safeFieldValue(
+                          value
+                        )}`
+                      }
+                    })
+                  : nav.to<'/search'>().create({
+                      route: '/search',
+                      search: {
+                        query: `${category === 'tag' && maliciousness === 'safe' ? 'result.sections.safelisted_tags.' : CATEGORY_PREFIX_MAP[category]}${type}:${safeFieldValue(
+                          value
+                        )}`
+                      }
+                    })
             }
             onClick={handleClose}
           >
@@ -491,12 +521,10 @@ const WrappedActionMenu = ({
           (submitType !== 'url' || (submitType === 'url' && !!currentUserConfig?.ui?.allow_url_submissions)) && (
             <MenuItem
               dense
-              component={Link}
-              to={`/submit`}
-              state={{
-                hash: value,
-                c12n: classification
-              }}
+              component={AppLink}
+              nav={nav => nav.to().create({ route: '/submit', search: { hash: value, classification } })}
+              navDeps={[value, classification]}
+              onClick={handleClose}
             >
               {SUBMIT_ICON}
               {t('submit') + ` ${submitType.toUpperCase()}`}

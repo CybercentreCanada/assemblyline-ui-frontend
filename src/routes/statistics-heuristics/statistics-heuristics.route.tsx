@@ -5,10 +5,8 @@ import useALContext from 'core/config/useALContext';
 import { createAppRoute } from 'core/router';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
 import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
-import useDrawer from 'layout/drawer/drawer.hooks';
-import { memo, useCallback, useState } from 'react';
+import { memo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ManageHeuristicDetailPage } from 'routes/manage-heuristic-detail/manage-heuristic-detail.route';
 import type { Cell } from 'ui/Table/enhanced_table';
 import EnhancedTable from 'ui/Table/enhanced_table';
 
@@ -17,13 +15,7 @@ export const StatisticsHeuristicsPage = memo(() => {
   const { apiCall } = useMyAPI();
   const theme = useTheme();
   const { c12nDef } = useALContext();
-  const { setGlobalDrawer } = useDrawer();
   const [signatureStats, setSignatureStats] = useState(null);
-
-  const handleRowClick = useCallback(row => {
-    setGlobalDrawer(<ManageHeuristicDetailPage heur_id={row.heur_id} />);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   useEffectOnce(() => {
     apiCall({
@@ -64,10 +56,9 @@ export const StatisticsHeuristicsPage = memo(() => {
         <EnhancedTable
           cells={cells}
           rows={signatureStats}
-          linkPrefix="/manage/heuristic/"
+          linkPrefix="/manage/heuristic/detail/"
           linkField="heur_id"
           defaultOrderBy="heur_id"
-          onClick={handleRowClick}
         />
       ) : (
         <Skeleton height="10rem" />

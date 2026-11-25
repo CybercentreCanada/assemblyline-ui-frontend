@@ -1,10 +1,9 @@
 import AltRouteOutlinedIcon from '@mui/icons-material/AltRouteOutlined';
 import useALContext from 'core/config/useALContext';
-import { createAppRoute, useAppLocationParamStore } from 'core/router';
+import { AppNavigate, createAppRoute, useAppLocationParamStore } from 'core/router';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
 import { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate } from 'react-router';
 import type { DevelopmentRoutesTableRowData } from 'routes/development-routes';
 import { DevelopmentRoutesTable, toRouteTableRow } from 'routes/development-routes';
 import { PageHeader } from 'ui/layouts/PageHeader';
@@ -31,7 +30,7 @@ export const DevelopmentRoutesPage = memo(() => {
   );
 
   return notAllowed ? (
-    <Navigate to="/forbidden" replace />
+    <AppNavigate nav={nav => nav.here<'/forbidden'>({ replace: true }).update({ route: '/forbidden' })} />
   ) : (
     <PageFullWidth>
       <PageHeader primary={t('page.title')} secondary={t('page.registered_routes', { count: rows.length })} />

@@ -8,7 +8,6 @@ import type { SearchResult } from 'models/api/search';
 import type { WorkflowIndexed } from 'models/base/workflow';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
 import { AlertPriority, AlertStatus } from 'routes/alerts/components/Components';
 import Classification from 'ui/Classification';
 import {
@@ -25,10 +24,9 @@ import Moment from 'ui/Moment';
 
 type Props = {
   workflowResults: SearchResult<WorkflowIndexed>;
-  setWorkflowID?: (id: string) => void;
 };
 
-const WrappedWorflowTable: React.FC<Props> = ({ workflowResults, setWorkflowID = null }) => {
+const WrappedWorflowTable: React.FC<Props> = ({ workflowResults }) => {
   const { t } = useTranslation(['search']);
   const { c12nDef } = useALContext();
 
@@ -54,14 +52,10 @@ const WrappedWorflowTable: React.FC<Props> = ({ workflowResults, setWorkflowID =
             {workflowResults.items.map((workflow, i) => (
               <LinkRow
                 key={`${workflow.workflow_id}-${i}`}
-                component={Link}
-                to={`/manage/workflow/detail/${workflow.workflow_id}`}
-                onClick={event => {
-                  if (setWorkflowID) {
-                    event.preventDefault();
-                    setWorkflowID(workflow.workflow_id);
-                  }
-                }}
+                nav={nav =>
+                  nav.to().create({ route: '/manage/workflow/detail/:id', path: { id: workflow.workflow_id } })
+                }
+                navDeps={[workflow.workflow_id]}
                 hover
               >
                 <DivTableCell>

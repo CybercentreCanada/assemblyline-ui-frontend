@@ -3,7 +3,6 @@ import { useStore } from '@tanstack/react-form';
 import { createPathParamsCodec } from 'features/path-params';
 import type { ReactNode } from 'react';
 import { memo, useCallback, useMemo } from 'react';
-import type { Location } from 'react-router';
 import { DemoContainer } from 'routes/development-library/components/DemoContainer';
 import { DemoSection } from 'routes/development-library/components/DemoSection';
 import { useForm } from 'routes/development-library/contexts/form';
@@ -84,7 +83,7 @@ const PARSE_BY_FIELD = {
  * @param pathname - Pathname of the location
  * @returns A location with an empty search and hash and no state
  */
-const createLocation = (pathname: string): Location => ({ pathname, search: '', hash: '', state: null, key: 'demo' });
+const createLocation = (pathname: string) => ({ pathname, search: '', hash: '', state: null, key: 'demo' });
 
 /**
  * @name stringifyResult

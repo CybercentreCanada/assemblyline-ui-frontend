@@ -3,7 +3,7 @@ import { IconButton, styled, useMediaQuery, useTheme } from '@mui/material';
 import { useAppConfigs, useAppLeftNav, useAppLogo } from 'core/template/components/app/hooks';
 import { useAppBrand } from 'core/template/components/app/hooks/useAppBrand';
 import { memo } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 const StyledTitle = styled('div')({
   display: 'flex',

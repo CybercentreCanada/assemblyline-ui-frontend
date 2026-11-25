@@ -1,7 +1,7 @@
 import KeyOutlinedIcon from '@mui/icons-material/KeyOutlined';
 import { Backdrop, Button, Typography, useTheme } from '@mui/material';
 import useALContext from 'core/config/useALContext';
-import { createAppRoute } from 'core/router';
+import { createAppRoute, useAppSearchSnapshot } from 'core/router';
 import PageCardCentered from 'core/template/branding/AppPageCardCentered';
 import { useAppUser } from 'core/template/components/app/hooks';
 import useAppBannerVert from 'core/template/components/app/hooks/useAppBannerVert';
@@ -18,6 +18,8 @@ const VALID_SCOPES: Omit<Scope, 'c'>[] = SCOPES.filter(s => s !== 'c');
 export const AuthorizePage = memo(() => {
   const location = useLocation();
   const navigate = useNavigate();
+
+  const search = useAppSearchSnapshot<'/authorize'>();
   const { t } = useTranslation(['authorize']);
   const theme = useTheme();
   const banner = useAppBannerVert();
@@ -51,6 +53,7 @@ export const AuthorizePage = memo(() => {
           ) : !rUrl || !clientID || (!scope && !roles) || !server || (scope && VALID_SCOPES.indexOf(scope) === -1) ? (
             <>
               <div style={{ marginBottom: '3rem' }}>{t('invalid')}</div>
+              {/** TODO: fix this, so that navigating either navigates back or brings you back to the login page */}
               <Button variant="contained" color="primary" onClick={() => navigate(-1)}>
                 {t('button.back')}
               </Button>
@@ -119,14 +122,6 @@ export const AuthorizeRoute = createAppRoute({
   component: AuthorizePage,
 
   path: '/authorize',
-  // TODO: revise in the new version
-  search: s => ({
-    redirect_url: s.string(''),
-    client_id: s.string(''),
-    server: s.string(''),
-    scope: s.string(''),
-    roles: s.string('')
-  }),
 
   ancestor: null,
   shortname: () => ['app_route.authorize.shortname', { ns: 'authorize' }],

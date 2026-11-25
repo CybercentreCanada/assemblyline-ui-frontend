@@ -31,7 +31,7 @@ import ThemeSelection from 'core/template/components/topnav/ThemeSelection';
 import useQuota from 'layout/quota/quota.hooks';
 import { memo, useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 export const AppUserAvatar = styled(AppAvatar)(({ theme }) => ({
   width: theme.spacing(5),

@@ -4,40 +4,27 @@ import SupervisorAccountOutlinedIcon from '@mui/icons-material/SupervisorAccount
 import { useTheme } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
-import { createAppRoute } from 'core/router';
+import { createAppRoute, useAppNavigate, useAppSearchSnapshot } from 'core/router';
 import PageContainer from 'core/template/branding/AppPageContainer';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
-import { createSearchParams, SearchParamsProvider, useSearchParams } from 'features/search-params';
 import type { SearchResult } from 'models/api/search';
 import type { IndexDefinition } from 'models/api/user';
 import type { UserIndexed } from 'models/base/user';
 import { memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate } from 'react-router';
 import { AddUserPage } from 'routes/admin-users/components/users_add';
 import UsersTable from 'routes/search/components/users';
 import { PageHeader } from 'ui/layouts/PageHeader';
 import { DEFAULT_SUGGESTION } from 'ui/SearchBar/search-textfield';
 import { SearchHeader } from 'ui/SearchBar/SearchHeader';
 
-const USERS_PARAMS = createSearchParams(p => ({
-  query: p.string(''),
-  offset: p.number(0).min(0).source('transient').ephemeral(),
-  rows: p.number(25).locked().source('transient').ephemeral(),
-  sort: p.string(null).nullable().ephemeral(),
-  filters: p.filters([]),
-  track_total_hits: p.number(10000).nullable().ephemeral(),
-  refresh: p.boolean(false).source('transient').ephemeral()
-}));
-
-type UsersParams = typeof USERS_PARAMS;
-
-export const AdminUsersContent = memo(() => {
+export const AdminUsersPage = memo(() => {
   const { t } = useTranslation(['adminUsers']);
   const theme = useTheme();
   const { apiCall } = useMyAPI();
   const { user: currentUser } = useALContext();
-  const { search, setSearchParams, setSearchObject } = useSearchParams<UsersParams>();
+  const navigate = useAppNavigate<'/admin/users'>();
+  const search = useAppSearchSnapshot<'/admin/users'>();
 
   const [userResults, setUserResults] = useState<SearchResult<UserIndexed>>(null);
   const [searching, setSearching] = useState<boolean>(false);
@@ -45,12 +32,15 @@ export const AdminUsersContent = memo(() => {
 
   const handleToggleFilter = useCallback(
     (filter: string) => {
-      setSearchObject(o => {
-        const filters = o.filters.includes(filter) ? o.filters.filter(f => f !== filter) : [...o.filters, filter];
-        return { ...o, offset: 0, filters };
-      });
+      navigate.here().search(s =>
+        s.set(o => ({
+          ...o,
+          offset: 0,
+          filters: o.filters.includes(filter) ? o.filters.filter(f => f !== filter) : [...o.filters, filter]
+        }))
+      );
     },
-    [setSearchObject]
+    [navigate]
   );
 
   const handleReload = useCallback(
@@ -89,18 +79,16 @@ export const AdminUsersContent = memo(() => {
 
   useEffect(() => {
     function reload() {
-      setSearchObject(o => ({ ...o, offset: 0, refresh: !o.refresh }));
+      navigate.here().search(s => s.set(o => ({ ...o, offset: 0, refresh: !o.refresh })));
     }
 
     window.addEventListener('reloadUsers', reload);
     return () => {
       window.removeEventListener('reloadUsers', reload);
     };
-  }, [setSearchObject]);
+  }, [navigate]);
 
-  return !currentUser.is_admin ? (
-    <Navigate to="/forbidden" replace />
-  ) : (
+  return (
     <PageFullWidth margin={4}>
       <PageHeader
         primary={t('title')}
@@ -122,7 +110,11 @@ export const AdminUsersContent = memo(() => {
                 ? t(`filtered${userResults?.total === 1 ? '' : 's'}`)
                 : t(`total${userResults?.total === 1 ? '' : 's'}`)
             }
-            onChange={v => setSearchParams(v)}
+            onChange={v =>
+              navigate
+                .here()
+                .update(s => ({ ...s, search: { ...s.search, ...AdminUsersRoute.search.full(v).toObject() } }))
+            }
             paramDefaults={search.defaults().toObject()}
             searchInputProps={{ placeholder: t('filter'), options: suggestions }}
             actionProps={[
@@ -159,12 +151,6 @@ export const AdminUsersContent = memo(() => {
     </PageFullWidth>
   );
 });
-
-export const AdminUsersPage = memo(() => (
-  <SearchParamsProvider params={USERS_PARAMS}>
-    <AdminUsersContent />
-  </SearchParamsProvider>
-));
 
 export const AdminUsersRoute = createAppRoute({
   component: AdminUsersPage,

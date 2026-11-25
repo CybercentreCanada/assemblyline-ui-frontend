@@ -16,7 +16,7 @@ import {
 } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
-import { createAppRoute } from 'core/router';
+import { AppNavigate, createAppRoute } from 'core/router';
 import { useAppUser } from 'core/template/components/app/hooks';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
 import type { SiteMapResponse } from 'models/api';
@@ -24,7 +24,6 @@ import type { CustomUser } from 'models/api/user';
 import type { Role } from 'models/base/user';
 import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate } from 'react-router';
 import type { PossibleColor } from 'shared/utils/colors';
 import CustomChip from 'ui/CustomChip';
 import { PageHeader } from 'ui/layouts/PageHeader';
@@ -173,7 +172,7 @@ export const AdminSiteMapPage = memo(() => {
       )}
     </PageFullWidth>
   ) : (
-    <Navigate to="/forbidden" replace />
+    <AppNavigate nav={nav => nav.here<'/forbidden'>({ replace: true }).update({ route: '/forbidden' })} />
   );
 });
 

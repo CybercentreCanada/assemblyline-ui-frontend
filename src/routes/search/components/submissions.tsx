@@ -3,13 +3,11 @@ import { AlertTitle, Skeleton, Tooltip } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
 import useALContext from 'core/config/useALContext';
-import { useSearchParams } from 'features/search-params';
+import { useAppNavigate, useAppSearchSnapshot } from 'core/router';
 import type { SearchResult } from 'models/api/search';
 import type { SubmissionIndexed } from 'models/base/submission';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
-import type { SubmissionParams } from 'routes/submissions/submissions.route';
 import { maxLenStr } from 'shared/utils/utils';
 import Classification from 'ui/Classification';
 import CustomChip from 'ui/CustomChip';
@@ -34,8 +32,9 @@ type Props = {
 
 const WrappedSubmissionsTable: React.FC<Props> = ({ submissionResults, allowSort = true }) => {
   const { t } = useTranslation(['search']);
-  const { c12nDef } = useALContext();
-  const { search, setSearchObject } = useSearchParams<SubmissionParams>();
+  const { c12nDef, settings } = useALContext();
+  const search = useAppSearchSnapshot<'/submissions'>();
+  const navigate = useAppNavigate<'/submissions'>();
 
   return submissionResults ? (
     !!submissionResults?.total ? (
@@ -71,12 +70,21 @@ const WrappedSubmissionsTable: React.FC<Props> = ({ submissionResults, allowSort
             {submissionResults.items.map((submission, id) => (
               <LinkRow
                 key={`${submission.id}-${id}`}
-                component={Link}
-                to={
-                  submission.state === 'completed'
-                    ? `/submission/${submission.id}`
-                    : `/submission/detail/${submission.id}`
+                nav={nav =>
+                  nav.to().create(s => {
+                    const route =
+                      submission.state !== 'completed'
+                        ? '/submission/detail/:id'
+                        : s?.route === '/submission/detail/:id' || s?.route === '/submission/report/:id'
+                          ? s.route
+                          : settings.submission_view === 'report'
+                            ? '/submission/report/:id'
+                            : '/submission/detail/:id';
+
+                    return { route, path: { id: submission.id } };
+                  })
                 }
+                navDeps={[submission.state, settings.submission_view, submission.id]}
                 hover
                 style={{ textDecoration: 'none' }}
               >
@@ -103,10 +111,13 @@ const WrappedSubmissionsTable: React.FC<Props> = ({ submissionResults, allowSort
                       onClick={event => {
                         event.preventDefault();
                         event.stopPropagation();
-                        setSearchObject(o => ({
-                          ...o,
-                          offset: 0,
-                          filters: [...o.filters, `params.submitter:"${submission.params.submitter}"`]
+                        navigate.here().update(s => ({
+                          ...s,
+                          search: {
+                            ...s.search,
+                            offset: 0,
+                            filters: [...s.search.filters, `params.submitter:"${submission.params.submitter}"`]
+                          }
                         }));
                       }}
                     />

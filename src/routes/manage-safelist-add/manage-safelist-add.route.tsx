@@ -15,7 +15,7 @@ import {
 import Autocomplete from '@mui/material/Autocomplete';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
-import { createAppRoute } from 'core/router';
+import { createAppRoute, useAppBlocker, useAppNavigate } from 'core/router';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
 import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
@@ -29,26 +29,13 @@ import {
 } from 'models/base/safelist';
 import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router';
 import { ForbiddenPage } from 'routes/forbidden/forbidden.page';
 import { HASH_MAP, MD5_REGEX, SHA1_REGEX, SHA256_REGEX, SSDEEP_REGEX, TLSH_REGEX } from 'shared/utils/constants';
 import Classification from 'ui/Classification';
 import DatePicker from 'ui/DatePicker';
-import { RouterPrompt } from 'ui/RouterPrompt';
 
-type ParamProps = {
-  id: string;
-};
-
-export type ManageSafelistAddPageProps = {
-  safelist_id?: string;
-  close?: () => void;
-};
-
-// eslint-disable-next-line no-empty-pattern
-export const ManageSafelistAddPage = memo(({}: ManageSafelistAddPageProps) => {
+export const ManageSafelistAddPage = memo(() => {
   const { t } = useTranslation(['manageSafelistAdd']);
-  const { id } = useParams<ParamProps>();
   const theme = useTheme();
   const [safelist, setSafelist] = useState<Safelist>(DEFAULT_SAFELIST);
   const [waiting, setWaiting] = useState<boolean>(false);
@@ -60,7 +47,9 @@ export const ManageSafelistAddPage = memo(({}: ManageSafelistAddPageProps) => {
   const { user: currentUser, c12nDef, indexes } = useALContext();
   const { showSuccessMessage } = useMySnackbar();
   const { apiCall } = useMyAPI();
-  const navigate = useNavigate();
+  const navigate = useAppNavigate();
+
+  useAppBlocker(() => (modified ? 'unsaved_changes' : null), [modified]);
 
   useEffectOnce(() => {
     const tempTags = Object.keys(indexes.result)
@@ -199,7 +188,7 @@ export const ManageSafelistAddPage = memo(({}: ManageSafelistAddPageProps) => {
         setModified(false);
         showSuccessMessage(t('add.success'));
         setTimeout(() => {
-          navigate(`/manage/safelist#${resp.api_response.hash}`);
+          navigate.here().create({ route: '/manage/safelist/detail/:id', path: { id: resp.api_response.hash } });
           window.dispatchEvent(new CustomEvent('reloadSafelist'));
         }, 1000);
       },
@@ -219,8 +208,7 @@ export const ManageSafelistAddPage = memo(({}: ManageSafelistAddPageProps) => {
   };
 
   return currentUser.roles.includes('safelist_view') ? (
-    <PageFullWidth margin={!id ? 2 : 4}>
-      <RouterPrompt when={modified} />
+    <PageFullWidth margin={2}>
       <div
         style={{
           alignItems: 'start',

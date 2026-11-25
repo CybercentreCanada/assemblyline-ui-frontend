@@ -6,15 +6,15 @@ import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOut
 import ToggleOffOutlinedIcon from '@mui/icons-material/ToggleOffOutlined';
 import ToggleOnIcon from '@mui/icons-material/ToggleOn';
 import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
-import { Grid, IconButton, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
+import { Grid, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
+import { useAppNavigate } from 'core/router';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import type { Workflow } from 'models/base/workflow';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router';
-import { Link } from 'react-router-dom';
+import { IconButton } from 'ui/buttons/IconButton';
 import ConfirmationDialog from 'ui/ConfirmationDialog';
 
 type RunWorkflowActionProps = {
@@ -110,8 +110,7 @@ export const ShowRelatedAlertsAction: React.FC<ShowRelatedAlertsActionProps> = R
         <Tooltip title={t('usage')}>
           <div>
             <IconButton
-              component={Link}
-              to={`/alerts/?q=events.entity_id:${id}`}
+              nav={nav => nav.to().create({ route: '/alerts', search: { q: `events.entity_id:${id}` } })}
               size="large"
               style={{ color: theme.palette.action.active }}
             >
@@ -132,21 +131,7 @@ export const DuplicateWorkflowAction: React.FC<DuplicateWorkflowActionProps> = R
   ({ id = null, workflow = null }) => {
     const { t } = useTranslation(['manageWorkflowDetail']);
     const theme = useTheme();
-    const navigate = useNavigate();
     const { user: currentUser } = useALContext();
-
-    const state = useMemo<Partial<Workflow>>(
-      () => ({
-        classification: workflow?.classification || '',
-        name: workflow?.name || '',
-        query: workflow?.query || '',
-        labels: workflow?.labels || [],
-        priority: workflow?.priority || '',
-        status: workflow?.status || '',
-        enabled: workflow?.enabled || true
-      }),
-      [workflow]
-    );
 
     if (!id || !currentUser.roles.includes('workflow_manage')) return null;
     else if (!workflow)
@@ -158,9 +143,21 @@ export const DuplicateWorkflowAction: React.FC<DuplicateWorkflowActionProps> = R
             <IconButton
               style={{ color: theme.palette.success.main }}
               size="large"
-              onClick={() => {
-                navigate(`${location.pathname}${location.search}#/create/`, { state });
-              }}
+              nav={nav =>
+                nav.here().create({
+                  route: '/manage/workflow/create',
+                  search: {
+                    classification: workflow.classification,
+                    name: workflow.name,
+                    query: workflow.query,
+                    labels: workflow.labels,
+                    priority: workflow.priority,
+                    status: workflow.status,
+                    enabled: workflow.enabled
+                  }
+                })
+              }
+              navDeps={[workflow]}
             >
               <ControlPointDuplicateOutlinedIcon />
             </IconButton>
@@ -191,12 +188,8 @@ export const EditWorkflowAction: React.FC<EditWorkflowActionProps> = React.memo(
         <div>
           <IconButton
             style={{ color: theme.palette.primary.main }}
-            component={Link}
-            to={
-              location.pathname === '/manage/workflows'
-                ? `/manage/workflows${location.search}#/create/${id}`
-                : location.pathname.replace('detail', 'create')
-            }
+            nav={nav => nav.here().create({ route: '/manage/workflow/create/:id', path: { id } })}
+            navDeps={[id]}
             size="large"
             disabled={editingDisabled}
           >
@@ -312,8 +305,7 @@ export const DeleteWorkflowAction: React.FC<DeleteWorkflowActionProps> = React.m
   ({ id = null, workflow = null }) => {
     const { t } = useTranslation(['manageWorkflowDetail']);
     const theme = useTheme();
-    const location = useLocation();
-    const navigate = useNavigate();
+    const navigate = useAppNavigate();
     const { apiCall } = useMyAPI();
     const { user: currentUser } = useALContext();
     const { showSuccessMessage } = useMySnackbar();
@@ -329,14 +321,14 @@ export const DeleteWorkflowAction: React.FC<DeleteWorkflowActionProps> = React.m
         onSuccess: () => {
           setDeleteDialog(false);
           showSuccessMessage(t('delete.success'));
-          navigate(`/manage/workflows${location.search}`);
+          navigate.here().create({ route: '/manage/workflows' });
           setTimeout(() => window.dispatchEvent(new CustomEvent('reloadWorkflows')), 1000);
         },
         onEnter: () => setLoading(true),
         onExit: () => setLoading(false)
       });
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentUser.roles, id, location.search]);
+    }, [currentUser.roles, id, navigate]);
 
     if (!id || !currentUser.roles.includes('workflow_manage')) return null;
     else if (!workflow)

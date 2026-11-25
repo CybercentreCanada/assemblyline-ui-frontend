@@ -1,6 +1,6 @@
+import { useAppNavigate, useAppSearchSnapshot } from 'core/router';
 import { once } from 'lodash';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router';
 import type { Params } from 'routes/alerts/utils/SearchParams';
 import type { SearchResult } from 'routes/alerts/utils/SearchParser';
 import { SearchParser } from 'routes/alerts/utils/SearchParser';
@@ -56,12 +56,12 @@ export const SearchParamsProvider = <T extends Params>({
   prefixes = null
 }: Props<T>) => {
   const SearchParamsContext = createSearchParamsContext<T>();
-  const navigate = useNavigate();
-  const location = useLocation();
+  const navigate = useAppNavigate<'/alerts'>();
+  const routeSearch = useAppSearchSnapshot<'/alerts'>();
 
   const [hiddenParams, setHiddenParams] = useState<URLSearchParams>(new URLSearchParams());
 
-  const locationParams = useMemo<URLSearchParams>(() => new URLSearchParams(location.search), [location.search]);
+  const locationParams = useMemo<URLSearchParams>(() => routeSearch.toParams(), [routeSearch?.toString()]);
 
   const parser = useMemo<SearchParser<T>>(
     () => new SearchParser<T>(defaultValue, { enforced, prefixes }),
@@ -91,11 +91,15 @@ export const SearchParamsProvider = <T extends Params>({
         setHiddenParams(nextHidden);
       }
 
-      if (prevSearch.current !== nextSearch.toString() && window.location.search.slice(1) !== nextSearch.toString()) {
-        navigate(`${window.location.pathname}?${nextSearch.toString()}${window.location.hash}`);
+      if (prevSearch.current !== nextSearch.toString() && routeSearch.toParams().toString() !== nextSearch.toString()) {
+        const nextValues = value.toObject();
+        navigate.here().update(s => ({
+          ...s,
+          search: { ...s.search, ...nextValues } as typeof s.search
+        }));
       }
     },
-    [hidden, navigate]
+    [hidden, navigate, routeSearch?.toString()]
   );
 
   const setSearchParams = useCallback<ContextProps<T>['setSearchParams']>(
