@@ -90,10 +90,10 @@ const LibraryPageContentInner = memo(({ tab, components }: LibraryPageContentInn
                 <ActiveAnchor key={String(item.id)} activeID={item.id}>
                   {isActive => (
                     <NavItem
+                      {...item}
                       primary={item.primary}
                       active={isActive}
                       onPageNavigation={e => scrollTo(e, item.id)}
-                      {...item}
                     />
                   )}
                 </ActiveAnchor>

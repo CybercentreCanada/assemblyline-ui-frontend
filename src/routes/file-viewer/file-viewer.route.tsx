@@ -114,6 +114,7 @@ export const FileViewerContent = memo(() => {
         url: `/api/v4/submit/${submitType}/${sha256}/`,
         onSuccess: api_data => {
           showSuccessMessage(t('submit.success'));
+          setSubmitAnchor(null);
           setTimeout(() => {
             navigate.to().create({ route: '/submission/detail/:id', path: { id: api_data.api_response.sid } });
           }, 500);
@@ -140,6 +141,7 @@ export const FileViewerContent = memo(() => {
         },
         onSuccess: api_data => {
           showSuccessMessage(t('submit.success'));
+          setSubmitAnchor(null);
           setTimeout(() => {
             navigate.to().create({ route: '/submission/detail/:id', path: { id: api_data.api_response.sid } });
           }, 500);
@@ -481,24 +483,6 @@ export const FileViewerPage = memo(() => (
 
 FileViewerPage.displayName = 'FileViewerPage';
 
-const FileViewerRootPage = memo(() => {
-  const { id = null } = useAppPathParams<'/file/viewer/:id'>();
-  const search = useAppSearchParams<'/file/viewer/:id'>();
-
-  return (
-    <AppNavigate
-      nav={nav =>
-        nav
-          .to({ replace: true })
-          .update({ route: '/file/viewer/:id/:tab', path: { id, tab: null }, search: search as never })
-      }
-      navDeps={[id, search]}
-    />
-  );
-});
-
-FileViewerRootPage.displayName = 'FileViewerRootPage';
-
 export const FileViewerRoute = createAppRoute({
   component: FileViewerPage,
 
@@ -528,6 +512,22 @@ export const FileViewerRoute = createAppRoute({
 
   disabled: () => false,
   forbidden: (_location, config) => !config.user.roles.includes('file_detail')
+});
+
+const FileViewerRootPage = memo(() => {
+  const { id = null } = useAppPathParams<'/file/viewer/:id'>();
+  const search = useAppSearchParams<'/file/viewer/:id'>();
+
+  return (
+    <AppNavigate
+      nav={nav =>
+        nav
+          .to({ replace: true })
+          .update({ route: '/file/viewer/:id/:tab', path: { id, tab: null }, search: search as never })
+      }
+      navDeps={[id, search]}
+    />
+  );
 });
 
 export const FileViewerRootRoute = createAppRoute({

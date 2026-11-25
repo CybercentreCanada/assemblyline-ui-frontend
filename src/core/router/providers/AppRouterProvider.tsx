@@ -2,7 +2,7 @@ import type { AppRouterStore } from 'core/router';
 import { createAppStore } from 'features/store';
 import type { PropsWithChildren } from 'react';
 import { memo } from 'react';
-import { BrowserRouter } from 'react-router-dom';
+import { BrowserRouter } from 'react-router';
 import { generateRandomUUID } from 'shared/utils/app.utils';
 import type { StoreApi } from 'zustand';
 

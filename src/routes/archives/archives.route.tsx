@@ -6,7 +6,7 @@ import { Chip, Grid, MenuItem, Pagination, Select, Tooltip, Typography, useMedia
 import FormControl from '@mui/material/FormControl';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
-import { AppNavigate, createAppRoute, useAppNavigate, useAppSearchSnapshot } from 'core/router';
+import { createAppRoute, useAppNavigate, useAppSearchSnapshot } from 'core/router';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import PageContainer from 'core/template/branding/AppPageContainer';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
@@ -75,13 +75,13 @@ export const ArchivesPage = memo(() => {
 
   const handleToggleFilter = useCallback(
     (filter: string) =>
-      navigate.here().update(s => ({
+      navigate.here<'/archives'>().update(s => ({
         ...s,
         search: {
           ...s.search,
           offset: 0,
           filters: s.search.filters.includes(filter)
-            ? s.search.filters.filter(value => value !== filter)
+            ? s.search.filters.filter(f => f !== filter)
             : [...s.search.filters, filter]
         }
       })),
@@ -89,13 +89,16 @@ export const ArchivesPage = memo(() => {
   );
 
   const handleClear = useCallback(() => {
-    navigate.here().update(s => ({ ...s, search: { ...s.search, query: '', offset: 0 } }));
+    navigate.here<'/archives'>().update(s => ({ ...s, search: { ...s.search, query: '', offset: 0 } }));
   }, [navigate]);
 
   const handleSearch = useCallback(
     (value: string) => {
-      if (value) navigate.here().update(s => ({ ...s, search: { ...s.search, query: value, offset: 0 } }));
-      else handleClear();
+      if (value !== '') {
+        navigate.here<'/archives'>().update(s => ({ ...s, search: { ...s.search, query: value, offset: 0 } }));
+      } else {
+        handleClear();
+      }
     },
     [handleClear, navigate]
   );
@@ -125,7 +128,7 @@ export const ArchivesPage = memo(() => {
   const buildFacetParams = useCallback((body: InferSearchParamValueMapFromEngine<typeof ArchivesRoute.search>) => {
     const params = new URLSearchParams();
     params.set('query', body.query);
-    for (const filter of (body.filters as string[]) ?? []) params.append('filters', filter);
+    for (const filter of body.filters ?? []) params.append('filters', filter);
     params.set('archive_only', `${body.archive_only}`);
     return params;
   }, []);
@@ -190,228 +193,215 @@ export const ArchivesPage = memo(() => {
     };
   }, [handleReload]);
 
-  if (!configuration?.datastore?.archive?.enabled) {
-    return <AppNavigate nav={nav => nav.here<'/not-found'>({ replace: true }).update({ route: '/not-found' })} />;
-  } else if (!currentUser.roles.includes('archive_view')) {
-    return <AppNavigate nav={nav => nav.here<'/forbidden'>({ replace: true }).update({ route: '/forbidden' })} />;
-  } else
-    return (
-      <PageFullWidth margin={4}>
-        <Grid container spacing={2} style={{ paddingBottom: theme.spacing(2) }}>
-          <Grid size={{ xs: 12, md: 8, xl: 10 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: theme.spacing(1) }}>
-              <Typography variant="h4">{t('title')}</Typography>
-              <Tooltip title={t('beta.description')}>
-                <div>
-                  <Chip color="primary" size="small" variant="outlined" label={t('beta.title')} />
-                </div>
-              </Tooltip>
-            </div>
-          </Grid>
-          <Grid size={{ xs: 12, md: 4, xl: 2 }}>
-            <FormControl size="small" fullWidth>
-              <Select
-                disabled={searching}
-                value={search.get('tc') || DEFAULT_TC}
-                variant="outlined"
-                onChange={event =>
-                  navigate.here().update(s => ({ ...s, search: { ...s.search, tc: event.target.value } }))
+  return (
+    <PageFullWidth margin={4}>
+      <Grid container spacing={2} style={{ paddingBottom: theme.spacing(2) }}>
+        <Grid size={{ xs: 12, md: 8, xl: 10 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: theme.spacing(1) }}>
+            <Typography variant="h4">{t('title')}</Typography>
+            <Tooltip title={t('beta.description')}>
+              <div>
+                <Chip color="primary" size="small" variant="outlined" label={t('beta.title')} />
+              </div>
+            </Tooltip>
+          </div>
+        </Grid>
+        <Grid size={{ xs: 12, md: 4, xl: 2 }}>
+          <FormControl size="small" fullWidth>
+            <Select
+              disabled={searching}
+              value={search.get('tc') || DEFAULT_TC}
+              variant="outlined"
+              onChange={event =>
+                navigate.here<'/archives'>().update(s => ({ ...s, search: { ...s.search, tc: event.target.value } }))
+              }
+              fullWidth
+            >
+              <MenuItem value="24h">{t('tc.24h')}</MenuItem>
+              <MenuItem value="4d">{t('tc.4d')}</MenuItem>
+              <MenuItem value="7d">{t('tc.7d')}</MenuItem>
+              <MenuItem value="1m">{t('tc.1m')}</MenuItem>
+              <MenuItem value="1y">{t('tc.1y')}</MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>
+      </Grid>
+
+      <PageContainer isSticky>
+        <div style={{ paddingTop: theme.spacing(1) }}>
+          <SearchBar
+            initValue={search.get('query')}
+            placeholder={t('filter')}
+            searching={searching}
+            suggestions={suggestions}
+            onValueChange={(inputValue: string) => {
+              queryValue.current = inputValue;
+            }}
+            onClear={handleClear}
+            onSearch={handleSearch}
+            buttons={[
+              {
+                icon: <AssignmentLateOutlinedIcon fontSize={downSM ? 'small' : 'medium'} />,
+                tooltip: hasFilter('label_categories.attribution:*')
+                  ? t('filter.attributed.remove')
+                  : t('filter.attributed.add'),
+                props: {
+                  color: hasFilter('label_categories.attribution:*') ? 'primary' : 'default',
+                  onClick: () => handleToggleFilter('label_categories.attribution:*')
                 }
-                fullWidth
+              },
+              {
+                icon: <ClassOutlinedIcon fontSize={downSM ? 'small' : 'medium'} />,
+                tooltip: hasFilter('labels:*') ? t('filter.labelled.remove') : t('filter.labelled.add'),
+                props: {
+                  color: hasFilter('labels:*') ? 'primary' : 'default',
+                  onClick: () => handleToggleFilter('labels:*')
+                }
+              },
+              {
+                icon: <FileOpenOutlinedIcon fontSize={downSM ? 'small' : 'medium'} />,
+                tooltip: search.get('supplementary') ? t('supplementary.exclude') : t('supplementary.include'),
+                props: {
+                  color: search.get('supplementary') ? 'primary' : 'default',
+                  onClick: () =>
+                    navigate
+                      .here<'/archives'>()
+                      .update(s => ({ ...s, search: { ...s.search, supplementary: !s.search.supplementary } }))
+                }
+              }
+            ]}
+          >
+            {fileResults !== null && (
+              <div
+                style={{
+                  fontStyle: 'italic',
+                  paddingTop: theme.spacing(0.5),
+                  paddingBottom: theme.spacing(0.5),
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  justifyContent: 'flex-end'
+                }}
               >
-                <MenuItem value="24h">{t('tc.24h')}</MenuItem>
-                <MenuItem value="4d">{t('tc.4d')}</MenuItem>
-                <MenuItem value="7d">{t('tc.7d')}</MenuItem>
-                <MenuItem value="1m">{t('tc.1m')}</MenuItem>
-                <MenuItem value="1y">{t('tc.1y')}</MenuItem>
-              </Select>
-            </FormControl>
+                {fileResults.total !== 0 && (
+                  <Typography variant="subtitle1" color="secondary" style={{ flexGrow: 1 }}>
+                    {searching ? (
+                      <span>{t('searching')}</span>
+                    ) : (
+                      <span>
+                        <SearchResultCount count={fileResults.total} />
+                        {search.get('query')
+                          ? t(`filtered${fileResults.total === 1 ? '' : 's'}`)
+                          : t(`total${fileResults.total === 1 ? '' : 's'}`)}
+                      </span>
+                    )}
+                  </Typography>
+                )}
+
+                {fileResults.total > search.get('rows') && (
+                  <Pagination
+                    page={(search.get('offset') ?? 0) / search.get('rows') + 1}
+                    count={Math.ceil(Math.min(fileResults.total, 10000) / search.get('rows'))}
+                    shape="rounded"
+                    size="small"
+                    onChange={(_e, page) =>
+                      navigate
+                        .here<'/archives'>()
+                        .update(s => ({ ...s, search: { ...s.search, offset: (page - 1) * s.search.rows } }))
+                    }
+                  />
+                )}
+              </div>
+            )}
+
+            <div>
+              <ChipList
+                items={search.get('filters').map(v => ({
+                  variant: 'outlined',
+                  label: `${v}`,
+                  color: v.indexOf('NOT ') === 0 ? 'error' : null,
+                  onClick: () =>
+                    navigate.here<'/archives'>().update(s => ({
+                      ...s,
+                      search: {
+                        ...s.search,
+                        filters: s.search.filters.map(f =>
+                          f !== v ? f : v.indexOf('NOT ') === 0 ? v.substring(5, v.length - 1) : `NOT (${v})`
+                        )
+                      }
+                    })),
+                  onDelete: () =>
+                    navigate.here<'/archives'>().update(s => ({
+                      ...s,
+                      search: { ...s.search, filters: s.search.filters.filter(f => f !== v) }
+                    }))
+                }))}
+              />
+            </div>
+          </SearchBar>
+        </div>
+      </PageContainer>
+
+      {fileResults !== null && fileResults.total !== 0 && (
+        <Grid container spacing={2}>
+          <Grid size={{ xs: 12, lg: 4 }}>
+            <Histogram
+              dataset={histogram}
+              height="200px"
+              title={t(`graph.histogram.title.${search.get('tc') || DEFAULT_TC}`)}
+              datatype={t('graph.datatype')}
+              isDate
+              verticalLine
+              onClick={(_evt, element) => {
+                if (!searching && element.length > 0) {
+                  const ind = element[0].index;
+                  const keys = Object.keys(histogram);
+                  handleToggleFilter(`archive_ts:[${keys[ind]} TO ${keys.length - 1 === ind ? 'now' : keys[ind + 1]}]`);
+                }
+              }}
+            />
+          </Grid>
+          <Grid size={{ xs: 12, md: 6, lg: 4 }}>
+            <LineGraph
+              dataset={labels}
+              height="200px"
+              title={t('graph.labels.title')}
+              datatype={t('graph.datatype')}
+              onClick={(_evt, element) => {
+                if (!searching && element.length > 0) {
+                  const ind = element[0].index;
+                  handleToggleFilter(`labels:${safeFieldValue(Object.keys(labels)[ind])}`);
+                }
+              }}
+            />
+          </Grid>
+          <Grid size={{ xs: 12, md: 6, lg: 4 }}>
+            <LineGraph
+              dataset={types}
+              height="200px"
+              title={t('graph.type.title')}
+              datatype={t('graph.datatype')}
+              onClick={(_evt, element) => {
+                if (!searching && element.length > 0) {
+                  const ind = element[0].index;
+                  handleToggleFilter(`type:${safeFieldValue(Object.keys(types)[ind])}`);
+                }
+              }}
+            />
           </Grid>
         </Grid>
+      )}
 
-        <PageContainer isSticky>
-          <div style={{ paddingTop: theme.spacing(1) }}>
-            <SearchBar
-              initValue={search.get('query')}
-              placeholder={t('filter')}
-              searching={searching}
-              suggestions={suggestions}
-              onValueChange={(inputValue: string) => {
-                queryValue.current = inputValue;
-              }}
-              onClear={handleClear}
-              onSearch={() => handleSearch(queryValue.current)}
-              buttons={[
-                {
-                  icon: <AssignmentLateOutlinedIcon fontSize={downSM ? 'small' : 'medium'} />,
-                  tooltip: hasFilter('label_categories.attribution:*')
-                    ? t('filter.attributed.remove')
-                    : t('filter.attributed.add'),
-                  props: {
-                    color: hasFilter('label_categories.attribution:*') ? 'primary' : 'default',
-                    onClick: () => handleToggleFilter('label_categories.attribution:*')
-                  }
-                },
-                {
-                  icon: <ClassOutlinedIcon fontSize={downSM ? 'small' : 'medium'} />,
-                  tooltip: hasFilter('labels:*') ? t('filter.labelled.remove') : t('filter.labelled.add'),
-                  props: {
-                    color: hasFilter('labels:*') ? 'primary' : 'default',
-                    onClick: () => handleToggleFilter('labels:*')
-                  }
-                },
-                {
-                  icon: <FileOpenOutlinedIcon fontSize={downSM ? 'small' : 'medium'} />,
-                  tooltip: search.get('supplementary') ? t('supplementary.exclude') : t('supplementary.include'),
-                  props: {
-                    color: search.get('supplementary') ? 'primary' : 'default',
-                    onClick: () =>
-                      navigate
-                        .here()
-                        .update(s => ({ ...s, search: { ...s.search, supplementary: !s.search.supplementary } }))
-                  }
-                }
-              ]}
-            >
-              {fileResults !== null && (
-                <div
-                  style={{
-                    fontStyle: 'italic',
-                    paddingTop: theme.spacing(0.5),
-                    paddingBottom: theme.spacing(0.5),
-                    display: 'flex',
-                    flexWrap: 'wrap',
-                    justifyContent: 'flex-end'
-                  }}
-                >
-                  {fileResults.total !== 0 && (
-                    <Typography variant="subtitle1" color="secondary" style={{ flexGrow: 1 }}>
-                      {searching ? (
-                        <span>{t('searching')}</span>
-                      ) : (
-                        <span>
-                          <SearchResultCount count={fileResults.total} />
-                          {search.get('query')
-                            ? t(`filtered${fileResults.total === 1 ? '' : 's'}`)
-                            : t(`total${fileResults.total === 1 ? '' : 's'}`)}
-                        </span>
-                      )}
-                    </Typography>
-                  )}
-
-                  {fileResults.total > search.get('rows') && (
-                    <Pagination
-                      page={(search.get('offset') ?? 0) / search.get('rows') + 1}
-                      count={Math.ceil(Math.min(fileResults.total, 10000) / search.get('rows'))}
-                      shape="rounded"
-                      size="small"
-                      onChange={(_event, page) =>
-                        navigate
-                          .here()
-                          .update(s => ({ ...s, search: { ...s.search, offset: (page - 1) * s.search.rows } }))
-                      }
-                    />
-                  )}
-                </div>
-              )}
-
-              <div>
-                <ChipList
-                  items={search.get('filters').map(v => ({
-                    variant: 'outlined',
-                    label: `${v}`,
-                    color: v.indexOf('NOT ') === 0 ? 'error' : null,
-                    onClick: () =>
-                      navigate.here().update(s => ({
-                        ...s,
-                        search: {
-                          ...s.search,
-                          filters: s.search.filters.map(filter =>
-                            filter !== v
-                              ? filter
-                              : v.indexOf('NOT ') === 0
-                                ? v.substring(5, v.length - 1)
-                                : `NOT (${v})`
-                          )
-                        }
-                      })),
-                    onDelete: () =>
-                      navigate
-                        .here()
-                        .update(s => ({
-                          ...s,
-                          search: { ...s.search, filters: s.search.filters.filter(f => f !== v) }
-                        }))
-                  }))}
-                />
-              </div>
-            </SearchBar>
-          </div>
-        </PageContainer>
-
-        {fileResults !== null && fileResults.total !== 0 && (
-          <Grid container spacing={2}>
-            <Grid size={{ xs: 12, lg: 4 }}>
-              <Histogram
-                dataset={histogram}
-                height="200px"
-                title={t(`graph.histogram.title.${search.get('tc') || DEFAULT_TC}`)}
-                datatype={t('graph.datatype')}
-                isDate
-                verticalLine
-                onClick={(_evt, element) => {
-                  if (!searching && element.length > 0) {
-                    const ind = element[0].index;
-                    const keys = Object.keys(histogram);
-                    handleToggleFilter(
-                      `archive_ts:[${keys[ind]} TO ${keys.length - 1 === ind ? 'now' : keys[ind + 1]}]`
-                    );
-                  }
-                }}
-              />
-            </Grid>
-            <Grid size={{ xs: 12, md: 6, lg: 4 }}>
-              <LineGraph
-                dataset={labels}
-                height="200px"
-                title={t('graph.labels.title')}
-                datatype={t('graph.datatype')}
-                onClick={(_evt, element) => {
-                  if (!searching && element.length > 0) {
-                    const ind = element[0].index;
-                    handleToggleFilter(`labels:${safeFieldValue(Object.keys(labels)[ind])}`);
-                  }
-                }}
-              />
-            </Grid>
-            <Grid size={{ xs: 12, md: 6, lg: 4 }}>
-              <LineGraph
-                dataset={types}
-                height="200px"
-                title={t('graph.type.title')}
-                datatype={t('graph.datatype')}
-                onClick={(_evt, element) => {
-                  if (!searching && element.length > 0) {
-                    const ind = element[0].index;
-                    handleToggleFilter(`type:${safeFieldValue(Object.keys(types)[ind])}`);
-                  }
-                }}
-              />
-            </Grid>
-          </Grid>
-        )}
-
-        <div
-          style={{
-            paddingTop: theme.spacing(2),
-            paddingLeft: theme.spacing(0.5),
-            paddingRight: theme.spacing(0.5)
-          }}
-        >
-          <ArchivesTable fileResults={fileResults} onLabelClick={handleLabelClick} />
-        </div>
-      </PageFullWidth>
-    );
+      <div
+        style={{
+          paddingTop: theme.spacing(2),
+          paddingLeft: theme.spacing(0.5),
+          paddingRight: theme.spacing(0.5)
+        }}
+      >
+        <ArchivesTable fileResults={fileResults} onLabelClick={handleLabelClick} />
+      </div>
+    </PageFullWidth>
+  );
 });
 
 export const ArchivesRoute = createAppRoute({

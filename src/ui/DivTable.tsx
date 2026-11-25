@@ -11,7 +11,7 @@ import {
 } from '@mui/material';
 import type { InferAppNavigationPropsFromPath } from 'core/router';
 import { AppLink, useAppNavigate, useAppSearchSnapshot } from 'core/router';
-import React from 'react';
+import React, { memo } from 'react';
 import type SimpleSearchQuery from 'ui/SearchBar/simple-search-query';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -67,7 +67,6 @@ type SortableHeaderCellProps = TableCellProps & {
 export const SortableHeaderCell: React.FC<SortableHeaderCellProps> = ({
   allowSort = true,
   children,
-  query = null,
   sortField,
   sortName = 'sort',
   inverted = false,
@@ -75,7 +74,7 @@ export const SortableHeaderCell: React.FC<SortableHeaderCellProps> = ({
   ...other
 }) => {
   const search = useAppSearchSnapshot<'/submissions'>();
-  const curSort = query ? query.get(sortName) : search.get('sort');
+  const curSort = (search?.get?.(sortName as any) || '') as string;
   const navigate = useAppNavigate<'/submissions'>();
   const active = curSort && curSort.indexOf(sortField) !== -1;
   const ascending = inverted ? 'desc' : 'asc';
@@ -83,15 +82,14 @@ export const SortableHeaderCell: React.FC<SortableHeaderCellProps> = ({
   const dir = active && curSort.indexOf(ascending) !== -1 ? ascending : descending;
 
   const triggerSort = (event: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
-    const nextSort =
+    const nextSortValue =
       curSort && curSort.indexOf(sortField) !== -1 && curSort.indexOf(ascending) === -1
         ? `${sortField} ${ascending}`
         : `${sortField} ${descending}`;
-
     if (onSort) {
-      onSort(event, { name: sortName, field: nextSort });
+      onSort(event, { name: sortName, field: nextSortValue || null });
     } else {
-      navigate.here().update(s => ({ ...s, search: { ...s.search, sort: nextSort } }));
+      navigate.here().search(search => search.set(s => ({ ...s, [sortName]: nextSortValue })));
     }
   };
 
@@ -108,33 +106,27 @@ export const SortableHeaderCell: React.FC<SortableHeaderCellProps> = ({
   );
 };
 
-type LinkTarget = string | { pathname?: string; search?: string; hash?: string };
+type LinkRowProps<Origin extends AppRoute['path']> = Omit<TableRowProps, 'component'> &
+  InferAppNavigationPropsFromPath<Origin>;
 
-type LinkRowProps<Origin extends AppRoute['path'] = AppRoute['path']> = TableRowProps &
-  InferAppNavigationPropsFromPath<Origin> & {
-    to?: LinkTarget;
-  };
-
-export const LinkRow = React.memo(function LinkRow<const Origin extends AppRoute['path']>({
+export const LinkRow = memo(function LinkRow<const Origin extends AppRoute['path']>({
   children,
   nav = null,
   navDeps = null,
-  to,
-  component,
   ...other
 }: LinkRowProps<Origin>) {
-  const target = typeof to === 'string' ? to : to ? `${to.pathname ?? ''}${to.search ?? ''}${to.hash ?? ''}` : null;
-  const resolvedNav = nav ?? (target ? navigate => navigate.to().create(target) : null);
-  const linkProps = resolvedNav
-    ? { component: AppLink, nav: resolvedNav, navDeps: navDeps ?? (target ? [target] : null) }
-    : { component: component ?? 'div' };
-
   return (
-    <TableRow {...other} {...linkProps} style={{ cursor: 'pointer', textDecoration: 'none' }}>
+    <TableRow
+      {...(other as TableRowProps)}
+      {...(!nav ? null : { component: AppLink, nav, navDeps })}
+      style={{ cursor: 'pointer', textDecoration: 'none' }}
+    >
       {children}
     </TableRow>
   );
 }) as unknown as <const Origin extends AppRoute['path']>(props: LinkRowProps<Origin>) => React.JSX.Element;
+
+(LinkRow as unknown as { displayName: string }).displayName = 'LinkRow';
 
 export const ExternalLinkRow = ({ children, href, ...other }) => (
   <TableRow

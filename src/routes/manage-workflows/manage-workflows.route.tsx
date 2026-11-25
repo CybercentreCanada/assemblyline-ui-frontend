@@ -13,7 +13,6 @@ import type { WorkflowIndexed } from 'models/base/workflow';
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
-import { ForbiddenPage } from 'routes/forbidden/forbidden.page';
 import WorkflowTable from 'routes/search/components/workflow';
 import { PageHeader } from 'ui/layouts/PageHeader';
 import { DEFAULT_SUGGESTION } from 'ui/SearchBar/search-textfield';
@@ -26,7 +25,7 @@ type SearchResults = {
   total: number;
 };
 
-export const ManageWorkflowsContent = memo(() => {
+export const ManageWorkflowsPage = memo(() => {
   const { t } = useTranslation(['manageWorkflows']);
   const theme = useTheme();
   const navigate = useAppNavigate<'/manage/workflows'>();
@@ -45,13 +44,12 @@ export const ManageWorkflowsContent = memo(() => {
 
   const handleToggleFilter = useCallback(
     (filter: string) => {
-      navigate.here().update(s => ({
+      navigate.here<'/manage/workflows'>().update(s => ({
         ...s,
         search: {
           ...s.search,
-          offset: 0,
           filters: s.search.filters.includes(filter)
-            ? s.search.filters.filter(value => value !== filter)
+            ? s.search.filters.filter(f => f !== filter)
             : [...s.search.filters, filter]
         }
       }));
@@ -86,7 +84,9 @@ export const ManageWorkflowsContent = memo(() => {
 
   useEffect(() => {
     function reload() {
-      navigate.here().update(s => ({ ...s, search: { ...s.search, offset: 0, refresh: !s.search.refresh } }));
+      navigate
+        .here<'/manage/workflows'>()
+        .update(s => ({ ...s, search: { ...s.search, offset: 0, refresh: !s.search.refresh } }));
     }
 
     window.addEventListener('reloadWorkflows', reload);
@@ -95,7 +95,7 @@ export const ManageWorkflowsContent = memo(() => {
     };
   }, [navigate]);
 
-  return currentUser.roles.includes('workflow_view') ? (
+  return (
     <PageFullWidth margin={4}>
       <PageHeader
         primary={t('title')}
@@ -132,11 +132,10 @@ export const ManageWorkflowsContent = memo(() => {
                 ? t(`filtered${workflowResults?.total === 1 ? '' : 's'}`)
                 : t(`total${workflowResults?.total === 1 ? '' : 's'}`)
             }
-            onChange={values =>
-              navigate.here().update(s => ({
-                ...s,
-                search: { ...s.search, ...ManageWorkflowsRoute.search.full(values).toObject() }
-              }))
+            onChange={v =>
+              navigate
+                .here()
+                .update(s => ({ ...s, search: { ...s.search, ...ManageWorkflowsRoute.search.full(v).toObject() } }))
             }
             paramDefaults={search.defaults().toObject()}
             searchInputProps={{ placeholder: t('filter'), options: suggestions }}
@@ -172,13 +171,8 @@ export const ManageWorkflowsContent = memo(() => {
         <WorkflowTable workflowResults={workflowResults} />
       </div>
     </PageFullWidth>
-  ) : (
-    <ForbiddenPage />
   );
 });
-
-export const ManageWorkflowsPage = memo(() => <ManageWorkflowsContent />);
-ManageWorkflowsPage.displayName = 'ManageWorkflowsPage';
 
 export const ManageWorkflowsRoute = createAppRoute({
   component: ManageWorkflowsPage,

@@ -2,18 +2,15 @@ import { loader } from '@monaco-editor/react';
 import FindInPageOutlinedIcon from '@mui/icons-material/FindInPageOutlined';
 import { Alert, Box, Grid, Paper, styled, Tab, Tabs, Typography, useTheme } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
-import { AppNavigate, createAppRoute } from 'core/router';
+import { createAppRoute, useAppBlocker } from 'core/router';
 import PageFullSize from 'core/template/branding/AppPageCenter';
-import { useAppUser } from 'core/template/components/app/hooks';
 import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
-import type { CustomUser } from 'models/api/user';
 import { memo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import LibMagic from 'routes/admin-identify/components/libmagic';
 import Mimes from 'routes/admin-identify/components/mimes';
 import Patterns from 'routes/admin-identify/components/patterns';
 import Yara from 'routes/admin-identify/components/yara';
-import { RouterPrompt } from 'ui/RouterPrompt';
 
 loader.config({ paths: { vs: '/cdn/monaco_0.35.0/vs' } });
 
@@ -27,7 +24,6 @@ const TabContent = styled('div')(({ theme }) => ({
 export const AdminIdentifyPage = memo(() => {
   const { t, i18n } = useTranslation(['adminIdentify']);
   const theme = useTheme();
-  const { user: currentUser } = useAppUser<CustomUser>();
   const { apiCall } = useMyAPI();
 
   const [value, setValue] = useState('magic');
@@ -39,6 +35,15 @@ export const AdminIdentifyPage = memo(() => {
   const [originalMimesFile, setOriginalMimesFile] = useState(null);
   const [patternsFile, setPatternsFile] = useState(null);
   const [originalPatternsFile, setOriginalPatternsFile] = useState(null);
+
+  useAppBlocker(() =>
+    magicFile !== originalMagicFile ||
+    mimesFile !== originalMimesFile ||
+    patternsFile !== originalPatternsFile ||
+    yaraFile !== originalYaraFile
+      ? 'unsaved_changes'
+      : null
+  );
 
   useEffectOnce(() => {
     // I cannot find a way to hot switch monaco editor's locale but at least I can load
@@ -102,16 +107,8 @@ export const AdminIdentifyPage = memo(() => {
     });
   };
 
-  return currentUser.is_admin ? (
+  return (
     <PageFullSize margin={4}>
-      <RouterPrompt
-        when={
-          magicFile !== originalMagicFile ||
-          mimesFile !== originalMimesFile ||
-          patternsFile !== originalPatternsFile ||
-          yaraFile !== originalYaraFile
-        }
-      />
       <div style={{ marginBottom: theme.spacing(2), textAlign: 'left' }}>
         <Grid container alignItems="center" spacing={1}>
           <Grid size={{ xs: 12 }}>
@@ -185,8 +182,6 @@ export const AdminIdentifyPage = memo(() => {
         )}
       </div>
     </PageFullSize>
-  ) : (
-    <AppNavigate nav={nav => nav.here<'/forbidden'>({ replace: true }).update({ route: '/forbidden' })} />
   );
 });
 

@@ -13,14 +13,13 @@ import PageFullWidth from 'core/template/components/pages/PageFullWidth';
 import type { CustomUser, IndexDefinition } from 'models/api/user';
 import { memo, useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ForbiddenPage } from 'routes/forbidden/forbidden.page';
 import BadlistTable from 'routes/search/components/badlist';
 import { IconButton } from 'ui/buttons/IconButton';
 import { PageHeader } from 'ui/layouts/PageHeader';
 import { DEFAULT_SUGGESTION } from 'ui/SearchBar/search-textfield';
 import SearchHeader from 'ui/SearchBar/SearchHeader';
 
-export const ManageBadlistsContent = memo(() => {
+export const ManageBadlistsPage = memo(() => {
   const { t } = useTranslation(['manageBadlist']);
   const theme = useTheme();
   const navigate = useAppNavigate<'/manage/badlists'>();
@@ -51,7 +50,7 @@ export const ManageBadlistsContent = memo(() => {
           ...s.search,
           offset: 0,
           filters: s.search.filters.includes(filter)
-            ? s.search.filters.filter(value => value !== filter)
+            ? s.search.filters.filter(f => f !== filter)
             : [...s.search.filters, filter]
         }
       }));
@@ -70,7 +69,7 @@ export const ManageBadlistsContent = memo(() => {
     };
   }, [navigate]);
 
-  return currentUser.roles.includes('badlist_view') ? (
+  return (
     <PageFullWidth margin={4}>
       <PageHeader
         primary={t('title')}
@@ -83,7 +82,7 @@ export const ManageBadlistsContent = memo(() => {
             preventRender={!currentUser.roles.includes('badlist_manage')}
             size="large"
             sx={{ color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark }}
-            nav={nav => nav.to().create({ route: '/manage/badlist/add' })}
+            onClick={() => navigate.to().create({ route: '/manage/badlist/add' })}
           >
             <AddCircleOutlineOutlinedIcon />
           </IconButton>
@@ -101,11 +100,10 @@ export const ManageBadlistsContent = memo(() => {
                 ? t(`filtered${badlists.data?.total === 1 ? '' : 's'}`)
                 : t(`total${badlists.data?.total === 1 ? '' : 's'}`)
             }
-            onChange={values =>
-              navigate.here().update(s => ({
-                ...s,
-                search: { ...s.search, ...ManageBadlistsRoute.search.full(values).toObject() }
-              }))
+            onChange={v =>
+              navigate
+                .here()
+                .update(s => ({ ...s, search: { ...s.search, ...ManageBadlistsRoute.search.full(v).toObject() } }))
             }
             paramDefaults={search.defaults().toObject()}
             searchInputProps={{ placeholder: t('filter'), options: suggestions }}
@@ -147,13 +145,8 @@ export const ManageBadlistsContent = memo(() => {
         <BadlistTable badlistResults={badlists.data} isLoading={badlists.isLoading} />
       </div>
     </PageFullWidth>
-  ) : (
-    <ForbiddenPage />
   );
 });
-
-export const ManageBadlistsPage = memo(() => <ManageBadlistsContent />);
-ManageBadlistsPage.displayName = 'ManageBadlistsPage';
 
 export const ManageBadlistsRoute = createAppRoute({
   component: ManageBadlistsPage,

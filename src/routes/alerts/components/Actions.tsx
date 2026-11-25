@@ -13,35 +13,34 @@ import {
   Badge,
   CircularProgress,
   Grid,
-  IconButton,
   Paper,
   Skeleton,
   SpeedDial,
   SpeedDialAction,
   SpeedDialIcon,
-  Tooltip,
   Typography,
   useMediaQuery,
   useTheme
 } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
+import useALContext from 'core/config/useALContext';
 import type { InferAppNavigationPropsFromPath } from 'core/router';
-import { AppLink, useAppSearchSnapshot } from 'core/router';
+import { AppLink, useAppNavigate, useAppSearchSnapshot } from 'core/router';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import { useAppUser } from 'core/template/components/app/hooks';
+import type { InferSearchParamValueMapFromEngine } from 'features/search-params';
 import type { CustomUser } from 'models/api/user';
 import type { AlertItem } from 'models/base/alert';
 import type { CSSProperties } from 'react';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
-import type { AlertSearchParams } from 'routes/alerts/alerts.route';
+import type { AlertsRoute } from 'routes/alerts/alerts.route';
 import { AlertEventsTable } from 'routes/alerts/components/Components';
 import AlertFiltersSelected from 'routes/alerts/components/FiltersSelected';
 import { AlertWorkflowDrawer } from 'routes/alerts/components/Workflows';
-import { useSearchParams } from 'routes/alerts/contexts/SearchParamsContext';
-import type { SearchResult } from 'routes/alerts/utils/SearchParser';
 import { getValueFromPath } from 'shared/utils/utils';
+import { IconButton } from 'ui/buttons/IconButton';
 import ConfirmationDialog from 'ui/ConfirmationDialog';
 
 type AlertActionButtonProps = InferAppNavigationPropsFromPath<AppRoute['path']> & {
@@ -109,7 +108,10 @@ const AlertActionButton: React.FC<AlertActionButtonProps> = React.memo(
             FabProps={{
               disabled: disabled || loading,
               size: permanent ? 'medium' : 'small',
-              sx: { ...(permanent && { '&.Mui-disabled': { backgroundColor: 'initial' } }) },
+              sx: {
+                backgroundColor: 'background.default',
+                ...(permanent && { '&.Mui-disabled': { backgroundColor: 'initial' } })
+              },
               style: {
                 boxShadow: permanent ? theme.shadows[0] : null,
                 margin: permanent ? '8px 2px 8px 2px' : null,
@@ -122,26 +124,22 @@ const AlertActionButton: React.FC<AlertActionButtonProps> = React.memo(
       );
     else
       return (
-        <Tooltip title={tooltipTitle}>
-          <span>
-            <IconButton
-              nav={navProp}
-              navDeps={navDepsProp}
-              disabled={disabled || loading}
-              size="large"
-              onClick={disabled || loading ? null : onClick}
-              sx={{
-                '&.Mui-disabled': {
-                  backgroundColor: 'initial'
-                }
-              }}
-              style={{ ...(loading ? { color: theme.palette.action.disabled } : color && { color: color }) }}
-            >
-              {icon}
-              {loading && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
-            </IconButton>
-          </span>
-        </Tooltip>
+        <IconButton
+          tooltip={tooltipTitle}
+          disabled={disabled || loading}
+          size="large"
+          {...(!navProp ? null : { nav: navProp, navDeps: navDepsProp })}
+          onClick={disabled || loading ? null : onClick}
+          sx={{
+            '&.Mui-disabled': {
+              backgroundColor: 'initial'
+            }
+          }}
+          style={{ ...(loading ? { color: theme.palette.action.disabled } : color && { color: color }) }}
+        >
+          {icon}
+          {loading && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
+        </IconButton>
       );
   }
 );
@@ -208,14 +206,15 @@ export const AlertGroup: React.FC<AlertActionProps> = React.memo(
   }: AlertActionProps) => {
     const { t } = useTranslation(['alerts']);
     const theme = useTheme();
-    const { user: currentUser } = useAppUser<CustomUser>();
-    const { search, setSearchObject } = useSearchParams<AlertSearchParams>();
+    const { user: currentUser } = useALContext();
+    const search = useAppSearchSnapshot<'/alerts'>();
+    const navigate = useAppNavigate<'/alerts'>();
 
     const groupBy = useMemo<string>(() => {
       const g = search.get('group_by');
       if (!alert || !alert.group_count || !g) return null;
       else return `${g}:${getValueFromPath(alert, g) as string}`;
-    }, [alert, search]);
+    }, [alert, search?.toString()]);
 
     return (
       <AlertActionButton
@@ -238,9 +237,13 @@ export const AlertGroup: React.FC<AlertActionProps> = React.memo(
           if (!groupBy) return;
 
           window.dispatchEvent(
-            new CustomEvent<Partial<AlertSearchParams>>('alertRefresh', { detail: { group_by: '', fq: [groupBy] } })
+            new CustomEvent<Partial<InferSearchParamValueMapFromEngine<typeof AlertsRoute.search>>>('alertRefresh', {
+              detail: { group_by: '', fq: [groupBy] }
+            })
           );
-          setSearchObject(p => ({ ...p, offset: 0, group_by: '', fq: [...p.fq, groupBy] }));
+          navigate
+            .here<'/alerts'>()
+            .update(s => ({ ...s, search: { ...s.search, offset: 0, group_by: '', fq: [...s.search.fq, groupBy] } }));
         }}
       />
     );
@@ -259,22 +262,22 @@ export const AlertOwnership: React.FC<AlertActionProps> = React.memo(
     const { t } = useTranslation(['alerts']);
     const theme = useTheme();
     const { apiCall } = useMyAPI();
-    const { user: currentUser } = useAppUser<CustomUser>();
+    const { user: currentUser } = useALContext();
     const { showErrorMessage, showSuccessMessage } = useMySnackbar();
-    const { search } = useSearchParams<AlertSearchParams>();
+    const search = useAppSearchSnapshot<'/alerts'>();
 
     const [confirmation, setConfirmation] = useState<boolean>(false);
     const [waiting, setWaiting] = useState<boolean>(false);
 
-    const query = useMemo<SearchResult<AlertSearchParams>>(() => {
+    const query = useMemo(() => {
       if (!alert) return null;
       return search
         .set(p => {
           const f = `${p.group_by}:${getValueFromPath(alert, p.group_by) as string}`;
           return { ...p, q: p.group_by ? f : `alert_id:${alert.alert_id}` };
         })
-        .filter(k => ['tc', 'tc_start', 'fq', 'q'].includes(k));
-    }, [alert, search]);
+        .pick(['tc', 'tc_start', 'fq', 'q']);
+    }, [alert, search?.toString()]);
 
     const handleTakeOwnership = useCallback(
       (prevAlert: AlertItem, q: string) => {
@@ -393,12 +396,24 @@ export const AlertSubmission: React.FC<AlertActionProps> = React.memo(
   }: AlertActionProps) => {
     const { t } = useTranslation(['alerts']);
     const theme = useTheme();
-    const { user: currentUser } = useAppUser<CustomUser>();
+    const { user: currentUser, settings } = useALContext();
+    const submissionView = settings.submission_view;
 
     return (
       <AlertActionButton
         tooltipTitle={t('submission')}
-        nav={nav => nav.to().create({ route: '/submission/:id', path: { id: alert.sid } })}
+        nav={nav =>
+          nav.to().create(s => {
+            const route =
+              s?.route === '/submission/detail/:id' || s?.route === '/submission/report/:id'
+                ? s.route
+                : submissionView === 'report'
+                  ? '/submission/report/:id'
+                  : '/submission/detail/:id';
+
+            return { route, path: { id: alert?.sid } };
+          })
+        }
         navDeps={[alert?.sid]}
         open={open}
         vertical={vertical}
@@ -428,12 +443,12 @@ export const AlertWorkflow: React.FC<AlertWorkflowProps> = React.memo(
   }: AlertWorkflowProps) => {
     const { t } = useTranslation(['alerts']);
     const theme = useTheme();
-    const { user: currentUser } = useAppUser<CustomUser>();
-    const { search } = useSearchParams<AlertSearchParams>();
+    const { user: currentUser } = useALContext();
+    const search = useAppSearchSnapshot<'/alerts'>();
 
     const [openWorkflow, setOpenWorkflow] = useState<boolean>(false);
 
-    const filteredSearch = useMemo<SearchResult<AlertSearchParams>>(() => {
+    const filteredSearch = useMemo(() => {
       if (!alert) return null;
       return search.set(p => ({
         ...p,
@@ -442,7 +457,7 @@ export const AlertWorkflow: React.FC<AlertWorkflowProps> = React.memo(
             ? `${p.group_by}:${getValueFromPath(alert, p.group_by) as string}`
             : `alert_id:${alert.alert_id}`
       }));
-    }, [alert, inDrawer, search, speedDial]);
+    }, [alert, inDrawer, search?.toString(), speedDial]);
 
     return (
       <>
@@ -693,7 +708,7 @@ const WrappedAlertActions = ({ alert, inDrawer = false }: Props) => {
               ...(permanent && { marginRight: '-6px' })
             },
             '.MuiSpeedDial-actions': {
-              backgroundColor: theme.palette.background.paper
+              backgroundColor: 'inherit'
             },
             '.MuiSpeedDial-actionsClosed': {
               backgroundColor: 'rgba(0, 0, 0, 0) !important',

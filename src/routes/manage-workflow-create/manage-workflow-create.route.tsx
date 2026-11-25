@@ -5,7 +5,7 @@ import { Grid, useTheme } from '@mui/material';
 import { useAPIMutation } from 'core/api/hooks/useApiMutation';
 import { useAPIQuery } from 'core/api/hooks/useApiQuery';
 import useALContext from 'core/config/useALContext';
-import { createAppRoute, useAppPathParams } from 'core/router';
+import { createAppRoute, useAppBlocker, useAppNavigate, useAppPathParams, useAppSearchSnapshot } from 'core/router';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import PageCenter from 'core/template/components/pages/PageCenter';
 import _ from 'lodash';
@@ -15,7 +15,6 @@ import type { Priority, Status, Workflow } from 'models/base/workflow';
 import { LABELS, PRIORITIES, STATUSES } from 'models/base/workflow';
 import { memo, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ForbiddenPage } from 'routes/forbidden/forbidden.page';
 import { IconButton } from 'ui/buttons/IconButton';
 import Classification from 'ui/Classification';
 import { CheckboxInput } from 'ui/inputs/CheckboxInput';
@@ -25,286 +24,294 @@ import { TextAreaInput } from 'ui/inputs/TextAreaInput';
 import { TextInput } from 'ui/inputs/TextInput';
 import { PageHeader } from 'ui/layouts/PageHeader';
 
-type Params = {
-  id: string;
-};
+export const ManageWorkflowCreatePage = memo(() => {
+  const { t } = useTranslation(['manageWorkflowDetail']);
+  const paramID = useAppPathParams<'/manage/workflow/create/:id' | '/manage/workflow/create'>()?.id;
+  const theme = useTheme();
+  const navigate = useAppNavigate<'/manage/workflow/create/:id' | '/manage/workflow/create'>();
+  const search = useAppSearchSnapshot<'/manage/workflow/create'>();
+  const { c12nDef, configuration, user: currentUser } = useALContext();
+  const { showSuccessMessage, showErrorMessage } = useMySnackbar();
 
-export type ManageWorkflowCreatePageProps = {
-  id?: string;
-  onClose?: (id?: string) => void;
-};
+  const [workflow, setWorkflow] = useState<Workflow>(null);
+  const [originalWorkflow, setOriginalWorkflow] = useState<Workflow>(null);
+  const [runWorkflow, setRunWorkflow] = useState<boolean>(false);
 
-export const ManageWorkflowCreatePage = memo(
-  ({ id: propID = null, onClose = () => null }: ManageWorkflowCreatePageProps) => {
-    const { t } = useTranslation(['manageWorkflowDetail']);
-    const paramID = useAppPathParams<'/manage/workflow/create/:id' | '/manage/workflow/create'>()?.id;
-    const theme = useTheme();
-    const { c12nDef, configuration, user: currentUser } = useALContext();
-    const { showSuccessMessage, showErrorMessage } = useMySnackbar();
+  const defaultWorkflow = useMemo<Workflow>(
+    () => ({
+      classification: c12nDef.UNRESTRICTED,
+      creation_date: undefined,
+      creator: '',
+      description: '',
+      edited_by: '',
+      enabled: true,
+      hit_count: 0,
+      id: '',
+      labels: [],
+      last_edit: undefined,
+      name: '',
+      origin: configuration.ui.fqdn,
+      priority: '',
+      query: '',
+      status: ''
+    }),
+    [c12nDef.UNRESTRICTED, configuration.ui.fqdn]
+  );
 
-    const [workflow, setWorkflow] = useState<Workflow>(null);
-    const [originalWorkflow, setOriginalWorkflow] = useState<Workflow>(null);
-    const [runWorkflow, setRunWorkflow] = useState<boolean>(false);
+  const modified = useMemo<boolean>(() => !_.isEqual(workflow, originalWorkflow), [originalWorkflow, workflow]);
 
-    const defaultWorkflow = useMemo<Workflow>(
-      () => ({
-        classification: c12nDef.UNRESTRICTED,
-        creation_date: undefined,
-        creator: '',
-        description: '',
-        edited_by: '',
-        enabled: true,
-        hit_count: 0,
-        id: '',
-        labels: [],
-        last_edit: undefined,
-        name: '',
-        origin: configuration.ui.fqdn,
-        priority: '',
-        query: '',
-        status: ''
-      }),
-      [c12nDef.UNRESTRICTED, configuration.ui.fqdn]
-    );
+  useAppBlocker(() => (modified ? 'unsaved_changes' : null), [modified]);
 
-    const id = useMemo(() => propID || paramID, [paramID, propID]);
-
-    const modified = useMemo<boolean>(() => !_.isEqual(workflow, originalWorkflow), [originalWorkflow, workflow]);
-
-    const handleAdd = useAPIMutation<[Workflow, boolean], { success: boolean; workflow_id: string }>(
-      (wf: Workflow, run: boolean) => ({
-        url: `/api/v4/workflow/?run_workflow=${run}`,
-        method: 'PUT',
-        body: {
-          ...wf,
-          priority: !wf.priority ? null : wf.priority,
-          status: !wf.status ? null : wf.status
-        },
-        disabled: !currentUser.roles.includes('workflow_manage'),
-        onSuccess: ({ api_response }) => {
-          showSuccessMessage(t('add.success'));
-          setTimeout(() => window.dispatchEvent(new CustomEvent('reloadWorkflows')), 1000);
-          setTimeout(() => window.dispatchEvent(new CustomEvent('alertRefresh', null)), 1500);
-          onClose(api_response.workflow_id);
-        }
-      })
-    );
-
-    const handleUpdate = useAPIMutation<[Workflow, boolean], { success: boolean; workflow_id: string }>(
-      (wf: Workflow, run: boolean) => ({
-        url: `/api/v4/workflow/${id}/?run_workflow=${run}`,
-        method: 'POST',
-        body: {
-          ...wf,
-          priority: !wf.priority ? null : wf.priority,
-          status: !wf.status ? null : wf.status
-        },
-        disabled: !currentUser.roles.includes('workflow_manage'),
-        onSuccess: () => {
-          showSuccessMessage(t('update.success'));
-          setTimeout(() => window.dispatchEvent(new CustomEvent('reloadWorkflows')), 1000);
-          onClose(id);
-        }
-      })
-    );
-
-    const handleFetch = useAPIQuery<Workflow>({
-      url: `/api/v4/workflow/${id}/`,
-      disabled: !id || !currentUser.roles.includes('workflow_manage') || !originalWorkflow,
-      onSuccess: ({ api_response }) => {
-        const wf = {
-          ...api_response,
-          status: api_response.status || '',
-          priority: api_response.priority || '',
-          enabled: api_response.enabled === undefined ? true : api_response.enabled
-        } as Workflow;
-        setWorkflow(wf);
-        setOriginalWorkflow(wf);
-      },
-      onFailure: api_data => {
-        showErrorMessage(api_data.api_error_message);
-        onClose();
-      }
-    });
-
-    useEffect(() => {
-      setOriginalWorkflow(defaultWorkflow);
-      setWorkflow(defaultWorkflow);
-    }, [defaultWorkflow]);
-
-    useEffect(() => {
-      const state = location?.state as Workflow;
-      if (!state) return;
-      setWorkflow(wf => ({
+  const handleAdd = useAPIMutation<[Workflow, boolean], { success: boolean; workflow_id: string }>(
+    (wf: Workflow, run: boolean) => ({
+      url: `/api/v4/workflow/?run_workflow=${run}`,
+      method: 'PUT',
+      body: {
         ...wf,
-        ...(state?.classification && { classification: state.classification }),
-        ...(state?.name && { name: state.name }),
-        ...(state?.query && { query: state.query }),
-        ...(Array.isArray(state?.labels) && { labels: state.labels }),
-        ...(PRIORITIES.includes(state?.priority) && { priority: state.priority }),
-        ...(STATUSES.includes(state?.status) && { status: state.status }),
-        ...(state?.enabled && { enabled: state.enabled })
-      }));
-    }, [location?.state]);
+        priority: !wf.priority ? null : wf.priority,
+        status: !wf.status ? null : wf.status
+      },
+      disabled: !currentUser.roles.includes('workflow_manage'),
+      onSuccess: ({ api_response }) => {
+        showSuccessMessage(t('add.success'));
+        setTimeout(() => window.dispatchEvent(new CustomEvent('reloadWorkflows')), 1000);
+        setTimeout(() => window.dispatchEvent(new CustomEvent('alertRefresh', null)), 1500);
+        navigate
+          .here<'/manage/workflow/detail/:id'>({ ignoreBlocker: true })
+          .create({ route: '/manage/workflow/detail/:id', path: { id: api_response.workflow_id } });
+      }
+    })
+  );
 
-    const handleResults = useAPIQuery<SearchResult<Alert>>({
-      url: `/api/v4/search/alert/?query=${encodeURIComponent(workflow?.query)}&rows=10&track_total_hits=true`,
-      disabled: !workflow?.query || !currentUser.roles.includes('alert_view'),
-      delay: 400,
-      onFailure: () => null
+  const handleUpdate = useAPIMutation<[Workflow, boolean], { success: boolean; workflow_id: string }>(
+    (wf: Workflow, run: boolean) => ({
+      url: `/api/v4/workflow/${paramID}/?run_workflow=${run}`,
+      method: 'POST',
+      body: {
+        ...wf,
+        priority: !wf.priority ? null : wf.priority,
+        status: !wf.status ? null : wf.status
+      },
+      disabled: !currentUser.roles.includes('workflow_manage'),
+      onSuccess: () => {
+        showSuccessMessage(t('update.success'));
+        setTimeout(() => window.dispatchEvent(new CustomEvent('reloadWorkflows')), 1000);
+        navigate
+          .here<'/manage/workflow/detail/:id'>({ ignoreBlocker: true })
+          .create({ route: '/manage/workflow/detail/:id', path: { id: paramID } });
+      }
+    })
+  );
+
+  const handleFetch = useAPIQuery<Workflow>({
+    url: `/api/v4/workflow/${paramID}/`,
+    disabled: !paramID || !currentUser.roles.includes('workflow_manage') || !originalWorkflow,
+    onFailure: api_data => {
+      showErrorMessage(api_data.api_error_message);
+      navigate.here().closePanel({ route: '/manage/workflows' });
+    }
+  });
+
+  useEffect(() => {
+    setOriginalWorkflow(defaultWorkflow);
+    setWorkflow(defaultWorkflow);
+  }, [defaultWorkflow]);
+
+  useEffect(() => {
+    if (!handleFetch.data) return;
+
+    const wf = {
+      ...handleFetch.data,
+      status: handleFetch.data.status || '',
+      priority: handleFetch.data.priority || '',
+      enabled: handleFetch.data.enabled === undefined ? true : handleFetch.data.enabled
+    } as Workflow;
+    setWorkflow(wf);
+    setOriginalWorkflow(wf);
+  }, [handleFetch.data]);
+
+  useEffect(() => {
+    setWorkflow(prev => {
+      if (!prev) return prev;
+
+      return {
+        ...prev,
+        ...(search.get('classification') && { classification: search.get('classification') }),
+        ...(search.get('name') && { name: search.get('name') }),
+        ...(search.get('query') && { query: search.get('query') }),
+        ...(Array.isArray(search.get('labels')) && { labels: search.get('labels') }),
+        ...(PRIORITIES.includes(search.get('priority') as Priority) && {
+          priority: search.get('priority') as Priority
+        }),
+        ...(STATUSES.includes(search.get('status') as Status) && { status: search.get('status') as Status }),
+        ...(typeof search.get('enabled') === 'boolean' && { enabled: search.get('enabled') })
+      };
     });
+  }, [search?.toString()]);
 
-    const disabled = useMemo<boolean>(
-      () =>
-        !modified ||
-        handleAdd.isPending ||
-        handleFetch.isFetching ||
-        handleUpdate.isPending ||
-        workflow?.name === '' ||
-        workflow?.query === '' ||
-        handleResults.isDebouncing ||
-        handleResults.isFetching ||
-        !!handleResults.error,
-      [
-        modified,
-        handleAdd.isPending,
-        handleFetch.isFetching,
-        handleUpdate.isPending,
-        workflow?.name,
-        workflow?.query,
-        handleResults.isDebouncing,
-        handleResults.isFetching,
-        handleResults.error
-      ]
-    );
+  const handleResults = useAPIQuery<SearchResult<Alert>>({
+    url: `/api/v4/search/alert/?query=${encodeURIComponent(workflow?.query)}&rows=10&track_total_hits=true`,
+    disabled: !workflow?.query || !currentUser.roles.includes('alert_view'),
+    delay: 400,
+    onFailure: () => null
+  });
 
-    if (!currentUser.roles.includes('workflow_manage')) return <ForbiddenPage />;
-    else
-      return (
-        <PageCenter margin={2} width="100%">
-          {/* <RouterPrompt when={modified && !loading} /> */}
+  const disabled = useMemo<boolean>(
+    () =>
+      !modified ||
+      handleAdd.isPending ||
+      handleFetch.isFetching ||
+      handleUpdate.isPending ||
+      workflow?.name === '' ||
+      workflow?.query === '' ||
+      handleResults.isDebouncing ||
+      handleResults.isFetching ||
+      !!handleResults.error,
+    [
+      modified,
+      handleAdd.isPending,
+      handleFetch.isFetching,
+      handleUpdate.isPending,
+      workflow?.name,
+      workflow?.query,
+      handleResults.isDebouncing,
+      handleResults.isFetching,
+      handleResults.error
+    ]
+  );
 
-          {c12nDef.enforce && (
-            <div style={{ paddingBottom: theme.spacing(2) }}>
-              <Classification
-                type="picker"
-                format="long"
-                c12n={!workflow ? null : workflow.classification}
-                setClassification={v => setWorkflow(wf => ({ ...wf, classification: v }))}
-              />
-            </div>
-          )}
+  return (
+    <PageCenter margin={2} width="100%">
+      {/* <RouterPrompt when={modified && !loading} /> */}
 
-          <PageHeader
-            primary={t(id ? 'edit.title' : 'add.title')}
-            secondary={id}
-            secondaryLoading={!workflow}
-            slotProps={{
-              root: { style: { marginBottom: theme.spacing(2) } }
-            }}
-            actions={
-              <>
-                {id ? (
-                  <>
-                    <IconButton tooltip={t('cancel.button')} color="error" onClick={() => onClose(id)}>
-                      <DoDisturbAltOutlinedIcon />
-                    </IconButton>
-
-                    <IconButton
-                      tooltip={t('update.button')}
-                      color="success"
-                      disabled={disabled}
-                      onClick={() => handleUpdate.mutate(workflow, runWorkflow)}
-                    >
-                      <CheckIcon />
-                    </IconButton>
-                  </>
-                ) : (
-                  <IconButton
-                    tooltip={t('add.button')}
-                    color="success"
-                    disabled={disabled}
-                    onClick={() => handleAdd.mutate(workflow, runWorkflow)}
-                  >
-                    <CheckIcon />
-                  </IconButton>
-                )}
-              </>
-            }
+      {c12nDef.enforce && (
+        <div style={{ paddingBottom: theme.spacing(2) }}>
+          <Classification
+            type="picker"
+            format="long"
+            c12n={!workflow ? null : workflow.classification}
+            setClassification={v => setWorkflow(wf => ({ ...wf, classification: v }))}
           />
+        </div>
+      )}
 
-          <Grid container spacing={2} textAlign="start">
-            <Grid size={{ xs: 12 }}>
-              <TextInput
-                label={t('name')}
-                loading={!workflow || handleFetch.isFetching}
-                value={!workflow ? null : workflow.name}
-                coercers={c => c.required()}
-                validators={v => v.required()}
-                onChange={(event, value) => setWorkflow(wf => ({ ...wf, name: value }))}
-              />
-            </Grid>
+      <PageHeader
+        primary={t(paramID ? 'edit.title' : 'add.title')}
+        secondary={paramID}
+        secondaryLoading={!workflow}
+        slotProps={{
+          root: { style: { marginBottom: theme.spacing(2) } }
+        }}
+        actions={
+          <>
+            {paramID ? (
+              <>
+                <IconButton
+                  tooltip={t('cancel.button')}
+                  color="error"
+                  onClick={() =>
+                    navigate
+                      .here<'/manage/workflow/detail/:id'>()
+                      .create({ route: '/manage/workflow/detail/:id', path: { id: paramID } })
+                  }
+                >
+                  <DoDisturbAltOutlinedIcon />
+                </IconButton>
 
-            <Grid size={{ xs: 12 }}>
-              <TextAreaInput
-                label={t('query')}
-                loading={!workflow || handleFetch.isFetching}
-                value={!workflow ? null : workflow.query}
-                progress={handleResults.isDebouncing || handleResults.isFetching ? t('query.validating') : null}
-                coercers={c => c.required()}
-                validators={v => v.required()}
-                validate={() => (handleResults.error ? { status: 'error', message: handleResults.error } : null)}
-                minRows={1}
-                maxRows={5}
-                onChange={(event, value) => setWorkflow(wf => ({ ...wf, query: value }))}
-              />
-            </Grid>
+                <IconButton
+                  tooltip={t('update.button')}
+                  color="success"
+                  disabled={disabled}
+                  onClick={() => handleUpdate.mutate(workflow, runWorkflow)}
+                >
+                  <CheckIcon />
+                </IconButton>
+              </>
+            ) : (
+              <IconButton
+                tooltip={t('add.button')}
+                color="success"
+                disabled={disabled}
+                onClick={() => handleAdd.mutate(workflow, runWorkflow)}
+              >
+                <CheckIcon />
+              </IconButton>
+            )}
+          </>
+        }
+      />
 
-            <Grid size={{ xs: 12 }}>
-              <ChipsInput
-                label={t('labels')}
-                loading={!workflow || handleFetch.isFetching}
-                value={!workflow ? null : workflow.labels}
-                options={LABELS}
-                onChange={(event, value) => setWorkflow(wf => ({ ...wf, labels: value.map(v => v.toUpperCase()) }))}
-                isOptionEqualToValue={(option: string, value: string) => option.toUpperCase() === value.toUpperCase()}
-              />
-            </Grid>
+      <Grid container spacing={2} textAlign="start">
+        <Grid size={{ xs: 12 }}>
+          <TextInput
+            label={t('name')}
+            loading={!workflow || handleFetch.isFetching}
+            value={!workflow ? null : workflow.name}
+            coercers={c => c.required()}
+            validators={v => v.required()}
+            onChange={(event, value) => setWorkflow(wf => ({ ...wf, name: value }))}
+          />
+        </Grid>
 
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <SelectInput
-                label={t('priority')}
-                loading={!workflow || handleFetch.isFetching}
-                value={!workflow ? null : workflow.priority}
-                options={PRIORITIES.map(v => ({ primary: t(`priority.${v || 'null'}`), value: v }))}
-                onChange={(event, value: Priority) => setWorkflow(wf => ({ ...wf, priority: value }))}
-              />
-            </Grid>
+        <Grid size={{ xs: 12 }}>
+          <TextAreaInput
+            label={t('query')}
+            loading={!workflow || handleFetch.isFetching}
+            value={!workflow ? null : workflow.query}
+            progress={handleResults.isDebouncing || handleResults.isFetching ? t('query.validating') : null}
+            coercers={c => c.required()}
+            validators={v => v.required()}
+            validate={() => (handleResults.error ? { status: 'error', message: handleResults.error } : null)}
+            minRows={1}
+            maxRows={5}
+            onChange={(event, value) => setWorkflow(wf => ({ ...wf, query: value }))}
+          />
+        </Grid>
 
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <SelectInput
-                label={t('status')}
-                loading={!workflow || handleFetch.isFetching}
-                value={!workflow ? null : workflow.status}
-                options={STATUSES.map(v => ({ primary: t(`status.${v || 'null'}`), value: v }))}
-                onChange={(event, value: Status) => setWorkflow(wf => ({ ...wf, status: value }))}
-              />
-            </Grid>
+        <Grid size={{ xs: 12 }}>
+          <ChipsInput
+            label={t('labels')}
+            loading={!workflow || handleFetch.isFetching}
+            value={!workflow ? null : workflow.labels}
+            options={LABELS}
+            onChange={(event, value) => setWorkflow(wf => ({ ...wf, labels: value.map(v => v.toUpperCase()) }))}
+            isOptionEqualToValue={(option: string, value: string) => option.toUpperCase() === value.toUpperCase()}
+          />
+        </Grid>
 
-            <Grid size={{ xs: 12 }}>
-              <CheckboxInput
-                label={`${t('backport_workflow_prompt')} ${handleResults.data?.total || 0} ${t('backport_workflow_matching')}`}
-                loading={!workflow || handleFetch.isFetching}
-                preventRender={!!id}
-                value={runWorkflow}
-                onChange={(event, value) => setRunWorkflow(() => value)}
-              />
-            </Grid>
-          </Grid>
-        </PageCenter>
-      );
-  }
-);
+        <Grid size={{ xs: 12, sm: 6 }}>
+          <SelectInput
+            label={t('priority')}
+            loading={!workflow || handleFetch.isFetching}
+            value={!workflow ? null : workflow.priority}
+            options={PRIORITIES.map(v => ({ primary: t(`priority.${v || 'null'}`), value: v }))}
+            onChange={(event, value: Priority) => setWorkflow(wf => ({ ...wf, priority: value }))}
+          />
+        </Grid>
+
+        <Grid size={{ xs: 12, sm: 6 }}>
+          <SelectInput
+            label={t('status')}
+            loading={!workflow || handleFetch.isFetching}
+            value={!workflow ? null : workflow.status}
+            options={STATUSES.map(v => ({ primary: t(`status.${v || 'null'}`), value: v }))}
+            onChange={(event, value: Status) => setWorkflow(wf => ({ ...wf, status: value }))}
+          />
+        </Grid>
+
+        <Grid size={{ xs: 12 }}>
+          <CheckboxInput
+            label={`${t('backport_workflow_prompt')} ${handleResults.data?.total || 0} ${t('backport_workflow_matching')}`}
+            loading={!workflow || handleFetch.isFetching}
+            preventRender={!!paramID}
+            value={runWorkflow}
+            onChange={(event, value) => setRunWorkflow(() => value)}
+          />
+        </Grid>
+      </Grid>
+    </PageCenter>
+  );
+});
 
 export const ManageWorkflowCreateRoute = createAppRoute({
   component: ManageWorkflowCreatePage,

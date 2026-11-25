@@ -1,13 +1,13 @@
 import ArchiveIcon from '@mui/icons-material/Archive';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
-import { AlertTitle, Box, IconButton, Skeleton, TableContainer, Tooltip, Typography, useTheme } from '@mui/material';
+import { AlertTitle, Box, Skeleton, TableContainer, Tooltip, Typography, useTheme } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
-import { AppLink } from 'core/router';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import type { File, SimilarResult, SimilarResults, SimilarType } from 'models/api/file';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { safeFieldValueURI } from 'shared/utils/utils';
+import { IconButton } from 'ui/buttons/IconButton';
 import {
   GridLinkRow,
   GridTable,
@@ -75,7 +75,6 @@ const SimilarItem: React.FC<SimilarItemProps> = ({ data, drawer }) => {
         <div style={{ gridRow: 'span 2' }}>
           <Tooltip title={t('search.tooltip')} placement="left">
             <IconButton
-              component={AppLink}
               size="small"
               nav={nav =>
                 nav.to().create({

@@ -672,7 +672,7 @@ export const RetrohuntDetailPage = memo(() => {
                   (retrohunt.total_warnings > 0 || retrohunt.total_errors > 0) &&
                   currentUser.is_admin
                 ),
-                inner: <RetrohuntErrors retrohunt={retrohunt} />
+                inner: <RetrohuntErrors retrohunt={retrohunt} isDrawer={false} />
               }
             }}
           />

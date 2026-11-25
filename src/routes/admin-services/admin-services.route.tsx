@@ -20,7 +20,7 @@ import {
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import { invalidateAPIQuery } from 'core/api/utils/invalidateApiQuery';
 import useALContext from 'core/config/useALContext';
-import { AppNavigate, createAppRoute } from 'core/router';
+import { createAppRoute } from 'core/router';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import { useAppUser } from 'core/template/components/app/hooks';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
@@ -280,7 +280,7 @@ export const AdminServicesPage = memo(() => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [installingServices, showErrorMessage, showInfoMessage, showSuccessMessage, t]);
 
-  return currentUser.is_admin ? (
+  return (
     <PageFullWidth margin={4}>
       <ConfirmationDialog
         open={restoreConfirmation}
@@ -492,8 +492,6 @@ export const AdminServicesPage = memo(() => {
         />
       </div>
     </PageFullWidth>
-  ) : (
-    <AppNavigate nav={nav => nav.here<'/forbidden'>({ replace: true }).update({ route: '/forbidden' })} />
   );
 });
 

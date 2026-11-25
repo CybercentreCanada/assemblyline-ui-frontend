@@ -13,14 +13,13 @@ import type { CustomUser, IndexDefinition } from 'models/api/user';
 import type { Signature } from 'models/base/signature';
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ForbiddenPage } from 'routes/forbidden/forbidden.page';
 import SignaturesTable from 'routes/search/components/signatures';
 import { FileDownloader } from 'ui/buttons/FileDownloader';
 import { PageHeader } from 'ui/layouts/PageHeader';
 import { DEFAULT_SUGGESTION } from 'ui/SearchBar/search-textfield';
 import SearchHeader from 'ui/SearchBar/SearchHeader';
 
-export const ManageSignaturesContent = memo(() => {
+export const ManageSignaturesPage = memo(() => {
   const { t } = useTranslation(['manageSignatures']);
   const theme = useTheme();
   const navigate = useAppNavigate<'/manage/signatures'>();
@@ -49,13 +48,12 @@ export const ManageSignaturesContent = memo(() => {
 
   const handleToggleFilter = useCallback(
     (filter: string) => {
-      navigate.here().update(s => ({
+      navigate.here<'/manage/signatures'>().update(s => ({
         ...s,
         search: {
           ...s.search,
-          offset: 0,
           filters: s.search.filters.includes(filter)
-            ? s.search.filters.filter(value => value !== filter)
+            ? s.search.filters.filter(f => f !== filter)
             : [...s.search.filters, filter]
         }
       }));
@@ -90,16 +88,17 @@ export const ManageSignaturesContent = memo(() => {
 
   useEffect(() => {
     function reload() {
-      navigate.here().update(s => ({ ...s, search: { ...s.search, offset: 0, refresh: !s.search.refresh } }));
+      navigate
+        .here<'/manage/signatures'>()
+        .update(s => ({ ...s, search: { ...s.search, offset: 0, refresh: !s.search.refresh } }));
     }
-
     window.addEventListener('reloadSignatures', reload);
     return () => {
       window.removeEventListener('reloadSignatures', reload);
     };
   }, [navigate]);
 
-  return currentUser.roles.includes('signature_view') ? (
+  return (
     <PageFullWidth margin={4}>
       <PageHeader
         primary={t('title')}
@@ -126,11 +125,10 @@ export const ManageSignaturesContent = memo(() => {
                 ? t(`filtered${signatureResults?.total === 1 ? '' : 's'}`)
                 : t(`total${signatureResults?.total === 1 ? '' : 's'}`)
             }
-            onChange={values =>
-              navigate.here().update(s => ({
-                ...s,
-                search: { ...s.search, ...ManageSignaturesRoute.search.full(values).toObject() }
-              }))
+            onChange={v =>
+              navigate
+                .here()
+                .update(s => ({ ...s, search: { ...s.search, ...ManageSignaturesRoute.search.full(v).toObject() } }))
             }
             paramDefaults={search.defaults().toObject()}
             searchInputProps={{ placeholder: t('filter'), options: suggestions }}
@@ -166,13 +164,8 @@ export const ManageSignaturesContent = memo(() => {
         <SignaturesTable signatureResults={signatureResults} />
       </div>
     </PageFullWidth>
-  ) : (
-    <ForbiddenPage />
   );
 });
-
-export const ManageSignaturesPage = memo(() => <ManageSignaturesContent />);
-ManageSignaturesPage.displayName = 'ManageSignaturesPage';
 
 export const ManageSignaturesRoute = createAppRoute({
   component: ManageSignaturesPage,

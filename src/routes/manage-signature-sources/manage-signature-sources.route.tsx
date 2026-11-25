@@ -16,7 +16,6 @@ import {
   Collapse,
   Divider,
   Grid,
-  IconButton,
   Skeleton,
   styled,
   Tooltip,
@@ -26,7 +25,7 @@ import {
 } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
-import { AppLink, createAppRoute } from 'core/router';
+import { createAppRoute } from 'core/router';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import { useAppUser } from 'core/template/components/app/hooks';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
@@ -39,6 +38,7 @@ import { useTranslation } from 'react-i18next';
 import { DiGitBranch } from 'react-icons/di';
 import { ForbiddenPage } from 'routes/forbidden/forbidden.page';
 import { SourceDetail } from 'routes/manage-signature-source-detail/manage-signature-source-detail.route';
+import { IconButton } from 'ui/buttons/IconButton';
 import Classification from 'ui/Classification';
 import ConfirmationDialog from 'ui/ConfirmationDialog';
 import { PageHeader } from 'ui/layouts/PageHeader';
@@ -188,7 +188,6 @@ export const SourceDetailDrawer = memo(
                       style={{
                         color: theme.palette.mode === 'dark' ? '#F' : '#0'
                       }}
-                      component={AppLink}
                       nav={nav =>
                         nav.to().create({
                           route: '/manage/signatures',
@@ -377,7 +376,6 @@ export const SourceCard = memo(
                   {generatesSignatures && (
                     <Tooltip title={t('view_signatures')}>
                       <IconButton
-                        component={AppLink}
                         nav={nav =>
                           nav.to().create({
                             route: '/manage/signatures',
@@ -575,7 +573,6 @@ export const ServiceDetail = memo(
               {generatesSignatures && (
                 <Tooltip title={t('view_signatures')}>
                   <IconButton
-                    component={AppLink}
                     nav={nav =>
                       nav.to().create({
                         route: '/manage/signatures',

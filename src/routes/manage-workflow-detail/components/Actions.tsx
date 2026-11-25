@@ -6,7 +6,7 @@ import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOut
 import ToggleOffOutlinedIcon from '@mui/icons-material/ToggleOffOutlined';
 import ToggleOnIcon from '@mui/icons-material/ToggleOn';
 import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
-import { Grid, IconButton, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
+import { Grid, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
 import { useAppNavigate } from 'core/router';
@@ -14,6 +14,7 @@ import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import type { Workflow } from 'models/base/workflow';
 import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { IconButton } from 'ui/buttons/IconButton';
 import ConfirmationDialog from 'ui/ConfirmationDialog';
 
 type RunWorkflowActionProps = {

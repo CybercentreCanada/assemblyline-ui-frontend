@@ -63,7 +63,6 @@ export type PageNavigationItemProp = InferAppNavigationPropsFromPath<AppRoute['p
     primaryProps?: ListItemTextProps['primaryTypographyProps'];
     readOnly?: boolean;
     subheader?: boolean;
-    to?: string | { pathname?: string; search?: string; hash?: string };
     variant?: DrawerProps['anchor'];
     onPageNavigation?: (e: React.MouseEvent<HTMLElement>, props: PageNavigationItemProp) => void;
   };
@@ -81,19 +80,14 @@ export const PageNavigationItem = React.memo((props: PageNavigationItemProp) => 
     primaryProps,
     readOnly = false,
     subheader = false,
-    nav = null,
-    navDeps = null,
-    to = null,
-    to,
+    nav,
+    navDeps,
     variant = 'left',
     onPageNavigation,
     ...listItemProps
   } = props;
 
   const computedId = id || primary.toString();
-  const target = typeof to === 'string' ? to : to ? `${to.pathname ?? ''}${to.search ?? ''}${to.hash ?? ''}` : null;
-  const resolvedNav = useMemo(() => nav ?? (target ? navigate => navigate.to().create(target) : null), [nav, target]);
-  const resolvedNavDeps = useMemo(() => navDeps ?? (target ? [target] : null), [navDeps, target]);
 
   const activeStyles = useMemo(
     () => ({
@@ -165,7 +159,7 @@ export const PageNavigationItem = React.memo((props: PageNavigationItemProp) => 
         id={computedId}
         className={active ? 'Active' : ''}
         onClick={handleClick}
-        {...(!resolvedNav ? { component: 'div' } : { component: AppLink, nav: resolvedNav, navDeps: resolvedNavDeps })}
+        {...(!nav ? { component: 'div' } : { component: AppLink, nav, navDeps })}
         sx={{
           pl: subheader ? 1.5 : 3,
           ...(active ? {} : { ml: '1px' }),

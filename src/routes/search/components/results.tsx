@@ -6,6 +6,7 @@ import useALContext from 'core/config/useALContext';
 import type { SearchResult } from 'models/api/search';
 import type { ResultIndexed } from 'models/base/result';
 import type { ElementType } from 'react';
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import Classification from 'ui/Classification';
 import {
@@ -115,5 +116,5 @@ const WrappedResultsTable: React.FC<Props> = ({ resultResults, component = Paper
   );
 };
 
-const ResultsTable = React.memo(WrappedResultsTable);
+const ResultsTable = memo(WrappedResultsTable);
 export default ResultsTable;

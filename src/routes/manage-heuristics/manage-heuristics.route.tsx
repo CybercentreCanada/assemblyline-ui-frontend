@@ -12,12 +12,11 @@ import type { CustomUser, IndexDefinition } from 'models/api/user';
 import type { Heuristic } from 'models/base/heuristic';
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ForbiddenPage } from 'routes/forbidden/forbidden.page';
 import HeuristicsTable from 'routes/search/components/heuristics';
 import SearchHeader from 'ui/SearchBar/SearchHeader';
 import { DEFAULT_SUGGESTION } from 'ui/SearchBar/search-textfield';
 
-export const ManageHeuristicsContent = memo(() => {
+export const ManageHeuristicsPage = memo(() => {
   const { t } = useTranslation(['manageHeuristics']);
   const theme = useTheme();
   const navigate = useAppNavigate<'/manage/heuristics'>();
@@ -56,7 +55,7 @@ export const ManageHeuristicsContent = memo(() => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [handleReload, search.toString()]);
 
-  return currentUser.roles.includes('heuristic_view') ? (
+  return (
     <PageFullWidth margin={4}>
       <div style={{ paddingBottom: theme.spacing(2) }}>
         <Typography variant="h4">{t('title')}</Typography>
@@ -73,11 +72,10 @@ export const ManageHeuristicsContent = memo(() => {
                 ? t(`filtered${heuristicResults?.total === 1 ? '' : 's'}`)
                 : t(`total${heuristicResults?.total === 1 ? '' : 's'}`)
             }
-            onChange={values =>
-              navigate.here().update(s => ({
-                ...s,
-                search: { ...s.search, ...ManageHeuristicsRoute.search.full(values).toObject() }
-              }))
+            onChange={v =>
+              navigate
+                .here()
+                .update(s => ({ ...s, search: { ...s.search, ...ManageHeuristicsRoute.search.full(v).toObject() } }))
             }
             paramDefaults={search.defaults().toObject()}
             searchInputProps={{ placeholder: t('filter'), options: suggestions }}
@@ -89,13 +87,8 @@ export const ManageHeuristicsContent = memo(() => {
         <HeuristicsTable heuristicResults={heuristicResults} />
       </div>
     </PageFullWidth>
-  ) : (
-    <ForbiddenPage />
   );
 });
-
-export const ManageHeuristicsPage = memo(() => <ManageHeuristicsContent />);
-ManageHeuristicsPage.displayName = 'ManageHeuristicsPage';
 
 export const ManageHeuristicsRoute = createAppRoute({
   component: ManageHeuristicsPage,

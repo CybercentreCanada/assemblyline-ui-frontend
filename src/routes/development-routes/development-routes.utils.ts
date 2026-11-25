@@ -1,5 +1,6 @@
 import type { InferHashParamBlueprintFromValue } from 'features/hash-params';
 import type { InferPathParamBlueprintFromValue } from 'features/path-params';
+import type { SearchParamBlueprintDescriptor } from 'features/search-params';
 import i18next from 'i18next';
 import type { Configuration } from 'models/base/config';
 import type { ReactNode } from 'react';
@@ -190,7 +191,7 @@ export const formatPathParams = (route: AppRoute): DevelopmentRoutesParamSpec[] 
  * @returns One spec per search param, in declaration order.
  */
 export const formatSearchParams = (route: AppRoute): DevelopmentRoutesSearchParamSpec[] => {
-  const descriptors = route?.search?.describeParams?.() ?? {};
+  const descriptors = (route?.search?.describeParams?.() ?? {}) as Record<string, SearchParamBlueprintDescriptor>;
 
   return Object.values(descriptors).map(descriptor => ({
     key: descriptor.key,

@@ -5,9 +5,9 @@ import PageviewOutlinedIcon from '@mui/icons-material/PageviewOutlined';
 import PanToolOutlinedIcon from '@mui/icons-material/PanToolOutlined';
 import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
 import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
-import { Card, Grid, IconButton, styled, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
+import { Card, Grid, styled, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
-import { AppLink, AppNavigate, createAppRoute, useAppPathParams } from 'core/router';
+import { createAppRoute, useAppPathParams } from 'core/router';
 import { useAppUser } from 'core/template/components/app/hooks';
 import PageCenter from 'core/template/components/pages/PageCenter';
 import useClipboard from 'layout/clipboard/clipboard.hooks';
@@ -17,8 +17,8 @@ import type { ReactElement } from 'react';
 import { memo, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BsClipboard } from 'react-icons/bs';
-import { DEFAULT_TAB } from 'routes/file-viewer/file-viewer.route';
 import { FileDownloader } from 'ui/buttons/FileDownloader';
+import { IconButton } from 'ui/buttons/IconButton';
 import Moment from 'ui/Moment';
 
 const StyledBsClipboard = styled(BsClipboard)(({ theme }) => ({
@@ -33,17 +33,13 @@ interface Error extends ErrorModel {
   key: string;
 }
 
-export type AdminErrorDetailPageProps = {
-  error_key?: string;
-};
-
-export const AdminErrorDetailPage = memo(({ error_key = null }: AdminErrorDetailPageProps) => {
+export const AdminErrorDetailPage = memo(() => {
   const { t } = useTranslation(['adminErrorViewer']);
   const theme = useTheme();
   const { copy } = useClipboard();
   const [error, setError] = useState<Error>(null);
   const { apiCall } = useMyAPI();
-  const key = error_key || useAppPathParams<'/admin/errors/:id'>()?.id;
+  const { id: key } = useAppPathParams<'/admin/apikeys/:id'>();
   const { user: currentUser } = useAppUser<CustomUser>();
   const downSM = useMediaQuery(theme.breakpoints.down('md'));
 
@@ -70,7 +66,7 @@ export const AdminErrorDetailPage = memo(({ error_key = null }: AdminErrorDetail
   useEffect(() => {
     if (key && currentUser.is_admin) {
       apiCall<Error>({
-        url: `/api/v4/error/${encodeURIComponent(key)}/`,
+        url: `/api/v4/error/${key}/`,
         onSuccess: api_data => {
           setError({ key, ...api_data.api_response });
         }
@@ -79,7 +75,7 @@ export const AdminErrorDetailPage = memo(({ error_key = null }: AdminErrorDetail
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key]);
 
-  return currentUser.is_admin ? (
+  return (
     <PageCenter margin={!key ? 2 : 4} width="100%">
       {error && (
         <div
@@ -131,7 +127,6 @@ export const AdminErrorDetailPage = memo(({ error_key = null }: AdminErrorDetail
               <div style={{ display: 'flex', marginBottom: theme.spacing(1), justifyContent: 'flex-end' }}>
                 <Tooltip title={t('related')}>
                   <IconButton
-                    component={AppLink}
                     nav={nav =>
                       nav.to().create({
                         route: '/search/:index',
@@ -149,9 +144,12 @@ export const AdminErrorDetailPage = memo(({ error_key = null }: AdminErrorDetail
                 </Tooltip>
                 <Tooltip title={t('detail')}>
                   <IconButton
-                    component={AppLink}
-                    nav={nav => nav.to().create({ route: '/file/detail/:id', path: { id: error.sha256 } })}
-                    navDeps={[error.sha256]}
+                    nav={nav =>
+                      nav.to().create({
+                        route: '/file/detail/:id',
+                        path: { id: error.sha256 }
+                      })
+                    }
                     size="large"
                   >
                     <DescriptionOutlinedIcon />
@@ -163,11 +161,15 @@ export const AdminErrorDetailPage = memo(({ error_key = null }: AdminErrorDetail
                 />
                 <Tooltip title={t('file_viewer')}>
                   <IconButton
-                    component={AppLink}
                     nav={nav =>
-                      nav.to().create({ route: '/file/viewer/:id/:tab', path: { id: error.sha256, tab: DEFAULT_TAB } })
+                      nav.to().create(prev => ({
+                        route: '/file/viewer/:id/:tab',
+                        path: {
+                          id: error?.sha256,
+                          tab: prev.route === '/file/viewer/:id/:tab' ? prev.path.tab : null
+                        }
+                      }))
                     }
-                    navDeps={[error.sha256]}
                     size="large"
                   >
                     <PageviewOutlinedIcon />
@@ -213,8 +215,6 @@ export const AdminErrorDetailPage = memo(({ error_key = null }: AdminErrorDetail
         </div>
       )}
     </PageCenter>
-  ) : (
-    <AppNavigate nav={nav => nav.here<'/forbidden'>({ replace: true }).update({ route: '/forbidden' })} />
   );
 });
 

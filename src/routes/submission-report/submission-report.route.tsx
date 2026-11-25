@@ -6,7 +6,7 @@ import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import ListAltOutlinedIcon from '@mui/icons-material/ListAltOutlined';
 import PrintOutlinedIcon from '@mui/icons-material/PrintOutlined';
 import type { TooltipProps } from '@mui/material';
-import { Box, Grid, IconButton, Skeleton, styled, Tooltip, Typography, useTheme } from '@mui/material';
+import { Box, Grid, Skeleton, styled, Tooltip, Typography, useTheme } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
 import { createAppRoute, useAppNavigate, useAppPathParams } from 'core/router';
@@ -28,10 +28,7 @@ import Metadata from 'routes/submission-report/components/metadata';
 import Tags from 'routes/submission-report/components/tags';
 import { filterObject } from 'shared/utils/utils';
 import Classification from 'ui/Classification';
-
-type ParamProps = {
-  id: string;
-};
+import { IconButton } from 'ui/buttons/IconButton';
 
 const NoPrintTooltip = memo(
   styled(Tooltip)<TooltipProps>(() => ({

@@ -299,14 +299,12 @@ const WrappedArchivedTagSection: React.FC<Props> = ({
                           <SortableGridHeaderCell
                             allowSort
                             children={t('type')}
-                            query={query}
                             sortField="tag_type"
                             onSort={handleSort}
                           />
                           <SortableGridHeaderCell
                             allowSort
                             children={t('verdict')}
-                            query={query}
                             sortField="h_type"
                             inverted
                             onSort={handleSort}
@@ -314,7 +312,6 @@ const WrappedArchivedTagSection: React.FC<Props> = ({
                           <SortableGridHeaderCell
                             allowSort
                             children={t('value')}
-                            query={query}
                             sortField="value"
                             onSort={handleSort}
                           />
@@ -322,7 +319,6 @@ const WrappedArchivedTagSection: React.FC<Props> = ({
                             <SortableGridHeaderCell
                               allowSort
                               children={t('classification')}
-                              query={query}
                               sortField="classification"
                               onSort={handleSort}
                             />
@@ -517,11 +513,19 @@ const WrappedRow: React.FC<RowProps> = ({
       )}
       <GridLinkRow
         hover
-        to={
-          tag_type === 'heuristic.signature'
-            ? `/search/result?query=result.sections.${tag_type}.name:${safeFieldValue(value)}`
-            : `/search/result?query=result.sections.tags.${tag_type}:${safeFieldValue(value)}`
+        nav={nav =>
+          nav.to().create({
+            route: '/search/:index',
+            path: { index: 'result' },
+            search: {
+              query:
+                tag_type === 'heuristic.signature'
+                  ? `result.sections.${tag_type}.name:${safeFieldValue(value)}`
+                  : `result.sections.tags.${tag_type}:${safeFieldValue(value)}`
+            }
+          })
         }
+        navDeps={[tag_type, value]}
         onClick={handleRowClick}
         onContextMenu={handleMenuClick}
       >

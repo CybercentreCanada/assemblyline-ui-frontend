@@ -14,15 +14,11 @@ export type IconButtonProps<Origin extends AppRoute['path'] = AppRoute['path']> 
     loading?: boolean;
     preventRender?: boolean | (() => boolean);
     progress?: CircularProgressProps['progress'];
-    to?:
-      | string
-      | { pathname?: string; search?: string; hash?: string }
-      | (() => string | { pathname?: string; search?: string; hash?: string });
     tooltip?: TooltipProps['title'];
     tooltipProps?: Omit<TooltipProps, 'children' | 'title'>;
   };
 
-export const IconButton = memo(function <Origin extends AppRoute['path'] = AppRoute['path']>({
+export const IconButton = memo(function <Origin extends AppRoute['path']>({
   children = null,
   color = null,
   disabled = false,
@@ -33,26 +29,11 @@ export const IconButton = memo(function <Origin extends AppRoute['path'] = AppRo
   size = 'medium',
   nav = null,
   navDeps = null,
-  to = null,
   tooltip = null,
   tooltipProps = null,
   ...props
 }: IconButtonProps<Origin>) {
   const theme = useTheme();
-  const href = useMemo(() => {
-    const target = typeof to === 'function' ? to() : to;
-    return typeof target === 'string'
-      ? target
-      : target
-        ? `${target.pathname ?? ''}${target.search ?? ''}${target.hash ?? ''}`
-        : null;
-  }, [to]);
-  const externalHref = useMemo(() => (href && /^(?:[a-z][a-z\d+.-]*:|\/\/)/i.test(href) ? href : null), [href]);
-  const resolvedNav = useMemo<InferAppNavigationPropsFromPath<Origin>['nav']>(
-    () => nav ?? (href && !externalHref ? navigation => navigation.to().create(href) : null),
-    [externalHref, href, nav]
-  );
-  const resolvedNavDeps = useMemo(() => navDeps ?? (href ? [href] : null), [href, navDeps]);
 
   const preventRender = useMemo<boolean>(
     () => (loading ? false : typeof preventRenderProp === 'function' ? preventRenderProp() : preventRenderProp),
@@ -95,11 +76,7 @@ export const IconButton = memo(function <Origin extends AppRoute['path'] = AppRo
         disabled={disabled || progress !== false}
         size={size}
         {...props}
-        {...(resolvedNav
-          ? { component: AppLink, nav: resolvedNav, navDeps: resolvedNavDeps }
-          : externalHref
-            ? { href: externalHref }
-            : null)}
+        {...(!nav ? null : { component: AppLink, nav, navDeps })}
         sx={{ height: 'fit-content', color: resolvedColor, ...props?.sx }}
       >
         {children}

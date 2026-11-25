@@ -12,9 +12,8 @@ import type { Heuristic } from 'models/base/heuristic';
 import { DEFAULT_STATS, type Statistic } from 'models/base/statistic';
 import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ForbiddenPage } from 'routes/forbidden/forbidden.page';
 import ResultsTable from 'routes/search/components/results';
-import { safeFieldValueURI } from 'shared/utils/utils';
+import { safeFieldValue } from 'shared/utils/utils';
 import { IconButton } from 'ui/buttons/IconButton';
 import Classification from 'ui/Classification';
 import Histogram from 'ui/Histogram';
@@ -32,17 +31,9 @@ const Preview = memo(
   }))
 );
 
-type ParamProps = {
-  id: string;
-};
-
-export type ManageHeuristicDetailPageProps = {
-  heur_id?: string;
-};
-
-export const ManageHeuristicDetailPage = memo(({ heur_id = null }: ManageHeuristicDetailPageProps) => {
+export const ManageHeuristicDetailPage = memo(() => {
   const { t, i18n } = useTranslation(['manageHeuristicDetail']);
-  const { id } = useAppPathParams<'/manage/heuristic/detail/:id'>();
+  const heuristicID = useAppPathParams<'/manage/heuristic/detail/:id'>()?.id;
   const theme = useTheme();
   const [heuristic, setHeuristic] = useState<Heuristic>(null);
   const [stats, setStats] = useState<Statistic>(DEFAULT_STATS);
@@ -55,14 +46,14 @@ export const ManageHeuristicDetailPage = memo(({ heur_id = null }: ManageHeurist
   useEffect(() => {
     if (currentUser.roles.includes('heuristic_view')) {
       apiCall({
-        url: `/api/v4/heuristics/${heur_id || id}/`,
+        url: `/api/v4/heuristics/${heuristicID}/`,
         onSuccess: api_data => {
           setHeuristic(api_data.api_response);
         }
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [heur_id, id]);
+  }, [heuristicID]);
 
   useEffect(() => {
     if (heuristic) {
@@ -71,7 +62,7 @@ export const ManageHeuristicDetailPage = memo(({ heur_id = null }: ManageHeurist
           apiCall({
             method: 'POST',
             url: '/api/v4/search/stats/result/result.score/',
-            body: { query: `result.sections.heuristic.heur_id:${heur_id || id}` },
+            body: { query: `result.sections.heuristic.heur_id:${heuristicID}` },
             onSuccess: api_data => {
               setStats(api_data.api_response);
             }
@@ -83,7 +74,7 @@ export const ManageHeuristicDetailPage = memo(({ heur_id = null }: ManageHeurist
           method: 'POST',
           url: '/api/v4/search/histogram/result/created/',
           body: {
-            query: `result.sections.heuristic.heur_id:${heur_id || id}`,
+            query: `result.sections.heuristic.heur_id:${heuristicID}`,
             mincount: 0,
             start: 'now-30d/d',
             end: 'now+1d/d-1s',
@@ -95,7 +86,7 @@ export const ManageHeuristicDetailPage = memo(({ heur_id = null }: ManageHeurist
         });
         apiCall({
           method: 'GET',
-          url: `/api/v4/search/result/?query=result.sections.heuristic.heur_id:${heur_id || id}&rows=10`,
+          url: `/api/v4/search/result/?query=result.sections.heuristic.heur_id:${heuristicID}&rows=10`,
           onSuccess: api_data => {
             setResults(api_data.api_response);
           }
@@ -107,8 +98,8 @@ export const ManageHeuristicDetailPage = memo(({ heur_id = null }: ManageHeurist
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [heuristic]);
 
-  return currentUser.roles.includes('heuristic_view') ? (
-    <PageCenter margin={!id ? 2 : 4} width="100%">
+  return (
+    <PageCenter margin={!heuristicID ? 2 : 4} width="100%">
       {c12nDef.enforce && (
         <div style={{ paddingBottom: theme.spacing(4) }}>
           <Classification size="tiny" c12n={heuristic ? heuristic.classification : null} />
@@ -128,8 +119,12 @@ export const ManageHeuristicDetailPage = memo(({ heur_id = null }: ManageHeurist
               preventRender={!currentUser.roles.includes('submission_view')}
               size="large"
               sx={{ color: theme.palette.action.active }}
-              to={() =>
-                `/search/result/?query=result.sections.heuristic.heur_id:${safeFieldValueURI(heuristic.heur_id)}`
+              nav={nav =>
+                nav.to().create({
+                  route: '/search/:index',
+                  path: { index: 'result' },
+                  search: { query: `result.sections.heuristic.heur_id:${safeFieldValue(heuristic.heur_id)}` }
+                })
               }
               tooltip={t('usage')}
             >
@@ -266,7 +261,7 @@ export const ManageHeuristicDetailPage = memo(({ heur_id = null }: ManageHeurist
                   height="300px"
                   isDate
                   title={t('chart.title')}
-                  datatype={heur_id || id}
+                  datatype={heuristicID}
                   verticalLine
                 />
               </Grid>
@@ -281,8 +276,6 @@ export const ManageHeuristicDetailPage = memo(({ heur_id = null }: ManageHeurist
         </Grid>
       </div>
     </PageCenter>
-  ) : (
-    <ForbiddenPage />
   );
 });
 

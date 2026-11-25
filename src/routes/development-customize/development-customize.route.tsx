@@ -1,7 +1,6 @@
 import DataObjectOutlinedIcon from '@mui/icons-material/DataObjectOutlined';
 import { Box, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, styled, useTheme } from '@mui/material';
-import useALContext from 'core/config/useALContext';
-import { AppNavigate, createAppRoute } from 'core/router';
+import { createAppRoute } from 'core/router';
 import { memo, Profiler, useEffect } from 'react';
 import type { CustomizeMethod } from 'routes/development-customize/development-customize.form';
 import { CUSTOMIZE_METHODS, FormProvider, useForm } from 'routes/development-customize/development-customize.form';
@@ -219,18 +218,11 @@ export const DevelopmentCustomizeContent = memo(() => {
   );
 });
 
-export const DevelopmentCustomizePage = memo(() => {
-  const { user: currentUser, configuration } = useALContext();
-
-  if (!currentUser.is_admin || !['development', 'staging'].includes(configuration.system.type))
-    return <AppNavigate nav={nav => nav.here<'/forbidden'>({ replace: true }).update({ route: '/forbidden' })} />;
-  else
-    return (
-      <FormProvider>
-        <DevelopmentCustomizeContent />
-      </FormProvider>
-    );
-});
+export const DevelopmentCustomizePage = memo(() => (
+  <FormProvider>
+    <DevelopmentCustomizeContent />
+  </FormProvider>
+));
 
 export const DevelopmentCustomizeRoute = createAppRoute({
   component: DevelopmentCustomizePage,

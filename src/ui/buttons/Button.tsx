@@ -4,24 +4,19 @@ import type { InferAppNavigationPropsFromPath } from 'core/router';
 import { AppLink } from 'core/router';
 import { memo, useMemo } from 'react';
 import { getTextContent } from 'shared/utils/utils';
-import { CircularProgress } from 'ui/buttons/CircularProgress';
 import { Tooltip } from 'ui/Tooltip';
+import { CircularProgress } from 'ui/buttons/CircularProgress';
 
 export type ButtonProps<Origin extends AppRoute['path'] = AppRoute['path']> = MuiButtonProps &
   InferAppNavigationPropsFromPath<Origin> & {
-    link?: boolean;
     loading?: boolean;
     preventRender?: boolean | (() => boolean);
     progress?: boolean;
-    to?:
-      | string
-      | { pathname?: string; search?: string; hash?: string }
-      | (() => string | { pathname?: string; search?: string; hash?: string });
     tooltip?: TooltipProps['title'];
     tooltipProps?: Omit<TooltipProps, 'children' | 'title'>;
   };
 
-export const Button = memo(function <Origin extends AppRoute['path'] = AppRoute['path']>({
+export const Button = memo(function <Origin extends AppRoute['path']>({
   children = null,
   disabled = false,
   id = null,
@@ -31,25 +26,10 @@ export const Button = memo(function <Origin extends AppRoute['path'] = AppRoute[
   size = 'medium',
   nav = null,
   navDeps = null,
-  to = null,
   tooltip = null,
   tooltipProps = null,
   ...props
 }: ButtonProps<Origin>) {
-  const href = useMemo(() => {
-    const target = typeof to === 'function' ? to() : to;
-    return typeof target === 'string'
-      ? target
-      : target
-        ? `${target.pathname ?? ''}${target.search ?? ''}${target.hash ?? ''}`
-        : null;
-  }, [to]);
-  const externalHref = useMemo(() => (href && /^(?:[a-z][a-z\d+.-]*:|\/\/)/i.test(href) ? href : null), [href]);
-  const resolvedNav = useMemo<InferAppNavigationPropsFromPath<Origin>['nav']>(
-    () => nav ?? (href && !externalHref ? navigation => navigation.to().create(href) : null),
-    [externalHref, href, nav]
-  );
-  const resolvedNavDeps = useMemo(() => navDeps ?? (href ? [href] : null), [href, navDeps]);
   const preventRender = useMemo<boolean>(
     () => (loading ? false : typeof preventRenderProp === 'function' ? preventRenderProp() : preventRenderProp),
     [loading, preventRenderProp]
@@ -70,17 +50,13 @@ export const Button = memo(function <Origin extends AppRoute['path'] = AppRoute[
       />
     </MuiButton>
   ) : preventRender ? null : (
-    <Tooltip title={tooltip} placement="bottom" {...tooltipProps}>
+    <Tooltip title={tooltip} placement="bottom" noDiv {...tooltipProps}>
       <MuiButton
         id={id ?? getTextContent(children)}
         disabled={progress || disabled}
         size={size}
+        {...(!nav ? null : { component: AppLink, nav, navDeps })}
         {...props}
-        {...(resolvedNav
-          ? { component: AppLink, nav: resolvedNav, navDeps: resolvedNavDeps }
-          : externalHref
-            ? { href: externalHref }
-            : null)}
       >
         {children}
         <CircularProgress progress={progress} />

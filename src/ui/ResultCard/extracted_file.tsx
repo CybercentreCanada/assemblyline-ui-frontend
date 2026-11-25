@@ -22,7 +22,6 @@ import type { File } from 'models/base/result';
 import type { Submission } from 'models/base/submission';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DEFAULT_TAB } from 'routes/file-viewer/file-viewer.route';
 import { IconButton } from 'ui/buttons/IconButton';
 
 export type ExtractedFileProps = {
@@ -86,15 +85,9 @@ export const ExtractedFile: React.FC<ExtractedFileProps> = React.memo(({ file, d
           ) : (
             <AppLink
               nav={nav =>
-                nav
-                  .to()
-                  .create(
-                    sid
-                      ? `/submission/detail/${sid}/${file.sha256}?name=${encodeURIComponent(file.name)}`
-                      : `/file/detail/${file.sha256}?name=${encodeURIComponent(file.name)}`
-                  )
+                nav.to().create({ route: '/file/detail/:id', path: { id: file.sha256 }, search: { name: file.name } })
               }
-              navDeps={[sid, file.sha256, file.name]}
+              navDeps={[file.sha256, file.name]}
             >
               {file.name}
             </AppLink>
@@ -178,15 +171,12 @@ export const ExtractedFile: React.FC<ExtractedFileProps> = React.memo(({ file, d
         <Tooltip title={`${t('view_file')}: ${file.name}`} placement="left">
           <IconButton
             nav={nav =>
-              nav.to().create(prev => ({
+              nav.to<'/file/viewer/:id/:tab'>().create(prev => ({
                 route: '/file/viewer/:id/:tab',
-                path: {
-                  id: file.sha256,
-                  tab: prev.route === '/file/viewer/:id/:tab' ? prev.path.tab : DEFAULT_TAB
-                }
+                path: { id: file?.sha256, tab: prev.route === '/file/viewer/:id/:tab' ? prev.path.tab : null }
               }))
             }
-            navDeps={[file.sha256]}
+            navDeps={[file?.sha256]}
             size="small"
             color="primary"
             sx={{ padding: 0 }}

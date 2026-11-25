@@ -6,10 +6,9 @@ import { useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
-import { createAppRoute } from 'core/router';
+import { createAppRoute, useAppNavigate, useAppSearchSnapshot } from 'core/router';
 import PageContainer from 'core/template/branding/AppPageContainer';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
-import { createSearchParams, SearchParamsProvider, useSearchParams } from 'features/search-params';
 import type { IndexDefinition } from 'models/api/user';
 import type { SubmissionIndexed } from 'models/base/submission';
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
@@ -27,23 +26,14 @@ type SearchResults = {
   total: number;
 };
 
-export const SUBMISSION_PARAMS = createSearchParams(p => ({
-  query: p.string(''),
-  offset: p.number(0).min(0).source('transient').ephemeral(),
-  rows: p.number(25).locked().source('transient').ephemeral(),
-  sort: p.string('times.submitted desc').ephemeral(),
-  filters: p.filters([]),
-  track_total_hits: p.number(null).source('transient').nullable().ephemeral()
-}));
-
-export type SubmissionParams = typeof SUBMISSION_PARAMS;
-
-export const SubmissionsContent = memo(() => {
+export const SubmissionsPage = memo(() => {
   const { t } = useTranslation(['submissions']);
   const theme = useTheme();
   const { apiCall } = useMyAPI();
   const { user: currentUser, indexes } = useALContext();
-  const { search, setSearchObject, setSearchParams } = useSearchParams<SubmissionParams>();
+
+  const search = useAppSearchSnapshot<'/submissions'>();
+  const navigate = useAppNavigate<'/submissions'>();
 
   const [submissionResults, setSubmissionResults] = useState<SearchResults>(null);
   const [searching, setSearching] = useState<boolean>(false);
@@ -54,13 +44,19 @@ export const SubmissionsContent = memo(() => {
   );
 
   const handleToggleFilter = useCallback(
-    (filter: string) => {
-      setSearchObject(o => {
-        const filters = o.filters.includes(filter) ? o.filters.filter(f => f !== filter) : [...o.filters, filter];
-        return { ...o, offset: 0, filters };
-      });
-    },
-    [setSearchObject]
+    (filter: string) =>
+      navigate.here().update(s => ({
+        ...s,
+        search: {
+          ...s?.search,
+          offset: 0,
+          filters: s.search.filters.includes(filter)
+            ? s.search.filters.filter(f => f !== filter)
+            : [...s.search.filters, filter]
+        }
+      })),
+
+    [navigate]
   );
 
   useEffect(() => {
@@ -78,7 +74,7 @@ export const SubmissionsContent = memo(() => {
     });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentUser.roles, search.toString()]);
+  }, [currentUser.roles, search?.toString()]);
 
   return currentUser.roles.includes('submission_view') ? (
     <PageFullWidth margin={4}>
@@ -97,7 +93,11 @@ export const SubmissionsContent = memo(() => {
                 ? t(`filtered${submissionResults?.total === 1 ? '' : 's'}`)
                 : t(`total${submissionResults?.total === 1 ? '' : 's'}`)
             }
-            onChange={v => setSearchParams(v)}
+            onChange={v =>
+              navigate
+                .here()
+                .update(s => ({ ...s, search: { ...s.search, ...SubmissionsRoute.search.full(v).toObject() } }))
+            }
             paramDefaults={search.defaults().toObject()}
             searchInputProps={{ placeholder: t('filter'), options: suggestions }}
             actionProps={[
@@ -164,12 +164,6 @@ export const SubmissionsContent = memo(() => {
     <ForbiddenPage />
   );
 });
-
-export const SubmissionsPage = memo(() => (
-  <SearchParamsProvider params={SUBMISSION_PARAMS}>
-    <SubmissionsContent />
-  </SearchParamsProvider>
-));
 
 export const SubmissionsRoute = createAppRoute({
   component: SubmissionsPage,

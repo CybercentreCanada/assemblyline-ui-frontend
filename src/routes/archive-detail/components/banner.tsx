@@ -12,7 +12,6 @@ import type { SvgIconProps, Theme } from '@mui/material';
 import {
   Box,
   Collapse,
-  IconButton,
   List,
   ListItemButton,
   ListItemIcon,
@@ -35,6 +34,7 @@ import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from '
 import { useTranslation } from 'react-i18next';
 import { bytesToSize } from 'shared/utils/utils';
 import { FileDownloader } from 'ui/buttons/FileDownloader';
+import { IconButton } from 'ui/buttons/IconButton';
 import Classification from 'ui/Classification';
 import CustomChip from 'ui/CustomChip';
 import InputDialog from 'ui/InputDialog';
@@ -151,8 +151,8 @@ type Props = {
 const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid = null, force = false }) => {
   const { t } = useTranslation(['fileDetail', 'archive']);
   const theme = useTheme();
-  const navigate = useAppNavigate();
   const search = useAppSearchSnapshot<'/archive/:id' | '/archive/:id/:tab'>();
+  const navigate = useAppNavigate();
   const { apiCall } = useMyAPI();
   const { showSuccessMessage } = useMySnackbar();
   const { user: currentUser, scoreToVerdict } = useALContext();
@@ -212,7 +212,7 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
       onSuccess: api_data => {
         showSuccessMessage(t('resubmit.success'));
         setTimeout(() => {
-          navigate.to().create({ route: '/submission/detail/:id', path: { id: api_data.api_response.sid } });
+          navigate.here().update({ route: '/submission/detail/:id', path: { id: api_data.api_response.sid } });
         }, 500);
       }
     });
@@ -483,7 +483,6 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
               <>
                 <Tooltip title={t('related')}>
                   <IconButton
-                    component={AppLink}
                     nav={nav =>
                       nav.to().create({
                         route: '/search/:index',
@@ -537,11 +536,16 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
                       <List disablePadding>
                         <ListItemButton
                           component={AppLink}
-                          nav={nav => nav.to().create({ route: '/submit', search: { hash: file.file_info.sha256 } })}
-                          navDeps={[file.file_info.sha256]}
-                          state={{
-                            c12n: file.file_info.classification
-                          }}
+                          nav={nav =>
+                            nav.to().create({
+                              route: '/submit',
+                              search: {
+                                hash: file.file_info.sha256,
+                                classification: file.file_info.classification
+                              }
+                            })
+                          }
+                          navDeps={[file?.file_info?.sha256, file?.file_info?.classification]}
                           dense
                           onClick={() => setResubmitAnchor(null)}
                         >

@@ -13,8 +13,7 @@ import CarouselItem from 'layout/carousel/components/AppCarouselItem';
 import type { Image as ImageData } from 'models/base/result_body';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation } from 'react-router';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router';
 
 export type BackgroundMode = 'transparent' | 'light' | 'dark';
 

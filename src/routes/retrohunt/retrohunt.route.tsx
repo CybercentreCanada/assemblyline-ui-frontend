@@ -5,7 +5,7 @@ import TimerOutlinedIcon from '@mui/icons-material/TimerOutlined';
 import { useTheme } from '@mui/material';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
-import { AppNavigate, createAppRoute, useAppNavigate, useAppSearchSnapshot } from 'core/router';
+import { createAppRoute, useAppNavigate, useAppSearchSnapshot } from 'core/router';
 import PageContainer from 'core/template/branding/AppPageContainer';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
 import type { SearchResult } from 'models/api/search';
@@ -26,9 +26,10 @@ const SOCKETIO_NAMESPACE = '/retrohunt';
 export const RetrohuntPage = memo(() => {
   const { t } = useTranslation(['retrohunt']);
   const theme = useTheme();
-  const navigate = useAppNavigate<'/retrohunt'>();
   const search = useAppSearchSnapshot<'/retrohunt'>();
+  const navigate = useAppNavigate<'/retrohunt'>();
   const { apiCall } = useMyAPI();
+
   const { user: currentUser, indexes, configuration } = useALContext();
 
   const [retrohuntResults, setRetrohuntResults] = useState<SearchResult<RetrohuntIndexed>>(null);
@@ -53,33 +54,34 @@ export const RetrohuntPage = memo(() => {
 
   const handleToggleFilter = useCallback(
     (filter: string) =>
-      navigate.here().update(s => ({
+      navigate.here<'/retrohunt'>().update(s => ({
         ...s,
         search: {
-          ...s.search,
+          ...s?.search,
           offset: 0,
           filters: s.search.filters.includes(filter)
-            ? s.search.filters.filter(value => value !== filter)
+            ? s.search.filters.filter(f => f !== filter)
             : [...s.search.filters, filter]
         }
       })),
+
     [navigate]
   );
 
   const handleReload = useCallback(
-    (body: typeof search) => {
-      if (currentUser.roles.includes('retrohunt_view') && configuration?.retrohunt?.enabled) {
+    (curSearch: typeof search) => {
+      if (curSearch && currentUser.roles.includes('retrohunt_view') && configuration?.retrohunt?.enabled) {
+        const body = curSearch.toObject();
+
         apiCall({
           method: 'POST',
           url: `/api/v4/retrohunt/`,
-          body: body.omit(['refresh']).toObject(),
+          body: { ...body, query: body?.query || '*' },
           onSuccess: api_data => {
             const { items, total, rows, offset } = api_data.api_response;
             if (items.length === 0 && offset !== 0 && offset >= total) {
-              navigate.here().update(s => ({
-                ...s,
-                search: { ...s.search, offset: Math.floor(total / rows) * rows }
-              }));
+              curSearch.set(s => ({ ...s, offset: Math.floor(total / rows) * rows }));
+              handleReload(curSearch);
             } else {
               setRetrohuntResults(api_data.api_response);
             }
@@ -90,26 +92,22 @@ export const RetrohuntPage = memo(() => {
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [configuration?.retrohunt?.enabled, currentUser.roles, navigate]
+    [configuration?.retrohunt?.enabled, currentUser.roles]
   );
 
   useEffect(() => {
-    handleReload(search);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (search) handleReload(search);
   }, [handleReload, search?.toString()]);
 
   useEffect(() => {
     function reload() {
-      navigate.here().update(s => ({
-        ...s,
-        search: { ...s.search, offset: 0, refresh: !s.search.refresh }
-      }));
+      handleReload(search);
     }
     window.addEventListener('reloadRetrohunts', reload);
     return () => {
       window.removeEventListener('reloadRetrohunts', reload);
     };
-  }, [navigate]);
+  }, [handleReload, search?.toString()]);
 
   useEffect(() => {
     const socket = io(SOCKETIO_NAMESPACE);
@@ -177,94 +175,85 @@ export const RetrohuntPage = memo(() => {
       });
   }, [retrohuntResults]);
 
-  if (!configuration?.retrohunt?.enabled) {
-    return <AppNavigate nav={nav => nav.here<'/not-found'>({ replace: true }).update({ route: '/not-found' })} />;
-  } else if (!currentUser.roles.includes('retrohunt_view')) {
-    return <AppNavigate nav={nav => nav.here<'/forbidden'>({ replace: true }).update({ route: '/forbidden' })} />;
-  } else
-    return (
-      <PageFullWidth margin={4}>
-        <PageHeader
-          primary={t('title')}
-          slotProps={{
-            root: { style: { marginBottom: theme.spacing(2) } }
-          }}
-          actions={
-            <IconButton
-              color="success"
-              preventRender={!currentUser.roles.includes('retrohunt_run')}
-              size="large"
-              tooltip={t('tooltip.add')}
-              nav={nav => nav.to().create({ route: '/retrohunt/create' })}
-            >
-              <AddCircleOutlineOutlinedIcon />
-            </IconButton>
-          }
-        />
+  return (
+    <PageFullWidth margin={4}>
+      <PageHeader
+        primary={t('title')}
+        slotProps={{
+          root: { style: { marginBottom: theme.spacing(2) } }
+        }}
+        actions={
+          <IconButton
+            color="success"
+            preventRender={!currentUser.roles.includes('retrohunt_run')}
+            size="large"
+            tooltip={t('tooltip.add')}
+            nav={nav => nav.to().create({ route: '/retrohunt/create' })}
+          >
+            <AddCircleOutlineOutlinedIcon />
+          </IconButton>
+        }
+      />
 
-        <PageContainer isSticky>
-          <div style={{ paddingTop: theme.spacing(1) }}>
-            <SearchHeader
-              params={search.toParams()}
-              loading={searching}
-              results={retrohuntResults}
-              resultLabel={
-                search.get('query') || search.get('filters')?.length
-                  ? t(`filtered${retrohuntResults?.total === 1 ? '' : 's'}`)
-                  : t(`total${retrohuntResults?.total === 1 ? '' : 's'}`)
-              }
-              onChange={values =>
-                navigate.here().update(s => ({
-                  ...s,
-                  search: { ...s.search, ...RetrohuntRoute.search.full(values).toObject() }
-                }))
-              }
-              paramDefaults={search.defaults().toObject()}
-              searchInputProps={{ placeholder: t('filter'), options: suggestions }}
-              actionProps={[
-                {
-                  tooltip: {
-                    title: search.has('filters', `creator:${currentUser.username}`)
-                      ? t('filter.creator_self.remove')
-                      : t('filter.creator_self.add')
-                  },
-                  icon: { children: <PersonIcon /> },
-                  button: {
-                    color: search.has('filters', `creator:${currentUser.username}`) ? 'primary' : 'default',
-                    onClick: () => handleToggleFilter(`creator:${currentUser.username}`)
-                  }
+      <PageContainer isSticky>
+        <div style={{ paddingTop: theme.spacing(1) }}>
+          <SearchHeader
+            params={search.toParams()}
+            loading={searching}
+            results={retrohuntResults}
+            resultLabel={
+              search.get('query') || search.get('filters')?.length
+                ? t(`filtered${retrohuntResults?.total === 1 ? '' : 's'}`)
+                : t(`total${retrohuntResults?.total === 1 ? '' : 's'}`)
+            }
+            onChange={v =>
+              navigate
+                .here()
+                .update(s => ({ ...s, search: { ...s.search, ...RetrohuntRoute.search.full(v).toObject() } }))
+            }
+            paramDefaults={search.defaults().toObject()}
+            searchInputProps={{ placeholder: t('filter'), options: suggestions }}
+            actionProps={[
+              {
+                tooltip: {
+                  title: search.has('filters', `creator:${currentUser.username}`)
+                    ? t('filter.creator_self.remove')
+                    : t('filter.creator_self.add')
                 },
-                {
-                  tooltip: {
-                    title: search.has('filters', `completed_time:>=${last24hDate}`)
-                      ? t('filter.completed_last_24.remove')
-                      : t('filter.completed_last_24.add')
-                  },
-                  icon: { children: <TimerOutlinedIcon /> },
-                  button: {
-                    color: search.has('filters', `completed_time:>=${last24hDate}`) ? 'primary' : 'default',
-                    onClick: () => handleToggleFilter(`completed_time:>=${last24hDate}`)
-                  }
+                icon: { children: <PersonIcon /> },
+                button: {
+                  color: search.has('filters', `creator:${currentUser.username}`) ? 'primary' : 'default',
+                  onClick: () => handleToggleFilter(`creator:${currentUser.username}`)
                 }
-              ]}
-            />
-          </div>
-        </PageContainer>
-
-        <div
-          style={{
-            paddingTop: theme.spacing(2),
-            paddingLeft: theme.spacing(0.5),
-            paddingRight: theme.spacing(0.5)
-          }}
-        >
-          <RetrohuntTable
-            retrohuntResults={retrohuntResults}
-            onSort={({ field }) => navigate.here().update(s => ({ ...s, search: { ...s.search, sort: field } }))}
+              },
+              {
+                tooltip: {
+                  title: search.has('filters', `completed_time:>=${last24hDate}`)
+                    ? t('filter.completed_last_24.remove')
+                    : t('filter.completed_last_24.add')
+                },
+                icon: { children: <TimerOutlinedIcon /> },
+                button: {
+                  color: search.has('filters', `completed_time:>=${last24hDate}`) ? 'primary' : 'default',
+                  onClick: () => handleToggleFilter(`completed_time:>=${last24hDate}`)
+                }
+              }
+            ]}
           />
         </div>
-      </PageFullWidth>
-    );
+      </PageContainer>
+
+      <div
+        style={{
+          paddingTop: theme.spacing(2),
+          paddingLeft: theme.spacing(0.5),
+          paddingRight: theme.spacing(0.5)
+        }}
+      >
+        <RetrohuntTable retrohuntResults={retrohuntResults} />
+      </div>
+    </PageFullWidth>
+  );
 });
 
 RetrohuntPage.displayName = 'RetrohuntPage';
@@ -282,8 +271,7 @@ export const RetrohuntRoute = createAppRoute({
       'indices,classification,search_classification,creator,description,expiry_ts,start_group,end_group,created_time,started_time,completed_time,key,raw_query,yara_signature,finished,truncated'
     ),
     filters: s.filters([]),
-    track_total_hits: s.number(null).source('transient').nullable().ephemeral(),
-    refresh: s.boolean(false).source('transient').ephemeral()
+    track_total_hits: s.number(null).source('transient').nullable().ephemeral()
   }),
 
   ancestor: null,

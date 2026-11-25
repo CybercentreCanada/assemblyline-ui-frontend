@@ -1,8 +1,7 @@
 import OpenInNewOutlinedIcon from '@mui/icons-material/OpenInNewOutlined';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import SelectAllOutlinedIcon from '@mui/icons-material/SelectAllOutlined';
-import { Box, Collapse, IconButton, Skeleton, Tooltip, useTheme } from '@mui/material';
-import { AppLink } from 'core/router';
+import { Box, Collapse, Skeleton, Tooltip, useTheme } from '@mui/material';
 import useHighlighter from 'layout/highlighter/highlighter.hooks';
 import useSafeResults from 'layout/safe-results/safe-results.hooks';
 import type { File } from 'models/api/file';
@@ -12,6 +11,7 @@ import type { Section } from 'models/base/result';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { safeFieldValueURI } from 'shared/utils/utils';
+import { IconButton } from 'ui/buttons/IconButton';
 import ResultSection from 'ui/ResultCard/result_section';
 import SectionContainer from 'ui/SectionContainer';
 
@@ -143,7 +143,6 @@ const WrappedHeuristic: React.FC<HeuristicProps> = ({ name, id, sections, level,
         <div onClick={stopPropagating} style={{ display: 'flex', justifyContent: 'flex-end', flexGrow: 0 }}>
           <Tooltip title={t('related')}>
             <IconButton
-              component={AppLink}
               size="small"
               nav={nav =>
                 nav.to().create({
@@ -165,7 +164,6 @@ const WrappedHeuristic: React.FC<HeuristicProps> = ({ name, id, sections, level,
           </Tooltip>
           <Tooltip title={t('goto_heuristic')}>
             <IconButton
-              component={AppLink}
               size="small"
               nav={nav => nav.to().create({ route: '/manage/heuristic/detail/:id', path: { id } })}
               navDeps={[id]}

@@ -14,7 +14,7 @@ import type { Safelist } from 'models/base/safelist';
 import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ForbiddenPage } from 'routes/forbidden/forbidden.page';
-import { bytesToSize, safeFieldValue, safeFieldValueURI } from 'shared/utils/utils';
+import { bytesToSize, safeFieldValue } from 'shared/utils/utils';
 import { IconButton } from 'ui/buttons/IconButton';
 import Classification from 'ui/Classification';
 import ConfirmationDialog from 'ui/ConfirmationDialog';
@@ -255,13 +255,21 @@ export const ManageSafelistDetailPage = memo(
                   loading={!safelist}
                   preventRender={!(safelist_id || id) || !currentUser.roles.includes('submission_view')}
                   sx={{ color: theme.palette.action.active }}
-                  to={() =>
-                    safelist.type === 'file'
-                      ? `/search/result/?query=result.sections.heuristic.signature.name:"SAFELIST_${safelist_id || id}"`
-                      : safelist.type === 'signature'
-                        ? `/search/result/?query=result.sections.heuristic.signature.name:${safeFieldValueURI(safelist.signature.name)}`
-                        : `/search/result/?query=result.sections.safelisted_tags.${safelist.tag.type}:${safeFieldValueURI(safelist.tag.value)}`
+                  nav={nav =>
+                    nav.to().create({
+                      route: '/search/:index',
+                      path: { index: 'result' },
+                      search: {
+                        query:
+                          safelist.type === 'file'
+                            ? `result.sections.heuristic.signature.name:"SAFELIST_${safelist_id || id}"`
+                            : safelist.type === 'signature'
+                              ? `result.sections.heuristic.signature.name:${safeFieldValue(safelist.signature.name)}`
+                              : `result.sections.safelisted_tags.${safelist.tag.type}:${safeFieldValue(safelist.tag.value)}`
+                      }
+                    })
                   }
+                  navDeps={[safelist, safelist_id, id]}
                   size="large"
                 >
                   <YoutubeSearchedForIcon />

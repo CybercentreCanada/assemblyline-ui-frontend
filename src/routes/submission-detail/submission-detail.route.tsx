@@ -41,6 +41,7 @@ import useALContext from 'core/config/useALContext';
 import { AppLink, createAppRoute, useAppLocation, useAppNavigate, useAppPathParams } from 'core/router';
 import useMySnackbar from 'core/snackbar/snackbar.hooks';
 import PageCenter from 'core/template/components/pages/PageCenter';
+import type { ObjectParamShape } from 'features/search-params';
 import useAssistant from 'layout/assistant/assistant.hooks';
 import useHighlighter from 'layout/highlighter/highlighter.hooks';
 import type { HighlighMapProps } from 'layout/highlighter/highlighter.providers';
@@ -877,7 +878,7 @@ export const SubmissionDetailPage = memo(() => {
             sid: submission?.sid ?? null,
             metadata: submission?.metadata,
             liveResultKeys,
-            liveErrors: curFileLiveErrors,
+            liveErrors: curFileLiveErrors as ObjectParamShape[],
             force: submission && submission.max_score < 0,
             filetypeOverride: submission?.files?.[0]?.sha256 !== fid ? null : submission?.params?.filetype_override
           }
@@ -1215,15 +1216,24 @@ export const SubmissionDetailPage = memo(() => {
                     <List disablePadding>
                       {submission?.files?.[0]?.sha256 && (
                         <ListItemButton
-                          component={Link}
-                          to={`/submit?hash=${submission.files[0].sha256}`}
-                          state={{
-                            c12n: submission.classification,
-                            metadata: submission.metadata,
-                            params: {
-                              filetype_override: submission?.params?.filetype_override
-                            }
-                          }}
+                          component={AppLink}
+                          nav={nav =>
+                            nav.to().create({
+                              route: '/submit',
+                              search: {
+                                hash: submission.files[0].sha256,
+                                classification: submission.classification,
+                                metadata: submission.metadata,
+                                filetypeOverride: submission?.params?.filetype_override
+                              }
+                            })
+                          }
+                          navDeps={[
+                            submission.files[0].sha256,
+                            submission.classification,
+                            submission.metadata,
+                            submission.params?.filetype_override
+                          ]}
                           dense
                           onClick={() => setResubmitAnchor(null)}
                         >
@@ -1280,14 +1290,14 @@ export const SubmissionDetailPage = memo(() => {
             </IconButton>
 
             <IconButton
-              component={Link}
+              nav={nav => nav.to().create({ route: '/submission/report/:id', path: { id: submission.sid } })}
+              navDeps={[submission?.sid]}
               size="large"
               tooltip={t('report_view')}
               {...(!submission
                 ? { loading: true }
                 : {
-                    preventRender: submission.state !== 'completed',
-                    to: `/submission/report/${submission.sid}`
+                    preventRender: submission.state !== 'completed'
                   })}
             >
               <ChromeReaderModeOutlinedIcon />

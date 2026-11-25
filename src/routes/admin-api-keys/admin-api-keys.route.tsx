@@ -4,7 +4,7 @@ import { Grid, useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import useMyAPI from 'core/api/hooks/useMyAPI';
 import useALContext from 'core/config/useALContext';
-import { AppNavigate, createAppRoute, useAppNavigate, useAppSearchSnapshot } from 'core/router';
+import { createAppRoute, useAppNavigate, useAppSearchSnapshot } from 'core/router';
 import PageContainer from 'core/template/branding/AppPageContainer';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
 import type { SearchResult } from 'models/api/search';
@@ -17,7 +17,7 @@ import { safeFieldValue } from 'shared/utils/utils';
 import SearchHeader from 'ui/SearchBar/SearchHeader';
 import { DEFAULT_SUGGESTION } from 'ui/SearchBar/search-textfield';
 
-const AdminAPIKeysContent = memo(() => {
+export const AdminAPIKeysPage = memo(() => {
   const { t } = useTranslation(['adminAPIkeys']);
   const navigate = useAppNavigate<'/admin/apikeys'>();
   const search = useAppSearchSnapshot<'/admin/apikeys'>();
@@ -37,7 +37,7 @@ const AdminAPIKeysContent = memo(() => {
           ...s.search,
           offset: 0,
           filters: s.search.filters.includes(filter)
-            ? s.search.filters.filter(value => value !== filter)
+            ? s.search.filters.filter(f => f !== filter)
             : [...s.search.filters, filter]
         }
       }));
@@ -92,7 +92,7 @@ const AdminAPIKeysContent = memo(() => {
     };
   }, [navigate]);
 
-  return currentUser.is_admin ? (
+  return (
     <PageFullWidth margin={4}>
       <div style={{ paddingBottom: theme.spacing(2) }}>
         <Grid container alignItems="center">
@@ -113,11 +113,10 @@ const AdminAPIKeysContent = memo(() => {
                 ? t(`filtered${apikeySearchResults?.total === 1 ? '' : 's'}`)
                 : t(`total${apikeySearchResults?.total === 1 ? '' : 's'}`)
             }
-            onChange={values =>
-              navigate.here().update(s => ({
-                ...s,
-                search: { ...s.search, ...AdminAPIKeysRoute.search.full(values).toObject() }
-              }))
+            onChange={v =>
+              navigate
+                .here()
+                .update(s => ({ ...s, search: { ...s.search, ...AdminAPIKeysRoute.search.full(v).toObject() } }))
             }
             paramDefaults={search.defaults().toObject()}
             searchInputProps={{ placeholder: t('filter'), options: suggestions }}
@@ -143,13 +142,8 @@ const AdminAPIKeysContent = memo(() => {
         <ApikeysTable apikeySearchResults={apikeySearchResults} />
       </div>
     </PageFullWidth>
-  ) : (
-    <AppNavigate nav={nav => nav.here<'/forbidden'>({ replace: true }).update({ route: '/forbidden' })} />
   );
 });
-
-export const AdminAPIKeysPage = memo(() => <AdminAPIKeysContent />);
-AdminAPIKeysPage.displayName = 'AdminAPIKeysPage';
 
 export const AdminAPIKeysRoute = createAppRoute({
   component: AdminAPIKeysPage,

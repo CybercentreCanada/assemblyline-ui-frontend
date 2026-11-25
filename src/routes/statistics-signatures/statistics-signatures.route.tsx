@@ -5,10 +5,8 @@ import useALContext from 'core/config/useALContext';
 import { createAppRoute } from 'core/router';
 import PageFullWidth from 'core/template/components/pages/PageFullWidth';
 import { useEffectOnce } from 'core/template/components/utils/hooks/useEffectOnce';
-import useDrawer from 'layout/drawer/drawer.hooks';
-import { memo, useCallback, useState } from 'react';
+import { memo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ManageSignatureDetailPage } from 'routes/manage-signature-detail/manage-signature-detail.route';
 import type { Cell } from 'ui/Table/enhanced_table';
 import EnhancedTable from 'ui/Table/enhanced_table';
 
@@ -17,20 +15,7 @@ export const StatisticsSignaturesPage = memo(() => {
   const { apiCall } = useMyAPI();
   const theme = useTheme();
   const { c12nDef } = useALContext();
-  const { closeGlobalDrawer, setGlobalDrawer } = useDrawer();
   const [signatureStats, setSignatureStats] = useState(null);
-
-  const handleSignatureDelete = () => {
-    closeGlobalDrawer();
-    setTimeout(() => window.dispatchEvent(new CustomEvent('reloadSignatures')), 1000);
-  };
-
-  const handleRowClick = useCallback(row => {
-    setGlobalDrawer(
-      <ManageSignatureDetailPage signature_id={row.id} onUpdated={() => {}} onDeleted={handleSignatureDelete} />
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   useEffectOnce(() => {
     apiCall({
@@ -72,10 +57,9 @@ export const StatisticsSignaturesPage = memo(() => {
         <EnhancedTable
           cells={cells}
           rows={signatureStats}
-          linkPrefix="/manage/signature/"
+          linkPrefix="/manage/signature/detail/"
           linkField="id"
           defaultOrderBy="type"
-          onClick={handleRowClick}
         />
       ) : (
         <Skeleton height="10rem" />

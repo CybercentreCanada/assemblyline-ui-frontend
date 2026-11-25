@@ -20,7 +20,6 @@ import PageCenter from 'core/template/components/pages/PageCenter';
 import { type ApiKey } from 'models/base/user';
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ForbiddenPage } from 'routes/forbidden/forbidden.page';
 import { useAPIKeyUtilities } from 'routes/user/components/api_keys';
 import { IconButton } from 'ui/buttons/IconButton';
 import ConfirmationDialog from 'ui/ConfirmationDialog';
@@ -28,18 +27,8 @@ import CustomChip from 'ui/CustomChip';
 import DatePicker from 'ui/DatePicker';
 import { PageHeader } from 'ui/layouts/PageHeader';
 import Moment from 'ui/Moment';
-import { RouterPrompt } from 'ui/RouterPrompt';
 
-type ParamProps = {
-  id: string;
-};
-
-export type AdminAPIKeyDetailPageProps = {
-  key_id?: string;
-  onClose?: () => void;
-};
-
-export const AdminAPIKeyDetailPage = memo(({ key_id = null, onClose = () => null }: AdminAPIKeyDetailPageProps) => {
+export const AdminAPIKeyDetailPage = memo(() => {
   const { t } = useTranslation(['adminAPIkeys']);
   const navigate = useAppNavigate<'/admin/apikeys/:id'>();
   const theme = useTheme();
@@ -59,7 +48,7 @@ export const AdminAPIKeyDetailPage = memo(({ key_id = null, onClose = () => null
 
   const handleReload = useCallback(() => {
     apiCall<ApiKey>({
-      url: `/api/v4/apikey/${key_id || id}/`,
+      url: `/api/v4/apikey/${id}/`,
       onSuccess: ({ api_response }) => {
         setApiKey({ ...api_response, roles: api_response.roles.sort() });
         setPrevApiKey({ ...api_response, roles: api_response.roles.sort() });
@@ -68,17 +57,16 @@ export const AdminAPIKeyDetailPage = memo(({ key_id = null, onClose = () => null
       onExit: () => setLoading(false)
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [key_id, id]);
+  }, [id]);
 
   const handleDelete = useCallback(() => {
     apiCall({
-      url: `/api/v4/apikey/${key_id || id}/`,
+      url: `/api/v4/apikey/${id}/`,
       method: 'DELETE',
       onSuccess: () => {
         setDeleteDialog(false);
         showSuccessMessage(t('delete.success'));
-        if (id || key_id) setTimeout(() => navigate.here().closePanel({ route: '/admin/apikeys' }), 1000);
-        onClose();
+        navigate.here().closePanel({ route: '/admin/apikeys' });
       },
       onEnter: () => {
         setLoading(true);
@@ -90,7 +78,7 @@ export const AdminAPIKeyDetailPage = memo(({ key_id = null, onClose = () => null
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [key_id, id, showSuccessMessage, t, onClose, navigate]);
+  }, [id, showSuccessMessage, t, navigate]);
 
   const handleSave = useCallback(
     (value: ApiKey) => {
@@ -123,20 +111,18 @@ export const AdminAPIKeyDetailPage = memo(({ key_id = null, onClose = () => null
   );
 
   useEffect(() => {
-    if (key_id || id) {
+    if (id) {
       handleReload();
     }
-  }, [key_id, id, handleReload]);
+  }, [id, handleReload]);
 
-  return currentUser.is_admin ? (
+  return (
     <PageCenter margin={!id ? 2 : 4} width="100%">
-      <RouterPrompt when={modified} />
-
       <ConfirmationDialog
         open={deleteDialog}
         handleClose={() => {
           setDeleteDialog(false);
-          onClose();
+          navigate.here().closePanel({ route: '/admin/apikeys' });
         }}
         handleAccept={() => handleDelete()}
         title={t('delete.title')}
@@ -156,7 +142,7 @@ export const AdminAPIKeyDetailPage = memo(({ key_id = null, onClose = () => null
           <IconButton
             disabled={loading}
             loading={!apiKey}
-            preventRender={!(key_id || id)}
+            preventRender={!id}
             size="large"
             tooltip={t('apikey.remove.tooltip')}
             onClick={() => setDeleteDialog(true)}
@@ -354,8 +340,6 @@ export const AdminAPIKeyDetailPage = memo(({ key_id = null, onClose = () => null
         </div>
       ) : null}
     </PageCenter>
-  ) : (
-    <ForbiddenPage />
   );
 });
 
